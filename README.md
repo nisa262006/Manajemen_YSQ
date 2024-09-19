@@ -1,19 +1,6 @@
 # Aplikasi Manajemen Pengajian Yayasan Sahabat Quran Bogor #
 
-Tech Stack:
-
-* Java 21
-* Spring Boot 3.3.3
-* PostgreSQL 16
-
-Dev Stack:
-
-* Maven 3
-* Docker Compose
-* TestContainer
-* Selenium
-* Jacoco Coverage Test
-* Sonarcloud Quality
+[![Proses Bisnis](docs/img/proses-bisnis-ysq.jpg)](docs/img/proses-bisnis-ysq.jpg)
 
 ## Daftar Fitur ##
 
@@ -67,6 +54,25 @@ Dev Stack:
 * Rekap sesi pengajaran
 * Slip Gaji
 * Rekap sesi ujian
+
+## Skema Database ##
+
+[![Skema Database](docs/img/skema-database.jpg)](docs/img/skema-database.jpg)
+
+# Tech Stack #
+
+* Java 21
+* Spring Boot 3.3.3
+* PostgreSQL 16
+
+## Dev Stack ##
+
+* Maven 3
+* Docker Compose
+* TestContainer
+* Selenium
+* Jacoco Coverage Test
+* Sonarcloud Quality
 
 # Links #
 
