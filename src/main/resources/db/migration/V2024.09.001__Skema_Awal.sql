@@ -27,6 +27,7 @@ create table kurikulum (
 
 create table kelas (
     id varchar(36),
+    id_kurikulum varchar(36) not null,
     id_pengajar varchar(36) not null,
     nama varchar(100) not null,
     hari varchar(10) not null,
@@ -34,6 +35,7 @@ create table kelas (
     waktu_selesai time not null,
     primary key (id),
     unique (nama),
+    foreign key (id_kurikulum) references kurikulum(id),
     foreign key (id_pengajar) references pengajar(id)
 );
 
