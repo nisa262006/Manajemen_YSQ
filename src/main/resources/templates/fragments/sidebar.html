@@ -15,7 +15,7 @@
             <div class="user-panel mt-3 pb-3 mb-3 d-flex" >
                 <div class="info">
                     <div class="row">
-                        <a class="col-12">Alexander Pierce</a>
+                        <a class="col-12" th:text="${nama}"></a>
                     </div>
                 </div>
             </div>
@@ -31,6 +31,22 @@
                             <p>
                                 Home
                             </p>
+                        </a>
+                    </li>
+
+                    <!-- Halaman Login -->
+                    <li class="nav-item">
+                        <a th:href="@{/login}" class="nav-link">
+                            <i class="nav-icon fas fa-sign-in-alt"></i>
+                            <p>Login</p>
+                        </a>
+                    </li>
+
+                    <!-- Registrasi -->
+                    <li class="nav-item">
+                        <a th:href="@{/register}" class="nav-link">
+                            <i class="nav-icon fas fa-user-plus"></i>
+                            <p>Registrasi</p>
                         </a>
                     </li>
                 </ul>

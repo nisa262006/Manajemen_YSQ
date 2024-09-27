@@ -32,15 +32,15 @@
     <div class="form-wrapper flex-fill d-flex justify-content-center align-items-center">
         <div class="form-box">
             <div class="text-center">
-<!--                <img th:src="@{/assets/img/logo_ptb_orbit.png}" alt="logo">-->
+                <!--                <img th:src="@{/assets/img/logo_ptb_orbit.png}" alt="logo">-->
                 <hr>
                 <h2 class="fw-bold mb-0" id="appTitle">Sahabat Quran | Register</h2>
                 <p>Silahkan isi form di bawah ini untuk menaftar</p>
                 <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}">
                 </div>
-<!--                <div class="alert alert-danger" role="alert" style="display: none;" id="captchaMsg">-->
-<!--                    Harap isi captcha-->
-<!--                </div>-->
+                <!--                <div class="alert alert-danger" role="alert" style="display: none;" id="captchaMsg">-->
+                <!--                    Harap isi captcha-->
+                <!--                </div>-->
                 <div class="alert alert-success" role="alert" th:if="${successMessage}" th:text="${successMessage}">
                 </div>
             </div>
@@ -78,9 +78,9 @@
                         Password must same
                     </div>
                 </div>
-<!--                <div class="mb-3 text-center">-->
-<!--                    <div class="g-recaptcha" data-callback="recaptchaCallback" th:attr="data-sitekey=${siteKey}"></div>-->
-<!--                </div>-->
+                <!--                <div class="mb-3 text-center">-->
+                <!--                    <div class="g-recaptcha" data-callback="recaptchaCallback" th:attr="data-sitekey=${siteKey}"></div>-->
+                <!--                </div>-->
                 <div class="d-grid">
                     <button id="submitBtn" type="submit" class="btn btn-primary">Daftar</button>
                 </div>

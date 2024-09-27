@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <div th:insert="~{fragments/head :: head}" th:remove="tag">Head</div>
+  <div layout:fragment="customHead" th:remove="tag"></div>
+</head>
+<body class="sidebar-mini layout-fixed">
+<!-- Site wrapper -->
+<div class="wrapper">
+  <!-- Navbar -->
+  <div th:insert="~{fragments/navbar :: navbar}" th:remove="tag">Navbar</div>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  <div th:insert="~{pengajar/sidebar :: sidebar}" th:remove="tag">Sidebar</div>
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <div layout:fragment="content" th:remove="tag"></div>
+  </div>
+  <!-- /.content-wrapper -->
+
+  <div th:insert="~{fragments/footer :: footer}" th:remove="tag">Footer</div>
+
+</div>
+<!-- ./wrapper -->
+
+<div th:insert="~{fragments/script :: script}" th:remove="tag">Footer</div>
+<div layout:fragment="customScript" th:remove="tag"></div>
+</body>
+</html>

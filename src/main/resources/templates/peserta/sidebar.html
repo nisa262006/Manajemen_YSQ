@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="sidebar">
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a th:href="@{/}" class="brand-link text-center">
+            <!--            <img src="../../dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">-->
+            <span id="appTitle" class="brand-text font-weight-light">Sahabat Quran</span>
+        </a>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex" >
+                <div class="info">
+                    <div class="row">
+                        <a class="col-12" th:text="${namaPeserta}"></a>
+                    </div>
+                </div>
+            </div>
+            <!-- Sidebar Menu -->
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Lihat Tagihan -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/lihat-tagihan}" class="nav-link">
+                            <i class="nav-icon fas fa-file-invoice"></i>
+                            <p>Lihat Tagihan</p>
+                        </a>
+                    </li>
+
+                    <!-- Pembayaran Iuran -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/pembayaran}" class="nav-link">
+                            <i class="nav-icon fas fa-credit-card"></i>
+                            <p>Pembayaran Iuran</p>
+                        </a>
+                    </li>
+
+                    <!-- Jadwal Belajar -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/jadwal}" class="nav-link">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p>Jadwal Belajar</p>
+                        </a>
+                    </li>
+
+                    <!-- Input Mutabaah -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/mutabaah}" class="nav-link">
+                            <i class="nav-icon fas fa-book-open"></i>
+                            <p>Input Mutabaah</p>
+                        </a>
+                    </li>
+
+                    <!-- Jadwal Event -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/event}" class="nav-link">
+                            <i class="nav-icon fas fa-calendar-check"></i>
+                            <p>Jadwal Event</p>
+                        </a>
+                    </li>
+
+                    <!-- Input Presensi Kelas -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/presensi-kelas}" class="nav-link">
+                            <i class="nav-icon fas fa-check-square"></i>
+                            <p>Input Presensi Kelas</p>
+                        </a>
+                    </li>
+
+                    <!-- Input Presensi Event -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/presensi-event}" class="nav-link">
+                            <i class="nav-icon fas fa-tasks"></i>
+                            <p>Input Presensi Event</p>
+                        </a>
+                    </li>
+
+                    <!-- Laporan Hasil Belajar -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/laporan}" class="nav-link">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <p>Laporan Hasil Belajar</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+    </aside>
+
+</div>
+</body>
+</html>

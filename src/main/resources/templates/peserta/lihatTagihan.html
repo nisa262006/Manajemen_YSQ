@@ -1,0 +1,76 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{peserta/layout}" th:with="activeTitle='Tagihan',activeTab='TAGIHAN'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Tagihan</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Tagihan Page</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">Tagihan</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+  <!-- Main content -->
+  <section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Daftar Tagihan Anda</h3>
+
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="container-fluid">
+
+          <div th:if="${tagihanList == null || #lists.isEmpty(tagihanList)}">
+            <p class="text-center">Tidak ada tagihan</p>
+          </div>
+
+          <div class="row" th:each="tagihan : ${tagihanList}">
+            <div class="col-12 mb-3">
+              <div class="card" style="width: 100%;">
+                <div class="card-body d-flex justify-content-between">
+                  <div>
+                    <h5 class="card-title" th:text="${tagihan['nama_Peserta']}">Nama Peserta</h5>
+                    <p class="card-text">Jatuh Tempo: <span th:text="${tagihan['tanggal_jatuh_tempo']}"></span></p>
+                    <p class="card-text">Nilai Tagihan: Rp <span th:text="${tagihan['nilai']}"></span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+  </section>
+  <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

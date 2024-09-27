@@ -1,0 +1,88 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{pengajar/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Home Pengajar</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Pengajar Page</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <!--                        <li class="breadcrumb-item"><a href="#">Home</a></li>-->
+                        <li class="breadcrumb-item active">Home</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chalkboard-teacher"></i> Daftar Kelas yang Anda Pegang</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                <tr>
+                                    <th>Nama Kelas</th>
+                                    <th>Hari</th>
+                                    <th>Waktu Selesai</th>
+                                    <th>Waktu Selesai</th>
+                                    <th>Aksi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="kelas : ${kelasList}">
+                                    <td>
+                                        <i class="fas fa-book"></i>
+                                        <span th:text="${kelas['nama']}"></span>
+                                    </td>
+                                    <td th:text="${kelas['hari']}">Senin</td>
+                                    <td th:text="${kelas['waktu_mulai']}"></td>
+                                    <td th:text="${kelas['waktu_selesai']}"></td>
+                                    <td>
+                                        <a class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i> Lihat Detail
+                                        </a>
+                                    </td>
+                                </tr>
+                                <!-- Jika tidak ada kelas -->
+                                <tr th:if="${#lists.isEmpty(kelasList)}">
+                                    <td colspan="5" class="text-center">Belum ada kelas yang dipegang</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>
