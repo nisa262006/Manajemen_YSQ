@@ -1,0 +1,90 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{finance/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Finance</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            .table thead th {
+                background-color: #007bff;
+                color: white;
+            }
+            .table tbody tr:hover {
+                background-color: #f1f1f1;
+            }
+            .btn-danger {
+                margin: 0;
+            }
+        </style>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Daftar Pembayaran</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item active">Finance</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Daftar Tagihan Peserta</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>Nama Peserta</th>
+                        <th>Jatuh Tempo</th>
+                        <th>Nilai Tagihan</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Ahmad Zain</td>
+                        <td>2024-10-01</td>
+                        <td>Rp 1,500,000</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirm('Anda yakin ingin menghapus tagihan ini?')">Hapus</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Fitri Ayu</td>
+                        <td>2024-10-05</td>
+                        <td>Rp 2,000,000</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirm('Anda yakin ingin menghapus tagihan ini?')">Hapus</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

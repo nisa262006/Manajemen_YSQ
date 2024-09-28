@@ -1,10 +1,10 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{admin/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+        layout:decorate="~{finance/layout}" th:with="activeTitle='Home',activeTab='HOME'">
 <head>
     <div layout:fragment="customHead">
-        <title>Sahabat Quran | Home Admin</title>
+        <title>Sahabat Quran | Home Finance</title>
     </div>
 </head>
 <body>
@@ -14,7 +14,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Admin Page</h1>
+                    <h1>Finance Page</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -32,7 +32,7 @@
         <!-- Default box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Welcome to the Admin Page!<Page></Page>!</h3>
+                <h3 class="card-title">Welcome to the Finance Page!<Page></Page>!</h3>
 
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
@@ -45,7 +45,7 @@
             </div>
             <div class="card-body">
                 <!--                Hi!, <span th:text="${#authentication.getPrincipal().getUsername()}"></span>-->
-                Hi Admin!
+                Hi Finance!
             </div>
             <!-- /.card-body -->
             <!--            <div class="card-footer">-->
