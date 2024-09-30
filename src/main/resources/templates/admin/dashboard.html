@@ -1,10 +1,19 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{admin/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Home',activeTab='HOME'">
 <head>
     <div layout:fragment="customHead">
         <title>Sahabat Quran | Home Admin</title>
+        <style>
+            .small-box .inner, .small-box .inner h3, .small-box .inner p, .small-box-footer {
+                color: white;
+            }
+
+            .small-box h3 {
+                white-space: normal;
+                word-wrap: break-word;
+            }
+        </style>
     </div>
 </head>
 <body>
@@ -14,11 +23,10 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Admin Page</h1>
+                    <h1>Dashboard</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <!--                        <li class="breadcrumb-item"><a href="#">Home</a></li>-->
                         <li class="breadcrumb-item active">Home</li>
                     </ol>
                 </div>
@@ -32,8 +40,7 @@
         <!-- Default box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Welcome to the Admin Page!<Page></Page>!</h3>
-
+                <h3 class="card-title">Welcome to the Dashboard!</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
@@ -44,17 +51,170 @@
                 </div>
             </div>
             <div class="card-body">
-                <!--                Hi!, <span th:text="${#authentication.getPrincipal().getUsername()}"></span>-->
-                Hi Admin!
+                <!-- Dashboard Links -->
+                <div class="row">
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3>Data Pengajar</h3>
+                                <p>Manage teacher data</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-user"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/data-pengajar" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>Data Bank</h3>
+                                <p>Manage bank and account data</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-university"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/data-bank-rekening" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3>Data Kurikulum</h3>
+                                <p>Manage curriculum data</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-book"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/data-kurikulum" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>Data Ruangan</h3>
+                                <p>Manage room data</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-building"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/data-ruangan" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-secondary">
+                            <div class="inner">
+                                <h3>Data Kelas</h3>
+                                <p>Manage class data</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-chalkboard-teacher"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/data-kelas" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>Plotting Kurikulum</h3>
+                                <p>Assign curriculum to classes</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-arrow-right"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/plotting-kurikulum-kelas" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3>Plotting Kelas</h3>
+                                <p>Assign classes to teachers</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-arrow-right"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/plotting-kelas-pengajar" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3>Plotting Kelas</h3>
+                                <p>Assign classes to rooms</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-arrow-right"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/plotting-kelas-ruangan" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>Jadwal Belajar</h3>
+                                <p>Manage learning schedules</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-calendar"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/jadwal-belajar" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-secondary">
+                            <div class="inner">
+                                <h3>Jadwal Ujian</h3>
+                                <p>Manage exam schedules</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-calendar-check"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/jadwal-ujian" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>Soal Ujian</h3>
+                                <p>Manage exam questions</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-question-circle"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/soal-ujian" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3>Parameter Penilaian</h3>
+                                <p>Manage exam scoring parameters</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-tasks"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/parameter-penilaian" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>Event</h3>
+                                <p>Manage events</p>
+                            </div>
+                            <div class="icon">
+                                <i class="nav-icon fas fa-bell"></i> <!-- Updated icon -->
+                            </div>
+                            <a href="/admin/event" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row -->
             </div>
             <!-- /.card-body -->
-            <!--            <div class="card-footer">-->
-            <!--                Footer-->
-            <!--            </div>-->
-            <!-- /.card-footer-->
         </div>
         <!-- /.card -->
-
     </section>
     <!-- /.content -->
 </div>

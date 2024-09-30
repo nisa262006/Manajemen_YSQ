@@ -13,7 +13,7 @@ $(".delete-confirmation").on("click", function (event) {
     if(msg === undefined || msg === null){
         msg = "apakah anda yakin ingin menghapus data?"
     }
-    createConfirmationAlert("Konfrimasi hapus",msg,link)
+    createConfirmationAlert("Konfirmasi hapus",msg,link)
 })
 
 $(".popup-confirmation").on("click", function (event) {
