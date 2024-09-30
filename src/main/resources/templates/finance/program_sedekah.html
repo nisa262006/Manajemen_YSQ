@@ -43,6 +43,25 @@
       </div>
 
       <div class="card-body">
+        <!-- Form untuk Menambah Pengajar -->
+        <div id="addProgramForm" class="collapse mt-3">
+          <form th:action="@{/pengajar/add}" method="post">
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="nama">Nama Program:</label>
+                <input type="text" id="nama" name="nama" class="form-control" placeholder="Masukkan nama" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="waktu_dilaksanakan">Waktu Dilaksanakan:</label>
+                <input type="time" id="waktu_dilaksanakan" name="waktu_dilaksanakan" class="form-control" placeholder="Masukkan email" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-success">Simpan</button>
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#addPengajarForm">Batal</button>
+          </form>
+        </div>
+
+      <div class="card-body">
         <table class="table table-striped table-bordered table-hover mt-3">
           <thead style="background-color: #343a40; color: white;">
           <tr>
@@ -60,8 +79,10 @@
             <td>2024-09-01</td>
             <td>Rp 2,000,000</td>
             <td class="text-center">
-              <a href="#" class="btn btn-danger btn-sm"
-                 onclick="return confirm('Apakah Anda yakin ingin menghapus program ini?');">
+              <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editProgramSedekah">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <a href="/program_sedekah/delete/1" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah anda yakin ingin menghapus program ini?">
                 <i class="fas fa-trash"></i> Hapus
               </a>
             </td>
@@ -72,15 +93,36 @@
             <td>2024-09-15</td>
             <td>Rp 1,500,000</td>
             <td class="text-center">
-              <a href="#" class="btn btn-danger btn-sm"
-                 onclick="return confirm('Apakah Anda yakin ingin menghapus program ini?');">
+              <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editProgramSedekah">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <a href="/program_sedekah/delete/1" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah anda yakin ingin menghapus program ini?">
                 <i class="fas fa-trash"></i> Hapus
               </a>
             </td>
           </tr>
           </tbody>
         </table>
+
+        <div id="editProgramSedekah" class="collapse mt-3">
+          <form th:action="@{/program_sedekah/update}" method="post">
+            <input type="hidden" name="id" value="1"> <!-- Set ID sesuai dengan pengajar yang dipilih -->
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="editNama">Nama Program:</label>
+                <input type="text" id="editNama" name="nama" class="form-control" placeholder="Masukkan nama" value="" required>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="editWaktuLaksana">Waktu Dilaksakan:</label>
+                <input type="time" id="editWaktuLaksana" name="editWaktuLaksana" class="form-control" placeholder="Masukkan email" value="" required>
+              </div>
+            <button type="submit" class="btn btn-success">Update</button>
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#editPengajar">Batal</button>
+            </div>
+          </form>
+        </div>
       </div>
+    </div>
     </div>
   </section>
 </div>

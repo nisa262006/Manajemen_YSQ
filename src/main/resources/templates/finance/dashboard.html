@@ -1,10 +1,113 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{finance/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{finance/layout}" th:with="activeTitle='Home',activeTab='HOME'">
 <head>
     <div layout:fragment="customHead">
         <title>Sahabat Quran | Home Finance</title>
+        <style>
+            /* Container for the chart */
+            .chart-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                height: 300px;
+                width: 100%;
+                max-width: 1200px;
+                border: 1px solid #ddd;
+                padding: 20px;
+                margin: 20px auto;
+                background-color: #f9f9f9;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+            }
+
+            /* Each bar in the chart */
+            .chart-bar {
+                flex: 1;
+                margin: 0 5px;
+                background: linear-gradient(to top, #36a2eb, #4bc0c0);
+                border-radius: 5px 5px 0 0;
+                text-align: center;
+                color: #fff;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                font-size: 12px;
+                position: relative;
+                transition: all 0.3s ease;
+            }
+
+            .chart-bar:hover {
+                background: linear-gradient(to top, #4bc0c0, #36a2eb);
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Value displayed above each bar */
+            .chart-bar span {
+                position: absolute;
+                top: -25px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #333;
+            }
+
+            /* Information tooltip when hovering */
+            .tooltip {
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.75);
+                color: #fff;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 12px;
+                white-space: nowrap;
+                display: none;
+                z-index: 10;
+                transition: opacity 0.3s ease;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            /* Show tooltip on hover */
+            .chart-bar:hover .tooltip {
+                display: block;
+                opacity: 1;
+            }
+
+            /* Icon styles */
+            .tooltip .icon {
+                display: flex;
+                align-items: center;
+                margin: 5px 0;
+            }
+
+            .icon img {
+                width: 15px;
+                height: 15px;
+                margin-right: 5px;
+            }
+
+            /* Month labels under each bar */
+            .chart-labels {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 5px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .chart-label {
+                flex: 1;
+                text-align: center;
+                font-size: 14px;
+                color: #555;
+            }
+        </style>
     </div>
 </head>
 <body>
@@ -18,46 +121,131 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <!--                        <li class="breadcrumb-item"><a href="#">Home</a></li>-->
                         <li class="breadcrumb-item active">Home</li>
                     </ol>
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
+
     <!-- Main content -->
     <section class="content">
-
         <!-- Default box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Welcome to the Finance Page!<Page></Page>!</h3>
-
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                        <i class="fas fa-times-circle"></i>
-                    </button>
-                </div>
+                <h3 class="card-title">Welcome to the Finance Page!</h3>
             </div>
             <div class="card-body">
-                <!--                Hi!, <span th:text="${#authentication.getPrincipal().getUsername()}"></span>-->
                 Hi Finance!
-            </div>
-            <!-- /.card-body -->
-            <!--            <div class="card-footer">-->
-            <!--                Footer-->
-            <!--            </div>-->
-            <!-- /.card-footer-->
-        </div>
-        <!-- /.card -->
 
+                <!-- Chart container -->
+                <div class="chart-container">
+                    <!-- Data bars for each month (dummy data) -->
+                    <div class="chart-bar" style="height: 50%;">
+                        <span>1200K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 30 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 5 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 60%;">
+                        <span>1400K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 35 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 10 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 70%;">
+                        <span>1600K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 50 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 8 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 80%;">
+                        <span>1800K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 60 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 15 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 90%;">
+                        <span>2000K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 70 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 20 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 65%;">
+                        <span>1500K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 45 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 12 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 75%;">
+                        <span>1700K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 55 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 18 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 55%;">
+                        <span>1300K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 40 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 9 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 85%;">
+                        <span>1900K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 65 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 16 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 95%;">
+                        <span>2100K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 80 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 20 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 50%;">
+                        <span>1200K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 30 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 7 Left</div>
+                        </div>
+                    </div>
+                    <div class="chart-bar" style="height: 40%;">
+                        <span>1000K</span>
+                        <div class="tooltip">
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/plus-math.png"/> 20 Joined</div>
+                            <div class="icon"><img src="https://img.icons8.com/color/48/000000/minus-math.png"/> 5 Left</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Month labels -->
+                <div class="chart-labels">
+                    <div class="chart-label">Jan</div>
+                    <div class="chart-label">Feb</div>
+                    <div class="chart-label">Mar</div>
+                    <div class="chart-label">Apr</div>
+                    <div class="chart-label">May</div>
+                    <div class="chart-label">Jun</div>
+                    <div class="chart-label">Jul</div>
+                    <div class="chart-label">Aug</div>
+                    <div class="chart-label">Sep</div>
+                    <div class="chart-label">Oct</div>
+                    <div class="chart-label">Nov</div>
+                    <div class="chart-label">Dec</div>
+                </div>
+
+            </div>
+        </div>
     </section>
-    <!-- /.content -->
 </div>
-<div layout:fragment="customScript"></div>
 </body>
 </html>
