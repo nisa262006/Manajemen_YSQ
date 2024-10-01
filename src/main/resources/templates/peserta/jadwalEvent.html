@@ -1,0 +1,134 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{peserta/layout}" th:with="activeTitle='Jadwal Event',activeTab='EVENT'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Jadwal Event</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+      /* Custom styles */
+      body {
+        background-color: #f8f9fa;
+      }
+      .card {
+        transition: transform 0.3s;
+      }
+      .card:hover {
+        transform: scale(1.05);
+      }
+      .card-header {
+        border-bottom: 2px solid #dee2e6;
+      }
+      .event-date {
+        font-weight: bold;
+        color: #007bff;
+      }
+      .event-time {
+        font-style: italic;
+        color: #6c757d;
+      }
+      .btn-custom {
+        transition: background-color 0.3s, color 0.3s;
+      }
+      .btn-custom:hover {
+        background-color: #007bff;
+        color: #fff;
+      }
+    </style>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="display-4">Jadwal Event</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">Event</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container">
+      <div class="row">
+        <!-- Event Card 1 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow border-light rounded">
+            <div class="card-header bg-info text-white text-center">
+              <h5 class="card-title mb-0">Kajian Tafsir Al-Quran</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="event-date">
+                <i class="fas fa-calendar-alt"></i> Tanggal: 10 Oktober 2024
+              </h6>
+              <h6 class="event-time">
+                <i class="fas fa-clock"></i> Waktu: 08:00 - 10:00 WIB
+              </h6>
+              <p class="card-text">Mengupas tafsir Al-Quran secara mendalam bersama Ustadz Muhammad. Jangan lewatkan kesempatan berharga ini!</p>
+              <div class="text-center">
+                <button class="btn btn-custom btn-outline-primary">Daftar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Card 2 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow border-light rounded">
+            <div class="card-header bg-success text-white text-center">
+              <h5 class="card-title mb-0">Pelatihan Tahsin Al-Quran</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="event-date">
+                <i class="fas fa-calendar-alt"></i> Tanggal: 15 Oktober 2024
+              </h6>
+              <h6 class="event-time">
+                <i class="fas fa-clock"></i> Waktu: 14:00 - 16:00 WIB
+              </h6>
+              <p class="card-text">Tingkatkan kualitas bacaan Al-Quran dengan bimbingan pengajar profesional. Ayo bergabung!</p>
+              <div class="text-center">
+                <button class="btn btn-custom btn-outline-success">Daftar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Card 3 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow border-light rounded">
+            <div class="card-header bg-warning text-dark text-center">
+              <h5 class="card-title mb-0">Workshop Metode Menghafal</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="event-date">
+                <i class="fas fa-calendar-alt"></i> Tanggal: 20 Oktober 2024
+              </h6>
+              <h6 class="event-time">
+                <i class="fas fa-clock"></i> Waktu: 09:00 - 11:00 WIB
+              </h6>
+              <p class="card-text">Pelajari metode menghafal Al-Quran yang efektif dan menyenangkan bersama ustadzah berpengalaman.</p>
+              <div class="text-center">
+                <button class="btn btn-custom btn-outline-warning">Daftar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

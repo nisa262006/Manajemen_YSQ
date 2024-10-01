@@ -17,4 +17,29 @@ public class PesertaController {
     public String pesertaLihatTagihan() {
         return "peserta/lihatTagihan";
     }
+
+    @GetMapping("/pembayaran")
+    public String pesertaPembayaran() {
+        return "peserta/pembayaran";
+    }
+
+    @GetMapping("/jadwal")
+    public String pesertaJadwal() {
+        return "peserta/jadwalBelajar";
+    }
+
+    @GetMapping("/mutabaah")
+    public String pesertaInputMutabaah() {
+        return "peserta/inputMutabaah";
+    }
+
+    @GetMapping("/event")
+    public String pesertaJadwalEvent() {
+        return "peserta/jadwalEvent";
+    }
+
+    @GetMapping("/laporan")
+    public String pesertaLaporanBelajar() {
+        return "peserta/laporanBelajar";
+    }
 }

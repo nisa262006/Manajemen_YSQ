@@ -1,0 +1,113 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{peserta/layout}" th:with="activeTitle='Input Mutaba\'ah',activeTab='MUTABAAH'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Input Mutaba'ah</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Input Mutaba'ah</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">Mutaba'ah</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card shadow-lg border-primary">
+            <div class="card-body p-5">
+              <form>
+                <!-- Date Input -->
+                <div class="form-group">
+                  <label for="date" class="font-weight-bold">Tanggal</label>
+                  <input type="date" class="form-control" id="date" required>
+                </div>
+
+                <!-- Quran Reading Input -->
+                <div class="form-group">
+                  <label for="quranReading" class="font-weight-bold">Jumlah Halaman Quran yang Dibaca</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="quranReading" placeholder="Masukkan jumlah halaman" min="0" required>
+                    <div class="input-group-append">
+                      <span class="input-group-text">halaman</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sholat Input -->
+                <div class="form-group">
+                  <label for="sholat" class="font-weight-bold">Sholat Wajib</label>
+                  <select class="form-control" id="sholat" required>
+                    <option value="" disabled selected>Pilih sholat yang dikerjakan lengkap</option>
+                    <option>Subuh</option>
+                    <option>Dzuhur</option>
+                    <option>Ashar</option>
+                    <option>Maghrib</option>
+                    <option>Isya</option>
+                  </select>
+                </div>
+
+                <!-- Puasa Input -->
+                <div class="form-group">
+                  <label for="fasting" class="font-weight-bold">Puasa Sunnah</label>
+                  <select class="form-control" id="fasting">
+                    <option value="" disabled selected>Pilih puasa sunnah yang dilakukan</option>
+                    <option>Senin</option>
+                    <option>Kamis</option>
+                    <option>Ayyamul Bidh</option>
+                    <option>Puasa Daud</option>
+                    <option>Tidak Puasa</option>
+                  </select>
+                </div>
+
+                <!-- Sedekah Input -->
+                <div class="form-group">
+                  <label for="charity" class="font-weight-bold">Jumlah Sedekah</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">Rp</span>
+                    </div>
+                    <input type="number" class="form-control" id="charity" placeholder="Masukkan jumlah sedekah" min="0">
+                  </div>
+                </div>
+
+                <!-- Note Input -->
+                <div class="form-group">
+                  <label for="notes" class="font-weight-bold">Catatan Tambahan</label>
+                  <textarea class="form-control" id="notes" rows="4" placeholder="Masukkan catatan tambahan (optional)"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                  <button type="submit" class="btn btn-success btn-lg px-5 mt-3 shadow-sm">
+                    <i class="fas fa-save mr-2"></i>Simpan Mutaba'ah
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

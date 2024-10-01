@@ -22,6 +22,14 @@
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a th:href="@{/peserta/dashboard}" class="nav-link">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+
                     <!-- Lihat Tagihan -->
                     <li class="nav-item">
                         <a th:href="@{/peserta/lihat-tagihan}" class="nav-link">

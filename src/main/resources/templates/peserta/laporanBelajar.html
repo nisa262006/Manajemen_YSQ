@@ -1,0 +1,105 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{peserta/layout}" th:with="activeTitle='Laporan Hasil Belajar',activeTab='LAPORAN'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Laporan Hasil Belajar</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      .card {
+        margin-top: 20px;
+      }
+      .table th, .table td {
+        vertical-align: middle;
+      }
+      .thead-light {
+        background-color: #f8f9fa;
+      }
+    </style>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="display-4">Laporan Hasil Belajar Perminggu</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">Laporan</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container">
+      <div class="card">
+        <div class="card-header bg-dark">
+          <h4 class="card-title text-light">Rincian Laporan Hasil Belajar</h4>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="thead-light">
+              <tr>
+                <th>No</th>
+                <th>Minggu</th>
+                <th>Tanggal</th>
+                <th>Materi yang Dipelajari</th>
+                <th>Hasil Belajar</th>
+                <th>Catatan</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>1</td>
+                <td>Minggu 1</td>
+                <td>1 - 7 Oktober 2024</td>
+                <td>Dasar-Dasar Al-Quran</td>
+                <td>80%</td>
+                <td>Belajar dengan baik, perlu lebih banyak latihan.</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Minggu 2</td>
+                <td>8 - 14 Oktober 2024</td>
+                <td>Tajwid dan Makharij</td>
+                <td>85%</td>
+                <td>Sudah memahami makharij dengan baik.</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Minggu 3</td>
+                <td>15 - 21 Oktober 2024</td>
+                <td>Hafalan Juz 30</td>
+                <td>90%</td>
+                <td>Hafalan sudah sangat baik, teruskan!</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Minggu 4</td>
+                <td>22 - 28 Oktober 2024</td>
+                <td>Pemahaman Ayat-Ayat Al-Quran</td>
+                <td>88%</td>
+                <td>Perlu lebih banyak diskusi.</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

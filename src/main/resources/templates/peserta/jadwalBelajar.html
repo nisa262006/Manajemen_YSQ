@@ -1,0 +1,123 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{peserta/layout}" th:with="activeTitle='Jadwal Belajar',activeTab='JADWAL'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Jadwal Belajar</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Jadwal Belajar</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item active">Jadwal Belajar</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="container">
+      <div class="row">
+        <!-- Card 1 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-primary">
+            <div class="card-header bg-primary text-white text-center">
+              <h5>Senin - 09:00 AM</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="card-title text-center">Tafsir Al-Quran</h6>
+              <p class="card-text"><strong>Pengajar:</strong> Ustadz Ahmad</p>
+              <p class="card-text"><strong>Ruangan:</strong> Ruangan A</p>
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-primary">Ikuti Kelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-success">
+            <div class="card-header bg-success text-white text-center">
+              <h5>Selasa - 10:00 AM</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="card-title text-center">Hadits</h6>
+              <p class="card-text"><strong>Pengajar:</strong> Ustadzah Aisyah</p>
+              <p class="card-text"><strong>Ruangan:</strong> Ruangan B</p>
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-success">Ikuti Kelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-white text-center">
+              <h5>Rabu - 01:00 PM</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="card-title text-center">Fiqh</h6>
+              <p class="card-text"><strong>Pengajar:</strong> Ustadz Abdullah</p>
+              <p class="card-text"><strong>Ruangan:</strong> Ruangan C</p>
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-warning">Ikuti Kelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white text-center">
+              <h5>Kamis - 03:00 PM</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="card-title text-center">Sirah Nabawiyah</h6>
+              <p class="card-text"><strong>Pengajar:</strong> Ustadz Bilal</p>
+              <p class="card-text"><strong>Ruangan:</strong> Ruangan D</p>
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-danger">Ikuti Kelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm border-info">
+            <div class="card-header bg-info text-white text-center">
+              <h5>Jumat - 08:00 AM</h5>
+            </div>
+            <div class="card-body">
+              <h6 class="card-title text-center">Tajwid</h6>
+              <p class="card-text"><strong>Pengajar:</strong> Ustadzah Fatimah</p>
+              <p class="card-text"><strong>Ruangan:</strong> Ruangan E</p>
+              <div class="d-flex justify-content-center">
+                <button class="btn btn-outline-info">Ikuti Kelas</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>
