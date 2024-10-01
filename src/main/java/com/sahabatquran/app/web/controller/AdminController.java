@@ -62,4 +62,19 @@ public class AdminController {
     public String adminJadwalBelajar() {
         return "admin/jadwalBelajar";
     }
+
+    @GetMapping("/parameter-penilaian")
+    public String adminParameterPenilaian() {
+        return "admin/parameterPenilaianUjian";
+    }
+
+    @GetMapping("/jadwal-ujian")
+    public String adminJadwalUjian() {
+        return "admin/jadwalUjian";
+    }
+
+    @GetMapping("/event")
+    public String adminEvent() {
+        return "admin/event";
+    }
 }
