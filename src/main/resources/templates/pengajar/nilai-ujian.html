@@ -1,0 +1,127 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{pengajar/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Nilai Ujian</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Nilai Ujian Siswa</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Nilai Ujian Manager</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Nilai Ujian</h3>
+                <div class="card-tools">
+                    <button class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#addRoomForm">
+                        <i class="fas fa-plus"></i> Tambah Nilai Siswa
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Form for adding Nilai Siswa -->
+                <div id="addRoomForm" class="collapse mt-3">
+                    <form th:action="@{/nilai/add}" method="post">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="roomName">Nama Siswa:</label>
+                                <input type="text" id="studentName" name="nama_siswa" class="form-control" placeholder="Masukkan Nama Siswa" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="roomLocation">Mata Ujian</label>
+                                <input type="text" id="CourseName" name="mata_ujian" class="form-control" placeholder="Masukkan Mata Ujian" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="roomCapacity">Nilai</label>
+                                <input type="number" id="grade" name="nilai" class="form-control" placeholder="Masukkan Nilai" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#addGradeForm">Batal</button>
+                    </form>
+                </div>
+
+                <!-- Tabel Nilai Siswa-->
+                <table class="table table-striped table-bordered table-hover mt-3">
+                    <thead style="background-color: #343a40; color: white;">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Mata Ujian</th>
+                        <th>Nilai</th>
+                        <th>Aksi</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Ronaldo</td>
+                        <td>Iqro</td>
+                        <td>90</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editRoomForm">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <a href="/nilai/delete/1" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Form untuk Edit Nilai Siswa -->
+                <div id="editRoomForm" class="collapse mt-3">
+                    <form th:action="@{/nilai/update}" method="post">
+                        <input type="hidden" name="id" value="1"> <!-- Set ID sesuai dengan Nilai Siswa yang dipilih -->
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="editStudentName">Nama Siswa:</label>
+                                <input type="text" id="editStudentName" name="nama_siswa" class="form-control" placeholder="Masukkan Nama Siswa" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="editCourseName">Mata Ujian</label>
+                                <input type="text" id="editCourseName" name="mata_ujian" class="form-control" placeholder="Masukkan Mata Ujian" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="editGrade">Nilai</label>
+                                <input type="number" id="editGrade" name="nilai" class="form-control" placeholder="Masukkan Nilai Ujian" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Update</button>
+                        <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#editGradeForm">Batal</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>
