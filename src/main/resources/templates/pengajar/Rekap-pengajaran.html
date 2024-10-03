@@ -1,0 +1,207 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{pengajar/layout}"
+      th:with="activeTitle='Rekap Mengajar', activeTab='REKAP MENGAJAR'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Rekap Mengajar</title>
+        <style>
+            .status-box {
+                padding: 5px 10px;
+                border-radius: 15px; /* Adjust the rounding as needed */
+                color: white;
+                text-align: center;
+                display: inline-block; /* Ensure it only takes up as much space as needed */
+            }
+
+            .status-finished {
+                background-color: #28a745; /* Green for finished */
+            }
+
+            .status-pending {
+                background-color: #dc3545; /* Red for pending */
+            }
+
+            /* Additional styling for the table and other elements */
+            .content-header {
+                margin-bottom: 20px;
+            }
+
+            .card {
+                margin: 15px;
+                border-radius: 8px;
+            }
+
+            .table {
+                margin-top: 15px;
+            }
+
+            .status-hadir {
+                background-color: #28a745; /* Green */
+            }
+            .status-tidak-hadir {
+                background-color: #dc3545; /* Red */
+            }
+        </style>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Rekap Mengajar</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Rekap Mengajar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Rekap Mengajar</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-hover mt-3">
+                    <thead style="background-color: #343a40; color: white;">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Pengajar</th>
+                        <th>Mata Pelajaran</th>
+                        <th>Jadwal</th>
+                        <th>Jam Pelajaran</th>
+                        <th>Status</th>
+                        <th>Materi Yang Diajar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Lionel Messi</td>
+                            <td>Iqro</td>
+                            <td>2024-09-30, 19.20 WIB</td>
+                            <td>2</td>
+                            <td>
+                                <span class="status-box status-finished">Selesai</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn">
+                                    <i class="fas"></i> Lorem ipsum dolor sit amet, consectetur adipisicing elit. A iste voluptatum corporis alias facere ab nihil beatae recusandae provident, repudiandae sapiente nesciunt rerum, amet, obcaecati veniam animi eum perferendis voluptatem.
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Lionel Messi</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-10-30, 15.00 WIB</td>
+                            <td>1</td>
+                            <td>
+                                <span class="status-box status-finished">Selesai</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn">
+                                    <i class="fas"></i> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Labore, natus dolores nisi veniam molestias possimus nostrum quas minima, perspiciatis molestiae ducimus pariatur aliquid rerum dolorem odit doloremque, qui illum? Accusantium.
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Lionel Messi</td>
+                            <td>Bahasa Indonesia</td>
+                            <td>2024-11-30, 16.30 WIB</td>
+                            <td>1</td>
+                            <td>
+                                <span class="status-box status-pending">Belum berlangsung</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn">
+                                    <i class="fas"></i> Belum Berlangsung.
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </section>
+    <!-- /.content -->
+
+    <section class="content"></section>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Rekap Kehadiran</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-hover mt-3">
+                    <thead style="background-color: #343a40; color: white;">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Mata Ujian</th>
+                        <th>Tanggal ujian</th>
+                        <th>Status Kehadiran</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Andi</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-09-30, 19.20 WIB</td>
+                            <td><span class="status-box status-hadir">Hadir</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Budi</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-10-30, 15.00 WIB</td>
+                            <td><span class="status-box status-hadir">Hadir</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Citra</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-11-30, 16.30 WIB</td>
+                            <td><span class="status-box status-tidak-hadir">Tidak Hadir</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>
