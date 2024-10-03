@@ -1,0 +1,128 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{pengajar/layout}"
+      th:with="activeTitle='Rekap Mengajar', activeTab='REKAP MENGAJAR'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Rekap Mengajar</title>
+        <style>
+            .status-box {
+                padding: 5px 10px;
+                border-radius: 15px; /* Adjust the rounding as needed */
+                color: white;
+                text-align: center;
+                display: inline-block; /* Make the box inline */
+            }
+
+            .status-hadir {
+                background-color: #28a745; /* Green for present */
+            }
+
+            .status-tidak-hadir {
+                background-color: #dc3545; /* Red for absent */
+            }
+
+            .content-header {
+                margin-bottom: 20px;
+            }
+
+            .card {
+                margin: 15px;
+                border-radius: 8px;
+            }
+
+            .table {
+                margin-top: 15px;
+            }
+
+            input.mutabaah-input {
+                width: 100%; /* Full width of the cell */
+                padding: 5px; /* Add some padding */
+                border-radius: 5px; /* Slight rounding of corners */
+                border: 1px solid #ced4da; /* Border color */
+                box-shadow: none; /* Remove default box shadow */
+            }
+        </style>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Rekap Mengajar</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Rekap Mengajar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content"></section>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Mutabaah</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-striped table-bordered table-hover mt-3">
+                    <thead style="background-color: #343a40; color: white;">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Mata Ujian</th>
+                        <th>Tanggal Ujian</th>
+                        <th>Status Kehadiran</th>
+                        <th>Mutabaah</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Andi</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-09-30, 19.20 WIB</td>
+                            <td><span class="status-box status-hadir">Hadir</span></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Budi</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-10-30, 15.00 WIB</td>
+                            <td><span class="status-box status-hadir">Hadir</span></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Citra</td>
+                            <td>Bahasa Arab</td>
+                            <td>2024-11-30, 16.30 WIB</td>
+                            <td><span class="status-box status-tidak-hadir">Tidak Hadir</span></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>
