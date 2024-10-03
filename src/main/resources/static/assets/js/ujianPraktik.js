@@ -8,6 +8,19 @@ function startSession() {
     document.getElementById('stopBtn').style.display = 'inline-block';
     document.getElementById('presenceTable').style.display = 'block';
 
+    // Set the statuses for each student
+    const studentStatuses = [
+        { name: 'Andi', status: 'Belum Memulai', color: '#dc3545' }, // Red
+        { name: 'Budi', status: 'Berlangsung', color: '#ffc107' }, // Yellow
+        { name: 'Citra', status: 'Telah Selesai', color: '#28a745' } // Green
+    ];
+
+    studentStatuses.forEach((student, index) => {
+        const statusCell = document.querySelector(`#studentTableBody tr:nth-child(${index + 1}) .status`);
+        statusCell.innerHTML = student.status;
+        statusCell.style.backgroundColor = student.color;
+    });
+
     let timeLeft = 3600; // 60 minutes
     timer = setInterval(function() {
         if (timeLeft <= 0) {
@@ -28,16 +41,4 @@ function stopSession() {
     document.getElementById('stopBtn').style.display = 'none';
     document.getElementById('presenceTable').style.display = 'none';
     document.getElementById('timer').innerHTML = '';
-}
-
-function markPresence(studentId, button) {
-    alert('Student ' + studentId + ' marked as present.');
-
-    // Change button text to "Hadir"
-    button.innerHTML = 'Hadir';
-    
-    // chg button color after clicking
-    button.style.backgroundColor = '#28a745'; // Green
-    button.style.color = 'white'; // Change text color to white
-    button.disabled = true; // Disable the button after clicking
 }
