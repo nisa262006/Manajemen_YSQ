@@ -4,7 +4,7 @@
         layout:decorate="~{pengajar/layout}" th:with="activeTitle='Jadwal Belajar', activeTab='JADWAL BELAJAR'">
 <head>
     <div layout:fragment="customHead">
-        <title>Sahabat Quran | Jadwal Belajar</title>
+        <title>Sahabat Quran | Jadwal Mengajar</title>
     </div>
 </head>
 <body>
@@ -14,12 +14,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Jadwal Belajar</h1>
+                    <h1>Jadwal Mengajar</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item active">Jadwal Belajar</li>
+                        <li class="breadcrumb-item active">Jadwal Mengajar</li>
                     </ol>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                         <th>Mata Pelajaran</th>
                         <th>Jadwal</th>
                         <th>Jam Pelajaran</th>
-                        <th>Absen</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -62,7 +62,7 @@
                         <td>2</td>
                         <td class="text-center">
                             <a href="#" class="btn">
-                                <i class="fas fa-edit"></i> Absen
+                                <i class="fas fa-play-circle"></i> Start Pengajaran
                             </a>
                         </td>
                     </tr>
@@ -74,7 +74,7 @@
                         <td>1</td>
                         <td class="text-center">
                             <a href="#" class="btn">
-                                <i class="fas fa-edit"></i> Absen
+                                <i class="fas fa-play-circle"></i> Start Pengajaran
                             </a>
                         </td>
                     </tr>
@@ -86,7 +86,7 @@
                         <td>1</td>
                         <td class="text-center">
                             <a href="#" class="btn">
-                                <i class="fas fa-edit"></i> Absen
+                                <i class="fas fa-play-circle"></i> Start Pengajaran
                             </a>
                         </td>
                     </tr>
