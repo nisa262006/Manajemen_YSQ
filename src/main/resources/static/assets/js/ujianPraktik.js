@@ -1,5 +1,6 @@
 let timer;
 let isClassActive = false;
+let timeLeft = 3600; // 60 minutes
 
 function startSession() {
     if (isClassActive) return; // Prevent multiple clicks
@@ -21,7 +22,7 @@ function startSession() {
         statusCell.style.backgroundColor = student.color;
     });
 
-    let timeLeft = 3600; // 60 minutes
+    
     timer = setInterval(function() {
         if (timeLeft <= 0) {
             clearInterval(timer);
