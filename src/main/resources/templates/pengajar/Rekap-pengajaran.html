@@ -1,49 +1,12 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{pengajar/layout}"
       th:with="activeTitle='Rekap Mengajar', activeTab='REKAP MENGAJAR'">
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Rekap Mengajar</title>
-        <style>
-            .status-box {
-                padding: 5px 10px;
-                border-radius: 15px; /* Adjust the rounding as needed */
-                color: white;
-                text-align: center;
-                display: inline-block; /* Make the box inline */
-            }
-
-            .status-finished {
-                background-color: #28a745; /* Green for finished */
-            }
-
-            .status-pending {
-                background-color: #dc3545; /* Red for pending */
-            }
-
-            .content-header {
-                margin-bottom: 20px;
-            }
-
-            .card {
-                margin: 15px;
-                border-radius: 8px;
-            }
-
-            .table {
-                margin-top: 15px;
-            }
-
-            /* For Kehadiran */
-            .status-hadir {
-                background-color: #28a745;
-            }
-            .status-tidak-hadir {
-                background-color: #dc3545; 
-            }
-        </style>
-    </div>
+    <title>Sahabat Quran | Rekap Mengajar</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" type="text/css" href="http://localhost:8080/assets/css/pengajar.css">
 </head>
 <body>
 <div layout:fragment="content">
@@ -104,7 +67,7 @@
                             </td>
                             <td class="text-center">
                                 <a href="#" class="btn">
-                                    <i class="fas"></i> Lorem ipsum dolor sit amet, consectetur adipisicing elit. A iste voluptatum corporis alias facere ab nihil beatae recusandae provident, repudiandae sapiente nesciunt rerum, amet, obcaecati veniam animi eum perferendis voluptatem.
+                                    <i class="fas"></i> Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                                 </a>
                             </td>
                         </tr>
@@ -119,7 +82,7 @@
                             </td>
                             <td class="text-center">
                                 <a href="#" class="btn">
-                                    <i class="fas"></i> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Labore, natus dolores nisi veniam molestias possimus nostrum quas minima, perspiciatis molestiae ducimus pariatur aliquid rerum dolorem odit doloremque, qui illum? Accusantium.
+                                    <i class="fas"></i> Lorem ipsum, dolor sit amet consectetur adipisicing elit.
                                 </a>
                             </td>
                         </tr>
@@ -141,14 +104,11 @@
                     </tbody>
                 </table>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
-    <!-- /.content -->
 
-    <!-- Rekap Ujian -->
-    <section class="content"></section>
+    <!-- Rekap Kehadiran -->
+    <section class="content">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Rekap Kehadiran</h3>
@@ -198,14 +158,11 @@
                     </tbody>
                 </table>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
 
-
     <!-- Mutabaah -->
-    <section class="content"></section>
+    <section class="content">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Mutabaah</h3>
@@ -238,7 +195,11 @@
                             <td>Bahasa Arab</td>
                             <td>2024-09-30, 19.20 WIB</td>
                             <td><span class="status-box status-hadir">Hadir</span></td>
-                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah...">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editMutabaah">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
@@ -246,7 +207,12 @@
                             <td>Bahasa Arab</td>
                             <td>2024-10-30, 15.00 WIB</td>
                             <td><span class="status-box status-hadir">Hadir</span></td>
-                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah...">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editMutabaah">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+
                         </tr>
                         <tr>
                             <td>3</td>
@@ -254,16 +220,17 @@
                             <td>Bahasa Arab</td>
                             <td>2024-11-30, 16.30 WIB</td>
                             <td><span class="status-box status-tidak-hadir">Tidak Hadir</span></td>
-                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah...">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editMutabaah">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
 </div>
-<div layout:fragment="customScript"></div>
 </body>
 </html>

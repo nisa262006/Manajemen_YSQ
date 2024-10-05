@@ -5,22 +5,7 @@
 <head>
     <div layout:fragment="customHead">
         <title>Sahabat Quran | Rekap Ujian</title>
-        <style>
-            .status-box {
-                display: inline-block;
-                padding: 5px 10px;
-                border-radius: 20px; /* Makes the box rounded */
-                color: white;
-                font-weight: bold;
-                text-align: center;
-            }
-            .status-hadir {
-                background-color: #28a745; /* Green */
-            }
-            .status-tidak-hadir {
-                background-color: #dc3545; /* Red */
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="http://localhost:8080/assets/css/pengajar.css">
     </div>
 </head>
 <body>
@@ -59,7 +44,7 @@
 
             <div class="card-body">
                 <table class="table table-striped table-bordered table-hover mt-3">
-                    <thead style="background-color: #343a40; color: white;">
+                    <thead>
                     <tr>
                         <th>No</th>
                         <th>Nama Siswa</th>
@@ -77,8 +62,8 @@
                             <td>2024-09-30, 19.20 WIB</td>
                             <td><span class="status-box status-hadir">Hadir</span></td>
                             <td class="text-center">
-                                <input type="number" min="0" max="100" step="5" class="form-control" placeholder="0 or 10-100" style="width: 80px; display: inline-block;">
-                                <button class="btn btn-primary" style="margin-left: 5px;">Submit</button>
+                                <input type="number" min="0" max="100" step="5" class="form-control" placeholder="0 or 10-100">
+                                <button class="btn btn-primary">Submit</button>
                             </td>
                         </tr>
                         <tr>
@@ -88,8 +73,8 @@
                             <td>2024-10-30, 15.00 WIB</td>
                             <td><span class="status-box status-hadir">Hadir</span></td>
                             <td class="text-center">
-                                <input type="number" min="0" max="100" step="5" class="form-control" placeholder="0 or 10-100" style="width: 80px; display: inline-block;">
-                                <button class="btn btn-primary" style="margin-left: 5px;">Submit</button>
+                                <input type="number" min="0" max="100" step="5" class="form-control" placeholder="0 or 10-100">
+                                <button class="btn btn-primary">Submit</button>
                             </td>
                         </tr>
                         <tr>
@@ -99,8 +84,8 @@
                             <td>2024-11-30, 16.30 WIB</td>
                             <td><span class="status-box status-tidak-hadir">Tidak Hadir</span></td>
                             <td class="text-center">
-                                <input type="number" min="0" max="100" step="5" class="form-control" placeholder="0 or 10-100" style="width: 80px; display: inline-block;">
-                                <button class="btn btn-primary" style="margin-left: 5px;">Submit</button>
+                                <input type="number" min="0" max="100" step="5" class="form-control" placeholder="0 or 10-100">
+                                <button class="btn btn-primary">Submit</button>
                             </td>
                         </tr>
                     </tbody>
