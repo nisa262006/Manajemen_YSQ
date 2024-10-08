@@ -1,0 +1,47 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Plotting',activeTab='PLOTTING'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Edit Plotting</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Edit Plotting Kelas ke Ruangan</h3>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/plotting_kelas/update}" method="post">
+          <input type="hidden" name="id" th:value="${plotting.id}"> <!-- Set ID sesuai dengan plotting yang dipilih -->
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="editClassSelect">Pilih Kelas:</label>
+              <select id="editClassSelect" name="kelas_id" class="form-control" required>
+                <option value="" disabled>Pilih Kelas</option>
+                <option th:each="kelas : ${kelasList}" th:value="${kelas.id}" th:text="${kelas.nama}"></option>
+                <!-- Tambahkan lebih banyak opsi kelas -->
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="editRoomSelect">Pilih Ruangan:</label>
+              <select id="editRoomSelect" name="ruangan_id" class="form-control" required>
+                <option value="" disabled>Pilih Ruangan</option>
+                <option th:each="ruangan : ${ruanganList}" th:value="${ruangan.id}" th:text="${ruangan.nama}"></option>
+                <!-- Tambahkan lebih banyak opsi ruangan -->
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Update</button>
+          <a th:href="@{/admin/plotting-kelas-pengajar}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

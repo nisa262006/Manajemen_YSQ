@@ -1,0 +1,59 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Tambah Rekening', activeTab='HOME'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Tambah Rekening</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Tambah Rekening</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/rekening}">Data Rekening dan Bank</a></li>
+                        <li class="breadcrumb-item active">Tambah Rekening</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Form Tambah Rekening</h3>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/rekening/add}" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="nama_bank">Nama Bank:</label>
+                            <input type="text" id="nama_bank" name="nama_bank" class="form-control" placeholder="Masukkan Nama Bank" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="nomor_rekening">Nomor Rekening:</label>
+                            <input type="text" id="nomor_rekening" name="nomor_rekening" class="form-control" placeholder="Masukkan Nomor Rekening" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="atas_nama">Atas Nama:</label>
+                            <input type="text" id="atas_nama" name="atas_nama" class="form-control" placeholder="Masukkan Nama Pemilik Rekening" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <a th:href="@{/admin/data-bank-rekening}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div layout:fragment="customScript"></div>
+</body>
+</html>

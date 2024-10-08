@@ -1,0 +1,59 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Kurikulum', activeTab='HOME'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Edit Kurikulum</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Edit Kurikulum</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Edit Kurikulum</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="card">
+            <div class="card-body">
+                <!-- Form untuk Edit Kurikulum -->
+                <form th:action="@{/kurikulum/update}" method="post">
+                    <input type="hidden" name="id" value="1"> <!-- Set ID sesuai dengan kurikulum yang dipilih -->
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="editKodeKurikulum">Kode Kurikulum:</label>
+                            <input type="text" id="editKodeKurikulum" name="kode" class="form-control" value="KUR2024" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="editNamaKurikulum">Nama Kurikulum:</label>
+                            <input type="text" id="editNamaKurikulum" name="nama" class="form-control" value="Kurikulum 2024" required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="editAktifKurikulum">Status:</label>
+                            <select id="editAktifKurikulum" name="aktif" class="form-control" required>
+                                <option value="true" selected>Aktif</option>
+                                <option value="false">Tidak Aktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning text-white">Update</button>
+                    <a th:href="@{/admin/data-kurikulum}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

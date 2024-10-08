@@ -1,0 +1,61 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Tambah Jadwal Ujian</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Tambah Jadwal Ujian</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Tambah Jadwal Ujian</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Form Tambah Jadwal Ujian</h3>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/jadwal_ujian/add}" method="post">
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="ujianId">ID Ujian:</label>
+              <input type="text" id="ujianId" name="id_ujian" class="form-control" placeholder="Masukkan ID Ujian" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="tanggalUjian">Tanggal Ujian:</label>
+              <input type="date" id="tanggalUjian" name="tanggal_ujian" class="form-control" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="waktuMulai">Waktu Mulai:</label>
+              <input type="time" id="waktuMulai" name="waktu_mulai" class="form-control" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="waktuSelesai">Waktu Selesai:</label>
+              <input type="time" id="waktuSelesai" name="waktu_selesai" class="form-control" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Simpan</button>
+          <a th:href="@{/admin/jadwal-ujian}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

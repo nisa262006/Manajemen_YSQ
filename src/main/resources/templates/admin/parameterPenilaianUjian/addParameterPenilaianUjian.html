@@ -1,0 +1,57 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Tambah Parameter Penilaian Ujian',activeTab='PENILAIAN'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Tambah Parameter Penilaian Ujian</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Tambah Parameter Penilaian Ujian</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Tambah Parameter Penilaian Ujian</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-body">
+        <form th:action="@{/parameter_penilaian/add}" method="post">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="ujianId">ID Ujian:</label>
+              <input type="text" id="ujianId" name="id_ujian" class="form-control" placeholder="Masukkan ID Ujian" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="namaParameter">Nama Parameter:</label>
+              <input type="text" id="namaParameter" name="nama_parameter" class="form-control" placeholder="Masukkan Nama Parameter" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="bobot">Bobot Penilaian (%):</label>
+              <input type="number" id="bobot" name="bobot" class="form-control" placeholder="Masukkan Bobot Penilaian" min="0" max="100" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Simpan</button>
+          <a th:href="@{/admin/parameter-penilaian}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

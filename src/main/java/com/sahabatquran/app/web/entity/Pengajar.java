@@ -24,4 +24,9 @@ public class Pengajar {
     @NotNull @NotEmpty
     private String nomorHandphone;
 
+    public Pengajar(String nama, String email, String nomorHandphone) {
+        this.nama = nama;
+        this.email = email;
+        this.nomorHandphone = nomorHandphone;
+    }
 }

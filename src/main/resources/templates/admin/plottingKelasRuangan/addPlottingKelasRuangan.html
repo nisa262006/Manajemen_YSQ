@@ -1,0 +1,48 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Add Plotting',activeTab='PLOTTING'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Tambah Plotting</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Tambah Plotting Kelas ke Ruangan</h3>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/plotting_kelas/add}" method="post">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="classSelect">Pilih Kelas:</label>
+              <select id="classSelect" name="kelas_id" class="form-control" required>
+                <option value="" disabled selected>Pilih Kelas</option>
+                <option value="1">Kelas 1</option>
+                <option value="2">Kelas 2</option>
+                <!-- Tambahkan lebih banyak opsi kelas sesuai kebutuhan -->
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="roomSelect">Pilih Ruangan:</label>
+              <select id="roomSelect" name="ruangan_id" class="form-control" required>
+                <option value="" disabled selected>Pilih Ruangan</option>
+                <option value="1">Ruangan A</option>
+                <option value="2">Ruangan B</option>
+                <!-- Tambahkan lebih banyak opsi ruangan sesuai kebutuhan -->
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Simpan</button>
+          <a th:href="@{/admin/plotting-kelas-pengajar}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

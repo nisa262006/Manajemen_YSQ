@@ -1,0 +1,52 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Plotting', activeTab='PLOTTING'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Edit Plotting Kelas</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content-header">
+    <div class="container-fluid">
+      <h1>Edit Plotting Kelas ke Pengajar</h1>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="card card-warning">
+      <div class="card-body">
+        <form th:action="@{/plotting/edit}" method="post">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="kelas">Kelas</label>
+              <select id="kelas" name="kelas" class="form-control" required>
+                <option value="">Pilih Kelas</option>
+                <option value="kelas1">Kelas 1</option>
+                <option value="kelas2">Kelas 2</option>
+                <option value="kelas3">Kelas 3</option>
+                <!-- Add more dummy classes as needed -->
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="pengajar">Pengajar</label>
+              <select id="pengajar" name="pengajar" class="form-control" required>
+                <option value="">Pilih Pengajar</option>
+                <option value="pengajar1">Pengajar 1</option>
+                <option value="pengajar2">Pengajar 2</option>
+                <option value="pengajar3">Pengajar 3</option>
+                <!-- Add more dummy teachers as needed -->
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-warning text-white">Update</button>
+          <a th:href="@{/admin/plotting-kelas-pengajar}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

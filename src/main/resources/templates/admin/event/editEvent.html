@@ -1,0 +1,71 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Event',activeTab='HOME'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Edit Event</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Event</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Edit Event</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Form Edit Event</h3>
+      </div>
+
+      <div class="card-body">
+        <!-- Form untuk Edit Event Pengajian -->
+        <form th:action="@{/event/update}" method="post">
+          <input type="hidden" name="id">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="editEventTitle">Judul Event:</label>
+              <input type="text" id="editEventTitle" name="judul_event" class="form-control" placeholder="Masukkan Judul Event" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="editEventLocation">Lokasi:</label>
+              <input type="text" id="editEventLocation" name="lokasi" class="form-control" placeholder="Masukkan Lokasi Event" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="editEventDate">Tanggal Event:</label>
+              <input type="date" id="editEventDate" name="tanggal_event" class="form-control" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="editStartTime">Waktu Mulai:</label>
+              <input type="time" id="editStartTime" name="waktu_mulai" class="form-control" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="editEndTime">Waktu Selesai:</label>
+              <input type="time" id="editEndTime" name="waktu_selesai" class="form-control" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-warning text-white">Update</button>
+          <a th:href="@{/admin/event}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Pengajar', activeTab='HOME'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Edit Pengajar</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Pengajar</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/pengajar}">Data Pengajar</a></li>
+            <li class="breadcrumb-item active">Edit Pengajar</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Form Edit Pengajar</h3>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/pengajar/update}" method="post">
+          <input type="hidden" name="id">
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="nama">Nama:</label>
+              <input type="text" id="nama" name="nama" class="form-control"
+                     placeholder="Masukkan nama" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" class="form-control"
+                     placeholder="Masukkan email" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="nomor_handphone">Nomor Handphone:</label>
+              <input type="text" id="nomor_handphone" name="nomor_handphone" class="form-control"
+                     placeholder="Masukkan nomor handphone" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-warning text-white">Update</button>
+          <a th:href="@{/admin/data-pengajar}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

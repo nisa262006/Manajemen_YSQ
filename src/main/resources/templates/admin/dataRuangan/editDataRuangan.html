@@ -1,0 +1,63 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Ruangan',activeTab='DATA RUANGAN'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Edit Ruangan</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Edit Ruangan</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Edit Ruangan</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Form Edit Ruangan</h3>
+            </div>
+
+            <div class="card-body">
+                <!-- Form Edit Ruangan -->
+                <form th:action="@{/ruangan/update}" method="post">
+                    <input type="hidden" name="id" value="1"> <!-- Set ID sesuai dengan ruangan yang dipilih -->
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="editRoomName">Nama Ruangan:</label>
+                            <input type="text" id="editRoomName" name="nama_ruangan" class="form-control" placeholder="Masukkan Nama Ruangan" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editRoomLocation">Lokasi Ruangan:</label>
+                            <input type="text" id="editRoomLocation" name="lokasi_ruangan" class="form-control" placeholder="Masukkan Lokasi Ruangan" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="editRoomCapacity">Kapasitas Ruangan:</label>
+                            <input type="number" id="editRoomCapacity" name="kapasitas" class="form-control" placeholder="Masukkan Kapasitas Ruangan" required>
+                        </div>
+                    </div>
+                    <!-- Button Simpan dan Batal (sesuai template Batal) -->
+                    <button type="submit" class="btn btn-warning text-white">Update</button>
+                    <a th:href="@{/admin/data-ruangan}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

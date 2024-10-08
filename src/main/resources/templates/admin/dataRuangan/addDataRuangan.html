@@ -1,0 +1,62 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Tambah Ruangan',activeTab='DATA RUANGAN'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Tambah Ruangan</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Tambah Ruangan</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Tambah Ruangan</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Form Tambah Ruangan</h3>
+            </div>
+
+            <div class="card-body">
+                <!-- Form Tambah Ruangan -->
+                <form th:action="@{/ruangan/add}" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="roomName">Nama Ruangan:</label>
+                            <input type="text" id="roomName" name="nama_ruangan" class="form-control" placeholder="Masukkan Nama Ruangan" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="roomLocation">Lokasi Ruangan:</label>
+                            <input type="text" id="roomLocation" name="lokasi_ruangan" class="form-control" placeholder="Masukkan Lokasi Ruangan" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="roomCapacity">Kapasitas Ruangan:</label>
+                            <input type="number" id="roomCapacity" name="kapasitas" class="form-control" placeholder="Masukkan Kapasitas Ruangan" required>
+                        </div>
+                    </div>
+                    <!-- Button Simpan dan Batal (sesuai template Batal) -->
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <a th:href="@{/admin/data-ruangan}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

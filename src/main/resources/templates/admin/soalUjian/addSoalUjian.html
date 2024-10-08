@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}" th:with="activeTitle='Add Soal Ujian', activeTab='HOME'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Tambah Soal Ujian</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content-header">
+    <div class="container-fluid">
+      <h1>Tambah Soal Ujian</h1>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+        <li class="breadcrumb-item active">Tambah Soal Ujian</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="card">
+      <div class="card-body">
+        <form th:action="@{/soal_ujian/add}" method="post">
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="ujianId">ID Ujian:</label>
+              <input type="text" id="ujianId" name="id_ujian" class="form-control" placeholder="Masukkan ID Ujian" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="urutan">Urutan:</label>
+              <input type="number" id="urutan" name="urutan" class="form-control" placeholder="Masukkan urutan soal" required>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="pertanyaan">Pertanyaan:</label>
+              <textarea id="pertanyaan" name="pertanyaan" class="form-control" rows="4" placeholder="Masukkan pertanyaan soal" required></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Simpan</button>
+          <a th:href="@{/admin/soal-ujian}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

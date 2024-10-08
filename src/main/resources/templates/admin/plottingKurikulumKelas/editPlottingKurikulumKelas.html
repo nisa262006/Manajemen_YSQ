@@ -1,0 +1,50 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit',activeTab='EDIT'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Edit Plotting Kurikulum</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Edit Plotting Kurikulum</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{/plotting/update}" method="post">
+                    <input type="hidden" name="id" value="1">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="editKurikulum">Kurikulum:</label>
+                            <select id="editKurikulum" name="kurikulum" class="form-control" required>
+                                <option value="kurikulum1">Kurikulum A</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="editKelas">Kelas:</label>
+                            <select id="editKelas" name="kelas" class="form-control" required>
+                                <option value="kelas1">Kelas 1</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning text-white">Update</button>
+                    <a th:href="@{/admin/plotting-kurikulum-kelas}" class="btn btn-secondary">Batal</a>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

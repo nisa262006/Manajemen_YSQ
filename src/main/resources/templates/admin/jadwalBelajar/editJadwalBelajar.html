@@ -1,0 +1,65 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Jadwal',activeTab='HOME'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Edit Jadwal Belajar</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- Content Header -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Jadwal Belajar</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Edit Jadwal</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Form Edit Jadwal Belajar</h3>
+      </div>
+
+      <div class="card-body">
+        <form th:action="@{/jadwal_belajar/update}" method="post">
+          <input type="hidden" name="id" >
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="editKelas">Kelas:</label>
+              <select id="editKelas" name="kelas" class="form-control" required>
+                <option value="kelas1">Kelas 1</option>
+                <option value="kelas2">Kelas 2</option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="edit_waktu_mulai">Waktu Mulai:</label>
+              <input type="time" id="edit_waktu_mulai" name="waktu_mulai" class="form-control" required>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="edit_waktu_selesai">Waktu Selesai:</label>
+              <input type="time" id="edit_waktu_selesai" name="waktu_selesai" class="form-control" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-warning text-white">Update</button>
+          <a th:href="@{/admin/jadwal-belajar}" class="btn btn-secondary">Batal</a>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

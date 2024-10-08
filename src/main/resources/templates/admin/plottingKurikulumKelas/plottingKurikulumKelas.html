@@ -1,0 +1,77 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{admin/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<head>
+  <div layout:fragment="customHead">
+    <title>Sahabat Quran | Home Pengajar</title>
+  </div>
+</head>
+<body>
+<div layout:fragment="content">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Plotting Kurikulum ke Kelas</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Plotting Kurikulum ke Kelas</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Daftar Plotting Kurikulum ke Kelas</h3>
+        <div class="card-tools">
+          <a th:href="@{/admin/add-plotting-kurikulum-kelas}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Tambah Plotting
+          </a>
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <table class="table table-striped table-bordered table-hover mt-3">
+          <thead style="background-color: #343a40; color: white;">
+          <tr>
+            <th>No</th>
+            <th>Kurikulum</th>
+            <th>Kelas</th>
+            <th>Aksi</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- Example row -->
+          <tr>
+            <td>1</td>
+            <td>Kurikulum A</td>
+            <td>Kelas 1</td>
+            <td class="text-center">
+              <a th:href="@{/admin/edit-plotting-kurikulum-kelas}" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <a href="" class="btn btn-danger btn-sm delete-confirmation">
+                <i class="fas fa-trash"></i> Hapus
+              </a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
