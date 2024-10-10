@@ -112,24 +112,26 @@ create table sesi_ujian (
 );
 
 create table sesi_ujian_peserta (
+    id varchar(36),
     id_peserta varchar(36),
     id_sesi_ujian varchar(36),
     waktu_datang timestamp not null,
-    primary key (id_peserta, id_sesi_ujian),
+    primary key (id),
     foreign key (id_peserta) references peserta(id),
     foreign key (id_sesi_ujian) references sesi_ujian(id)
 );
 
 create table sesi_ujian_pengajar (
+    id varchar(36),
     id_pengajar varchar(36),
     id_sesi_ujian varchar(36),
     waktu_datang timestamp not null,
-    primary key (id_pengajar, id_sesi_ujian),
+    primary key (id),
     foreign key (id_pengajar) references pengajar(id),
     foreign key (id_sesi_ujian) references sesi_ujian(id)
 );
 
-create table nilai (
+create table nilai_ujian (
     id varchar(36),
     id_sesi_ujian varchar(36),
     id_peserta varchar(36),
@@ -146,6 +148,7 @@ create table tagihan (
     tanggal_terbit date not null,
     tanggal_jatuh_tempo date not null,
     nilai numeric(19,2) not null,
+    lunas boolean not null,
     primary key (id),
     foreign key (id_peserta) references peserta(id)
 );
@@ -153,14 +156,12 @@ create table tagihan (
 create table pembayaran_tagihan (
     id varchar(36),
     id_tagihan varchar(36) not null,
-    id_peserta varchar(36) not null,
     waktu_pembayaran timestamp not null,
     nilai_pembayaran numeric(19,2) not null,
     kanal_pembayaran varchar(20) not null,
     referensi varchar(50) not null,
     primary key (id),
-    foreign key (id_tagihan) references tagihan(id),
-    foreign key (id_peserta) references peserta(id)
+    foreign key (id_tagihan) references tagihan(id)
 );
 
 create table program_sedekah (
@@ -175,7 +176,7 @@ create table program_sedekah (
 create table pembayaran_sedekah (
     id varchar(36),
     id_program_sedekah varchar(36) not null,
-    id_peserta varchar(36) not null,
+    id_peserta varchar(36),
     waktu_pembayaran timestamp not null,
     nilai_pembayaran numeric(19,2) not null,
     kanal_pembayaran varchar(20) not null,
