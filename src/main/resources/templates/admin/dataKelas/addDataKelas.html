@@ -1,10 +1,13 @@
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}" th:with="activeTitle='Add Kelas', activeTab='KELAS'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Tambah Kelas', activeTab='DATA_KELAS'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Tambah Kelas</title>
-    </div>
+    <title>Sahabat Quran | Tambah Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
     <!-- Content Header (Page header) -->
@@ -17,11 +20,13 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/data-kelas}">Data Kelas</a></li>
                         <li class="breadcrumb-item active">Tambah Kelas</li>
                     </ol>
                 </div>
             </div>
         </div>
+        <!-- /.container-fluid -->
     </section>
 
     <!-- Main content -->
@@ -31,33 +36,39 @@
                 <h3 class="card-title">Form Tambah Kelas</h3>
             </div>
 
-            <!-- Form Add Kelas -->
-            <div class="card-body">
-                <form method="POST" th:action="@{/kelas/add}" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="kurikulum">Kurikulum</label>
-                        <select class="form-control" id="kurikulum" name="kurikulum" required>
-                            <option value="">-- Pilih Kurikulum --</option>
-                            <option value="1">Kurikulum 2024</option>
-                            <option value="2">Kurikulum 2025</option>
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <form th:action="@{/admin/save-data-kelas}" method="post">
+                    <div class="mb-4">
+                        <label for="kurikulum" class="block text-gray-700 text-sm font-bold mb-2">Kurikulum:</label>
+                        <select id="kurikulum" name="kurikulum" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Kurikulum</option>
+                            <option value="1">Kurikulum Tahfidz</option>
+                            <option value="2">Kurikulum Tilawah</option>
+                            <option value="3">Kurikulum Bahasa Arab</option>
+                            <option value="4">Kurikulum Fiqih</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="pengajar">Pengajar</label>
-                        <select class="form-control" id="pengajar" name="pengajar" required>
-                            <option value="">-- Pilih Pengajar --</option>
-                            <option value="1">John Doe</option>
-                            <option value="2">Jane Smith</option>
+
+                    <div class="mb-4">
+                        <label for="pengajar" class="block text-gray-700 text-sm font-bold mb-2">Pengajar:</label>
+                        <select id="pengajar" name="pengajar" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Pengajar</option>
+                            <option value="1">Ustadz Abdullah</option>
+                            <option value="2">Ustadzah Aisyah</option>
+                            <option value="3">Ustadz Zaid</option>
+                            <option value="4">Ustadzah Fatimah</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="namaKelas">Nama Kelas</label>
-                        <input type="text" class="form-control" id="namaKelas" name="namaKelas" placeholder="Nama Kelas" required>
+
+                    <div class="mb-4">
+                        <label for="namaKelas" class="block text-gray-700 text-sm font-bold mb-2">Nama Kelas:</label>
+                        <input type="text" id="namaKelas" name="namaKelas" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama kelas">
                     </div>
-                    <div class="form-group">
-                        <label for="hari">Hari</label>
-                        <select class="form-control" id="hari" name="hari" required>
-                            <option value="">-- Pilih Hari --</option>
+
+                    <div class="mb-4">
+                        <label for="hari" class="block text-gray-700 text-sm font-bold mb-2">Hari:</label>
+                        <select id="hari" name="hari" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Hari</option>
                             <option value="Senin">Senin</option>
                             <option value="Selasa">Selasa</option>
                             <option value="Rabu">Rabu</option>
@@ -67,20 +78,31 @@
                             <option value="Minggu">Minggu</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="waktuMulai">Waktu Mulai</label>
-                        <input type="time" class="form-control" id="waktuMulai" name="waktuMulai" required>
+
+                    <div class="mb-4">
+                        <label for="waktuMulai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Mulai:</label>
+                        <input type="time" id="waktuMulai" name="waktuMulai" required class="border rounded-lg p-2 w-full">
                     </div>
-                    <div class="form-group">
-                        <label for="waktuSelesai">Waktu Selesai</label>
-                        <input type="time" class="form-control" id="waktuSelesai" name="waktuSelesai" required>
+
+                    <div class="mb-4">
+                        <label for="waktuSelesai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Selesai:</label>
+                        <input type="time" id="waktuSelesai" name="waktuSelesai" required class="border rounded-lg p-2 w-full">
                     </div>
-                    <button type="submit" class="btn btn-success">Simpan</button>
-                    <a th:href="@{/admin/data-kelas}" class="btn btn-secondary">Batal</a>
+
+                    <div class="flex justify-end">
+                        <a th:href="@{/admin/data-kelas}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+                        <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+                            <i class="fas fa-save text-white mr-2"></i>
+                            Simpan
+                        </button>
+                    </div>
                 </form>
             </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </section>
+    <!-- /.content -->
 </div>
 <div layout:fragment="customScript"></div>
 </body>

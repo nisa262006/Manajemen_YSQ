@@ -1,50 +1,82 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit',activeTab='EDIT'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Plotting Kurikulum ke Kelas', activeTab='PLOTTING_KURIKULUM'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Edit Plotting Kurikulum</title>
-    </div>
+    <title>Sahabat Quran | Edit Plotting Kurikulum ke Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
+    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Edit Plotting Kurikulum</h1>
+                    <h1>Edit Plotting Kurikulum ke Kelas</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/plotting-kurikulum-kelas}">Data Plotting Kurikulum ke Kelas</a></li>
+                        <li class="breadcrumb-item active">Edit Plotting Kurikulum ke Kelas</li>
+                    </ol>
                 </div>
             </div>
         </div>
+        <!-- /.container-fluid -->
     </section>
 
+    <!-- Main content -->
     <section class="content">
         <div class="card">
-            <div class="card-body">
-                <form th:action="@{/plotting/update}" method="post">
-                    <input type="hidden" name="id" value="1">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="editKurikulum">Kurikulum:</label>
-                            <select id="editKurikulum" name="kurikulum" class="form-control" required>
-                                <option value="kurikulum1">Kurikulum A</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="editKelas">Kelas:</label>
-                            <select id="editKelas" name="kelas" class="form-control" required>
-                                <option value="kelas1">Kelas 1</option>
-                            </select>
+            <div class="card-header">
+                <h3 class="card-title">Form Edit Plotting Kurikulum ke Kelas</h3>
+            </div>
+
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <form th:action="@{/admin/update-data-plotting-kurikulum}" method="post">
+                    <div class="mb-4">
+                        <label for="kelas" class="block text-gray-700 text-sm font-bold mb-2">Kelas:</label>
+                        <select id="kelas" name="kelas" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Kelas</option>
+                            <!-- Add static options for classes -->
+                            <option value="kelas_1">Kelas 1</option>
+                            <option value="kelas_2">Kelas 2</option>
+                            <option value="kelas_3">Kelas 3</option>
+                            <!-- Add more classes as needed -->
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="kurikulum" class="block text-gray-700 text-sm font-bold mb-2">Kurikulum:</label>
+                        <select id="kurikulum" name="kurikulum" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Kurikulum</option>
+                            <!-- Add static options for curriculums -->
+                            <option value="kurikulum_1">Kurikulum 1</option>
+                            <option value="kurikulum_2">Kurikulum 2</option>
+                            <option value="kurikulum_3">Kurikulum 3</option>
+                            <!-- Add more curriculums as needed -->
+                        </select>
+                    </div>
+                    <div class="flex justify-end">
+                        <div class="flex justify-end">
+                            <a th:href="@{/admin/plotting-kurikulum-kelas}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+                            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+                                <i class="fas fa-save text-white mr-2"></i>
+                                Simpan Perubahan
+                            </button>
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-warning text-white">Update</button>
-                    <a th:href="@{/admin/plotting-kurikulum-kelas}" class="btn btn-secondary">Batal</a>
                 </form>
             </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </section>
+    <!-- /.content -->
 </div>
+<div layout:fragment="customScript"></div>
 </body>
 </html>

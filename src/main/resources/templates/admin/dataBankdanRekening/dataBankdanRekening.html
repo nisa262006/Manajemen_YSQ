@@ -1,102 +1,145 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}" th:with="activeTitle='Data Rekening dan Bank', activeTab='HOME'">
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Data Bank dan Rekening', activeTab='DATA_BANK_REKENING'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Data Rekening dan Bank</title>
-    </div>
+    <title>Sahabat Quran | Data Bank dan Rekening</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
+    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Data Rekening dan Bank</h1>
+                    <h1>Data Bank dan Rekening</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item active">Data Rekening dan Bank</li>
+                        <li class="breadcrumb-item active">Data Bank dan Rekening</li>
                     </ol>
                 </div>
             </div>
         </div>
+        <!-- /.container-fluid -->
     </section>
 
+    <!-- Main content -->
     <section class="content">
+        <!-- Default box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Daftar Rekening dan Bank</h3>
+                <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Bank dan Rekening!</h3>
                 <div class="card-tools">
-                    <a th:href="@{/admin/add-data-bank-rekening}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> Tambah Rekening
-                    </a>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
                 </div>
             </div>
 
-            <div class="card-body">
-                <table class="table table-striped table-bordered table-hover mt-3">
-                    <thead style="background-color: #343a40; color: white;">
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Bank</th>
-                        <th>Nomor Rekening</th>
-                        <th>Atas Nama</th>
-                        <th>Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- Dummy Data -->
-                    <tr>
-                        <td>1</td>
-                        <td>BCA</td>
-                        <td>1234567890</td>
-                        <td>John Doe</td>
-                        <td class="text-center">
-                            <a th:href="@{/admin/edit-data-bank-rekening}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a th:href="@{/admin/delete-data-bank-rekening}" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
-                                <i class="fas fa-trash"></i> Delete
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Mandiri</td>
-                        <td>0987654321</td>
-                        <td>Jane Smith</td>
-                        <td class="text-center">
-                            <a th:href="@{/admin/edit-data-bank-rekening}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a th:href="@{/admin/delete-data-bank-rekening}" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
-                                <i class="fas fa-trash"></i> Delete
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>BNI</td>
-                        <td>1122334455</td>
-                        <td>Michael Johnson</td>
-                        <td class="text-center">
-                            <a th:href="@{/admin/edit-data-bank-rekening}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a th:href="@{/admin/delete-data-bank-rekening}" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
-                                <i class="fas fa-trash"></i> Delete
-                            </a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <div class="overflow-x-auto">
+                    <div class="flex justify-between mb-4">
+                        <input type="text" id="searchInput" class="border rounded-lg p-2 w-1/3" placeholder="Search all columns..." onkeyup="filterTable()">
+                        <a th:href="@{/admin/add-data-bank-rekening}" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow flex items-center">
+                            <i class="fas fa-plus-circle text-white mr-2"></i>
+                            Tambah Bank dan Rekening
+                        </a>
+                    </div>
+
+                    <table class="min-w-full border border-gray-300 mt-3 shadow-lg">
+                        <thead>
+                        <tr style="background-color: #343a40;" class="text-white">
+                            <th class="border border-gray-300 px-4 py-2">No</th>
+                            <th class="border border-gray-300 px-4 py-2">Nama Bank</th>
+                            <th class="border border-gray-300 px-4 py-2">Nomor Rekening</th>
+                            <th class="border border-gray-300 px-4 py-2">Atas Nama</th>
+                            <th class="border border-gray-300 px-4 py-2">Aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody id="bankRekeningTable">
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">1</td>
+                            <td class="border border-gray-300 px-4 py-2">Bank Mandiri</td>
+                            <td class="border border-gray-300 px-4 py-2">1234567890</td>
+                            <td class="border border-gray-300 px-4 py-2">John Doe</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="flex justify-center space-x-2">
+                                    <!-- Icon Edit -->
+                                    <a th:href="@{/admin/edit-data-bank-rekening}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <!-- Icon Delete -->
+                                    <a th:href="@{/admin/delete-data-bank-rekening(id=1)}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">2</td>
+                            <td class="border border-gray-300 px-4 py-2">Bank BCA</td>
+                            <td class="border border-gray-300 px-4 py-2">0987654321</td>
+                            <td class="border border-gray-300 px-4 py-2">Jane Smith</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="flex justify-center space-x-2">
+                                    <!-- Icon Edit -->
+                                    <a th:href="@{/admin/edit-data-bank-rekening}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <!-- Icon Delete -->
+                                    <a th:href="@{/admin/delete-data-bank-rekening(id=2)}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- Tambahkan lebih banyak baris sesuai kebutuhan -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </section>
+    <!-- /.content -->
 </div>
 
-<div layout:fragment="customScript"></div>
+<div layout:fragment="customScript">
+    <script>
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById('bankRekeningTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+
+                for (let j = 0; j < cells.length; j++) {
+                    const cell = cells[j];
+                    if (cell) {
+                        const txtValue = cell.textContent || cell.innerText;
+                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</div>
 </body>
 </html>

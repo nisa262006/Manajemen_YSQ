@@ -1,48 +1,68 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Soal Ujian', activeTab='HOME'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Soal Ujian', activeTab='DATA_SOAL_UJIAN'">
+
 <head>
-  <div layout:fragment="customHead">
-    <title>Sahabat Quran | Edit Soal Ujian</title>
-  </div>
+  <title>Sahabat Quran | Edit Soal Ujian</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
   <section class="content-header">
     <div class="container-fluid">
-      <h1>Edit Soal Ujian</h1>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-        <li class="breadcrumb-item active">Edit Soal Ujian</li>
-      </ol>
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Soal Ujian</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/admin/soal-ujian}">Data Soal Ujian</a></li>
+            <li class="breadcrumb-item active">Edit Soal Ujian</li>
+          </ol>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="content">
     <div class="card">
-      <div class="card-body">
-        <form th:action="@{/soal_ujian/update}" method="post">
-          <input type="hidden" name="id">
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="editUjianId">ID Ujian:</label>
-              <input type="text" id="editUjianId" name="id_ujian" class="form-control" placeholder="Masukkan ID Ujian" required>
-            </div>
-            <div class="form-group col-md-4">
-              <label for="editUrutan">Urutan:</label>
-              <input type="number" id="editUrutan" name="urutan" class="form-control" placeholder="Masukkan urutan soal" required>
-            </div>
-            <div class="form-group col-md-12">
-              <label for="editPertanyaan">Pertanyaan:</label>
-              <textarea id="editPertanyaan" name="pertanyaan" class="form-control" rows="4" placeholder="Masukkan pertanyaan soal" required></textarea>
-            </div>
+      <div class="card-header">
+        <h3 class="card-title">Form Edit Soal Ujian</h3>
+      </div>
+
+      <div class="card-body shadow-lg rounded-lg bg-white p-6">
+        <form action="/admin/update-data-soal-ujian/{id}" method="post">
+          <div class="mb-4">
+            <label for="idUjian" class="block text-gray-700 text-sm font-bold mb-2">ID Ujian:</label>
+            <input type="text" id="idUjian" name="idUjian" value="ID Ujian Saat Ini" required class="border rounded-lg p-2 w-full" placeholder="Masukkan ID Ujian">
           </div>
-          <button type="submit" class="btn btn-warning text-white">Update</button>
-          <a th:href="@{/admin/soal-ujian}" class="btn btn-secondary">Batal</a>
+
+          <div class="mb-4">
+            <label for="urutan" class="block text-gray-700 text-sm font-bold mb-2">Urutan:</label>
+            <input type="number" id="urutan" name="urutan" value="1" required class="border rounded-lg p-2 w-full" placeholder="Masukkan urutan soal">
+          </div>
+
+          <div class="mb-4">
+            <label for="pertanyaan" class="block text-gray-700 text-sm font-bold mb-2">Pertanyaan:</label>
+            <textarea id="pertanyaan" name="pertanyaan" required class="border rounded-lg p-2 w-full" placeholder="Masukkan pertanyaan soal">Pertanyaan Saat Ini</textarea>
+          </div>
+
+          <div class="flex justify-end">
+            <a href="/admin/soal-ujian" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+              <i class="fas fa-save text-white mr-2"></i>
+              Simpan Perubahan
+            </button>
+          </div>
         </form>
       </div>
     </div>
   </section>
 </div>
+
 <div layout:fragment="customScript"></div>
 </body>
 </html>
