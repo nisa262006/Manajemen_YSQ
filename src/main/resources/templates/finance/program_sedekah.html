@@ -30,9 +30,9 @@
       <div class="card-header">
         <h3 class="card-title">Daftar Program Sedekah</h3>
         <div class="card-tools">
-          <button class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#addProgramForm">
+          <a class="btn btn-primary btn-sm" th:href="@{/finance/addProgramSedekah}">
             <i class="fas fa-plus"></i> Tambah Program
-          </button>
+          </a>
           <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
             <i class="fas fa-minus"></i>
           </button>
@@ -41,25 +41,6 @@
           </button>
         </div>
       </div>
-
-      <div class="card-body">
-        <!-- Form untuk Menambah Pengajar -->
-        <div id="addProgramForm" class="collapse mt-3">
-          <form th:action="@{/pengajar/add}" method="post">
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="nama">Nama Program:</label>
-                <input type="text" id="nama" name="nama" class="form-control" placeholder="Masukkan nama" required>
-              </div>
-              <div class="form-group col-md-4">
-                <label for="waktu_dilaksanakan">Waktu Dilaksanakan:</label>
-                <input type="time" id="waktu_dilaksanakan" name="waktu_dilaksanakan" class="form-control" placeholder="Masukkan email" required>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-success">Simpan</button>
-            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#addPengajarForm">Batal</button>
-          </form>
-        </div>
 
       <div class="card-body">
         <table class="table table-striped table-bordered table-hover mt-3">
@@ -122,7 +103,6 @@
           </form>
         </div>
       </div>
-    </div>
     </div>
   </section>
 </div>
