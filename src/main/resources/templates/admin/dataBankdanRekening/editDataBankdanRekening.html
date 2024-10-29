@@ -1,60 +1,73 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Rekening', activeTab='HOME'">
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Bank dan Rekening', activeTab='DATA_BANK_REKENING'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Edit Rekening</title>
-    </div>
+    <title>Sahabat Quran | Edit Bank dan Rekening</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
+    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Edit Rekening</h1>
+                    <h1>Edit Bank dan Rekening</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/rekening}">Data Rekening dan Bank</a></li>
-                        <li class="breadcrumb-item active">Edit Rekening</li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/data-bank-rekening}">Data Bank dan Rekening</a></li>
+                        <li class="breadcrumb-item active">Edit Bank dan Rekening</li>
                     </ol>
                 </div>
             </div>
         </div>
+        <!-- /.container-fluid -->
     </section>
 
+    <!-- Main content -->
     <section class="content">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Form Edit Rekening</h3>
+                <h3 class="card-title">Form Edit Bank dan Rekening</h3>
             </div>
-            <div class="card-body">
-                <form th:action="@{/rekening/update}" method="post">
-                    <input type="hidden" />
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="editNamaBank">Nama Bank:</label>
-                            <input type="text" id="editNamaBank" class="form-control" placeholder="Masukkan Nama Bank" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="editNomorRekening">Nomor Rekening:</label>
-                            <input type="text" id="editNomorRekening" class="form-control" placeholder="Masukkan Nomor Rekening" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="editAtasNama">Atas Nama:</label>
-                            <input type="text" id="editAtasNama" class="form-control" placeholder="Masukkan Nama Pemilik Rekening" required>
+
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <form th:action="@{/admin/update-data-bank-rekening}" method="post">
+                    <input type="hidden" id="id" name="id"/> <!-- ID untuk pengenalan -->
+                    <div class="mb-4">
+                        <label for="namaBank" class="block text-gray-700 text-sm font-bold mb-2">Nama Bank:</label>
+                        <input type="text" id="namaBank" name="namaBank" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama bank">
+                    </div>
+                    <div class="mb-4">
+                        <label for="nomorRekening" class="block text-gray-700 text-sm font-bold mb-2">Nomor Rekening:</label>
+                        <input type="text" id="nomorRekening" name="nomorRekening" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nomor rekening">
+                    </div>
+                    <div class="mb-4">
+                        <label for="atasNama" class="block text-gray-700 text-sm font-bold mb-2">Atas Nama:</label>
+                        <input type="text" id="atasNama" name="atasNama" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama pemilik rekening">
+                    </div>
+                    <div class="flex justify-end">
+                        <div class="flex justify-end">
+                            <a th:href="@{/admin/data-bank-rekening}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+                            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+                                <i class="fas fa-save text-white mr-2"></i>
+                                Simpan Perubahan
+                            </button>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-warning text-white">Update</button>
-                    <a th:href="@{/admin/data-bank-rekening}" class="btn btn-secondary">Batal</a>
                 </form>
             </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </section>
+    <!-- /.content -->
 </div>
-
 <div layout:fragment="customScript"></div>
 </body>
 </html>

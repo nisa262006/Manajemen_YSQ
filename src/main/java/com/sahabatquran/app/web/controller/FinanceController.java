@@ -23,6 +23,9 @@ public class FinanceController {
         return "finance/program_sedekah";
     }
 
+    @GetMapping("/addProgramSedekah")
+    public String addProgramSedekah(){return "finance/addProgramSedekah";}
+
     @GetMapping("/daftar-sedekah")
     public String daftarProgramSedekah(){
         return "finance/daftar_sedekah";

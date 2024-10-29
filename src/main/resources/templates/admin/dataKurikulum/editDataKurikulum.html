@@ -1,13 +1,16 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Kurikulum', activeTab='HOME'">
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Kurikulum', activeTab='DATA_KURIKULUM'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Edit Kurikulum</title>
-    </div>
+    <title>Sahabat Quran | Edit Kurikulum</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
+    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -17,6 +20,7 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/data-kurikulum}">Data Kurikulum</a></li>
                         <li class="breadcrumb-item active">Edit Kurikulum</li>
                     </ol>
                 </div>
@@ -24,36 +28,64 @@
         </div>
     </section>
 
+    <!-- Main content -->
     <section class="content">
         <div class="card">
-            <div class="card-body">
-                <!-- Form untuk Edit Kurikulum -->
-                <form th:action="@{/kurikulum/update}" method="post">
-                    <input type="hidden" name="id" value="1"> <!-- Set ID sesuai dengan kurikulum yang dipilih -->
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="editKodeKurikulum">Kode Kurikulum:</label>
-                            <input type="text" id="editKodeKurikulum" name="kode" class="form-control" value="KUR2024" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="editNamaKurikulum">Nama Kurikulum:</label>
-                            <input type="text" id="editNamaKurikulum" name="nama" class="form-control" value="Kurikulum 2024" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="editAktifKurikulum">Status:</label>
-                            <select id="editAktifKurikulum" name="aktif" class="form-control" required>
-                                <option value="true" selected>Aktif</option>
-                                <option value="false">Tidak Aktif</option>
-                            </select>
-                        </div>
+            <div class="card-header">
+                <h3 class="card-title">Form Edit Kurikulum</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <form th:action="@{/admin/update-kurikulum}" method="post" class="space-y-6">
+                    <!-- ID Kurikulum (hidden) -->
+                    <input type="hidden" name="id" >
+
+                    <!-- Kode Kurikulum -->
+                    <div class="flex flex-col">
+                        <label for="kodeKurikulum" class="text-gray-700">Kode Kurikulum</label>
+                        <input type="text" id="kodeKurikulum" name="kodeKurikulum"
+                               class="border rounded-lg p-2 mt-1"
+                               placeholder="Masukkan kode kurikulum" required>
                     </div>
-                    <button type="submit" class="btn btn-warning text-white">Update</button>
-                    <a th:href="@{/admin/data-kurikulum}" class="btn btn-secondary">Batal</a>
+
+                    <!-- Nama Kurikulum -->
+                    <div class="flex flex-col">
+                        <label for="namaKurikulum" class="text-gray-700">Nama Kurikulum</label>
+                        <input type="text" id="namaKurikulum" name="namaKurikulum"
+                               class="border rounded-lg p-2 mt-1"
+                               placeholder="Masukkan nama kurikulum" required>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="flex flex-col">
+                        <label for="statusKurikulum" class="text-gray-700">Status Kurikulum</label>
+                        <select id="statusKurikulum" name="statusKurikulum" class="border rounded-lg p-2 mt-1" required>
+                            <!-- Pilihan Statis -->
+                            <option value="Aktif">Aktif</option>
+                            <option value="Non-Aktif">Non-Aktif</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <a href="/admin/data-kurikulum" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+                        <button type="submit" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow">
+                            <i class="fas fa-save text-white mr-2"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
     </section>
 </div>
-<div layout:fragment="customScript"></div>
 </body>
 </html>

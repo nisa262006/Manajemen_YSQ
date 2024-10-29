@@ -1,0 +1,80 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{finance/layout}" th:with="activeTitle='Tambah Program Sedekah',activeTab='SEDEKAH'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Tambah Program Sedekah</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Tambah Program Sedekah</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Program Sedekah</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Form Tambah Program Sedekah</h4>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <!-- Nama Program -->
+                        <div class="form-group">
+                            <label for="programName">Nama Program</label>
+                            <input type="text" class="form-control" id="programName" placeholder="Masukkan Nama Program" required>
+                        </div>
+
+                        <!-- Deskripsi Program -->
+                        <div class="form-group">
+                            <label for="description">Deskripsi Program</label>
+                            <textarea class="form-control" id="description" rows="3" placeholder="Masukkan Deskripsi Program" required></textarea>
+                        </div>
+
+                        <!-- Target Donasi -->
+                        <div class="form-group">
+                            <label for="targetDonation">Target Donasi (Rp)</label>
+                            <input type="number" class="form-control" id="targetDonation" placeholder="Masukkan Target Donasi" required>
+                        </div>
+
+                        <!-- Batas Waktu -->
+                        <div class="form-group">
+                            <label for="deadline">Batas Waktu</label>
+                            <input type="date" class="form-control" id="deadline" required>
+                        </div>
+
+                        <!-- Submit and Cancel Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary">Tambah Program</button>
+                            <!-- Cancel Button as link -->
+                            <a href="javascript:history.back()" class="btn btn-secondary">Batal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

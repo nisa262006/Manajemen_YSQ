@@ -1,12 +1,13 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Ruangan',activeTab='DATA RUANGAN'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Ruangan', activeTab='DATA_RUANGAN'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Edit Ruangan</title>
-    </div>
+    <title>Sahabat Quran | Edit Ruangan</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
     <!-- Content Header (Page header) -->
@@ -19,11 +20,13 @@
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/data-ruangan}">Data Ruangan</a></li>
                         <li class="breadcrumb-item active">Edit Ruangan</li>
                     </ol>
                 </div>
             </div>
         </div>
+        <!-- /.container-fluid -->
     </section>
 
     <!-- Main content -->
@@ -33,31 +36,35 @@
                 <h3 class="card-title">Form Edit Ruangan</h3>
             </div>
 
-            <div class="card-body">
-                <!-- Form Edit Ruangan -->
-                <form th:action="@{/ruangan/update}" method="post">
-                    <input type="hidden" name="id" value="1"> <!-- Set ID sesuai dengan ruangan yang dipilih -->
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="editRoomName">Nama Ruangan:</label>
-                            <input type="text" id="editRoomName" name="nama_ruangan" class="form-control" placeholder="Masukkan Nama Ruangan" required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="editRoomLocation">Lokasi Ruangan:</label>
-                            <input type="text" id="editRoomLocation" name="lokasi_ruangan" class="form-control" placeholder="Masukkan Lokasi Ruangan" required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="editRoomCapacity">Kapasitas Ruangan:</label>
-                            <input type="number" id="editRoomCapacity" name="kapasitas" class="form-control" placeholder="Masukkan Kapasitas Ruangan" required>
-                        </div>
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <form th:action="@{/admin/update-data-ruangan}" method="post">
+                    <div class="mb-4">
+                        <label for="namaRuangan" class="block text-gray-700 text-sm font-bold mb-2">Nama Ruangan:</label>
+                        <input type="text" id="namaRuangan" name="namaRuangan" class="border border-gray-300 rounded-lg p-2 w-full" placeholder="Masukkan nama ruangan" readonly value="Ruang Kelas A">
                     </div>
-                    <!-- Button Simpan dan Batal (sesuai template Batal) -->
-                    <button type="submit" class="btn btn-warning text-white">Update</button>
-                    <a th:href="@{/admin/data-ruangan}" class="btn btn-secondary">Batal</a>
+                    <div class="mb-4">
+                        <label for="lokasi" class="block text-gray-700 text-sm font-bold mb-2">Lokasi:</label>
+                        <input type="text" id="lokasi" name="lokasi" class="border border-gray-300 rounded-lg p-2 w-full" placeholder="Masukkan lokasi ruangan" readonly value="Lantai 1">
+                    </div>
+                    <div class="mb-4">
+                        <label for="kapasitas" class="block text-gray-700 text-sm font-bold mb-2">Kapasitas:</label>
+                        <input type="number" id="kapasitas" name="kapasitas" class="border border-gray-300 rounded-lg p-2 w-full" placeholder="Masukkan kapasitas ruangan" readonly value="30">
+                    </div>
+                    <div class="flex justify-end">
+                        <a th:href="@{/admin/data-ruangan}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105">Batal</a>
+                        <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+                            <i class="fas fa-save text-white mr-2"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
                 </form>
             </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </section>
+    <!-- /.content -->
 </div>
+<div layout:fragment="customScript"></div>
 </body>
 </html>
