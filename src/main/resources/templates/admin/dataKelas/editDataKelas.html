@@ -3,80 +3,100 @@
       layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Soal Ujian', activeTab='DATA_SOAL_UJIAN'">
 
 <head>
-    <title>Sahabat Quran | Edit Soal Ujian</title>
+    <title>Sahabat Quran | Edit Data Kelas</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 
 <body>
 <div layout:fragment="content">
+    <!-- Content Header (Page header) -->
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Edit Soal Ujian</h1>
+                    <h1>Edit Kelas</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/admin/data-soal-ujian}">Data Soal Ujian</a></li>
-                        <li class="breadcrumb-item active">Edit Soal Ujian</li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/data-kelas}">Data Kelas</a></li>
+                        <li class="breadcrumb-item active">Tambah Kelas</li>
                     </ol>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Main content -->
     <section class="content">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Form Edit Soal Ujian</h3>
+                <h3 class="card-title">Form Tambah Kelas</h3>
             </div>
 
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
-                <form action="/admin/update-data-soal-ujian/{id}" method="post">
+                <form th:action="@{/admin/save-data-kelas}" method="post">
+                    <!-- Materi -->
                     <div class="mb-4">
-                        <label for="kurikulum" class="block text-gray-700 text-sm font-bold mb-2">Kurikulum:</label>
-                        <select id="kurikulum" name="kurikulum" required class="border rounded-lg p-2 w-full">
-                            <option value="" disabled>Pilih Kurikulum</option>
-                            <option value="1">Kurikulum Tahfidz</option>
-                            <option value="2">Kurikulum Tilawah</option>
-                            <option value="3">Kurikulum Bahasa Arab</option>
-                            <option value="4">Kurikulum Fiqih</option>
+                        <label for="materi" class="block text-gray-700 text-sm font-bold mb-2">Materi:</label>
+                        <select id="materi" name="materi" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Materi</option>
+                            <option value="1">Materi 1</option>
+                            <option value="2">Materi 2</option>
+                            <option value="3">Materi 3</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+
+                    <!-- Pengajar -->
+                    <div class="mb-4">
+                        <label for="pengajar" class="block text-gray-700 text-sm font-bold mb-2">Pengajar:</label>
+                        <select id="pengajar" name="pengajar" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Pengajar</option>
+                            <option value="1">Ustadz Abdullah</option>
+                            <option value="2">Ustadzah Aisyah</option>
+                            <option value="3">Ustadz Zaid</option>
+                            <option value="4">Ustadzah Fatimah</option>
+                        </select>
+                    </div>
+
+                    <!-- Nama Kelas -->
+                    <div class="mb-4">
+                        <label for="namaKelas" class="block text-gray-700 text-sm font-bold mb-2">Nama Kelas:</label>
+                        <input type="text" id="namaKelas" name="namaKelas" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama kelas">
+                    </div>
+
+                    <!-- Hari -->
+                    <div class="mb-4">
+                        <label for="hari" class="block text-gray-700 text-sm font-bold mb-2">Hari:</label>
+                        <select id="hari" name="hari" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Hari</option>
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                            <option value="Sabtu">Sabtu</option>
+                            <option value="Minggu">Minggu</option>
                         </select>
                     </div>
 
                     <div class="mb-4">
-                        <label for="judulSoal" class="block text-gray-700 text-sm font-bold mb-2">Judul Soal:</label>
-                        <input type="text" id="judulSoal" name="judulSoal" value="Judul Soal Saat Ini" required class="border rounded-lg p-2 w-full" placeholder="Masukkan judul soal">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="deskripsiSoal" class="block text-gray-700 text-sm font-bold mb-2">Deskripsi Soal:</label>
-                        <textarea id="deskripsiSoal" name="deskripsiSoal" required class="border rounded-lg p-2 w-full" placeholder="Masukkan deskripsi soal">Deskripsi Soal Saat Ini</textarea>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="jenisSoal" class="block text-gray-700 text-sm font-bold mb-2">Jenis Soal:</label>
-                        <select id="jenisSoal" name="jenisSoal" required class="border rounded-lg p-2 w-full">
-                            <option value="" disabled>Pilih Jenis Soal</option>
-                            <option value="Pilihan Ganda">Pilihan Ganda</option>
-                            <option value="Essay">Essay</option>
+                        <label for="sesi" class="block text-gray-700 text-sm font-bold mb-2">Sesi:</label>
+                        <select id="sesi" name="sesi" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Sesi</option>
+                            <!-- Static session options -->
+                            <option value="08:00-10:00">08:00 - 10:00</option>
+                            <option value="10:00-12:00">10:00 - 12:00</option>
+                            <option value="14:00-16:00">14:00 - 16:00</option>
+                            <!-- Add more session times as needed -->
                         </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="jumlahSoal" class="block text-gray-700 text-sm font-bold mb-2">Jumlah Soal:</label>
-                        <input type="number" id="jumlahSoal" name="jumlahSoal" value="Jumlah Soal Saat Ini" required class="border rounded-lg p-2 w-full">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="durasiUjian" class="block text-gray-700 text-sm font-bold mb-2">Durasi Ujian (menit):</label>
-                        <input type="number" id="durasiUjian" name="durasiUjian" value="Durasi Ujian Saat Ini" required class="border rounded-lg p-2 w-full">
-                    </div>
-
+                    <!-- Submit and Cancel buttons -->
                     <div class="flex justify-end">
-                        <a href="/admin/data-soal-ujian" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+                        <a th:href="@{/admin/data-kelas}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
                         <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
                             <i class="fas fa-save text-white mr-2"></i>
                             Simpan Perubahan
@@ -87,7 +107,6 @@
         </div>
     </section>
 </div>
-
 <div layout:fragment="customScript"></div>
 </body>
 </html>
