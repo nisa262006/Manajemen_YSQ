@@ -26,7 +26,6 @@
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
 
     <!-- Main content -->
@@ -38,17 +37,19 @@
 
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
                 <form th:action="@{/admin/save-data-kelas}" method="post">
+                    <!-- Materi -->
                     <div class="mb-4">
-                        <label for="kurikulum" class="block text-gray-700 text-sm font-bold mb-2">Kurikulum:</label>
-                        <select id="kurikulum" name="kurikulum" required class="border rounded-lg p-2 w-full">
-                            <option value="" disabled selected>Pilih Kurikulum</option>
-                            <option value="1">Kurikulum Tahfidz</option>
-                            <option value="2">Kurikulum Tilawah</option>
-                            <option value="3">Kurikulum Bahasa Arab</option>
-                            <option value="4">Kurikulum Fiqih</option>
+                        <label for="materi" class="block text-gray-700 text-sm font-bold mb-2">Materi:</label>
+                        <select id="materi" name="materi" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Materi</option>
+                            <option value="1">Materi 1</option>
+                            <option value="2">Materi 2</option>
+                            <option value="3">Materi 3</option>
+                            <!-- Add more options as needed -->
                         </select>
                     </div>
 
+                    <!-- Pengajar -->
                     <div class="mb-4">
                         <label for="pengajar" class="block text-gray-700 text-sm font-bold mb-2">Pengajar:</label>
                         <select id="pengajar" name="pengajar" required class="border rounded-lg p-2 w-full">
@@ -60,11 +61,13 @@
                         </select>
                     </div>
 
+                    <!-- Nama Kelas -->
                     <div class="mb-4">
                         <label for="namaKelas" class="block text-gray-700 text-sm font-bold mb-2">Nama Kelas:</label>
                         <input type="text" id="namaKelas" name="namaKelas" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama kelas">
                     </div>
 
+                    <!-- Hari -->
                     <div class="mb-4">
                         <label for="hari" class="block text-gray-700 text-sm font-bold mb-2">Hari:</label>
                         <select id="hari" name="hari" required class="border rounded-lg p-2 w-full">
@@ -80,15 +83,18 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="waktuMulai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Mulai:</label>
-                        <input type="time" id="waktuMulai" name="waktuMulai" required class="border rounded-lg p-2 w-full">
+                        <label for="sesi" class="block text-gray-700 text-sm font-bold mb-2">Sesi:</label>
+                        <select id="sesi" name="sesi" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Sesi</option>
+                            <!-- Static session options -->
+                            <option value="08:00-10:00">08:00 - 10:00</option>
+                            <option value="10:00-12:00">10:00 - 12:00</option>
+                            <option value="14:00-16:00">14:00 - 16:00</option>
+                            <!-- Add more session times as needed -->
+                        </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="waktuSelesai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Selesai:</label>
-                        <input type="time" id="waktuSelesai" name="waktuSelesai" required class="border rounded-lg p-2 w-full">
-                    </div>
-
+                    <!-- Submit and Cancel buttons -->
                     <div class="flex justify-end">
                         <a th:href="@{/admin/data-kelas}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
                         <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
@@ -98,11 +104,8 @@
                     </div>
                 </form>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
-    <!-- /.content -->
 </div>
 <div layout:fragment="customScript"></div>
 </body>

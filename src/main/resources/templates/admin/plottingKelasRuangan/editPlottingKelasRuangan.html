@@ -49,6 +49,7 @@
               <!-- Add more classes as needed -->
             </select>
           </div>
+
           <div class="mb-4">
             <label for="ruangan" class="block text-gray-700 text-sm font-bold mb-2">Ruangan:</label>
             <select id="ruangan" name="ruangan" required class="border rounded-lg p-2 w-full">
@@ -60,14 +61,25 @@
               <!-- Add more rooms as needed -->
             </select>
           </div>
+
+          <div class="mb-4">
+            <label for="sesi" class="block text-gray-700 text-sm font-bold mb-2">Sesi:</label>
+            <select id="sesi" name="sesi" required class="border rounded-lg p-2 w-full">
+              <option value="" disabled selected>Pilih Sesi</option>
+              <!-- Static session options -->
+              <option value="08:00-10:00">08:00 - 10:00</option>
+              <option value="10:00-12:00">10:00 - 12:00</option>
+              <option value="14:00-16:00">14:00 - 16:00</option>
+              <!-- Add more session times as needed -->
+            </select>
+          </div>
+
           <div class="flex justify-end">
-            <div class="flex justify-end">
-              <a th:href="@{/admin/plotting-kelas-ruangan}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
-              <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
-                <i class="fas fa-save text-white mr-2"></i>
-                Simpan Perubahan
-              </button>
-            </div>
+            <a th:href="@{/admin/plotting-kelas-ruangan}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+              <i class="fas fa-save text-white mr-2"></i>
+              Simpan Perubahan
+            </button>
           </div>
         </form>
       </div>

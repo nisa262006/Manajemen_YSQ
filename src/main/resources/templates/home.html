@@ -1,63 +1,374 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      th:with="activeTitle='Home',activeTab='HOME'">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <div layout:fragment="customHead">
         <title>Sahabat Quran | Home</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+        <style>
+            :root {
+                --primary-color: #5846f9;
+                --secondary-color: #2b2b2b;
+            }
+
+            /* Hero Section */
+            .hero {
+                width: 100%;
+                height: 80vh;
+                justify-content: center;
+                align-items: center;
+                background: linear-gradient(45deg, rgba(86, 58, 250, 0.9) 0%, rgba(116, 15, 214, 0.9) 100%), url('/api/placeholder/1920/1080') center center no-repeat;
+                background-size: cover;
+                position: relative;
+                padding: 200px 40px;
+                overflow: hidden;
+            }
+
+            .hero h1 {
+                margin: 0 0 20px 0;
+                font-size: 48px;
+                font-weight: 700;
+                line-height: 56px;
+                color: #fff;
+            }
+
+            .hero h2 {
+                color: rgba(255, 255, 255, 0.8);
+                margin-bottom: 30px;
+                font-size: 24px;
+            }
+
+            .hero .btn-get-started {
+                font-size: 16px;
+                padding: 12px 32px;
+                border-radius: 50px;
+                transition: 0.5s;
+                color: #fff;
+                background: rgba(255, 255, 255, 0.1);
+                border: 2px solid #fff;
+                text-decoration: none;
+            }
+
+            .hero .btn-get-started:hover {
+                background: #fff;
+                color: var(--primary-color);
+            }
+
+            /* Features Section */
+            .features {
+                padding: 80px 0;
+                overflow: hidden;
+            }
+
+            .section-title {
+                text-align: center;
+                padding-bottom: 30px;
+            }
+
+            .section-title h2 {
+                font-size: 32px;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                position: relative;
+            }
+
+            .section-title h2::after {
+                content: '';
+                position: absolute;
+                display: block;
+                width: 50px;
+                height: 3px;
+                background: var(--primary-color);
+                bottom: 0;
+                left: calc(50% - 25px);
+            }
+
+            .features .icon-box {
+                padding: 30px;
+                position: relative;
+                overflow: hidden;
+                background: #fff;
+                box-shadow: 0 0 29px 0 rgba(68, 88, 144, 0.12);
+                transition: all 0.3s ease-in-out;
+                border-radius: 8px;
+                z-index: 1;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .features .icon-box:hover {
+                transform: scale(1.08);
+            }
+
+            .features .icon {
+                margin: 0 auto 20px auto;
+                padding-top: 10px;
+                display: inline-block;
+                text-align: center;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                background: var(--primary-color);
+            }
+
+            .features .icon i {
+                font-size: 36px;
+                line-height: 1;
+                color: #fff;
+            }
+
+            .features .title {
+                font-weight: 700;
+                margin-bottom: 15px;
+                font-size: 18px;
+            }
+
+            /* Counts Section */
+            .counts {
+                padding: 70px 0 60px;
+                background: linear-gradient(45deg, rgba(86, 58, 250, 0.9) 0%, rgba(116, 15, 214, 0.9) 100%), url('/api/placeholder/1920/1080') center center no-repeat;
+                background-size: cover;
+                color: #fff;
+            }
+
+            .counts .count-box {
+                padding: 30px 30px 25px 30px;
+                width: 100%;
+                position: relative;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+            }
+
+            .counts .count-box i {
+                position: absolute;
+                top: -25px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 24px;
+                background: var(--primary-color);
+                padding: 12px;
+                color: #fff;
+                border-radius: 50px;
+            }
+
+            .counts .count-box span {
+                font-size: 36px;
+                display: block;
+                font-weight: 600;
+                color: #fff;
+            }
+
+            .counts .count-box p {
+                padding: 0;
+                margin: 0;
+                font-size: 14px;
+            }
+
+            /* Schedule Section */
+            .schedule {
+                padding: 80px 0;
+                background: #f6f7ff;
+            }
+
+            .schedule .card {
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 0 29px 0 rgba(68, 88, 144, 0.12);
+                margin-bottom: 30px;
+            }
+
+            .schedule .card-header {
+                background-color: var(--primary-color);
+                color: #fff;
+                border-radius: 15px 15px 0 0;
+            }
+
+            /* Footer */
+            footer {
+                background: var(--secondary-color);
+                color: #fff;
+                padding: 60px 0 30px 0;
+            }
+
+            footer .footer-links {
+                margin-bottom: 30px;
+            }
+
+            footer .footer-links ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            footer .footer-links ul li {
+                padding: 10px 0;
+            }
+
+            footer .footer-links ul a {
+                color: rgba(255, 255, 255, 0.7);
+                text-decoration: none;
+            }
+
+            footer .footer-links ul a:hover {
+                color: #fff;
+            }
+        </style>
     </div>
 </head>
 <body>
 <div layout:fragment="content">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Home Page</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-<!--                        <li class="breadcrumb-item"><a href="#">Home</a></li>-->
-                        <li class="breadcrumb-item active">Home</li>
-                    </ol>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7" data-aos="fade-up">
+                    <h1>Selamat Datang di Sahabat Quran</h1>
+                    <h2>Mari belajar Al-Quran dan ilmu agama bersama ustadz dan ustadzah terpercaya</h2>
+                    <a href="#about" class="btn-get-started scrollto">Mulai Belajar</a>
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
-    <!-- Main content -->
-    <section class="content">
 
-        <!-- Default box -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Welcome to the app!</h3>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Program Unggulan</h2>
+                <p>Program-program pembelajaran yang kami tawarkan</p>
+            </div>
 
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                        <i class="fas fa-times-circle"></i>
-                    </button>
+            <div class="row">
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="icon-box">
+                        <div class="icon"><i class="fas fa-quran"></i></div>
+                        <h4 class="title">Tahsin Al-Quran</h4>
+                        <p class="description">Program pembelajaran membaca Al-Quran dengan tajwid yang benar</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="icon-box">
+                        <div class="icon"><i class="fas fa-moon"></i></div>
+                        <h4 class="title">Tahfidz</h4>
+                        <p class="description">Program menghafal Al-Quran dengan metode yang sistematis</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon-box">
+                        <div class="icon"><i class="fas fa-book"></i></div>
+                        <h4 class="title">Kajian Fiqih</h4>
+                        <p class="description">Pembelajaran hukum-hukum Islam dalam kehidupan sehari-hari</p>
+                    </div>
                 </div>
             </div>
-            <div class="card-body">
-<!--                Hi!, <span th:text="${#authentication.getPrincipal().getUsername()}"></span>-->
-                Hi there
-            </div>
-            <!-- /.card-body -->
-<!--            <div class="card-footer">-->
-<!--                Footer-->
-<!--            </div>-->
-            <!-- /.card-footer-->
         </div>
-        <!-- /.card -->
-
     </section>
-    <!-- /.content -->
+
+    <!-- Counts Section -->
+    <section class="counts">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up">
+                    <div class="count-box">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>1,200+</span>
+                        <p>Peserta</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="count-box">
+                        <i class="fas fa-mosque"></i>
+                        <span>15+</span>
+                        <p>Ustadz/Ustadzah</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="count-box">
+                        <i class="fas fa-book-open"></i>
+                        <span>30+</span>
+                        <p>Program Kajian</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                    <div class="count-box">
+                        <i class="fas fa-award"></i>
+                        <span>5+</span>
+                        <p>Tahun Pengalaman</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section class="schedule">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Jadwal Kajian</h2>
+                <p>Jadwal kajian rutin minggu ini</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Senin, 19:30 WIB</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Tafsir Al-Quran</h6>
+                            <p>Ustadz Ahmad Faiz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Rabu, 20:00 WIB</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Hadits Arbain</h6>
+                            <p>Ustadz Muhammad Ridwan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Jumat, 16:00 WIB</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Fiqih Muamalah</h6>
+                            <p>Ustadzah Fatimah</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
-<div layout:fragment="customScript"></div>
+
+<div layout:fragment="customScript">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+</div>
 </body>
 </html>

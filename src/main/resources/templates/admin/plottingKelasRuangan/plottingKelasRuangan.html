@@ -31,7 +31,7 @@
     <section class="content">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Plotting Kelas ke Ruangan</h3>
+                <h3 class="card-title">Hai <span th:text="${nama}">User</span>, selamat datang di halaman Data Plotting Kelas ke Ruangan</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
@@ -58,6 +58,7 @@
                             <th class="border border-gray-300 px-4 py-2">No</th>
                             <th class="border border-gray-300 px-4 py-2">Kelas</th>
                             <th class="border border-gray-300 px-4 py-2">Ruangan</th>
+                            <th class="border border-gray-300 px-4 py-2">Sesi</th> <!-- Session Column for time range -->
                             <th class="border border-gray-300 px-4 py-2">Aksi</th>
                         </tr>
                         </thead>
@@ -67,20 +68,8 @@
                             <td class="border border-gray-300 px-4 py-2">Kelas A</td>
                             <td class="border border-gray-300 px-4 py-2">Ruangan 101</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-plotting-kelas-ruangan}">
-                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
-                                    </a>
-                                    <a th:href="@{/admin/delete-plotting-kelas-ruangan}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
-                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-100">
-                            <td class="border border-gray-300 px-4 py-2">2</td>
-                            <td class="border border-gray-300 px-4 py-2">Kelas B</td>
-                            <td class="border border-gray-300 px-4 py-2">Ruangan 102</td>
+                                <span>08:00 - 10:00</span>
+                            </td> <!-- Display session time range -->
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
                                     <a th:href="@{/admin/edit-plotting-kelas-ruangan}">
@@ -92,21 +81,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr class="hover:bg-gray-100">
-                            <td class="border border-gray-300 px-4 py-2">3</td>
-                            <td class="border border-gray-300 px-4 py-2">Kelas C</td>
-                            <td class="border border-gray-300 px-4 py-2">Ruangan 103</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-plotting-kelas-ruangan}">
-                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
-                                    </a>
-                                    <a th:href="@{/admin/delete-plotting-kelas-ruangan}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
-                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                        <!-- Repeat for other rows as needed -->
                         </tbody>
                     </table>
                 </div>
