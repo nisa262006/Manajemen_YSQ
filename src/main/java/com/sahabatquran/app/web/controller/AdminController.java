@@ -1,6 +1,7 @@
 package com.sahabatquran.app.web.controller;
 
 import com.sahabatquran.app.web.entity.Pengajar;
+import com.sahabatquran.app.web.entity.Peserta;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,32 @@ public class AdminController {
     public String adminEditDataPengajar(Model model) {
         return "admin/dataPengajar/editDataPengajar";
     }
+
+    // Data Peserta
+    @GetMapping("/data-peserta")
+    public String adminDataPeserta(Model model) {
+        List<Peserta> pesertas = new ArrayList<>();
+        pesertas.add(new Peserta("Andi", "andi@example.com", "08712345678"));
+        pesertas.add(new Peserta("Dewi", "dewi@example.com", "08823456789"));
+        pesertas.add(new Peserta("Sari", "sari@example.com", "08934567890"));
+        pesertas.add(new Peserta("Rudi", "rudi@example.com", "09045678901"));
+        pesertas.add(new Peserta("Nina", "nina@example.com", "09156789012"));
+
+        model.addAttribute("pesertas", pesertas);
+
+        return "admin/dataPeserta/dataPeserta";
+    }
+
+    @GetMapping("/add-data-peserta")
+    public String adminAddDataPeserta() {
+        return "admin/dataPeserta/addDataPeserta";
+    }
+
+    @GetMapping("/edit-data-peserta")
+    public String adminEditDataPeserta(Model model) {
+        return "admin/dataPeserta/editDataPeserta"; // Ganti dengan path yang sesuai
+    }
+
 
     // Data Bank dan Rekening
     @GetMapping("/data-bank-rekening")
@@ -209,5 +236,19 @@ public class AdminController {
     @GetMapping("/edit-event")
     public String adminEditEvent() {
         return "admin/event/editEvent";
+    }
+
+    // Event Kehadiran
+    @GetMapping("/event-kehadiran")
+    public String adminEventKehadiran() {
+        return "admin/eventKehadiran/eventKehadiran";
+    }
+    @GetMapping("/add-event-kehadiran")
+    public String adminAddEventKehdiran() {
+        return "admin/eventKehadiran/addEventKehadiran";
+    }
+    @GetMapping("/edit-event-kehadiran")
+    public String adminEditEventKehadiran() {
+        return "admin/eventKehadiran/editEventKehadiran";
     }
 }

@@ -25,12 +25,10 @@
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
 
     <!-- Main content -->
     <section class="content">
-        <!-- Default box -->
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Soal Ujian!</h3>
@@ -69,7 +67,15 @@
                             <td class="border border-gray-300 px-4 py-2">1</td>
                             <td class="border border-gray-300 px-4 py-2">Ujian123</td>
                             <td class="border border-gray-300 px-4 py-2">1</td>
-                            <td class="border border-gray-300 px-4 py-2">Apa itu Tauhid?</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <!-- Tombol Collapse untuk Pertanyaan -->
+                                <button onclick="togglePertanyaan(this)" class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
+                                    <i class="fas fa-chevron-down mr-2"></i> Tampilkan Pertanyaan
+                                </button>
+                                <div class="pertanyaan-content hidden mt-2">
+                                    Apa itu Tauhid?
+                                </div>
+                            </td>
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
                                     <!-- Icon Edit -->
@@ -83,20 +89,36 @@
                                 </div>
                             </td>
                         </tr>
-                        <!-- Add more dummy rows as needed -->
+                        <!-- Tambahkan lebih banyak baris sesuai kebutuhan -->
                         </tbody>
                     </table>
                 </div>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
-    <!-- /.content -->
 </div>
 
 <div layout:fragment="customScript">
     <script>
+        function togglePertanyaan(button) {
+            const pertanyaanContent = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            const isHidden = pertanyaanContent.classList.contains('hidden');
+
+            if (isHidden) {
+                pertanyaanContent.classList.remove('hidden');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+                button.textContent = ' Sembunyikan Pertanyaan';
+            } else {
+                pertanyaanContent.classList.add('hidden');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+                button.textContent = ' Tampilkan Pertanyaan';
+            }
+            button.prepend(icon);
+        }
+
         function filterTable() {
             const input = document.getElementById('searchInput');
             const filter = input.value.toLowerCase();

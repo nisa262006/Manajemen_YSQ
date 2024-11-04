@@ -89,7 +89,7 @@ create table ujian (
     id varchar(36),
     id_kurikulum varchar(36) not null,
     nama_ujian varchar(100) not null,
-    primary key (id),
+    primaryz key (id),
     foreign key (id_kurikulum) references kurikulum(id)
 );
 

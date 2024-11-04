@@ -64,13 +64,19 @@
           </div>
 
           <div class="mb-4">
-            <label for="waktuMulai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Mulai:</label>
-            <input type="time" id="waktuMulai" name="waktuMulai" required class="border rounded-lg p-2 w-full">
+            <label for="sesi" class="block text-gray-700 text-sm font-bold mb-2">Sesi:</label>
+            <input type="text" id="sesi" name="sesi" required class="border rounded-lg p-2 w-full" placeholder="Contoh: 09:00 - 10:00">
           </div>
 
           <div class="mb-4">
-            <label for="waktuSelesai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Selesai:</label>
-            <input type="time" id="waktuSelesai" name="waktuSelesai" required class="border rounded-lg p-2 w-full">
+            <label for="ruang" class="block text-gray-700 text-sm font-bold mb-2">Ruang:</label>
+            <select id="ruang" name="ruang" required class="border rounded-lg p-2 w-full">
+              <option value="" disabled selected>Pilih Ruang</option>
+              <option value="Ruang 101">Ruang 101</option>
+              <option value="Ruang 102">Ruang 102</option>
+              <option value="Ruang 201">Ruang 201</option>
+              <option value="Ruang 202">Ruang 202</option>
+            </select>
           </div>
 
           <div class="flex justify-end">
