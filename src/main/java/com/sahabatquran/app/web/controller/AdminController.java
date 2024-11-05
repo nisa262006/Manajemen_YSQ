@@ -210,6 +210,20 @@ public class AdminController {
         return "admin/jadwalUjian/editJadwalUjian";
     }
 
+    // Ujian
+    @GetMapping("/ujian")
+    public String adminUjian() {
+        return "admin/ujian/ujian";
+    }
+    @GetMapping("/add-ujian")
+    public String adminAddUjian() {
+        return "admin/ujian/addUjian";
+    }
+    @GetMapping("/edit-ujian")
+    public String adminEditUjian() {
+        return "admin/ujian/editUjian";
+    }
+
     // Soal Ujian
     @GetMapping("/soal-ujian")
     public String adminSoalUjian() {

@@ -68,28 +68,106 @@
                             <td class="border border-gray-300 px-4 py-2">Ujian123</td>
                             <td class="border border-gray-300 px-4 py-2">1</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                <!-- Tombol Collapse untuk Pertanyaan -->
-                                <button onclick="togglePertanyaan(this)" class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
+                                <button onclick="togglePertanyaan(this)" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
                                     <i class="fas fa-chevron-down mr-2"></i> Tampilkan Pertanyaan
                                 </button>
-                                <div class="pertanyaan-content hidden mt-2">
-                                    Apa itu Tauhid?
-                                </div>
+                                <div class="pertanyaan-content hidden mt-2">Apa itu Tauhid?</div>
                             </td>
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
-                                    <!-- Icon Edit -->
                                     <a th:href="@{/admin/edit-soal-ujian}">
                                         <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
                                     </a>
-                                    <!-- Icon Delete -->
                                     <a th:href="@{/admin/delete-soal-ujian}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
                                         <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
                                     </a>
                                 </div>
                             </td>
                         </tr>
-                        <!-- Tambahkan lebih banyak baris sesuai kebutuhan -->
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">2</td>
+                            <td class="border border-gray-300 px-4 py-2">Ujian456</td>
+                            <td class="border border-gray-300 px-4 py-2">2</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <button onclick="togglePertanyaan(this)" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
+                                    <i class="fas fa-chevron-down mr-2"></i> Tampilkan Pertanyaan
+                                </button>
+                                <div class="pertanyaan-content hidden mt-2">Apa itu Risalah?</div>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="flex justify-center space-x-2">
+                                    <a th:href="@{/admin/edit-soal-ujian}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <a th:href="@{/admin/delete-soal-ujian}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">3</td>
+                            <td class="border border-gray-300 px-4 py-2">Ujian789</td>
+                            <td class="border border-gray-300 px-4 py-2">3</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <button onclick="togglePertanyaan(this)" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
+                                    <i class="fas fa-chevron-down mr-2"></i> Tampilkan Pertanyaan
+                                </button>
+                                <div class="pertanyaan-content hidden mt-2">Apa itu Akhlak?</div>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="flex justify-center space-x-2">
+                                    <a th:href="@{/admin/edit-soal-ujian}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <a th:href="@{/admin/delete-soal-ujian}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">4</td>
+                            <td class="border border-gray-300 px-4 py-2">Ujian101</td>
+                            <td class="border border-gray-300 px-4 py-2">4</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <button onclick="togglePertanyaan(this)" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
+                                    <i class="fas fa-chevron-down mr-2"></i> Tampilkan Pertanyaan
+                                </button>
+                                <div class="pertanyaan-content hidden mt-2">Apa itu Syahadah?</div>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="flex justify-center space-x-2">
+                                    <a th:href="@{/admin/edit-soal-ujian}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <a th:href="@{/admin/delete-soal-ujian}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">5</td>
+                            <td class="border border-gray-300 px-4 py-2">Ujian102</td>
+                            <td class="border border-gray-300 px-4 py-2">5</td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <button onclick="togglePertanyaan(this)" class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow focus:outline-none flex items-center">
+                                    <i class="fas fa-chevron-down mr-2"></i> Tampilkan Pertanyaan
+                                </button>
+                                <div class="pertanyaan-content hidden mt-2">Apa itu Iman?</div>
+                            </td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <div class="flex justify-center space-x-2">
+                                    <a th:href="@{/admin/edit-soal-ujian}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <a th:href="@{/admin/delete-soal-ujian}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
