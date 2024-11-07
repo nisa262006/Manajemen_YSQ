@@ -5,77 +5,162 @@
 <head>
   <div layout:fragment="customHead">
     <title>Sahabat Quran | Tagihan</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
   </div>
 </head>
 <body>
 <div layout:fragment="content">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1>Tagihan</h1>
+  <!-- Hero Section -->
+  <div class="bg-primary bg-gradient text-white py-4 mb-4">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="display-5 fw-bold">Tagihan Anda</h1>
+          <p class="lead">Kelola dan pantau tagihan Anda dengan mudah</p>
         </div>
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item active">Tagihan</li>
-          </ol>
+        <div class="col-md-6">
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-md-end mb-0">
+              <li class="breadcrumb-item"><a href="#" class="text-dark">Beranda</a></li>
+              <li class="breadcrumb-item active text-dark" aria-current="page">Tagihan</li>
+            </ol>
+          </nav>
         </div>
       </div>
     </div>
-    <!-- /.container-fluid -->
-  </section>
+  </div>
 
   <!-- Main content -->
-  <section class="content">
-    <div class="container">
-      <div class="card">
-        <div class="card-header bg-primary text-white text-center">
-          <h3>Daftar Tagihan Anda</h3>
+  <div class="container py-4">
+    <div class="row">
+      <!-- Summary Cards -->
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                <i class="bi bi-credit-card text-primary fs-4"></i>
+              </div>
+              <div class="ms-3">
+                <h6 class="mb-0">Total Tagihan</h6>
+                <h3 class="fw-bold mb-0">Rp 5,500,000</h3>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-              <thead class="thead-light">
-              <tr>
-                <th>No</th>
-                <th>Deskripsi</th>
-                <th>Tanggal</th>
-                <th>Jumlah</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>1</td>
-                <td>Tagihan Paket 1 Bulan</td>
-                <td>01-09-2024</td>
-                <td>Rp 500,000</td>
-                <td><span class="badge badge-warning">Belum Dibayar</span></td>
-                <td class="text-center">
-                  <a th:href="@{/peserta/pembayaran}" class="btn btn-success btn-sm">Bayar</a>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Tagihan Paket 1 Tahun</td>
-                <td>01-01-2024</td>
-                <td>Rp 5,000,000</td>
-                <td><span class="badge badge-success">Lunas</span></td>
-                <td class="text-center">
-                  <button class="btn btn-secondary btn-sm" disabled>Sudah Dibayar</button>
-                </td>
-              </tr>
-              <!-- Tambahkan lebih banyak baris sesuai kebutuhan -->
-              </tbody>
-            </table>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                <i class="bi bi-check-circle text-success fs-4"></i>
+              </div>
+              <div class="ms-3">
+                <h6 class="mb-0">Sudah Dibayar</h6>
+                <h3 class="fw-bold mb-0">Rp 5,000,000</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                <i class="bi bi-exclamation-circle text-warning fs-4"></i>
+              </div>
+              <div class="ms-3">
+                <h6 class="mb-0">Belum Dibayar</h6>
+                <h3 class="fw-bold mb-0">Rp 500,000</h3>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
-  <!-- /.content -->
+
+    <!-- Tabel Tagihan -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Daftar Tagihan</h5>
+          <div class="btn-group">
+            <button type="button" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-download me-1"></i> Export
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-printer me-1"></i> Print
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+            <tr>
+              <th class="text-center" style="width: 50px">No</th>
+              <th>Deskripsi</th>
+              <th>Tanggal</th>
+              <th>Jumlah</th>
+              <th>Status</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="text-center">1</td>
+              <td>
+                <div class="fw-bold">Tagihan Paket 1 Bulan</div>
+                <small class="text-muted">INV/2024/09/001</small>
+              </td>
+              <td>01-09-2024</td>
+              <td>Rp 500,000</td>
+              <td>
+                <span class="badge bg-warning">Belum Dibayar</span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <a th:href="@{/peserta/pembayaran}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-credit-card me-1"></i> Bayar
+                  </a>
+                  <button type="button" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="text-center">2</td>
+              <td>
+                <div class="fw-bold">Tagihan Paket 1 Tahun</div>
+                <small class="text-muted">INV/2024/01/001</small>
+              </td>
+              <td>01-01-2024</td>
+              <td>Rp 5,000,000</td>
+              <td>
+                <span class="badge bg-success">Lunas</span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group">
+                  <button class="btn btn-secondary btn-sm" disabled>
+                    <i class="bi bi-check-circle me-1"></i> Sudah Dibayar
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div layout:fragment="customScript"></div>
 </body>

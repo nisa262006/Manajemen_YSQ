@@ -9,7 +9,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
       .content-header {
-          background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
           padding: 2rem 0;
           margin-bottom: 2rem;
           color: white;
@@ -85,7 +84,6 @@
       }
 
       .btn-add {
-          background: linear-gradient(45deg, #2196F3, #00BCD4);
           border: none;
           padding: 0.75rem 1.5rem;
           font-weight: 600;
@@ -132,7 +130,7 @@
 </head>
 <body>
 <div layout:fragment="content">
-  <section class="content-header">
+  <section class="content-header bg-primary">
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
@@ -140,7 +138,7 @@
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item active">Mutaba'ah</li>
+            <li class="breadcrumb-item active text-white">Mutaba'ah</li>
           </ol>
         </div>
       </div>
@@ -151,7 +149,7 @@
     <div class="container">
       <!-- Button to Add New Mutaba'ah -->
       <div class="text-right mb-4">
-        <button class="btn btn-add text-white" data-toggle="modal" data-target="#addMutabaahModal">
+        <button class="btn btn-add text-white bg-primary" data-toggle="modal" data-target="#addMutabaahModal">
           <i class="fas fa-plus mr-2"></i>Input Mutaba'ah Baru
         </button>
       </div>
