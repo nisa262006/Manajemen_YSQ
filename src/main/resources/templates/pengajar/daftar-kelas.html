@@ -1,12 +1,13 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{pengajar/layout}" th:with="activeTitle='Home',activeTab='HOME'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Data Kelas', activeTab='DATA_KELAS'">
+
 <head>
-    <div layout:fragment="customHead">
-        <title>Sahabat Quran | Home Pengajar</title>
-    </div>
+    <title>Sahabat Quran | Data Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
 <div layout:fragment="content">
     <!-- Content Header (Page header) -->
@@ -14,75 +15,79 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Pengajar Page</h1>
+                    <h1>Data Kelas</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <!--                        <li class="breadcrumb-item"><a href="#">Home</a></li>-->
-                        <li class="breadcrumb-item active">Home</li>
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Data Kelas</li>
                     </ol>
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
+
     <!-- Main content -->
     <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card card-outline">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-chalkboard-teacher"></i> Daftar Kelas yang Anda Pegang</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body table-responsive p-0">
-                            <table class="table table-hover text-nowrap">
-                                <thead>
-                                <tr>
-                                    <th>Nama Kelas</th>
-                                    <th>Hari</th>
-                                    <th>Waktu Selesai</th>
-                                    <th>Waktu Selesai</th>
-                                    <th>Aksi</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="kelas : ${kelasList}">
-                                    <td>
-                                        <i class="fas fa-book"></i>
-                                        <span th:text="${kelas['nama']}"></span>
-                                    </td>
-                                    <td th:text="${kelas['hari']}">Senin</td>
-                                    <td th:text="${kelas['waktu_mulai']}"></td>
-                                    <td th:text="${kelas['waktu_selesai']}"></td>
-                                    <td>
-                                        <a class="btn btn-info btn-sm">
-                                            <i class="fas fa-eye"></i> Lihat Detail
-                                        </a>
-                                    </td>
-                                </tr>
-                                <!-- Jika tidak ada kelas -->
-                                <tr th:if="${#lists.isEmpty(kelasList)}">
-                                    <td colspan="5" class="text-center">Belum ada kelas yang dipegang</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-                    <!-- /.card -->
+        <!-- Default box -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Kelas!</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
                 </div>
             </div>
+
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-300 mt-3 shadow-lg">
+                        <thead>
+                        <tr style="background-color: #343a40;" class="text-white">
+                            <th class="border border-gray-300 px-4 py-2">No</th>
+                            <th class="border border-gray-300 px-4 py-2">Materi</th>
+                            <th class="border border-gray-300 px-4 py-2">Pengajar</th>
+                            <th class="border border-gray-300 px-4 py-2">Nama Kelas</th>
+                            <th class="border border-gray-300 px-4 py-2">Hari</th>
+                            <th class="border border-gray-300 px-4 py-2">Sesi</th>
+                            <th class="border border-gray-300 px-4 py-2">Mulai Kelas</th>
+                        </tr>
+                        </thead>
+                        <tbody id="kelasTable">
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">1</td>
+                            <td class="border border-gray-300 px-4 py-2">Bahasa Arab</td>
+                            <td class="border border-gray-300 px-4 py-2">Ustadz Ahmad</td>
+                            <td class="border border-gray-300 px-4 py-2">Kelas Tahfidz A</td>
+                            <td class="border border-gray-300 px-4 py-2">Senin</td>
+                            <td class="border border-gray-300 px-4 py-2">08:00 - 10:00</td>
+                            <td class="border border-gray-300 px-4 py-2">Mulai</td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2">2</td>
+                            <td class="border border-gray-300 px-4 py-2">Tajwid</td>
+                            <td class="border border-gray-300 px-4 py-2">Ustadzah Fatimah</td>
+                            <td class="border border-gray-300 px-4 py-2">Kelas Tafsir B</td>
+                            <td class="border border-gray-300 px-4 py-2">Rabu</td>
+                            <td class="border border-gray-300 px-4 py-2">14:00 - 16:00</td>
+                            <td class="border border-gray-300 px-4 py-2">Mulai</td>
+                        </tr>
+                        <!-- Add more dummy rows as needed -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </section>
-    <!-- /.content -->
 </div>
-<div layout:fragment="customScript"></div>
+
+<div layout:fragment="customScript">
+</div>
 </body>
 </html>

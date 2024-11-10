@@ -1,0 +1,86 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{pengajar/layout}" th:with="activeTitle='Sesi Belajar', activeTab='SESI BELAJAR'">
+<head>
+    <div layout:fragment="customHead">
+        <title>Sahabat Quran | Sesi Belajar</title>
+    </div>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Sesi Belajar</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item active">Sesi Belajar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Manage Sesi Belajar</h3>
+            </div>
+            <div class="card-body">
+                <div>
+                    <button id="startBtn" onclick="startSession()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">Start Sesi Belajar</button>
+                    <button id="stopBtn" onclick="stopSession()" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; display: none;">Stop Sesi Belajar</button>
+                </div>
+                <div id="timer" style="margin-top: 20px;"></div>
+                <div id="totalTimeUsed" style="margin-top: 20px;"></div>
+                <div id="presenceTable" style="margin-top: 20px; display: none;">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Siswa</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td>Andi</td>
+                            <td class="text-center">
+                                <button onclick="markPresence('Andi', this)" style="padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Mark Absen</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td>Budi</td>
+                            <td class="text-center">
+                                <button onclick="markPresence('Budi', this)" style="padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Mark Absen</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">3</td>
+                            <td>Citra</td>
+                            <td class="text-center">
+                                <button onclick="markPresence('Citra', this)" style="padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Mark Absen</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+</div>
+<div layout:fragment="customScript">
+    <script src="http://localhost:8080/assets/js/inbox.js"></script>
+</div>
+</body>
+
+
+</html>
