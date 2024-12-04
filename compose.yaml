@@ -6,6 +6,6 @@ services:
       - 'POSTGRES_PASSWORD=sahabatquran1234'
       - 'POSTGRES_USER=sahabatquran'
     ports:
-      - '5432'
+      - '54321:5432'
     volumes:
       - ./db-sahabatquran:/var/lib/postgresql/data

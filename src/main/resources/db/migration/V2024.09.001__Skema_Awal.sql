@@ -179,6 +179,7 @@ create table pembayaran_tagihan (
 create table program_sedekah (
     id varchar(36),
     nama varchar(200) not null,
+    deskripsi varchar(255),
     tanggal_mulai date not null,
     tanggal_selesai date not null,
     aktif boolean,

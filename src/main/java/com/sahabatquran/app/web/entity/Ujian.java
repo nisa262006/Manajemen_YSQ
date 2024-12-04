@@ -17,8 +17,8 @@ public class Ujian {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_kurikulum")
-    private Kurikulum kurikulum;
+    @JoinColumn(name = "id_mata_pelajaran")
+    private MataPelajaran mataPelajaran;
 
     @NotNull @NotEmpty
     private String namaUjian;
