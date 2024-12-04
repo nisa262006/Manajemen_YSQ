@@ -1,90 +1,231 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{peserta/layout}" th:with="activeTitle='Pembayaran Iuran',activeTab='IURAN'">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{peserta/layout}"
+      th:with="activeTitle='Pembayaran Iuran',activeTab='IURAN'">
 <head>
     <div layout:fragment="customHead">
         <title>Sahabat Quran | Pembayaran Iuran</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+        <style>
+            .content-header {
+                padding: 2rem 0;
+                margin-bottom: 2rem;
+                color: white;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+
+            .content-header h1 {
+                font-size: 2.5rem;
+                font-weight: 600;
+                margin: 0;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .breadcrumb {
+                background: transparent;
+                margin: 0;
+            }
+
+            .breadcrumb-item {
+                color: rgba(255,255,255,0.8);
+            }
+
+            .breadcrumb-item.active {
+                color: white;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .card {
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+
+            .card-body {
+                padding: 2rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group label {
+                color: #333;
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .total-bill {
+                background: #f8f9fa;
+                padding: 1.5rem;
+                border-radius: 10px;
+                margin-bottom: 1.5rem;
+            }
+
+            .total-bill h3 {
+                color: #2196F3;
+                margin: 0;
+                font-size: 1.75rem;
+            }
+
+            .form-control {
+                border-radius: 8px;
+                padding: 0.75rem 1rem;
+                border: 2px solid #e0e0e0;
+                transition: all 0.3s ease;
+            }
+
+            .form-control:focus {
+                border-color: #2196F3;
+                box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.1);
+            }
+
+            .form-control:disabled {
+                background-color: #f8f9fa;
+                cursor: not-allowed;
+            }
+
+            .btn-payment {
+                background: linear-gradient(45deg, #2196F3, #00BCD4);
+                border: none;
+                padding: 1rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+            .btn-payment:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+            }
+
+            .payment-icon {
+                margin-right: 10px;
+            }
+
+            .alert {
+                border-radius: 8px;
+                border: none;
+                background-color: rgba(33, 150, 243, 0.1);
+                border-left: 4px solid #2196F3;
+            }
+
+            .payment-methods {
+                display: flex;
+                gap: 1rem;
+                margin-top: 0.5rem;
+            }
+
+            .payment-method-option {
+                border: 2px solid #e0e0e0;
+                padding: 1rem;
+                border-radius: 8px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .payment-method-option:hover {
+                border-color: #2196F3;
+                background-color: rgba(33, 150, 243, 0.05);
+            }
+
+            .payment-method-option i {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+                color: #2196F3;
+            }
+
+            .card-footer {
+                background-color: #f8f9fa;
+                border-top: 1px solid #eee;
+                padding: 1rem;
+            }
+        </style>
     </div>
 </head>
 <body>
 <div layout:fragment="content">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
+    <section class="content-header bg-primary">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Pembayaran Iuran</h1>
+                    <h1><i class="fas fa-money-bill-wave mr-2"></i>Pembayaran Tagihan</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item active">Pembayaran Iuran</li>
+                        <li class="breadcrumb-item active">Pembayaran Tagihan</li>
                     </ol>
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
     </section>
 
-    <!-- Main content -->
     <section class="content">
         <div class="container">
-            <div class="card shadow-lg">
+            <div class="card">
                 <div class="card-body">
                     <form>
-                        <!-- Jenis Iuran -->
-                        <div class="form-group">
-                            <label for="iuranType"><strong>Jenis Iuran</strong></label>
-                            <select class="form-control" id="iuranType" required>
-                                <option value="" disabled selected>Pilih Jenis Iuran</option>
-                                <option value="bulanan">Iuran Bulanan</option>
-                                <option value="tahunan">Iuran Tahunan</option>
-                                <option value="lainnya">Iuran Lainnya</option>
-                            </select>
-                            <small class="form-text text-muted">Pilih jenis iuran yang ingin Anda bayarkan.</small>
-                        </div>
-
-                        <!-- Jumlah Iuran -->
-                        <div class="form-group">
-                            <label for="amount"><strong>Jumlah Iuran (Rp)</strong></label>
-                            <input type="number" class="form-control" id="amount" placeholder="Masukkan jumlah iuran" min="0" required>
-                            <small class="form-text text-muted">Masukkan jumlah iuran yang sesuai.</small>
+                        <!-- Total Tagihan -->
+                        <div class="total-bill">
+                            <label class="d-block">Total Tagihan</label>
+                            <h3>Rp 500.000</h3>
+                            <small class="text-muted">Periode: Juli 2024</small>
                         </div>
 
                         <!-- Metode Pembayaran -->
                         <div class="form-group">
-                            <label for="paymentMethod"><strong>Metode Pembayaran</strong></label>
-                            <select class="form-control" id="paymentMethod" required>
-                                <option value="" disabled selected>Pilih Metode Pembayaran</option>
-                                <option value="transfer_bank">Transfer Bank</option>
-                                <option value="e-wallet">E-Wallet</option>
-                                <option value="kartu_kredit">Kartu Kredit</option>
-                            </select>
-                            <small class="form-text text-muted">Pilih metode pembayaran yang Anda inginkan.</small>
+                            <label><i class="fas fa-credit-card mr-2"></i>Metode Pembayaran</label>
+                            <div class="payment-methods">
+                                <div class="payment-method-option col">
+                                    <i class="fas fa-university d-block"></i>
+                                    Transfer Bank
+                                </div>
+                                <div class="payment-method-option col">
+                                    <i class="fas fa-wallet d-block"></i>
+                                    E-Wallet
+                                </div>
+                                <div class="payment-method-option col">
+                                    <i class="far fa-credit-card d-block"></i>
+                                    Kartu Kredit
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Tanggal Pembayaran -->
                         <div class="form-group">
-                            <label for="paymentDate"><strong>Tanggal Pembayaran</strong></label>
+                            <label><i class="far fa-calendar-alt mr-2"></i>Tanggal Pembayaran</label>
                             <input type="date" class="form-control" id="paymentDate" required>
                         </div>
 
                         <!-- Informasi Pembayaran -->
                         <div class="alert alert-info mt-4" role="alert">
-                            Pastikan Anda telah mengisi semua informasi dengan benar sebelum melanjutkan pembayaran.
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Pastikan Anda telah memilih metode pembayaran yang tepat sebelum melanjutkan transaksi.
                         </div>
 
                         <!-- Tombol Bayar -->
-                        <button type="submit" class="btn btn-success btn-lg btn-block mt-3"><i class="fas fa-credit-card"></i> Bayar Sekarang</button>
+                        <button type="submit" class="btn btn-payment btn-block text-white mt-4">
+                            <i class="fas fa-lock payment-icon"></i>
+                            Lanjutkan Pembayaran
+                        </button>
                     </form>
                 </div>
-                <div class="card-footer text-muted text-center">
-                    <small>Jika Anda memiliki pertanyaan, silakan hubungi layanan pelanggan kami.</small>
+                <div class="card-footer text-center">
+                    <i class="fas fa-headset mr-2"></i>
+                    <small>Butuh bantuan? Hubungi layanan pelanggan kami di (021) 123-4567</small>
                 </div>
             </div>
         </div>
     </section>
-    <!-- /.content -->
 </div>
 <div layout:fragment="customScript"></div>
 </body>

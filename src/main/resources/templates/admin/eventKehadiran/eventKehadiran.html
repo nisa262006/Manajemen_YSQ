@@ -1,0 +1,121 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Event Kehadiran', activeTab='EVENT_KEHADIRAN'">
+
+<head>
+  <title>Sahabat Quran | Event Kehadiran</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Event Kehadiran</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Event Kehadiran</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Hai {nama}, selamat datang di halaman Event Kehadiran!</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body shadow-lg rounded-lg bg-white p-6">
+        <div class="overflow-x-auto">
+          <div class="flex justify-between mb-4">
+            <input type="text" id="searchInput" class="border rounded-lg p-2 w-1/3" placeholder="Cari nama siswa..." onkeyup="filterTable()">
+          </div>
+
+          <table class="min-w-full border border-gray-300 mt-3 shadow-lg">
+            <thead>
+            <tr style="background-color: #343a40;" class="text-white">
+              <th class="border border-gray-300 px-4 py-2">Nama Event</th>
+              <th class="border border-gray-300 px-4 py-2">Nama Siswa</th>
+              <th class="border border-gray-300 px-4 py-2">Aksi</th>
+            </tr>
+            </thead>
+            <tbody id="kehadiranTable">
+            <!-- Sample Data for Testing -->
+            <tr class="hover:bg-gray-100">
+              <td class="border border-gray-300 px-4 py-2">Kajian Fiqih</td>
+              <td class="border border-gray-300 px-4 py-2">Aliya Ramadhan</td>
+              <td class="border border-gray-300 px-4 py-2">
+                <button onclick="markAttendance(this)" class="text-blue-500 hover:text-green-700">Daftar Kehadiran</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-100">
+              <td class="border border-gray-300 px-4 py-2">Tahsin Al-Quran</td>
+              <td class="border border-gray-300 px-4 py-2">Bayu Santoso</td>
+              <td class="border border-gray-300 px-4 py-2">
+                <button onclick="markAttendance(this)" class="text-blue-500 hover:text-green-700">Daftar Kehadiran</button>
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-100">
+              <td class="border border-gray-300 px-4 py-2">Belajar Hadits</td>
+              <td class="border border-gray-300 px-4 py-2">Cinta Putri</td>
+              <td class="border border-gray-300 px-4 py-2">
+                <button onclick="markAttendance(this)" class="text-blue-500 hover:text-green-700">Daftar Kehadiran</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </section>
+  <!-- /.content -->
+</div>
+
+<div layout:fragment="customScript">
+  <script>
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('kehadiranTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            const namaSiswa = cells[1].textContent || cells[1].innerText;
+            rows[i].style.display = namaSiswa.toLowerCase().includes(filter) ? '' : 'none';
+        }
+    }
+
+    function markAttendance(button) {
+        // Ubah teks tombol menjadi "Sudah Terdaftar"
+        button.textContent = "Sudah Terdaftar";
+        // Ubah warna teks tombol menjadi abu-abu
+        button.classList.remove("text-blue-500", "hover:text-green-700");
+        button.classList.add("text-gray-500", "cursor-not-allowed");
+        // Matikan tombol agar tidak bisa diklik lagi
+        button.disabled = true;
+    }
+  </script>
+</div>
+</body>
+</html>

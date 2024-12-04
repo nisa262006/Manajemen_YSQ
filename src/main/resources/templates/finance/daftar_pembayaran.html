@@ -1,7 +1,7 @@
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{finance/layout}" th:with="activeTitle='Pembayaran', activeTab='PEMBAYARAN'">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{finance/layout}"
+      th:with="activeTitle='Pembayaran', activeTab='PEMBAYARAN'">
 <head>
     <div layout:fragment="customHead">
         <title>Sahabat Quran | Daftar Pembayaran Belum Dibayar</title>
@@ -42,7 +42,24 @@
             </div>
 
             <div class="card-body">
-                <table class="table table-striped table-bordered table-hover mt-3">
+                <!-- Filter by Month -->
+                <form action="#" method="get" th:action="@{/finance/filterByMonth}" class="form-inline mb-3">
+                    <label for="month" class="mr-2">Pilih Bulan:</label>
+                    <select name="month" id="month" class="form-control mr-2" style="width: 200px;">
+                        <option value="" selected>Semua Bulan</option>
+                        <option value="01">Januari</option>
+                        <!-- Tambahkan bulan lainnya -->
+                    </select>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </form>
+
+                <!-- Search Field -->
+                <div class="form-group mb-3 col-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cari Nama Pembayar...">
+                </div>
+
+                <!-- Table for displaying payment records -->
+                <table class="table table-striped table-bordered table-hover mt-3" id="paymentTable">
                     <thead style="background-color: #343a40; color: white;">
                     <tr>
                         <th>No</th>
@@ -57,7 +74,7 @@
                         <td>1</td>
                         <td>Ahmad Syaiful</td>
                         <td>500,000</td>
-                        <td>2024-10-02</td>
+                        <td>2024-01-15</td>
                         <td class="text-center">
                             <a href="#" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah anda yakin ingin menghapus tagihan?">
                                 <i class="fas fa-trash"></i> Hapus
@@ -66,15 +83,16 @@
                     </tr>
                     <tr>
                         <td>2</td>
-                        <td>Nur Hidayah</td>
-                        <td>250,000</td>
-                        <td>2024-10-03</td>
+                        <td>Ananda David</td>
+                        <td>400,000</td>
+                        <td>2024-01-15</td>
                         <td class="text-center">
                             <a href="#" class="btn btn-danger btn-sm delete-confirmation" data-message="Apakah anda yakin ingin menghapus tagihan?">
                                 <i class="fas fa-trash"></i> Hapus
                             </a>
                         </td>
                     </tr>
+                    <!-- Tambahkan baris lainnya -->
                     </tbody>
                 </table>
             </div>
@@ -84,6 +102,20 @@
     </section>
     <!-- /.content -->
 </div>
-<div layout:fragment="customScript"></div>
+
+<!-- Custom Script for Search Function -->
+<div layout:fragment="customScript">
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const filter = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#paymentTable tbody tr');
+
+            rows.forEach(row => {
+                const nameCell = row.cells[1].textContent.toLowerCase();
+                row.style.display = nameCell.includes(filter) ? '' : 'none';
+            });
+        });
+    </script>
+</div>
 </body>
 </html>

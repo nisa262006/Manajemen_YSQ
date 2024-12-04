@@ -28,4 +28,9 @@ public class Peserta {
     @Size(min = 3, max = 50)
     private String nomorHandphone;
 
+    public Peserta(String nama, String email, String nomorHandphone) {
+        this.nama = nama;
+        this.email = email;
+        this.nomorHandphone = nomorHandphone;
+    }
 }

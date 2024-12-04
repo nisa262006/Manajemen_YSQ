@@ -65,6 +65,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a th:href="@{/admin/data-peserta   }" class="nav-link">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>Data Peserta</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a th:href="@{/admin/data-bank-rekening}" class="nav-link">
                                     <i class="nav-icon fas fa-university"></i>
                                     <p>Data Bank dan Rekening</p>
@@ -119,6 +125,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a th:href="@{/admin/ujian}" class="nav-link">
+                                    <i class="nav-icon fas fa-clipboard-check"></i>
+                                    <p>Ujian</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a th:href="@{/admin/soal-ujian}" class="nav-link">
                                     <i class="nav-icon fas fa-question-circle"></i>
                                     <p>Soal Ujian</p>
@@ -134,6 +146,12 @@
                                 <a th:href="@{/admin/event}" class="nav-link">
                                     <i class="nav-icon fas fa-bell"></i>
                                     <p>Event</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/admin/event-kehadiran}" class="nav-link">
+                                    <i class="nav-icon fas fa-user-check"></i>
+                                    <p>Event Kehadiran</p>
                                 </a>
                             </li>
                         </ul>
@@ -195,13 +213,19 @@
                             <li class="nav-item">
                                 <a th:href="@{/pengajar/sesi-belajar}" class="nav-link">
                                     <i class="nav-icon fas fa-play-circle"></i>
-                                    <p>Start Sesi Belajar</p>
+                                    <p>Sesi Belajar</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a th:href="@{/pengajar/rekap-pengajaran}" class="nav-link">
+                                <a th:href="@{/pengajar/ujian-praktik}" class="nav-link">
+                                    <i class="nav-icon fas fa-pen-square"></i>
+                                    <p>Ujian Praktik</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a th:href="@{/pengajar/mutabaah}" class="nav-link">
                                     <i class="nav-icon fas fa-list-alt"></i>
-                                    <p>Rekap Pengajaran</p>
+                                    <p>Mutabaah Peserta</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -210,10 +234,11 @@
                                     <p>Berita Acara</p>
                                 </a>
                             </li>
+                            
                             <li class="nav-item">
-                                <a th:href="@{/pengajar/ujian-praktik}" class="nav-link">
-                                    <i class="nav-icon fas fa-pen-square"></i>
-                                    <p>Ujian Praktik</p>
+                                <a th:href="@{/pengajar/rekap-pengajaran}" class="nav-link">
+                                    <i class="nav-icon fas fa-list-alt"></i>
+                                    <p>Rekap Pengajaran</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -250,7 +275,7 @@
                             <li class="nav-item">
                                 <a th:href="@{/peserta/pembayaran}" class="nav-link">
                                     <i class="nav-icon fas fa-credit-card"></i>
-                                    <p>Pembayaran Iuran</p>
+                                    <p>Pembayaran Tagihan</p>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -269,18 +294,6 @@
                                 <a th:href="@{/peserta/event}" class="nav-link">
                                     <i class="nav-icon fas fa-calendar-check"></i>
                                     <p>Jadwal Event</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a th:href="@{/peserta/presensi-kelas}" class="nav-link">
-                                    <i class="nav-icon fas fa-check-square"></i>
-                                    <p>Input Presensi Kelas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a th:href="@{/peserta/presensi-event}" class="nav-link">
-                                    <i class="nav-icon fas fa-tasks"></i>
-                                    <p>Input Presensi Event</p>
                                 </a>
                             </li>
                             <li class="nav-item">

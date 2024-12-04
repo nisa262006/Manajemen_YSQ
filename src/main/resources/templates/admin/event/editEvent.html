@@ -20,7 +20,7 @@
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/admin/event}">Data Event</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/admin/data-event}">Data Event</a></li>
             <li class="breadcrumb-item active">Edit Event</li>
           </ol>
         </div>
@@ -37,34 +37,17 @@
       </div>
 
       <div class="card-body shadow-lg rounded-lg bg-white p-6">
-        <form th:action="@{/admin/update-event}" method="post">
+        <form th:action="@{/admin/save-event}" method="post">
           <div class="mb-4">
-            <label for="judulEvent" class="block text-gray-700 text-sm font-bold mb-2">Judul Event:</label>
-            <input type="text" id="judulEvent" name="judulEvent" required class="border rounded-lg p-2 w-full" placeholder="Masukkan judul event">
+            <label for="namaEvent" class="block text-gray-700 text-sm font-bold mb-2">Nama Event:</label>
+            <input type="text" id="namaEvent" name="namaEvent" required class="border border-gray-300 rounded-lg p-2 w-full" placeholder="Masukkan nama event">
           </div>
-
           <div class="mb-4">
-            <label for="lokasi" class="block text-gray-700 text-sm font-bold mb-2">Lokasi:</label>
-            <input type="text" id="lokasi" name="lokasi" required class="border rounded-lg p-2 w-full" placeholder="Masukkan lokasi event">
+            <label for="waktuTerlaksana" class="block text-gray-700 text-sm font-bold mb-2">Waktu Terlaksana:</label>
+            <input type="datetime-local" id="waktuTerlaksana" name="waktuTerlaksana" required class="border border-gray-300 rounded-lg p-2 w-full">
           </div>
-
-          <div class="mb-4">
-            <label for="tanggalEvent" class="block text-gray-700 text-sm font-bold mb-2">Tanggal Event:</label>
-            <input type="date" id="tanggalEvent" name="tanggalEvent" required class="border rounded-lg p-2 w-full">
-          </div>
-
-          <div class="mb-4">
-            <label for="waktuMulai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Mulai:</label>
-            <input type="time" id="waktuMulai" name="waktuMulai" required class="border rounded-lg p-2 w-full">
-          </div>
-
-          <div class="mb-4">
-            <label for="waktuSelesai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Selesai:</label>
-            <input type="time" id="waktuSelesai" name="waktuSelesai" required class="border rounded-lg p-2 w-full">
-          </div>
-
           <div class="flex justify-end">
-            <a th:href="@{/admin/event}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+            <a th:href="@{/admin/event}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105">Batal</a>
             <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
               <i class="fas fa-save text-white mr-2"></i>
               Simpan Perubahan
@@ -78,6 +61,7 @@
   </section>
   <!-- /.content -->
 </div>
+
 <div layout:fragment="customScript"></div>
 </body>
 </html>

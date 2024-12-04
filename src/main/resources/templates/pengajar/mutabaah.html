@@ -1,10 +1,10 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{pengajar/layout}"
-      th:with="activeTitle='Rekap Mengajar', activeTab='REKAP MENGAJAR'">
+      th:with="activeTitle='Mutabaah', activeTab='MUTABAAH'">
 <head>
     <div layout:fragment="customHead">
-        <title>Sahabat Quran | Rekap Mengajar</title>
+        <title>Sahabat Quran | Mutabaah Peserta</title>
         <style>
             .status-box {
                 padding: 5px 10px;
@@ -52,19 +52,20 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Rekap Mengajar</h1>
+                    <h1>Mutabaah Peserta</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item active">Rekap Mengajar</li>
+                        <li class="breadcrumb-item active">Mutabaah</li>
                     </ol>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="content"></section>
+    <!-- Mutabaah -->
+    <section class="content">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Mutabaah</h3>
@@ -83,44 +84,51 @@
                     <thead style="background-color: #343a40; color: white;">
                     <tr>
                         <th>No</th>
+                        <th>ID Siswa</th>
                         <th>Nama Siswa</th>
-                        <th>Mata Ujian</th>
-                        <th>Tanggal Ujian</th>
-                        <th>Status Kehadiran</th>
+                        <th>Mata Pelajaran/Ujian</th>
                         <th>Mutabaah</th>
                     </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>1</td>
+                            <td>0011</td>
                             <td>Andi</td>
                             <td>Bahasa Arab</td>
-                            <td>2024-09-30, 19.20 WIB</td>
-                            <td><span class="status-box status-hadir">Hadir</span></td>
-                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah...">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editMutabaah">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
+                            <td>0012</td>
                             <td>Budi</td>
                             <td>Bahasa Arab</td>
-                            <td>2024-10-30, 15.00 WIB</td>
-                            <td><span class="status-box status-hadir">Hadir</span></td>
-                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah...">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editMutabaah">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
+
                         </tr>
                         <tr>
                             <td>3</td>
+                            <td>0013</td>
                             <td>Citra</td>
                             <td>Bahasa Arab</td>
-                            <td>2024-11-30, 16.30 WIB</td>
-                            <td><span class="status-box status-tidak-hadir">Tidak Hadir</span></td>
-                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah..."></td>
+                            <td><input type="text" class="mutabaah-input" placeholder="Input mutabaah...">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="collapse" data-target="#editMutabaah">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
 </div>
 <div layout:fragment="customScript"></div>
