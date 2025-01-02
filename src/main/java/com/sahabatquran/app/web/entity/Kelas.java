@@ -30,10 +30,9 @@ public class Kelas {
     @JoinColumn(name = "id_pengajar")
     private Pengajar pengajar;
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "id_kurikulum")
-    private Kurikulum kurikulum;
+    @NotNull @ManyToOne
+    @JoinColumn(name = "id_mata_pelajaran")
+    private MataPelajaran mataPelajaran;
 
     @NotNull @NotEmpty
     @Size(min = 3, max = 100)

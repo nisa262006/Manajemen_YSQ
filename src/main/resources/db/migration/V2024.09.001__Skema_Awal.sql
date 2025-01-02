@@ -25,9 +25,19 @@ create table kurikulum (
     unique (kode)
 );
 
+create table mata_pelajaran (
+    id varchar(36),
+    id_kurikulum varchar(36),
+    kode varchar(100) not null,
+    nama varchar(200) not null,
+    aktif boolean,
+    primary key (id),
+    foreign key (id_kurikulum) references kurikulum(id)
+);
+
 create table kelas (
     id varchar(36),
-    id_kurikulum varchar(36) not null,
+    id_mata_pelajaran varchar(36) not null,
     id_pengajar varchar(36) not null,
     nama varchar(100) not null,
     hari varchar(10) not null,
@@ -35,7 +45,7 @@ create table kelas (
     waktu_selesai time not null,
     primary key (id),
     unique (nama),
-    foreign key (id_kurikulum) references kurikulum(id),
+    foreign key (id_mata_pelajaran) references mata_pelajaran(id),
     foreign key (id_pengajar) references pengajar(id)
 );
 
@@ -52,6 +62,7 @@ create table sesi_belajar (
     id_kelas varchar(36) not null,
     waktu_mulai timestamp not null,
     waktu_selesai timestamp,
+    isi_pelajaran text,
     primary key (id),
     foreign key (id_kelas) references kelas(id)
 );
@@ -60,7 +71,8 @@ create table presensi_peserta (
     id varchar(36),
     id_sesi_belajar varchar(36) not null,
     id_peserta varchar(36) not null,
-    waktu_datang timestamp not null,
+    waktu_datang timestamp,
+    jenis_presensi varchar(20) not null,
     primary key (id),
     foreign key (id_sesi_belajar) references sesi_belajar(id),
     foreign key (id_peserta) references peserta(id)
@@ -87,10 +99,10 @@ create table jurnal_mutabaah (
 
 create table ujian (
     id varchar(36),
-    id_kurikulum varchar(36) not null,
+    id_mata_pelajaran varchar(36) not null,
     nama_ujian varchar(100) not null,
     primary key (id),
-    foreign key (id_kurikulum) references kurikulum(id)
+    foreign key (id_mata_pelajaran) references mata_pelajaran(id)
 );
 
 create table soal_ujian (
@@ -112,24 +124,26 @@ create table sesi_ujian (
 );
 
 create table sesi_ujian_peserta (
+    id varchar(36),
     id_peserta varchar(36),
     id_sesi_ujian varchar(36),
     waktu_datang timestamp not null,
-    primary key (id_peserta, id_sesi_ujian),
+    primary key (id),
     foreign key (id_peserta) references peserta(id),
     foreign key (id_sesi_ujian) references sesi_ujian(id)
 );
 
 create table sesi_ujian_pengajar (
+    id varchar(36),
     id_pengajar varchar(36),
     id_sesi_ujian varchar(36),
     waktu_datang timestamp not null,
-    primary key (id_pengajar, id_sesi_ujian),
+    primary key (id),
     foreign key (id_pengajar) references pengajar(id),
     foreign key (id_sesi_ujian) references sesi_ujian(id)
 );
 
-create table nilai (
+create table nilai_ujian (
     id varchar(36),
     id_sesi_ujian varchar(36),
     id_peserta varchar(36),
@@ -146,6 +160,7 @@ create table tagihan (
     tanggal_terbit date not null,
     tanggal_jatuh_tempo date not null,
     nilai numeric(19,2) not null,
+    lunas boolean not null,
     primary key (id),
     foreign key (id_peserta) references peserta(id)
 );
@@ -153,19 +168,18 @@ create table tagihan (
 create table pembayaran_tagihan (
     id varchar(36),
     id_tagihan varchar(36) not null,
-    id_peserta varchar(36) not null,
     waktu_pembayaran timestamp not null,
     nilai_pembayaran numeric(19,2) not null,
     kanal_pembayaran varchar(20) not null,
     referensi varchar(50) not null,
     primary key (id),
-    foreign key (id_tagihan) references tagihan(id),
-    foreign key (id_peserta) references peserta(id)
+    foreign key (id_tagihan) references tagihan(id)
 );
 
 create table program_sedekah (
     id varchar(36),
     nama varchar(200) not null,
+    deskripsi varchar(255),
     tanggal_mulai date not null,
     tanggal_selesai date not null,
     aktif boolean,
@@ -175,12 +189,31 @@ create table program_sedekah (
 create table pembayaran_sedekah (
     id varchar(36),
     id_program_sedekah varchar(36) not null,
-    id_peserta varchar(36) not null,
+    id_peserta varchar(36),
     waktu_pembayaran timestamp not null,
     nilai_pembayaran numeric(19,2) not null,
     kanal_pembayaran varchar(20) not null,
     referensi varchar(50) not null,
     primary key (id),
     foreign key (id_program_sedekah) references program_sedekah(id),
+    foreign key (id_peserta) references peserta(id)
+);
+
+create table event (
+    id varchar(36),
+    nama varchar(100) not null,
+    waktu_kegiatan_rencana timestamp not null,
+    waktu_kegiatan_realisasi timestamp,
+    catatan_acara text,
+    primary key (id)
+);
+
+create table event_kehadiran_peserta (
+    id varchar(36),
+    id_event varchar(36) not null,
+    id_peserta varchar(36) not null,
+    waktu_kehadiran timestamp not null,
+    primary key (id),
+    foreign key (id_event) references event(id),
     foreign key (id_peserta) references peserta(id)
 );
