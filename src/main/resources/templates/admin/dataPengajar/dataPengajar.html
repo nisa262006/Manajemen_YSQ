@@ -65,19 +65,21 @@
                         </tr>
                         </thead>
                         <tbody id="pengajarTable">
-                        <tr class="hover:bg-gray-100" th:each="pengajar, iterStat : ${pengajars}">
+                        <tr th:each="pengajar, iterStat : ${pengajars}" class="hover:bg-gray-100">
                             <td class="border border-gray-300 px-4 py-2" th:text="${iterStat.index + 1}"></td>
                             <td class="border border-gray-300 px-4 py-2" th:text="${pengajar.nama}"></td>
                             <td class="border border-gray-300 px-4 py-2" th:text="${pengajar.email}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${pengajar.nomorHandphone}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${pengajar.nomor_handphone}"></td>
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
                                     <!-- Icon Edit -->
-                                    <a th:href="@{/admin/edit-data-pengajar}">
+                                    <a th:href="@{/admin/edit-data-pengajar/{id}(id=${pengajar.id})}">
                                         <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
                                     </a>
                                     <!-- Icon Delete -->
-                                    <a th:href="@{/admin/delete-data-pengajar(id=${pengajar.id})}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                    <a th:href="@{/admin/delete-data-pengajar/{id}(id=${pengajar.id})}"
+                                       data-id="${pengajar.id}" class="delete-confirmation"
+                                       data-message="Apakah Anda yakin ingin menghapus data ini?">
                                         <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
                                     </a>
                                 </div>
