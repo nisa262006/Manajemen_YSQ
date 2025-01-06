@@ -56,10 +56,10 @@ public class PengajarController {
     }   
 
     // Not used -> included in sesi-belajar
-    // @GetMapping("/mutabaah")
-    // public String mutabaah() {
-    //     return "pengajar/mutabaah";
-    // }   
+    @GetMapping("/mutabaah")
+    public String mutabaah() {
+        return "pengajar/mutabaah";
+    }   
 
     @GetMapping("/berita-acara")
     public String beritaAcara() {
