@@ -37,18 +37,18 @@
       </div>
 
       <div class="card-body shadow-lg rounded-lg bg-white p-6">
-        <form th:action="@{/admin/save-data-peserta}" method="post">
+        <form th:action="@{/admin/save-data-peserta}" method="post" th:object="${peserta}">
           <div class="mb-4">
             <label for="nama" class="block text-gray-700 text-sm font-bold mb-2">Nama:</label>
-            <input type="text" id="nama" name="nama" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama peserta">
+            <input type="text" id="nama" name="nama" th:field="*{nama}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama peserta">
           </div>
           <div class="mb-4">
             <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-            <input type="email" id="email" name="email" required class="border rounded-lg p-2 w-full" placeholder="Masukkan email peserta">
+            <input type="email" id="email" name="email" th:field="*{email}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan email peserta">
           </div>
           <div class="mb-4">
-            <label for="nomorHandphone" class="block text-gray-700 text-sm font-bold mb-2">Nomor Handphone:</label>
-            <input type="text" id="nomorHandphone" name="nomorHandphone" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nomor handphone peserta">
+            <label for="nomor_handphone" class="block text-gray-700 text-sm font-bold mb-2">Nomor Handphone:</label>
+            <input type="text" id="nomor_handphone" name="nomor_handphone" th:field="*{nomor_handphone}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nomor handphone peserta">
           </div>
           <div class="flex justify-end">
             <div class="flex justify-end">

@@ -1,0 +1,8 @@
+package com.sahabatquran.app.web.repository;
+
+import com.sahabatquran.app.web.entity.Pengajar;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DataPengajarRepository extends JpaRepository<Pengajar, String> {
+
+}
