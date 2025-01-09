@@ -44,40 +44,37 @@
             </div>
 
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
-                <form th:action="@{/admin/update-kurikulum}" method="post" class="space-y-6">
+                <form th:action="@{/admin/save-edit-data-kurikulum}" method="post" th:object="${kurikulum}" class="space-y-6">
                     <!-- ID Kurikulum (hidden) -->
-                    <input type="hidden" name="id" >
+                    <input type="hidden" th:field="*{id}" />
 
                     <!-- Kode Kurikulum -->
                     <div class="flex flex-col">
-                        <label for="kodeKurikulum" class="text-gray-700">Kode Kurikulum</label>
-                        <input type="text" id="kodeKurikulum" name="kodeKurikulum"
-                               class="border rounded-lg p-2 mt-1"
-                               placeholder="Masukkan kode kurikulum" required>
+                        <label for="kode" class="text-gray-700">Kode Kurikulum</label>
+                        <input type="text" id="kode" th:field="*{kode}" class="border rounded-lg p-2 mt-1" placeholder="Masukkan kode kurikulum" required />
                     </div>
 
                     <!-- Nama Kurikulum -->
                     <div class="flex flex-col">
-                        <label for="namaKurikulum" class="text-gray-700">Nama Kurikulum</label>
-                        <input type="text" id="namaKurikulum" name="namaKurikulum"
-                               class="border rounded-lg p-2 mt-1"
-                               placeholder="Masukkan nama kurikulum" required>
+                        <label for="nama" class="text-gray-700">Nama Kurikulum</label>
+                        <input type="text" id="nama" th:field="*{nama}" class="border rounded-lg p-2 mt-1" placeholder="Masukkan nama kurikulum" required />
                     </div>
 
-                    <!-- Status -->
+                    <!-- Status Kurikulum -->
                     <div class="flex flex-col">
-                        <label for="statusKurikulum" class="text-gray-700">Status Kurikulum</label>
-                        <select id="statusKurikulum" name="statusKurikulum" class="border rounded-lg p-2 mt-1" required>
-                            <!-- Pilihan Statis -->
-                            <option value="Aktif">Aktif</option>
-                            <option value="Non-Aktif">Non-Aktif</option>
+                        <label for="aktif" class="text-gray-700">Status Kurikulum</label>
+                        <select id="aktif" th:field="*{aktif}" class="border rounded-lg p-2 mt-1" required>
+                            <!-- Cek apakah aktif true -->
+                            <option value="true" th:selected="${kurikulum.aktif}">Aktif</option>
+                            <!-- Cek apakah aktif false -->
+                            <option value="false" th:selected="${not kurikulum.aktif}">Tidak Aktif</option>
                         </select>
                     </div>
 
                     <!-- Submit Button -->
                     <div class="flex justify-end">
-                        <a href="/admin/data-kurikulum" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
-                        <button type="submit" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow">
+                        <a th:href="@{/admin/data-kurikulum}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105">Batal</a>
+                        <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
                             <i class="fas fa-save text-white mr-2"></i>
                             Simpan Perubahan
                         </button>

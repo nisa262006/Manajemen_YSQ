@@ -1,9 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}" th:with="activeTitle='Data Kelas', activeTab='DATA_KELAS'">
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Data Mata Pelajaran', activeTab='DATA_MATA_PELAJARAN'">
 
 <head>
-    <title>Sahabat Quran | Data Kelas</title>
+    <title>Sahabat Quran | Data Mata Pelajaran</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
@@ -15,12 +15,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Data Kelas</h1>
+                    <h1>Data Mata Pelajaran</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item active">Data Kelas</li>
+                        <li class="breadcrumb-item active">Data Mata Pelajaran</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
         <!-- Default box -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Kelas!</h3>
+                <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Mata Pelajaran!</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
@@ -47,9 +47,9 @@
                 <div class="overflow-x-auto">
                     <div class="flex justify-between mb-4">
                         <input type="text" id="searchInput" class="border rounded-lg p-2 w-1/3" placeholder="Search all columns..." onkeyup="filterTable()">
-                        <a th:href="@{/admin/add-data-kelas}" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow flex items-center">
+                        <a th:href="@{/admin/add-data-mata-pelajaran}" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow flex items-center">
                             <i class="fas fa-plus-circle text-white mr-2"></i>
-                            Tambah Kelas
+                            Tambah Mata Pelajaran
                         </a>
                     </div>
 
@@ -57,28 +57,33 @@
                         <thead>
                         <tr style="background-color: #343a40;" class="text-white">
                             <th class="border border-gray-300 px-4 py-2">No</th>
-                            <th class="border border-gray-300 px-4 py-2">Mata Pelajaran</th>
-                            <th class="border border-gray-300 px-4 py-2">Pengajar</th>
-                            <th class="border border-gray-300 px-4 py-2">Nama Kelas</th>
-                            <th class="border border-gray-300 px-4 py-2">Hari</th>
-                            <th class="border border-gray-300 px-4 py-2">Sesi</th>
+                            <th class="border border-gray-300 px-4 py-2">Kurikulum</th>
+                            <th class="border border-gray-300 px-4 py-2">Kode</th>
+                            <th class="border border-gray-300 px-4 py-2">Nama</th>
+                            <th class="border border-gray-300 px-4 py-2">Status</th>
                             <th class="border border-gray-300 px-4 py-2">Aksi</th>
                         </tr>
                         </thead>
-                        <tbody id="kelasTable">
-                        <tr th:each="kelas, iterStat : ${kelasList}" class="hover:bg-gray-100">
+                        <tbody id="mataPelajaranTable">
+                        <tr th:each="mataPelajaran, iterStat : ${mataPelajarans}" class="hover:bg-gray-100">
                             <td class="border border-gray-300 px-4 py-2" th:text="${iterStat.index + 1}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${kelas.mataPelajaran.nama}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${kelas.pengajar.nama}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${kelas.nama}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${kelas.hari}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${kelas.waktuMulai} + ' - ' + ${kelas.waktuSelesai}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${mataPelajaran.kurikulum.nama}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${mataPelajaran.kode}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${mataPelajaran.nama}"></td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <span th:if="${mataPelajaran.aktif}" class="text-green-500">✔️</span>
+                                <span th:if="${!mataPelajaran.aktif}" class="text-red-500">❌</span>
+                            </td>
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-data-kelas/{id}(id=${kelas.id})}">
+                                    <!-- Icon Edit -->
+                                    <a th:href="@{/admin/edit-data-mata-pelajaran/{id}(id=${mataPelajaran.id})}">
                                         <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
                                     </a>
-                                    <a th:href="@{/admin/delete-data-kelas/{id}(id=${kelas.id})}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                    <!-- Icon Delete -->
+                                    <a th:href="@{/admin/delete-data-mata-pelajaran/{id}(id=${mataPelajaran.id})}"
+                                       data-id="${mataPelajaran.id}" class="delete-confirmation"
+                                       data-message="Apakah Anda yakin ingin menghapus data ini?">
                                         <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
                                     </a>
                                 </div>
@@ -88,9 +93,7 @@
                     </table>
                 </div>
             </div>
-            <!-- /.card-body -->
         </div>
-        <!-- /.card -->
     </section>
 </div>
 
@@ -99,7 +102,7 @@
         function filterTable() {
             const input = document.getElementById('searchInput');
             const filter = input.value.toLowerCase();
-            const table = document.getElementById('kelasTable');
+            const table = document.getElementById('mataPelajaranTable');
             const rows = table.getElementsByTagName('tr');
 
             for (let i = 0; i < rows.length; i++) {

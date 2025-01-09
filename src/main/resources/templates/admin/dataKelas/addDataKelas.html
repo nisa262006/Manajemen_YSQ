@@ -37,15 +37,14 @@
 
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
                 <form th:action="@{/admin/save-data-kelas}" method="post">
-                    <!-- Materi -->
+                    <!-- Mata Pelajaran -->
                     <div class="mb-4">
-                        <label for="materi" class="block text-gray-700 text-sm font-bold mb-2">Materi:</label>
-                        <select id="materi" name="materi" required class="border rounded-lg p-2 w-full">
-                            <option value="" disabled selected>Pilih Materi</option>
-                            <option value="1">Materi 1</option>
-                            <option value="2">Materi 2</option>
-                            <option value="3">Materi 3</option>
-                            <!-- Add more options as needed -->
+                        <label for="mataPelajaran" class="block text-gray-700 text-sm font-bold mb-2">Mata Pelajaran:</label>
+                        <select id="mataPelajaran" name="mataPelajaran" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Mata Pelajaran</option>
+                            <option th:each="mataPelajaran : ${mataPelajaranList}"
+                                    th:value="${mataPelajaran.id}"
+                                    th:text="${mataPelajaran.nama}"></option>
                         </select>
                     </div>
 
@@ -54,17 +53,16 @@
                         <label for="pengajar" class="block text-gray-700 text-sm font-bold mb-2">Pengajar:</label>
                         <select id="pengajar" name="pengajar" required class="border rounded-lg p-2 w-full">
                             <option value="" disabled selected>Pilih Pengajar</option>
-                            <option value="1">Ustadz Abdullah</option>
-                            <option value="2">Ustadzah Aisyah</option>
-                            <option value="3">Ustadz Zaid</option>
-                            <option value="4">Ustadzah Fatimah</option>
+                            <option th:each="pengajar : ${pengajarList}"
+                                    th:value="${pengajar.id}"
+                                    th:text="${pengajar.nama}"></option>
                         </select>
                     </div>
 
                     <!-- Nama Kelas -->
                     <div class="mb-4">
-                        <label for="namaKelas" class="block text-gray-700 text-sm font-bold mb-2">Nama Kelas:</label>
-                        <input type="text" id="namaKelas" name="namaKelas" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama kelas">
+                        <label for="nama" class="block text-gray-700 text-sm font-bold mb-2">Nama Kelas:</label>
+                        <input type="text" id="nama" name="nama" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama kelas">
                     </div>
 
                     <!-- Hari -->
@@ -72,26 +70,22 @@
                         <label for="hari" class="block text-gray-700 text-sm font-bold mb-2">Hari:</label>
                         <select id="hari" name="hari" required class="border rounded-lg p-2 w-full">
                             <option value="" disabled selected>Pilih Hari</option>
-                            <option value="Senin">Senin</option>
-                            <option value="Selasa">Selasa</option>
-                            <option value="Rabu">Rabu</option>
-                            <option value="Kamis">Kamis</option>
-                            <option value="Jumat">Jumat</option>
-                            <option value="Sabtu">Sabtu</option>
-                            <option value="Minggu">Minggu</option>
+                            <option th:each="hari : ${hariList}"
+                                    th:value="${hari}"
+                                    th:text="${hari}"></option>
                         </select>
                     </div>
 
+                    <!-- Waktu Mulai -->
                     <div class="mb-4">
-                        <label for="sesi" class="block text-gray-700 text-sm font-bold mb-2">Sesi:</label>
-                        <select id="sesi" name="sesi" required class="border rounded-lg p-2 w-full">
-                            <option value="" disabled selected>Pilih Sesi</option>
-                            <!-- Static session options -->
-                            <option value="08:00-10:00">08:00 - 10:00</option>
-                            <option value="10:00-12:00">10:00 - 12:00</option>
-                            <option value="14:00-16:00">14:00 - 16:00</option>
-                            <!-- Add more session times as needed -->
-                        </select>
+                        <label for="waktuMulai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Mulai:</label>
+                        <input type="time" id="waktuMulai" name="waktuMulai" required class="border rounded-lg p-2 w-full">
+                    </div>
+
+                    <!-- Waktu Selesai -->
+                    <div class="mb-4">
+                        <label for="waktuSelesai" class="block text-gray-700 text-sm font-bold mb-2">Waktu Selesai:</label>
+                        <input type="time" id="waktuSelesai" name="waktuSelesai" required class="border rounded-lg p-2 w-full">
                     </div>
 
                     <!-- Submit and Cancel buttons -->

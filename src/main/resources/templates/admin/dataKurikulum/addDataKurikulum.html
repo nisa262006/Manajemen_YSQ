@@ -44,39 +44,35 @@
             </div>
 
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
-                <form th:action="@{/admin/save-kurikulum}" method="post" class="space-y-6">
-                    <!-- Kode Kurikulum -->
-                    <div class="flex flex-col">
-                        <label for="kodeKurikulum" class="text-gray-700">Kode Kurikulum</label>
-                        <input type="text" id="kodeKurikulum" name="kodeKurikulum"
-                               class="border rounded-lg p-2 mt-1" placeholder="Masukkan kode kurikulum" required>
+                <form th:action="@{/admin/save-data-kurikulum}" method="post" th:object="${kurikulum}">
+                    <div class="mb-4">
+                        <label for="kode" class="block text-gray-700 text-sm font-bold mb-2">Kode:</label>
+                        <input type="text" id="kode" name="kode" th:field="*{kode}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan kode pengajar">
                     </div>
-
-                    <!-- Nama Kurikulum -->
-                    <div class="flex flex-col">
-                        <label for="namaKurikulum" class="text-gray-700">Nama Kurikulum</label>
-                        <input type="text" id="namaKurikulum" name="namaKurikulum"
-                               class="border rounded-lg p-2 mt-1" placeholder="Masukkan nama kurikulum" required>
+                    <div class="mb-4">
+                        <label for="nama" class="block text-gray-700 text-sm font-bold mb-2">Nama:</label>
+                        <input type="nama" id="nama" name="nama" th:field="*{nama}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan nama pengajar">
                     </div>
 
                     <!-- Status -->
                     <div class="flex flex-col">
-                        <label for="statusKurikulum" class="text-gray-700">Status Kurikulum</label>
-                        <select id="statusKurikulum" name="statusKurikulum" class="border rounded-lg p-2 mt-1" required>
-                            <!-- Pilihan Statis -->
+                        <label for="aktif" class="text-gray-700">Status Kurikulum</label>
+                        <select id="aktif" name="aktif" class="border rounded-lg p-2 mt-1" required>
                             <option value="" disabled selected>Pilih status kurikulum</option>
-                            <option value="Aktif">Aktif</option>
-                            <option value="Non-Aktif">Non-Aktif</option>
+                            <option value="true">Aktif</option>
+                            <option value="false">Non-Aktif</option>
                         </select>
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="flex justify-end">
-                        <a href="/admin/data-kurikulum" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
-                        <button type="submit" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow">
-                            <i class="fas fa-save text-white mr-2"></i>
-                            Simpan
-                        </button>
+                    <div class="flex justify-end mt-3">
+                        <div class="flex justify-end">
+                            <a th:href="@{/admin/data-kurikulum}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+                            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+                                <i class="fas fa-save text-white mr-2"></i>
+                                Simpan
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
