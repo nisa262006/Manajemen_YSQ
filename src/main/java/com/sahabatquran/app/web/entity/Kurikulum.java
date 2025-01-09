@@ -26,4 +26,35 @@ public class Kurikulum {
     @NotNull
     private Boolean aktif = Boolean.TRUE;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public @NotNull @NotEmpty @Size(min = 3, max = 100) String getKode() {
+        return kode;
+    }
+
+    public void setKode(@NotNull @NotEmpty @Size(min = 3, max = 100) String kode) {
+        this.kode = kode;
+    }
+
+    public @NotNull @NotEmpty @Size(min = 3, max = 200) String getNama() {
+        return nama;
+    }
+
+    public void setNama(@NotNull @NotEmpty @Size(min = 3, max = 200) String nama) {
+        this.nama = nama;
+    }
+
+    public @NotNull Boolean getAktif() {
+        return aktif;
+    }
+
+    public void setAktif(@NotNull Boolean aktif) {
+        this.aktif = aktif;
+    }
 }

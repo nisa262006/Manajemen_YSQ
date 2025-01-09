@@ -63,44 +63,30 @@
                         </tr>
                         </thead>
                         <tbody id="kurikulumTable">
-                        <!-- Data Statis -->
-                        <tr class="hover:bg-gray-100">
-                            <td class="border border-gray-300 px-4 py-2">1</td>
-                            <td class="border border-gray-300 px-4 py-2">K001</td>
-                            <td class="border border-gray-300 px-4 py-2">Kurikulum Dasar</td>
-                            <td class="border border-gray-300 px-4 py-2">Aktif</td>
+                        <!-- Loop through kurikulums -->
+                        <tr th:each="kurikulum, stat : ${kurikulums}" class="hover:bg-gray-100">
+                            <td class="border border-gray-300 px-4 py-2" th:text="${stat.index + 1}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${kurikulum.kode}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${kurikulum.nama}"></td>
+                            <td class="border border-gray-300 px-4 py-2">
+                                <span th:if="${kurikulum.aktif}" class="text-green-500">✔️</span>
+                                <span th:if="${!kurikulum.aktif}" class="text-red-500">❌</span>
+                            </td>
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-data-kurikulum}"><i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i></a>
-                                    <a th:href="@{/admin/delete-kurikulum(id=1)}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?"><i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i></a>
+                                    <!-- Icon Edit -->
+                                    <a th:href="@{/admin/edit-data-kurikulum/{id}(id=${kurikulum.id})}">
+                                        <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                                    </a>
+                                    <!-- Icon Delete -->
+                                    <a th:href="@{/admin/delete-data-kurikulum/{id}(id=${kurikulum.id})}"
+                                       data-id="${kurikulum.id}" class="delete-confirmation"
+                                       data-message="Apakah Anda yakin ingin menghapus data ini?">
+                                        <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
-                        <tr class="hover:bg-gray-100">
-                            <td class="border border-gray-300 px-4 py-2">2</td>
-                            <td class="border border-gray-300 px-4 py-2">K002</td>
-                            <td class="border border-gray-300 px-4 py-2">Kurikulum Lanjutan</td>
-                            <td class="border border-gray-300 px-4 py-2">Aktif</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-data-kurikulum}"><i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i></a>
-                                    <a th:href="@{/admin/delete-kurikulum(id=2)}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?"><i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-100">
-                            <td class="border border-gray-300 px-4 py-2">3</td>
-                            <td class="border border-gray-300 px-4 py-2">K003</td>
-                            <td class="border border-gray-300 px-4 py-2">Kurikulum Khusus</td>
-                            <td class="border border-gray-300 px-4 py-2">Non-Aktif</td>
-                            <td class="border border-gray-300 px-4 py-2">
-                                <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-data-kurikulum}"><i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i></a>
-                                    <a th:href="@{/admin/delete-kurikulum(id=3)}" class="delete-confirmation" data-message="Apakah Anda yakin ingin menghapus data ini?"><i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
                     </table>
                 </div>
             </div>

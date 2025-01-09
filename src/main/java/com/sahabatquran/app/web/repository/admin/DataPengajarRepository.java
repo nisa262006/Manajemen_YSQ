@@ -1,4 +1,4 @@
-package com.sahabatquran.app.web.repository;
+package com.sahabatquran.app.web.repository.admin;
 
 import com.sahabatquran.app.web.entity.Pengajar;
 import org.springframework.data.jpa.repository.JpaRepository;

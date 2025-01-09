@@ -1,8 +1,7 @@
-package com.sahabatquran.app.web.service;
+package com.sahabatquran.app.web.service.admin;
 
 import com.sahabatquran.app.web.entity.Peserta;
-import com.sahabatquran.app.web.repository.DataPesertaRepository;
-import com.sahabatquran.app.web.repository.DataPesertaRepository;
+import com.sahabatquran.app.web.repository.admin.DataPesertaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

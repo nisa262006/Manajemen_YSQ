@@ -54,4 +54,68 @@ public class Kelas {
         inverseJoinColumns = @JoinColumn(name = "id_peserta")
     )
     private List<Peserta> daftarPeserta = new ArrayList<>();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public @NotNull Pengajar getPengajar() {
+        return pengajar;
+    }
+
+    public void setPengajar(@NotNull Pengajar pengajar) {
+        this.pengajar = pengajar;
+    }
+
+    public @NotNull MataPelajaran getMataPelajaran() {
+        return mataPelajaran;
+    }
+
+    public void setMataPelajaran(@NotNull MataPelajaran mataPelajaran) {
+        this.mataPelajaran = mataPelajaran;
+    }
+
+    public @NotNull @NotEmpty @Size(min = 3, max = 100) String getNama() {
+        return nama;
+    }
+
+    public void setNama(@NotNull @NotEmpty @Size(min = 3, max = 100) String nama) {
+        this.nama = nama;
+    }
+
+    public Hari getHari() {
+        return hari;
+    }
+
+    public void setHari(Hari hari) {
+        this.hari = hari;
+    }
+
+    public @NotNull LocalTime getWaktuMulai() {
+        return waktuMulai;
+    }
+
+    public void setWaktuMulai(@NotNull LocalTime waktuMulai) {
+        this.waktuMulai = waktuMulai;
+    }
+
+    public @NotNull LocalTime getWaktuSelesai() {
+        return waktuSelesai;
+    }
+
+    public void setWaktuSelesai(@NotNull LocalTime waktuSelesai) {
+        this.waktuSelesai = waktuSelesai;
+    }
+
+    public List<Peserta> getDaftarPeserta() {
+        return daftarPeserta;
+    }
+
+    public void setDaftarPeserta(List<Peserta> daftarPeserta) {
+        this.daftarPeserta = daftarPeserta;
+    }
 }

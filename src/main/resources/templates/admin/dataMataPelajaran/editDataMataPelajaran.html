@@ -1,0 +1,98 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Mata Pelajaran', activeTab='DATA_MATA_PELAJARAN'">
+
+<head>
+    <title>Sahabat Quran | Edit Mata Pelajaran</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Edit Mata Pelajaran</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/data-mata-pelajaran}">Data Mata Pelajaran</a></li>
+                        <li class="breadcrumb-item active">Edit Mata Pelajaran</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Form Edit Mata Pelajaran</h3>
+            </div>
+
+            <div class="card-body shadow-lg rounded-lg bg-white p-6">
+                <!-- Form Edit Data Mata Pelajaran -->
+                <form th:action="@{/admin/save-edit-data-mata-pelajaran}" method="post" th:object="${mataPelajaran}">
+                    <input type="hidden" th:field="*{id}" />
+
+                    <!-- Kurikulum -->
+                    <div class="mb-4">
+                        <label for="kurikulum" class="block text-gray-700 text-sm font-bold mb-2">Kurikulum:</label>
+                        <select id="kurikulum" th:field="*{kurikulum.id}" class="border rounded-lg p-2 w-full" required>
+                            <option value="" disabled selected>Pilih Kurikulum</option>
+                            <option th:each="kurikulum : ${kurikulums}"
+                                    th:value="${kurikulum.id}"
+                                    th:text="${kurikulum.nama}"
+                                    th:selected="${kurikulum.id == mataPelajaran.kurikulum.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Nama Mata Pelajaran -->
+                    <div class="mb-4">
+                        <label for="nama" class="block text-gray-700 text-sm font-bold mb-2">Mata Pelajaran:</label>
+                        <input type="text" id="nama" th:field="*{nama}" class="border rounded-lg p-2 w-full" placeholder="Masukkan nama mata pelajaran" required />
+                    </div>
+
+                    <!-- Kode Mata Pelajaran -->
+                    <div class="mb-4">
+                        <label for="kode" class="block text-gray-700 text-sm font-bold mb-2">Kode:</label>
+                        <input type="text" id="kode" th:field="*{kode}" class="border rounded-lg p-2 w-full" placeholder="Masukkan kode mata pelajaran" required />
+                    </div>
+
+                    <!-- Status Kurikulum -->
+                    <div class="flex flex-col">
+                        <label for="aktif" class="text-gray-700">Status Kurikulum</label>
+                        <select id="aktif" th:field="*{aktif}" class="border rounded-lg p-2 mt-1" required>
+                            <!-- Cek apakah aktif true -->
+                            <option value="true" th:selected="${mataPelajaran.aktif}">Aktif</option>
+                            <!-- Cek apakah aktif false -->
+                            <option value="false" th:selected="${not mataPelajaran.aktif}">Tidak Aktif</option>
+                        </select>
+                    </div>
+
+                    <!-- Tombol Aksi -->
+                    <div class="flex justify-end mt-3">
+                        <a th:href="@{/admin/data-mata-pelajaran}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105">Batal</a>
+                        <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+                            <i class="fas fa-save text-white mr-2"></i>
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </section>
+    <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>
