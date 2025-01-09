@@ -22,4 +22,28 @@ public class Ujian {
 
     @NotNull @NotEmpty
     private String namaUjian;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public @NotNull MataPelajaran getMataPelajaran() {
+        return mataPelajaran;
+    }
+
+    public void setMataPelajaran(@NotNull MataPelajaran mataPelajaran) {
+        this.mataPelajaran = mataPelajaran;
+    }
+
+    public @NotNull @NotEmpty String getNamaUjian() {
+        return namaUjian;
+    }
+
+    public void setNamaUjian(@NotNull @NotEmpty String namaUjian) {
+        this.namaUjian = namaUjian;
+    }
 }

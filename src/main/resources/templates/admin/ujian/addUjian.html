@@ -38,10 +38,16 @@
 
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
                 <form th:action="@{/admin/save-ujian}" method="post">
-                    <!-- Field ID Kurikulum -->
+                    <!-- Select Mata Pelajaran -->
                     <div class="mb-4">
-                        <label for="id_kurikulum" class="block text-gray-700 text-sm font-bold mb-2">ID Kurikulum:</label>
-                        <input type="text" id="id_kurikulum" name="id_kurikulum" required class="border rounded-lg p-2 w-full" placeholder="Masukkan ID Kurikulum">
+                        <label for="mata_pelajaran" class="block text-gray-700 text-sm font-bold mb-2">Mata Pelajaran:</label>
+                        <select id="mata_pelajaran" name="mata_pelajaran_id" required class="border rounded-lg p-2 w-full">
+                            <option value="" disabled selected>Pilih Mata Pelajaran</option>
+                            <option th:each="mataPelajaran : ${mataPelajarans}"
+                                    th:value="${mataPelajaran.id}"
+                                    th:text="${mataPelajaran.nama}">
+                            </option>
+                        </select>
                     </div>
 
                     <!-- Field Nama Ujian -->
@@ -50,6 +56,7 @@
                         <input type="text" id="nama_ujian" name="nama_ujian" required class="border rounded-lg p-2 w-full" placeholder="Masukkan Nama Ujian">
                     </div>
 
+                    <!-- Submit and Cancel buttons -->
                     <div class="flex justify-end">
                         <a th:href="@{/admin/ujian}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
                         <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
