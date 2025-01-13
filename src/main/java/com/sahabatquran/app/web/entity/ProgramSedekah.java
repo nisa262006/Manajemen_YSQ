@@ -26,4 +26,5 @@ public class ProgramSedekah {
     
     private Boolean aktif = Boolean.TRUE;
 
+
 }

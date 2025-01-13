@@ -34,24 +34,40 @@
       </div>
 
       <div class="card-body shadow-lg rounded-lg bg-white p-6">
-        <form action="/admin/update-data-soal-ujian/{id}" method="post">
+        <form th:action="@{/admin/save-edit-soal-ujian}" th:object="${soalUjian}" method="post">
+          <input type="hidden" name="id" th:value="${soalUjian.id}">
+
+          <!-- Dropdown Nama Ujian -->
           <div class="mb-4">
-            <label for="idUjian" class="block text-gray-700 text-sm font-bold mb-2">ID Ujian:</label>
-            <input type="text" id="idUjian" name="idUjian" value="ID Ujian Saat Ini" required class="border rounded-lg p-2 w-full" placeholder="Masukkan ID Ujian">
+            <label for="ujian" class="block text-gray-700 text-sm font-bold mb-2">Nama Ujian:</label>
+            <select id="ujian" th:field="*{ujian}" required class="border rounded-lg p-2 w-full">
+              <option value="" disabled>Pilih Nama Ujian</option>
+              <option th:each="ujian : ${ujianList}"
+                      th:value="${ujian.id}"
+                      th:text="${ujian.namaUjian}"
+                      th:selected="${ujian.id == soalUjian.ujian.id}"></option>
+            </select>
           </div>
 
+          <!-- Field Urutan -->
           <div class="mb-4">
             <label for="urutan" class="block text-gray-700 text-sm font-bold mb-2">Urutan:</label>
-            <input type="number" id="urutan" name="urutan" value="1" required class="border rounded-lg p-2 w-full" placeholder="Masukkan urutan soal">
+            <input type="number"
+                   id="urutan"
+                   th:field="*{urutan}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan urutan soal">
           </div>
 
+          <!-- Field Pertanyaan -->
           <div class="mb-4">
             <label for="pertanyaan" class="block text-gray-700 text-sm font-bold mb-2">Pertanyaan:</label>
-            <textarea id="pertanyaan" name="pertanyaan" required class="border rounded-lg p-2 w-full" placeholder="Masukkan pertanyaan soal">Pertanyaan Saat Ini</textarea>
+            <textarea id="pertanyaan"
+                      th:field="*{pertanyaan}"
+                      required class="border rounded-lg p-2 w-full" placeholder="Masukkan pertanyaan ujian"></textarea>
           </div>
 
+          <!-- Tombol Aksi -->
           <div class="flex justify-end">
-            <a href="/admin/soal-ujian" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+            <a th:href="@{/admin/soal-ujian}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
             <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
               <i class="fas fa-save text-white mr-2"></i>
               Simpan Perubahan
