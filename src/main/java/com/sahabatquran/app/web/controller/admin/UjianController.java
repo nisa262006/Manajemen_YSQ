@@ -30,7 +30,7 @@ public class UjianController {
 
     @GetMapping("/ujian")
     public String adminUjian(Model model) {
-        List<Ujian> ujians = ujianRepository.findAll(); // Ujian already includes MataPelajaran
+        List<Ujian> ujians = ujianRepository.findAll();
         model.addAttribute("ujians", ujians);
         return "admin/ujian/ujian";
     }
