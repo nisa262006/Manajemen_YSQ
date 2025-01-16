@@ -1,0 +1,130 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{finance/layout}" th:with="activeTitle='Program Sedekah', activeTab='PROGRAM_SEDEKAH'">
+
+<head>
+  <title>Sahabat Quran | Program Sedekah</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Program Sedekah</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item active">Program Sedekah</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <!-- Binding nama pengguna -->
+        <h3 class="card-title" th:text="'Hai ' + ${nama} + ', selamat datang di halaman Program Sedekah!'"></h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body shadow-lg rounded-lg bg-white p-6">
+        <div class="overflow-x-auto">
+          <div class="flex justify-between mb-4">
+            <input type="text" id="searchInput" class="border rounded-lg p-2 w-1/3" placeholder="Search all columns..." onkeyup="filterTable()">
+            <a th:href="@{/finance/add-program-sedekah}" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow flex items-center">
+              <i class="fas fa-plus-circle text-white mr-2"></i>
+              Tambah Program
+            </a>
+          </div>
+
+          <!-- Tabel Sedekah -->
+          <table class="min-w-full border border-gray-300 mt-3 shadow-lg">
+            <thead>
+            <tr style="background-color: #343a40;" class="text-white">
+              <th class="border border-gray-300 px-4 py-2">No</th>
+              <th class="border border-gray-300 px-4 py-2">Nama Program</th>
+              <th class="border border-gray-300 px-4 py-2">Deskripsi</th>
+              <th class="border border-gray-300 px-4 py-2">Tanggal Mulai</th>
+              <th class="border border-gray-300 px-4 py-2">Tanggal Selesai</th>
+              <th class="border border-gray-300 px-4 py-2">Aktif</th>
+              <th class="border border-gray-300 px-4 py-2">Aksi</th>
+            </tr>
+            </thead>
+            <tbody id="sedekahTable">
+            <!-- Binding data dengan th:each -->
+            <tr th:each="program, iterStat : ${programs}" class="hover:bg-gray-100">
+              <td class="border border-gray-300 px-4 py-2" th:text="${iterStat.index + 1}"></td>
+              <td class="border border-gray-300 px-4 py-2" th:text="${program.nama}"></td>
+              <td class="border border-gray-300 px-4 py-2" th:text="${program.deskripsi}"></td>
+              <td class="border border-gray-300 px-4 py-2" th:text="${program.tanggalMulai}"></td>
+              <td class="border border-gray-300 px-4 py-2" th:text="${program.tanggalSelesai}"></td>
+              <td class="border border-gray-300 px-4 py-2" th:text="${program.aktif ? 'Aktif' : 'Tidak Aktif'}"></td>
+              <td class="border border-gray-300 px-4 py-2">
+                <div class="flex justify-center space-x-2">
+                  <!-- Icon Edit -->
+                  <a th:href="@{/finance/edit-program-sedekah/{id}(id=${program.id})}">
+                    <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
+                  </a>
+                  <!-- Icon Delete -->
+                  <a th:href="@{/finance/delete-program-sedekah/{id}(id=${program.id})}"
+                     data-id="${program.id}" class="delete-confirmation"
+                     data-message="Apakah Anda yakin ingin menghapus data ini?">
+                    <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div layout:fragment="customScript">
+  <script>
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('sedekahTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let found = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                const cell = cells[j];
+                if (cell) {
+                    const txtValue = cell.textContent || cell.innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            rows[i].style.display = found ? '' : 'none';
+        }
+    }
+  </script>
+</div>
+</body>
+</html>

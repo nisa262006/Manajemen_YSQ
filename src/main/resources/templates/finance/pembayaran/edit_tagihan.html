@@ -1,0 +1,81 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Program Sedekah', activeTab='PROGRAM_SEDEKAH'">
+
+<head>
+  <title>Sahabat Quran | Edit Tagihan</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Tagihan</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/finance/daftar-pembayaran}">Tagihan Pembayaran</a></li>
+            <li class="breadcrumb-item active">Edit Tagihan</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Form Tambah Tagihan</h3>
+      </div>
+
+      <div class="card-body shadow-lg rounded-lg bg-white p-6">
+        <form th:action="@{/finance/save-edit-tagihan}" method="post" th:object="${tagihans}">
+          <input type="hidden" name="id" th:value="${id}">
+          <div class="mb-4">
+            <label for="peserta_id" class="block text-gray-700 text-sm font-bold mb-2">Nama Peserta:</label>
+            <select id="peserta_id" name="peserta_id" th:field="*{peserta.id}" required class="border rounded-lg p-2 w-full">
+              <option value="" disabled selected>Pilih Peserta</option>
+              <option th:each="peserta : ${daftarPeserta}" th:value="${peserta.id}" th:text="${peserta.nama}"></option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label for="tanggaTerbit" class="block text-gray-700 text-sm font-bold mb-2">Tanggal Terbit:</label>
+            <textarea id="tanggaTerbit" name="tanggaTerbit" th:field="*{tanggalTerbit}" required class="border rounded-lg p-2 w-full" placeholder="Masukkan deskripsi program"></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="jatuhTempo" class="block text-gray-700 text-sm font-bold mb-2">Jatuh Tempo:</label>
+            <input type="date" id="jatuhTempo" name="jatuhTempo" th:field="*{tanggalJatuhTempo}" required class="border rounded-lg p-2 w-full">
+          </div>
+          <div class="mb-4">
+            <label for="nominal" class="block text-gray-700 text-sm font-bold mb-2">Nominal:</label>
+            <input type="number" id="nominal" name="nominal" th:field="*{nilai}" required class="border rounded-lg p-2 w-full">
+          </div>
+          <div class="mb-4">
+            <label for="lunas" class="block text-gray-700 text-sm font-bold mb-2">Lunas:</label>
+            <select id="lunas" name="lunas" th:field="*{lunas}" required class="border rounded-lg p-2 w-full">
+              <option value="false">Belum Lunas</option>
+              <option value="true">Lunas</option>
+            </select>
+          </div>
+          <div class="flex justify-end">
+            <a th:href="@{/finance/daftar-pembayaran}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+              <i class="fas fa-save text-white mr-2"></i>
+              Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

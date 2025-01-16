@@ -26,5 +26,51 @@ public class ProgramSedekah {
     
     private Boolean aktif = Boolean.TRUE;
 
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public @NotNull @NotEmpty String getNama() {
+        return nama;
+    }
+
+    public void setNama(@NotNull @NotEmpty String nama) {
+        this.nama = nama;
+    }
+
+    public String getDeskripsi() {
+        return deskripsi;
+    }
+
+    public void setDeskripsi(String deskripsi) {
+        this.deskripsi = deskripsi;
+    }
+
+    public @NotNull LocalDate getTanggalMulai() {
+        return tanggalMulai;
+    }
+
+    public void setTanggalMulai(@NotNull LocalDate tanggalMulai) {
+        this.tanggalMulai = tanggalMulai;
+    }
+
+    public LocalDate getTanggalSelesai() {
+        return tanggalSelesai;
+    }
+
+    public void setTanggalSelesai(LocalDate tanggalSelesai) {
+        this.tanggalSelesai = tanggalSelesai;
+    }
+
+    public Boolean getAktif() {
+        return aktif;
+    }
+
+    public void setAktif(Boolean aktif) {
+        this.aktif = aktif;
+    }
 }
