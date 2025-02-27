@@ -147,7 +147,7 @@ create table nilai_ujian (
     id varchar(36),
     id_sesi_ujian varchar(36),
     id_peserta varchar(36),
-    nilai numeric(3,2) not null,
+    nilai numeric(5,2) not null,
     keterangan varchar(255),
     primary key (id),
     foreign key (id_peserta) references peserta(id),

@@ -1,0 +1,73 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Edit Parameter Penilaian Ujian', activeTab='DATA_UJIAN'">
+
+<head>
+  <title>Sahabat Quran | Edit Parameter Penilaian Ujian</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+<div layout:fragment="content">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Edit Parameter Penilaian Ujian</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/admin/parameter-penilaian}">Data Parameter Penilaian Ujian</a></li>
+            <li class="breadcrumb-item active">Edit Parameter Penilaian Ujian</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <!-- /.container-fluid -->
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Form Edit Parameter Penilaian Ujian</h3>
+      </div>
+
+      <div class="card-body shadow-lg rounded-lg bg-white p-6">
+        <form th:action="@{/admin/update-parameter-penilaian}" method="post">
+          <div class="mb-4">
+            <label for="idUjian" class="block text-gray-700 text-sm font-bold mb-2">ID Ujian:</label>
+            <input type="text" id="idUjian" name="idUjian" required class="border rounded-lg p-2 w-full" placeholder="Masukkan ID Ujian">
+          </div>
+
+          <div class="mb-4">
+            <label for="namaParameter" class="block text-gray-700 text-sm font-bold mb-2">Nama Parameter:</label>
+            <input type="text" id="namaParameter" name="namaParameter" required class="border rounded-lg p-2 w-full" placeholder="Masukkan Nama Parameter">
+          </div>
+
+          <div class="mb-4">
+            <label for="bobot" class="block text-gray-700 text-sm font-bold mb-2">Bobot (%):</label>
+            <input type="number" id="bobot" name="bobot" required min="0" max="100" class="border rounded-lg p-2 w-full" placeholder="Masukkan Bobot (0-100)">
+          </div>
+
+          <div class="flex justify-end">
+            <a th:href="@{/admin/parameter-penilaian}" class="bg-gray-200 text-gray-800 hover:bg-gray-300 px-4 py-2 rounded-lg shadow mr-4 transition-transform transform hover:scale-105" style="color: inherit;">Batal</a>
+            <button type="submit" class="bg-gray-800 text-white rounded-lg px-4 py-2 shadow transition-all duration-200 hover:bg-gray-700 transition-transform transform hover:scale-105">
+              <i class="fas fa-save text-white mr-2"></i>
+              Simpan Perubahan
+            </button>
+          </div>
+        </form>
+      </div>
+      <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+  </section>
+  <!-- /.content -->
+</div>
+<div layout:fragment="customScript"></div>
+</body>
+</html>

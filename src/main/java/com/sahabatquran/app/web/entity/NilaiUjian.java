@@ -31,4 +31,44 @@ public class NilaiUjian {
     private BigDecimal nilai;
 
     private String keterangan;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public @NotNull Peserta getPeserta() {
+        return peserta;
+    }
+
+    public void setPeserta(@NotNull Peserta peserta) {
+        this.peserta = peserta;
+    }
+
+    public @NotNull SesiUjian getSesiUjian() {
+        return sesiUjian;
+    }
+
+    public void setSesiUjian(@NotNull SesiUjian sesiUjian) {
+        this.sesiUjian = sesiUjian;
+    }
+
+    public @NotNull @Min(0) BigDecimal getNilai() {
+        return nilai;
+    }
+
+    public void setNilai(@NotNull @Min(0) BigDecimal nilai) {
+        this.nilai = nilai;
+    }
+
+    public String getKeterangan() {
+        return keterangan;
+    }
+
+    public void setKeterangan(String keterangan) {
+        this.keterangan = keterangan;
+    }
 }

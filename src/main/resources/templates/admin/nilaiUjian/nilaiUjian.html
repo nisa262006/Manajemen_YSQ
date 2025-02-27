@@ -1,9 +1,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout}" th:with="activeTitle='Data Event', activeTab='DATA_EVENT'">
+      layout:decorate="~{admin/layout}" th:with="activeTitle='Nilai Ujian', activeTab='NILAI_UJIAN'">
 
 <head>
-    <title>Sahabat Quran | Data Event</title>
+    <title>Sahabat Quran | Nilai Ujian</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
@@ -14,12 +14,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Data Event</h1>
+                    <h1>Nilai Ujian</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                        <li class="breadcrumb-item active">Data Event</li>
+                        <li class="breadcrumb-item active">Nilai Ujian</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
     <section class="content">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Hai {nama}, selamat datang di halaman Data Event!</h3>
+                <h3 class="card-title">Hai <span th:text="${nama}"></span>, selamat datang di halaman Nilai Ujian!</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
                         <i class="fas fa-minus"></i>
@@ -43,10 +43,10 @@
             <div class="card-body shadow-lg rounded-lg bg-white p-6">
                 <div class="overflow-x-auto">
                     <div class="flex justify-between mb-4">
-                        <input type="text" id="searchInput" class="border rounded-lg p-2 w-1/3" placeholder="Search all columns..." onkeyup="filterTable()">
-                        <a th:href="@{/admin/add-event}" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow flex items-center">
+                        <input type="text" id="searchInput" class="border rounded-lg p-2 w-1/3" placeholder="Cari semua kolom..." onkeyup="filterTable()">
+                        <a th:href="@{/admin/add-nilai-ujian}" style="background-color: #343a40;" class="text-white px-4 py-2 rounded-lg shadow flex items-center">
                             <i class="fas fa-plus-circle text-white mr-2"></i>
-                            Tambah Event
+                            Tambah Nilai Ujian
                         </a>
                     </div>
 
@@ -54,28 +54,28 @@
                         <thead>
                         <tr style="background-color: #343a40;" class="text-white">
                             <th class="border border-gray-300 px-4 py-2">No</th>
-                            <th class="border border-gray-300 px-4 py-2">Nama Event</th>
-                            <th class="border border-gray-300 px-4 py-2">Waktu Rencana</th>
-                            <th class="border border-gray-300 px-4 py-2">Waktu Realisasi</th>
-                            <th class="border border-gray-300 px-4 py-2">Catatan</th>
+                            <th class="border border-gray-300 px-4 py-2">Nama Peserta</th>
+                            <th class="border border-gray-300 px-4 py-2">Ujian</th>
+                            <th class="border border-gray-300 px-4 py-2">Nilai</th>
+                            <th class="border border-gray-300 px-4 py-2">Keterangan</th>
                             <th class="border border-gray-300 px-4 py-2">Aksi</th>
                         </tr>
                         </thead>
-                        <tbody id="eventTable">
-                        <tr th:each="event, iterStat : ${events}" class="hover:bg-gray-100">
+                        <tbody id="nilaiTable">
+                        <tr th:each="nilai, iterStat : ${nilaiList}" class="hover:bg-gray-100">
                             <td class="border border-gray-300 px-4 py-2" th:text="${iterStat.index + 1}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${event.nama}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${#temporals.format(event.waktu_kegiatan_rencana, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${#temporals.format(event.waktu_kegiatan_realisasi, 'dd-MM-yyyy HH:mm')}"></td>
-                            <td class="border border-gray-300 px-4 py-2" th:text="${event.catatan_acara}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${nilai.peserta.nama}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${nilai.sesiUjian.ujian}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${nilai.nilai}"></td>
+                            <td class="border border-gray-300 px-4 py-2" th:text="${nilai.keterangan}"></td>
                             <td class="border border-gray-300 px-4 py-2">
                                 <div class="flex justify-center space-x-2">
-                                    <a th:href="@{/admin/edit-event/{id}(id=${event.id})}">
+                                    <a th:href="@{/admin/edit-nilai/{id}(id=${nilai.id})}">
                                         <i class="fas fa-edit text-yellow-500 cursor-pointer hover:bg-yellow-500 hover:text-white p-2 rounded-full border-2 border-yellow-500"></i>
                                     </a>
-                                    <a th:href="@{/admin/delete-event/{id}(id=${event.id})}"
-                                       data-id="${event.id}" class="delete-confirmation"
-                                       data-message="Apakah Anda yakin ingin menghapus event ini?">
+                                    <a th:href="@{/admin/delete-nilai/{id}(id=${nilai.id})}"
+                                       data-id="${nilai.id}" class="delete-confirmation"
+                                       data-message="Apakah Anda yakin ingin menghapus nilai ini?">
                                         <i class="fas fa-trash text-red-500 cursor-pointer hover:bg-red-500 hover:text-white p-2 rounded-full border-2 border-red-500"></i>
                                     </a>
                                 </div>
@@ -83,7 +83,6 @@
                         </tr>
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>
@@ -95,7 +94,7 @@
         function filterTable() {
             const input = document.getElementById('searchInput');
             const filter = input.value.toLowerCase();
-            const table = document.getElementById('eventTable');
+            const table = document.getElementById('nilaiTable');
             const rows = table.getElementsByTagName('tr');
 
             for (let i = 0; i < rows.length; i++) {
