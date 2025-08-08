@@ -11,19 +11,22 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class PengajarFormPage {
+public class KurikulumFormPage {
 
     private final WebDriver webDriver;
     private final WebDriverWait wait;
 
+    @FindBy(id = "kode")
+    private WebElement kodeInput;
+
     @FindBy(id = "nama")
     private WebElement namaInput;
 
-    @FindBy(id = "email")
-    private WebElement emailInput;
+    @FindBy(css = "input[name='aktif'][value='true']")
+    private WebElement aktifTrueRadio;
 
-    @FindBy(id = "nomorHandphone")
-    private WebElement nomorHandphoneInput;
+    @FindBy(css = "input[name='aktif'][value='false']")
+    private WebElement aktifFalseRadio;
 
     @FindBy(css = "button[type='submit']")
     private WebElement submitButton;
@@ -31,7 +34,7 @@ public class PengajarFormPage {
     @FindBy(css = "button[type='reset']")
     private WebElement resetButton;
 
-    @FindBy(css = "a[href*='/pengajar']:not([href*='/new']):not([href*='/edit'])")
+    @FindBy(css = "a[href*='/kurikulum']:not([href*='/new']):not([href*='/edit'])")
     private WebElement kembaliButton;
 
     @FindBy(css = ".text-red-600")
@@ -40,7 +43,7 @@ public class PengajarFormPage {
     @FindBy(css = ".bg-red-50")
     private WebElement errorAlert;
 
-    public PengajarFormPage(WebDriver webDriver, String url) {
+    public KurikulumFormPage(WebDriver webDriver, String url) {
         this.webDriver = webDriver;
         this.wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
         webDriver.get(url);
@@ -67,28 +70,32 @@ public class PengajarFormPage {
         return webDriver.getCurrentUrl().contains("/edit");
     }
 
+    public void fillKode(String kode) {
+        wait.until(ExpectedConditions.elementToBeClickable(kodeInput));
+        kodeInput.clear();
+        kodeInput.sendKeys(kode);
+    }
+
     public void fillNama(String nama) {
         wait.until(ExpectedConditions.elementToBeClickable(namaInput));
         namaInput.clear();
         namaInput.sendKeys(nama);
     }
 
-    public void fillEmail(String email) {
-        wait.until(ExpectedConditions.elementToBeClickable(emailInput));
-        emailInput.clear();
-        emailInput.sendKeys(email);
+    public void selectAktif(boolean aktif) {
+        if (aktif) {
+            wait.until(ExpectedConditions.elementToBeClickable(aktifTrueRadio));
+            aktifTrueRadio.click();
+        } else {
+            wait.until(ExpectedConditions.elementToBeClickable(aktifFalseRadio));
+            aktifFalseRadio.click();
+        }
     }
 
-    public void fillNomorHandphone(String nomorHandphone) {
-        wait.until(ExpectedConditions.elementToBeClickable(nomorHandphoneInput));
-        nomorHandphoneInput.clear();
-        nomorHandphoneInput.sendKeys(nomorHandphone);
-    }
-
-    public void fillForm(String nama, String email, String nomorHandphone) {
+    public void fillForm(String kode, String nama, boolean aktif) {
+        fillKode(kode);
         fillNama(nama);
-        fillEmail(email);
-        fillNomorHandphone(nomorHandphone);
+        selectAktif(aktif);
     }
 
     public void submitForm() {
@@ -115,16 +122,16 @@ public class PengajarFormPage {
         kembaliButton.click();
     }
 
+    public String getKodeValue() {
+        return kodeInput.getAttribute("value");
+    }
+
     public String getNamaValue() {
         return namaInput.getAttribute("value");
     }
 
-    public String getEmailValue() {
-        return emailInput.getAttribute("value");
-    }
-
-    public String getNomorHandphoneValue() {
-        return nomorHandphoneInput.getAttribute("value");
+    public boolean getAktifValue() {
+        return aktifTrueRadio.isSelected();
     }
 
     public boolean hasValidationError() {
@@ -160,15 +167,11 @@ public class PengajarFormPage {
     public boolean isFieldHighlightedAsError(String fieldName) {
         WebElement field = null;
         switch (fieldName.toLowerCase()) {
+            case "kode":
+                field = kodeInput;
+                break;
             case "nama":
                 field = namaInput;
-                break;
-            case "email":
-                field = emailInput;
-                break;
-            case "nomorhandphone":
-            case "nomor handphone":
-                field = nomorHandphoneInput;
                 break;
         }
         
@@ -182,15 +185,11 @@ public class PengajarFormPage {
     public boolean isRequiredField(String fieldName) {
         WebElement field = null;
         switch (fieldName.toLowerCase()) {
+            case "kode":
+                field = kodeInput;
+                break;
             case "nama":
                 field = namaInput;
-                break;
-            case "email":
-                field = emailInput;
-                break;
-            case "nomorhandphone":
-            case "nomor handphone":
-                field = nomorHandphoneInput;
                 break;
         }
         
@@ -208,7 +207,7 @@ public class PengajarFormPage {
             // Wait for either redirect to list page or error message to appear
             wait.until(driver -> {
                 String currentUrl = driver.getCurrentUrl();
-                return (currentUrl.contains("/pengajar") && !currentUrl.contains("/new") && !currentUrl.contains("/edit"))
+                return (currentUrl.contains("/kurikulum") && !currentUrl.contains("/new") && !currentUrl.contains("/edit"))
                     || hasValidationError() 
                     || isErrorMessageDisplayed()
                     || currentUrl.contains("/new")  // Still on form page after validation error
@@ -219,7 +218,7 @@ public class PengajarFormPage {
         }
     }
 
-    public PengajarListPage submitAndGoToList() {
+    public KurikulumListPage submitAndGoToList() {
         submitAndWaitForResponse();
         
         // If we're still on form page, there was an error
@@ -227,28 +226,26 @@ public class PengajarFormPage {
             return null;
         }
         
-        return new PengajarListPage(webDriver, webDriver.getCurrentUrl());
+        return new KurikulumListPage(webDriver, webDriver.getCurrentUrl());
     }
 
-    public PengajarListPage goBackToList() {
+    public KurikulumListPage goBackToList() {
         clickKembali();
-        return new PengajarListPage(webDriver, webDriver.getCurrentUrl());
+        return new KurikulumListPage(webDriver, webDriver.getCurrentUrl());
     }
 
     public void submitFormBypassingClientValidation() {
-        // Bypass client-side validation by directly submitting form via JavaScript
-        wait.until(ExpectedConditions.elementToBeClickable(submitButton));
-        ((JavascriptExecutor) webDriver).executeScript("document.querySelector('form').submit();");
+        // Use JavaScript to submit the form bypassing client-side validation
+        JavascriptExecutor js = (JavascriptExecutor) webDriver;
+        js.executeScript("document.querySelector('form').submit();");
         
-        // Handle potential JavaScript alerts that might still appear
+        // Handle potential server-side validation alerts
         try {
-            Thread.sleep(100); // Brief wait for alert to appear
-            if (webDriver.switchTo().alert() != null) {
-                webDriver.switchTo().alert().accept();
-            }
+            WebDriverWait alertWait = new WebDriverWait(webDriver, Duration.ofSeconds(3));
+            alertWait.until(ExpectedConditions.alertIsPresent());
+            webDriver.switchTo().alert().accept();
         } catch (Exception e) {
-            // No alert present, continue normally
+            // No alert present within timeout, continue normally
         }
     }
-
 }

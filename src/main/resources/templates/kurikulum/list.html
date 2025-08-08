@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Data Kurikulum</title>
+</head>
+
+<body>
+    <h1 layout:fragment="page-title">Data Kurikulum</h1>
+    
+    <th:block layout:fragment="breadcrumb">
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li class="text-gray-700">Data Kurikulum</li>
+    </th:block>
+
+    <div layout:fragment="content">
+        <!-- Header Actions -->
+        <div class="bg-white rounded-lg shadow mb-6">
+            <div class="p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <!-- Search Form -->
+                    <form th:action="@{/kurikulum}" method="get" class="flex-1 max-w-md">
+                        <div class="relative">
+                            <input type="text" 
+                                   name="search" 
+                                   th:value="${search}"
+                                   placeholder="Cari nama kurikulum..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Add Button -->
+                    <a th:href="@{/kurikulum/new}" 
+                       class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>
+                        Tambah Kurikulum
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">
+                    Daftar Kurikulum
+                    <span class="text-sm font-normal text-gray-500" th:if="${search}">
+                        - Hasil pencarian untuk "<span th:text="${search}"></span>"
+                    </span>
+                </h3>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="kurikulum, iterStat : ${kurikulums}" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${iterStat.index + 1}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900" th:text="${kurikulum.kode}"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900" th:text="${kurikulum.nama}"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span th:if="${kurikulum.aktif}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle w-3 h-3 mr-1"></i>
+                                    Aktif
+                                </span>
+                                <span th:unless="${kurikulum.aktif}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle w-3 h-3 mr-1"></i>
+                                    Tidak Aktif
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <!-- View Button -->
+                                    <a th:href="@{/kurikulum/{id}(id=${kurikulum.id})}" 
+                                       class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors duration-200"
+                                       title="Lihat Detail">
+                                        <i class="fas fa-eye w-3 h-3"></i>
+                                    </a>
+                                    
+                                    <!-- Edit Button -->
+                                    <a th:href="@{/kurikulum/{id}/edit(id=${kurikulum.id})}" 
+                                       class="inline-flex items-center px-2 py-1 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 transition-colors duration-200"
+                                       title="Edit">
+                                        <i class="fas fa-edit w-3 h-3"></i>
+                                    </a>
+                                    
+                                    <!-- Delete Button -->
+                                    <form th:action="@{/kurikulum/{id}/delete(id=${kurikulum.id})}" method="post" class="inline" 
+                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus data kurikulum ini?')">
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-full hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors duration-200"
+                                                title="Hapus">
+                                            <i class="fas fa-trash w-3 h-3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Empty State -->
+                        <tr th:if="${#lists.isEmpty(kurikulums)}">
+                            <td colspan="5" class="px-6 py-8 text-center">
+                                <div class="text-gray-500">
+                                    <i class="fas fa-book text-4xl mb-4 text-gray-300"></i>
+                                    <p class="text-lg font-medium">Tidak ada data kurikulum</p>
+                                    <p class="text-sm" th:if="${search}">
+                                        Tidak ditemukan hasil untuk pencarian "<span th:text="${search}"></span>"
+                                    </p>
+                                    <p class="text-sm" th:unless="${search}">
+                                        Belum ada data kurikulum yang ditambahkan
+                                    </p>
+                                    <a th:href="@{/kurikulum/new}" 
+                                       class="inline-flex items-center mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Tambah Kurikulum Pertama
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="extra-scripts">
+        <script>
+            // Auto-submit search form on input
+            document.querySelector('input[name="search"]').addEventListener('input', function() {
+                clearTimeout(this.searchTimeout);
+                this.searchTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            });
+        </script>
+    </th:block>
+</body>
+</html>

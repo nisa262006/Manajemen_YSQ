@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title th:text="${isEdit ? 'Edit Kurikulum' : 'Tambah Kurikulum'}">Form Kurikulum</title>
+</head>
+
+<body>
+    <h1 layout:fragment="page-title" th:text="${isEdit ? 'Edit Kurikulum' : 'Tambah Kurikulum'}">Form Kurikulum</h1>
+    
+    <th:block layout:fragment="breadcrumb">
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li><a th:href="@{/kurikulum}" class="hover:text-indigo-600">Data Kurikulum</a></li>
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li class="text-gray-700" th:text="${isEdit ? 'Edit' : 'Tambah'}"></li>
+    </th:block>
+
+    <div layout:fragment="content">
+        <!-- Form Card -->
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900" th:text="${isEdit ? 'Edit Data Kurikulum' : 'Tambah Data Kurikulum'}"></h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Lengkapi form di bawah ini untuk <span th:text="${isEdit ? 'mengubah' : 'menambah'}"></span> data kurikulum.
+                    </p>
+                </div>
+                
+                <form th:object="${kurikulum}" 
+                      th:action="${isEdit ? '/kurikulum/' + kurikulum.id : '/kurikulum'}" 
+                      method="post" 
+                      class="p-6">
+                    
+                    <!-- Kode Field -->
+                    <div class="mb-6">
+                        <label for="kode" class="block text-sm font-medium text-gray-700 mb-2">
+                            Kode Kurikulum <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               id="kode"
+                               th:field="*{kode}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               th:classappend="${#fields.hasErrors('kode')} ? 'border-red-500' : ''"
+                               placeholder="Masukkan kode kurikulum (contoh: K001)">
+                        <p th:if="${#fields.hasErrors('kode')}" 
+                           th:errors="*{kode}" 
+                           class="mt-2 text-sm text-red-600"></p>
+                        <p class="mt-1 text-xs text-gray-500">Kode kurikulum harus unik dan minimal 3 karakter</p>
+                    </div>
+
+                    <!-- Nama Field -->
+                    <div class="mb-6">
+                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nama Kurikulum <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               id="nama"
+                               th:field="*{nama}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               th:classappend="${#fields.hasErrors('nama')} ? 'border-red-500' : ''"
+                               placeholder="Masukkan nama kurikulum">
+                        <p th:if="${#fields.hasErrors('nama')}" 
+                           th:errors="*{nama}" 
+                           class="mt-2 text-sm text-red-600"></p>
+                        <p class="mt-1 text-xs text-gray-500">Nama kurikulum minimal 3 karakter dan maksimal 200 karakter</p>
+                    </div>
+
+                    <!-- Aktif Field -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Status <span class="text-red-500">*</span>
+                        </label>
+                        <div class="space-y-2">
+                            <label class="inline-flex items-center">
+                                <input type="radio" 
+                                       th:field="*{aktif}" 
+                                       value="true" 
+                                       class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                                <span class="ml-2 text-sm text-gray-700">
+                                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                                    Aktif
+                                </span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" 
+                                       th:field="*{aktif}" 
+                                       value="false" 
+                                       class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                                <span class="ml-2 text-sm text-gray-700">
+                                    <i class="fas fa-times-circle text-red-500 mr-1"></i>
+                                    Tidak Aktif
+                                </span>
+                            </label>
+                        </div>
+                        <p th:if="${#fields.hasErrors('aktif')}" 
+                           th:errors="*{aktif}" 
+                           class="mt-2 text-sm text-red-600"></p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                        <a th:href="@{/kurikulum}" 
+                           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Kembali
+                        </a>
+                        
+                        <div class="flex space-x-3">
+                            <button type="reset" 
+                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-redo mr-2"></i>
+                                Reset
+                            </button>
+                            
+                            <button type="submit" 
+                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-2"></i>
+                                <span th:text="${isEdit ? 'Perbarui' : 'Simpan'}"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="extra-scripts">
+        <script>
+            // Form validation
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const kode = document.getElementById('kode').value.trim();
+                const nama = document.getElementById('nama').value.trim();
+                const aktifSelected = document.querySelector('input[name="aktif"]:checked');
+                
+                if (!kode || !nama) {
+                    e.preventDefault();
+                    alert('Semua field yang bertanda (*) wajib diisi!');
+                    return false;
+                }
+                
+                if (kode.length < 3) {
+                    e.preventDefault();
+                    alert('Kode kurikulum minimal 3 karakter!');
+                    return false;
+                }
+                
+                if (nama.length < 3) {
+                    e.preventDefault();
+                    alert('Nama kurikulum minimal 3 karakter!');
+                    return false;
+                }
+                
+                if (!aktifSelected) {
+                    e.preventDefault();
+                    alert('Status kurikulum harus dipilih!');
+                    return false;
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>
