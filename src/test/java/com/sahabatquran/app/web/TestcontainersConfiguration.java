@@ -28,21 +28,22 @@ public class TestcontainersConfiguration {
 		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:16"));
 	}
 
-	@SuppressWarnings("resource")
-	@Bean
-	BrowserWebDriverContainer<?> browserContainer(){
-		BrowserWebDriverContainer<?> container = new BrowserWebDriverContainer<>()
-			.withAccessToHost(true)
-    		.withCapabilities(new FirefoxOptions());
-		
-		if (seleniumRecordingEnabled) {
-			RECORDING_OUTPUT_FOLDER.mkdirs();
-			container.withRecordingMode(
-				VncRecordingMode.RECORD_ALL, 
-				RECORDING_OUTPUT_FOLDER,
-				VncRecordingFormat.MP4);
-		}
-		
-		return container;
-	}
+	// Browser container is now managed by SeleniumTestContainerSingleton
+	// @SuppressWarnings("resource")
+	// @Bean
+	// BrowserWebDriverContainer<?> browserContainer(){
+	// 	BrowserWebDriverContainer<?> container = new BrowserWebDriverContainer<>()
+	// 		.withAccessToHost(true)
+    // 		.withCapabilities(new FirefoxOptions());
+	// 	
+	// 	if (seleniumRecordingEnabled) {
+	// 		RECORDING_OUTPUT_FOLDER.mkdirs();
+	// 		container.withRecordingMode(
+	// 			VncRecordingMode.RECORD_ALL, 
+	// 			RECORDING_OUTPUT_FOLDER,
+	// 			VncRecordingFormat.MP4);
+	// 	}
+	// 	
+	// 	return container;
+	// }
 }

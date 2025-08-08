@@ -1,21 +1,16 @@
 package com.sahabatquran.app.web.selenium;
 
-import java.time.Duration;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.UseMainMethod;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.Testcontainers;
-import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.lifecycle.TestDescription;
 
 import com.sahabatquran.app.web.TestcontainersConfiguration;
@@ -29,22 +24,19 @@ public abstract class BaseSeleniumTests {
 
     WebDriver webDriver;
 
-    @Autowired
-    BrowserWebDriverContainer<?> browserContainer;
-
     @LocalServerPort Integer webappPort;
 
     @BeforeEach
 	void setupWebDriver() throws Exception {
         Testcontainers.exposeHostPorts(webappPort); 
-		webDriver = new RemoteWebDriver(browserContainer.getSeleniumAddress(), new FirefoxOptions());
-		webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-		log.info("VNC URL : {}", browserContainer.getVncAddress());
+		webDriver = SeleniumTestContainerSingleton.DRIVER;
+		log.info("Using singleton WebDriver");
+		log.info("VNC URL : {}", SeleniumTestContainerSingleton.getContainer().getVncAddress());
 	}
 
     @AfterEach
 	void stopWebDriver(){
-		browserContainer.afterTest(
+		SeleniumTestContainerSingleton.getContainer().afterTest(
                 new TestDescription() {
                     @Override
                     public String getTestId() {
@@ -58,11 +50,10 @@ public abstract class BaseSeleniumTests {
                 },
                 Optional.empty()
             );
-		webDriver.quit();
 	}
 
     String getHostUrl(){
-        return TestcontainersConfiguration.TESTCONTAINER_HOST_URL + ":" + webappPort;
+        return SeleniumTestContainerSingleton.TESTCONTAINER_HOST_URL + ":" + webappPort;
     }
 
     String getTestName(){
