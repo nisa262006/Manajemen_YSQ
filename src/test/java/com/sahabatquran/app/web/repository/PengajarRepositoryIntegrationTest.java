@@ -99,7 +99,7 @@ class PengajarRepositoryIntegrationTest {
         return Stream.of(
             Arguments.of("Abdul", 1),
             Arguments.of("Muhammad", 1),
-            Arguments.of("Ustaz", 2),
+            Arguments.of("Ustaz", 4), // Updated: includes both "Ustaz" and "Ustazah" entries
             Arguments.of("Ustazah", 2),
             Arguments.of("Prof", 1),
             Arguments.of("xyz", 0) // Should not match any name

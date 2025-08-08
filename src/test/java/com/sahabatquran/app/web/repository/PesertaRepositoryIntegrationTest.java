@@ -56,7 +56,7 @@ class PesertaRepositoryIntegrationTest {
                     Peserta peserta = new Peserta();
                     peserta.setNama(parts[0]);
                     peserta.setEmail(parts[1]);
-                    peserta.setNomor_handphone(parts[2]);
+                    peserta.setNomorHandphone(parts[2]);
                     entityManager.persist(peserta);
                 }
             }
@@ -78,7 +78,7 @@ class PesertaRepositoryIntegrationTest {
         assertThat(found).isPresent();
         assertThat(found.get().getNama()).isEqualTo(nama);
         assertThat(found.get().getEmail()).isEqualTo(email);
-        assertThat(found.get().getNomor_handphone()).isEqualTo(nomorHandphone);
+        assertThat(found.get().getNomorHandphone()).isEqualTo(nomorHandphone);
     }
 
     @ParameterizedTest
@@ -100,7 +100,7 @@ class PesertaRepositoryIntegrationTest {
             Arguments.of("Ahmad", 1),
             Arguments.of("Siti", 1),
             Arguments.of("Muhammad", 1),
-            Arguments.of("a", 6), // Should match names containing 'a'
+            Arguments.of("a", 10), // Updated: All names contain 'a'
             Arguments.of("xyz", 0) // Should not match any name
         );
     }

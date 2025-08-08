@@ -3,6 +3,7 @@ package com.sahabatquran.app.web;
 import java.io.File;
 
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,9 @@ public class TestcontainersConfiguration {
 	public static final String TESTCONTAINER_HOST_URL = "http://host.testcontainers.internal";
 	private static final File RECORDING_OUTPUT_FOLDER = new File("./target/selenium-recordings/");
 
+	@Value("${selenium.recording.enabled:false}")
+	private boolean seleniumRecordingEnabled;
+
 	@Bean
 	@ServiceConnection
 	PostgreSQLContainer<?> postgresContainer() {
@@ -27,13 +31,18 @@ public class TestcontainersConfiguration {
 	@SuppressWarnings("resource")
 	@Bean
 	BrowserWebDriverContainer<?> browserContainer(){
-		RECORDING_OUTPUT_FOLDER.mkdirs();
-		return new BrowserWebDriverContainer<>()
+		BrowserWebDriverContainer<?> container = new BrowserWebDriverContainer<>()
 			.withAccessToHost(true)
-    		.withCapabilities(new FirefoxOptions())
-			.withRecordingMode(
+    		.withCapabilities(new FirefoxOptions());
+		
+		if (seleniumRecordingEnabled) {
+			RECORDING_OUTPUT_FOLDER.mkdirs();
+			container.withRecordingMode(
 				VncRecordingMode.RECORD_ALL, 
 				RECORDING_OUTPUT_FOLDER,
 				VncRecordingFormat.MP4);
+		}
+		
+		return container;
 	}
 }

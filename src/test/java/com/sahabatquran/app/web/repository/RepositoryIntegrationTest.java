@@ -60,7 +60,7 @@ class RepositoryIntegrationTest {
                     Peserta peserta = new Peserta();
                     peserta.setNama(parts[0]);
                     peserta.setEmail(parts[1]);
-                    peserta.setNomor_handphone(parts[2]);
+                    peserta.setNomorHandphone(parts[2]);
                     entityManager.persist(peserta);
                 }
             }
@@ -145,7 +145,7 @@ class RepositoryIntegrationTest {
     static Stream<Arguments> provideBatchTestParameters() {
         return Stream.of(
             Arguments.of("Peserta", "Ahmad", "email.com", 1, 5),
-            Arguments.of("Pengajar", "Ustaz", "sahabatquran.com", 2, 8),
+            Arguments.of("Pengajar", "Ustaz", "sahabatquran.com", 4, 8), // Updated: "Ustaz" matches 4 entries
             Arguments.of("Peserta", "Muhammad", "gmail.com", 1, 3),
             Arguments.of("Pengajar", "Abdul", "sahabatquran.com", 1, 8)
         );

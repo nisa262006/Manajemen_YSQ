@@ -1,5 +1,6 @@
 package com.sahabatquran.app.web.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,5 +27,6 @@ public class Peserta {
 
     @NotNull @NotEmpty
     @Size(min = 3, max = 50)
-    private String nomor_handphone;
+    @Column(name = "nomor_handphone")
+    private String nomorHandphone;
 }
