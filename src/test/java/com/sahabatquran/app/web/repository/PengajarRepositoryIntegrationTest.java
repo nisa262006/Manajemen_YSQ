@@ -53,7 +53,10 @@ class PengajarRepositoryIntegrationTest {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
-                    Pengajar pengajar = new Pengajar(parts[0], parts[1], parts[2]);
+                    Pengajar pengajar = new Pengajar();
+                    pengajar.setNama(parts[0]);
+                    pengajar.setEmail(parts[1]);
+                    pengajar.setNomorHandphone(parts[2]);
                     entityManager.persist(pengajar);
                 }
             }

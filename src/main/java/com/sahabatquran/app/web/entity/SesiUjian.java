@@ -26,38 +26,6 @@ public class SesiUjian {
     private LocalDateTime waktuMulai;
     private LocalDateTime waktuSelesai;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public @NotNull Ujian getUjian() {
-        return ujian;
-    }
-
-    public void setUjian(@NotNull Ujian ujian) {
-        this.ujian = ujian;
-    }
-
-    public @NotNull LocalDateTime getWaktuMulai() {
-        return waktuMulai;
-    }
-
-    public void setWaktuMulai(@NotNull LocalDateTime waktuMulai) {
-        this.waktuMulai = waktuMulai;
-    }
-
-    public LocalDateTime getWaktuSelesai() {
-        return waktuSelesai;
-    }
-
-    public void setWaktuSelesai(LocalDateTime waktuSelesai) {
-        this.waktuSelesai = waktuSelesai;
-    }
-
     public String getSesi() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm");
         return (waktuMulai != null && waktuSelesai != null) ?

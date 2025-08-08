@@ -53,7 +53,10 @@ class PesertaRepositoryIntegrationTest {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
-                    Peserta peserta = new Peserta(parts[0], parts[1], parts[2]);
+                    Peserta peserta = new Peserta();
+                    peserta.setNama(parts[0]);
+                    peserta.setEmail(parts[1]);
+                    peserta.setNomor_handphone(parts[2]);
                     entityManager.persist(peserta);
                 }
             }
@@ -75,7 +78,7 @@ class PesertaRepositoryIntegrationTest {
         assertThat(found).isPresent();
         assertThat(found.get().getNama()).isEqualTo(nama);
         assertThat(found.get().getEmail()).isEqualTo(email);
-        assertThat(found.get().getNomorHandphone()).isEqualTo(nomorHandphone);
+        assertThat(found.get().getNomor_handphone()).isEqualTo(nomorHandphone);
     }
 
     @ParameterizedTest

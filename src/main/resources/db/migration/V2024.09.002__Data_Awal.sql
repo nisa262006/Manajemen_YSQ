@@ -35,7 +35,7 @@ INSERT INTO sesi_belajar (id, id_kelas, waktu_mulai, waktu_selesai, isi_pelajara
     ('b0ecb462-d11f-482b-84fa-d436268adfc6', '8c586ee9-31ac-4f9d-821e-0ad4c21e4381', '2025-01-06 08:00:00', '2025-01-06 09:30:00', 'Surah Al-Baqarah Ayat 1-10'),
     ('43db31c5-d72b-4fe6-b5a2-220b3d395a66', 'e6cb1d83-6c96-4635-b4f9-5c43b85e6db0', '2025-01-08 10:00:00', '2025-01-08 11:30:00', 'Pembahasan Wudhu dan Shalat');
 
-INSERT INTO event (id, nama, waktu_kegiatan_rencana, waktu_kegiatan_realisasi, catatan_acara) VALUES
+INSERT INTO kegiatan (id, nama, waktu_rencana, waktu_realisasi, catatan_acara) VALUES
     ('123e4567-e89b-12d3-a456-426614174000', 'Kajian Tafsir Al-Quran', '2025-03-10 09:00:00', NULL, 'Kajian rutin setiap bulan'),
     ('223e4567-e89b-12d3-a456-426614174001', 'Pelatihan Tajwid', '2025-04-15 14:00:00', '2025-04-15 14:10:00', 'Diikuti oleh santri dan umum'),
     ('323e4567-e89b-12d3-a456-426614174002', 'Muhasabah Akhir Tahun', '2025-12-31 22:00:00', NULL, 'Evaluasi diri sebelum tahun baru');

@@ -57,7 +57,10 @@ class RepositoryIntegrationTest {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
-                    Peserta peserta = new Peserta(parts[0], parts[1], parts[2]);
+                    Peserta peserta = new Peserta();
+                    peserta.setNama(parts[0]);
+                    peserta.setEmail(parts[1]);
+                    peserta.setNomor_handphone(parts[2]);
                     entityManager.persist(peserta);
                 }
             }
@@ -74,7 +77,10 @@ class RepositoryIntegrationTest {
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
-                    Pengajar pengajar = new Pengajar(parts[0], parts[1], parts[2]);
+                    Pengajar pengajar = new Pengajar();
+                    pengajar.setNama(parts[0]);
+                    pengajar.setEmail(parts[1]);
+                    pengajar.setNomorHandphone(parts[2]);
                     entityManager.persist(pengajar);
                 }
             }

@@ -199,21 +199,21 @@ create table pembayaran_sedekah (
     foreign key (id_peserta) references peserta(id)
 );
 
-create table event (
+create table kegiatan (
     id varchar(36),
     nama varchar(100) not null,
-    waktu_kegiatan_rencana timestamp not null,
-    waktu_kegiatan_realisasi timestamp,
+    waktu_rencana timestamp not null,
+    waktu_realisasi timestamp,
     catatan_acara text,
     primary key (id)
 );
 
-create table event_kehadiran_peserta (
+create table kegiatan_kehadiran_peserta (
     id varchar(36),
-    id_event varchar(36) not null,
+    id_kegiatan varchar(36) not null,
     id_peserta varchar(36) not null,
     waktu_kehadiran timestamp not null,
     primary key (id),
-    foreign key (id_event) references event(id),
+    foreign key (id_kegiatan) references kegiatan(id),
     foreign key (id_peserta) references peserta(id)
 );
