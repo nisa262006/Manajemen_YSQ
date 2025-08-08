@@ -4,7 +4,8 @@ create table peserta (
     email varchar(50) not null,
     nomor_handphone varchar(50) not null,
     primary key (id),
-    unique (email)
+    unique (email),
+    unique (nomor_handphone)
 );
 
 create table pengajar (
@@ -13,7 +14,8 @@ create table pengajar (
     email varchar(50) not null,
     nomor_handphone varchar(50) not null,
     primary key (id),
-    unique (email)
+    unique (email),
+    unique (nomor_handphone)
 );
 
 create table kurikulum (

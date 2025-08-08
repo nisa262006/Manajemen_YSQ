@@ -30,4 +30,10 @@ public class HomePage {
         .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='appTitle']")))
         .getText());
     }
+
+    public void clickRegistrationButton() {
+        new WebDriverWait(webDriver, Duration.ofSeconds(5))
+            .until(ExpectedConditions.elementToBeClickable(By.id("registerBtn")))
+            .click();
+    }
 }

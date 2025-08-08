@@ -12,6 +12,10 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Entity @Data
+@jakarta.persistence.Table(uniqueConstraints = {
+    @jakarta.persistence.UniqueConstraint(columnNames = "email"),
+    @jakarta.persistence.UniqueConstraint(columnNames = "nomor_handphone")
+})
 public class Peserta {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
