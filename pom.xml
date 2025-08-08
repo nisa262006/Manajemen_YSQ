@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.3</version>
+		<version>3.5.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sahabatquran.app</groupId>
@@ -49,9 +49,10 @@
 		<sonar.organization>sahabat-quran</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.sources>src/main/java,src/main/resources/templates</sonar.sources>
-		<jacoco.version>0.8.12</jacoco.version>
-		<git-commit-id-maven-plugin.version>9.0.1</git-commit-id-maven-plugin.version>
-		<selenium.version>4.24.0</selenium.version>
+		<jacoco.version>0.8.13</jacoco.version>
+		<git-commit-id-maven-plugin.version>9.0.2</git-commit-id-maven-plugin.version>
+		<selenium.version>4.33.0</selenium.version>
+		<thymeleaf-layout-dialect.version>3.4.0</thymeleaf-layout-dialect.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -69,7 +70,7 @@
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
-			<version>3.3.0</version>
+			<version>${thymeleaf-layout-dialect.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
