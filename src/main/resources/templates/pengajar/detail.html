@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title>Detail Pengajar</title>
+</head>
+
+<body>
+    <h1 layout:fragment="page-title">Detail Pengajar</h1>
+    
+    <th:block layout:fragment="breadcrumb">
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li><a th:href="@{/pengajar}" class="hover:text-indigo-600">Data Pengajar</a></li>
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li class="text-gray-700">Detail</li>
+    </th:block>
+
+    <div layout:fragment="content">
+        <div class="max-w-2xl mx-auto">
+            <!-- Profile Card -->
+            <div class="bg-white rounded-lg shadow mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Informasi Pengajar</h3>
+                            <p class="mt-1 text-sm text-gray-600">Detail lengkap data pengajar</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <a th:href="@{/pengajar/{id}/edit(id=${pengajar.id})}" 
+                               class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-yellow-600 bg-yellow-100 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-1 transition-colors duration-200">
+                                <i class="fas fa-edit mr-1"></i>
+                                Edit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-6">
+                        <!-- Avatar Section -->
+                        <div class="flex items-center space-x-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-indigo-600 text-2xl"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900" th:text="${pengajar.nama}"></h2>
+                                <p class="text-gray-600">Pengajar</p>
+                            </div>
+                        </div>
+
+                        <!-- Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- ID -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide">ID</label>
+                                <p class="mt-1 text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded" th:text="${pengajar.id}"></p>
+                            </div>
+
+                            <!-- Nama -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide">Nama Lengkap</label>
+                                <p class="mt-1 text-lg text-gray-900" th:text="${pengajar.nama}"></p>
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide">Email</label>
+                                <div class="mt-1 flex items-center space-x-2">
+                                    <p class="text-lg text-gray-900" th:text="${pengajar.email}"></p>
+                                    <a th:href="'mailto:' + ${pengajar.email}" 
+                                       class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                                       title="Kirim Email">
+                                        <i class="fas fa-envelope text-sm"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Nomor Handphone -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide">Nomor Handphone</label>
+                                <div class="mt-1 flex items-center space-x-2">
+                                    <p class="text-lg text-gray-900" th:text="${pengajar.nomorHandphone}"></p>
+                                    <a th:href="'tel:' + ${pengajar.nomorHandphone}" 
+                                       class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                                       title="Panggil">
+                                        <i class="fas fa-phone text-sm"></i>
+                                    </a>
+                                    <a th:href="'https://wa.me/' + ${pengajar.nomorHandphone.substring(1)}" 
+                                       target="_blank"
+                                       class="inline-flex items-center text-green-600 hover:text-green-800 transition-colors duration-200"
+                                       title="WhatsApp">
+                                        <i class="fab fa-whatsapp text-sm"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <div class="flex items-center justify-between">
+                        <a th:href="@{/pengajar}" 
+                           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Kembali ke Daftar
+                        </a>
+                        
+                        <div class="flex space-x-3">
+                            <a th:href="@{/pengajar/{id}/edit(id=${pengajar.id})}" 
+                               class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-edit mr-2"></i>
+                                Edit Data
+                            </a>
+                            
+                            <form th:action="@{/pengajar/{id}/delete(id=${pengajar.id})}" method="post" class="inline" 
+                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pengajar ini?\n\nNama: ' + document.querySelector('[data-nama]').textContent + '\nEmail: ' + document.querySelector('[data-email]').textContent + '\n\nTindakan ini tidak dapat dibatalkan!')">
+                                <button type="submit" 
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+                                    <i class="fas fa-trash mr-2"></i>
+                                    Hapus Data
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden data for confirmation dialog -->
+        <span data-nama th:text="${pengajar.nama}" style="display: none;"></span>
+        <span data-email th:text="${pengajar.email}" style="display: none;"></span>
+    </div>
+
+    <th:block layout:fragment="extra-scripts">
+        <script>
+            // Copy ID to clipboard functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const idElement = document.querySelector('.font-mono');
+                if (idElement) {
+                    idElement.style.cursor = 'pointer';
+                    idElement.title = 'Klik untuk menyalin ID';
+                    
+                    idElement.addEventListener('click', function() {
+                        const textToCopy = this.textContent;
+                        navigator.clipboard.writeText(textToCopy).then(function() {
+                            // Show temporary feedback
+                            const originalText = idElement.textContent;
+                            idElement.textContent = 'Tersalin!';
+                            idElement.classList.add('text-green-600');
+                            
+                            setTimeout(function() {
+                                idElement.textContent = originalText;
+                                idElement.classList.remove('text-green-600');
+                            }, 1000);
+                        }).catch(function() {
+                            alert('Gagal menyalin ID');
+                        });
+                    });
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

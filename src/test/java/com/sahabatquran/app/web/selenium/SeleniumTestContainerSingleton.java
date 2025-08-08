@@ -28,51 +28,92 @@ public class SeleniumTestContainerSingleton {
     }
     
     private static void initialize() {
-        String browser = System.getProperty("selenium.browser", "firefox").toLowerCase();
-        boolean recordingEnabled = Boolean.parseBoolean(System.getProperty("selenium.recording.enabled", "false"));
-        
-        log.info("Initializing Selenium TestContainer with browser: {} and recording: {}", browser, recordingEnabled);
-        
-        container = new BrowserWebDriverContainer<>()
-            .withAccessToHost(true);
+        try {
+            String browser = System.getProperty("selenium.browser", "firefox").toLowerCase();
+            boolean recordingEnabled = Boolean.parseBoolean(System.getProperty("selenium.recording.enabled", "false"));
             
-        // Set browser capabilities
-        switch (browser) {
-            case "chrome":
-                container.withCapabilities(new ChromeOptions());
-                break;
-            case "firefox":
-            default:
-                container.withCapabilities(new FirefoxOptions());
-                break;
+            log.info("Initializing Selenium TestContainer with browser: {} and recording: {}", browser, recordingEnabled);
+            
+            container = new BrowserWebDriverContainer<>()
+                .withAccessToHost(true);
+                
+            // Set browser capabilities
+            switch (browser) {
+                case "chrome":
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu");
+                    container.withCapabilities(chromeOptions);
+                    break;
+                case "firefox":
+                default:
+                    FirefoxOptions firefoxOptions = new FirefoxOptions();
+                    container.withCapabilities(firefoxOptions);
+                    break;
+            }
+            
+            // Configure recording if enabled
+            if (recordingEnabled) {
+                RECORDING_OUTPUT_FOLDER.mkdirs();
+                container.withRecordingMode(
+                    VncRecordingMode.RECORD_ALL, 
+                    RECORDING_OUTPUT_FOLDER,
+                    VncRecordingFormat.MP4);
+            }
+            
+            log.info("Starting Selenium container...");
+            container.start();
+            log.info("Selenium container started, Selenium URL: {}", container.getSeleniumAddress());
+            
+            // Wait a moment for container to be fully ready
+            Thread.sleep(2000);
+            
+            // Initialize WebDriver with retry logic
+            int maxRetries = 3;
+            Exception lastException = null;
+            
+            for (int retry = 0; retry < maxRetries; retry++) {
+                try {
+                    log.info("Attempting to create WebDriver (attempt {} of {})", retry + 1, maxRetries);
+                    
+                    switch (browser) {
+                        case "chrome":
+                            ChromeOptions chromeOptions = new ChromeOptions();
+                            chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu");
+                            DRIVER = new RemoteWebDriver(container.getSeleniumAddress(), chromeOptions);
+                            break;
+                        case "firefox":
+                        default:
+                            FirefoxOptions firefoxOptions = new FirefoxOptions();
+                            DRIVER = new RemoteWebDriver(container.getSeleniumAddress(), firefoxOptions);
+                            break;
+                    }
+                    
+                    DRIVER.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+                    
+                    log.info("Selenium TestContainer initialized successfully");
+                    log.info("VNC URL: {}", container.getVncAddress());
+                    return;
+                    
+                } catch (Exception e) {
+                    lastException = e;
+                    log.warn("Failed to create WebDriver on attempt {}: {}", retry + 1, e.getMessage());
+                    if (retry < maxRetries - 1) {
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            throw new RuntimeException("Interrupted while waiting to retry WebDriver creation", ie);
+                        }
+                    }
+                }
+            }
+            
+            throw new RuntimeException("Failed to initialize WebDriver after " + maxRetries + " attempts", lastException);
+            
+        } catch (Exception e) {
+            log.error("Failed to initialize Selenium TestContainer", e);
+            throw new ExceptionInInitializerError(e);
         }
-        
-        // Configure recording if enabled
-        if (recordingEnabled) {
-            RECORDING_OUTPUT_FOLDER.mkdirs();
-            container.withRecordingMode(
-                VncRecordingMode.RECORD_ALL, 
-                RECORDING_OUTPUT_FOLDER,
-                VncRecordingFormat.MP4);
-        }
-        
-        container.start();
-        
-        // Initialize WebDriver
-        switch (browser) {
-            case "chrome":
-                DRIVER = new RemoteWebDriver(container.getSeleniumAddress(), new ChromeOptions());
-                break;
-            case "firefox":
-            default:
-                DRIVER = new RemoteWebDriver(container.getSeleniumAddress(), new FirefoxOptions());
-                break;
-        }
-        
-        DRIVER.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-        
-        log.info("Selenium TestContainer initialized successfully");
-        log.info("VNC URL: {}", container.getVncAddress());
     }
     
     public static BrowserWebDriverContainer<?> getContainer() {

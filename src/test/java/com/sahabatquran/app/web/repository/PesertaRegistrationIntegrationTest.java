@@ -95,8 +95,8 @@ class PesertaRegistrationIntegrationTest {
     void shouldPreventDuplicateEmail() {
         // Given
         Peserta peserta1 = new Peserta();
-        peserta1.setNama("Fatimah");
-        peserta1.setEmail("fatimah@example.com");
+        peserta1.setNama("Fatimah Test");
+        peserta1.setEmail("fatimah.test@example.com");
         peserta1.setNomorHandphone("081234567893");
         pesertaRepository.save(peserta1);
         entityManager.flush();
@@ -104,7 +104,7 @@ class PesertaRegistrationIntegrationTest {
         // When
         Peserta peserta2 = new Peserta();
         peserta2.setNama("Aisyah");
-        peserta2.setEmail("fatimah@example.com"); // Same email
+        peserta2.setEmail("fatimah.test@example.com"); // Same email
         peserta2.setNomorHandphone("081234567894");
 
         // Then

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+
+<head>
+    <title th:text="${isEdit ? 'Edit Pengajar' : 'Tambah Pengajar'}">Form Pengajar</title>
+</head>
+
+<body>
+    <h1 layout:fragment="page-title" th:text="${isEdit ? 'Edit Pengajar' : 'Tambah Pengajar'}">Form Pengajar</h1>
+    
+    <th:block layout:fragment="breadcrumb">
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li><a th:href="@{/pengajar}" class="hover:text-indigo-600">Data Pengajar</a></li>
+        <li><i class="fas fa-angle-right mx-2"></i></li>
+        <li class="text-gray-700" th:text="${isEdit ? 'Edit' : 'Tambah'}"></li>
+    </th:block>
+
+    <div layout:fragment="content">
+        <!-- Form Card -->
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900" th:text="${isEdit ? 'Edit Data Pengajar' : 'Tambah Data Pengajar'}"></h3>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Lengkapi form di bawah ini untuk <span th:text="${isEdit ? 'mengubah' : 'menambah'}"></span> data pengajar.
+                    </p>
+                </div>
+                
+                <form th:object="${pengajar}" 
+                      th:action="${isEdit ? '/pengajar/' + pengajar.id : '/pengajar'}" 
+                      method="post" 
+                      class="p-6">
+                    
+                    <!-- Nama Field -->
+                    <div class="mb-6">
+                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nama Lengkap <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               id="nama"
+                               th:field="*{nama}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               th:classappend="${#fields.hasErrors('nama')} ? 'border-red-500' : ''"
+                               placeholder="Masukkan nama lengkap pengajar">
+                        <p th:if="${#fields.hasErrors('nama')}" 
+                           th:errors="*{nama}" 
+                           class="mt-2 text-sm text-red-600"></p>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-6">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" 
+                               id="email"
+                               th:field="*{email}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               th:classappend="${#fields.hasErrors('email')} ? 'border-red-500' : ''"
+                               placeholder="contoh@email.com">
+                        <p th:if="${#fields.hasErrors('email')}" 
+                           th:errors="*{email}" 
+                           class="mt-2 text-sm text-red-600"></p>
+                    </div>
+
+                    <!-- Nomor Handphone Field -->
+                    <div class="mb-6">
+                        <label for="nomorHandphone" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nomor Handphone <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" 
+                               id="nomorHandphone"
+                               th:field="*{nomorHandphone}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                               th:classappend="${#fields.hasErrors('nomorHandphone')} ? 'border-red-500' : ''"
+                               placeholder="081234567890">
+                        <p th:if="${#fields.hasErrors('nomorHandphone')}" 
+                           th:errors="*{nomorHandphone}" 
+                           class="mt-2 text-sm text-red-600"></p>
+                        <p class="mt-1 text-xs text-gray-500">Format: 08xxxxxxxxxx</p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                        <a th:href="@{/pengajar}" 
+                           class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Kembali
+                        </a>
+                        
+                        <div class="flex space-x-3">
+                            <button type="reset" 
+                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-redo mr-2"></i>
+                                Reset
+                            </button>
+                            
+                            <button type="submit" 
+                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-2"></i>
+                                <span th:text="${isEdit ? 'Perbarui' : 'Simpan'}"></span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="extra-scripts">
+        <script>
+            // Phone number formatting
+            document.getElementById('nomorHandphone').addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length > 0 && !value.startsWith('0')) {
+                    value = '0' + value;
+                }
+                this.value = value;
+            });
+
+            // Form validation
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const nama = document.getElementById('nama').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const nomorHandphone = document.getElementById('nomorHandphone').value.trim();
+                
+                if (!nama || !email || !nomorHandphone) {
+                    e.preventDefault();
+                    alert('Semua field yang bertanda (*) wajib diisi!');
+                    return false;
+                }
+                
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    alert('Format email tidak valid!');
+                    return false;
+                }
+                
+                const phoneRegex = /^08\d{8,11}$/;
+                if (!phoneRegex.test(nomorHandphone)) {
+                    e.preventDefault();
+                    alert('Format nomor handphone tidak valid! Harus dimulai dengan 08 dan terdiri dari 10-13 digit.');
+                    return false;
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>
