@@ -2,9 +2,6 @@ package com.sahabatquran.app.web.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -18,10 +15,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import com.sahabatquran.app.web.TestcontainersConfiguration;
 import com.sahabatquran.app.web.entity.Pengajar;
@@ -30,38 +26,15 @@ import com.sahabatquran.app.web.entity.Pengajar;
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(scripts = {"/test-data/cleanup-pengajar.sql", "/test-data/init-pengajar-data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class PengajarRepositoryIntegrationTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
 
     @Autowired
     private PengajarRepository pengajarRepository;
 
     @BeforeEach
     void setUp() throws Exception {
-        loadTestData();
-    }
-
-    private void loadTestData() throws Exception {
-        ClassPathResource resource = new ClassPathResource("test-data/pengajar-data.csv");
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-            
-            reader.readLine(); // Skip header
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 3) {
-                    Pengajar pengajar = new Pengajar();
-                    pengajar.setNama(parts[0]);
-                    pengajar.setEmail(parts[1]);
-                    pengajar.setNomorHandphone(parts[2]);
-                    entityManager.persist(pengajar);
-                }
-            }
-            entityManager.flush();
-        }
+        // Data initialization handled by @Sql annotation
     }
 
     @Test

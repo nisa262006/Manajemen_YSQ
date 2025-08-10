@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sahabatquran.app.web.TestcontainersConfiguration;
@@ -31,6 +32,7 @@ import com.sahabatquran.app.web.service.PengajarService.PengajarValidationExcept
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
+@Sql(scripts = "/test-data/cleanup-pengajar.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class PengajarServiceIntegrationTest {
 
     @Autowired
@@ -44,8 +46,6 @@ class PengajarServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        pengajarRepository.deleteAll();
-        
         testPengajar1 = new Pengajar();
         testPengajar1.setNama("Ahmad Fulan");
         testPengajar1.setEmail("ahmad.fulan@sahabatquran.com");

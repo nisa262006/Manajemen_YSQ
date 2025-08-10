@@ -7,12 +7,14 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 
 import com.sahabatquran.app.web.repository.PesertaRepository;
 import com.sahabatquran.app.web.selenium.pages.HomePage;
 import com.sahabatquran.app.web.selenium.pages.PendaftaranPage;
 
 @DisplayName("Student Registration Functional Tests")
+@Sql(scripts = {"classpath:/sql/clear-data.sql", "classpath:/sql/base-test-data.sql", "classpath:/sql/registration-test-data.sql"})
 class PendaftaranFunctionalTest extends BaseSeleniumTests {
 
     @Autowired

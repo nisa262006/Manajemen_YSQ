@@ -26,23 +26,31 @@ import com.sahabatquran.app.web.selenium.pages.KurikulumFormPage;
 import com.sahabatquran.app.web.selenium.pages.KurikulumListPage;
 
 @DisplayName("Kurikulum CRUD Functional Tests")
-@Sql(scripts = {"classpath:/sql/clear-data.sql"})
+@Sql(scripts = {"classpath:/sql/clear-data.sql", "classpath:/sql/base-test-data.sql", "classpath:/sql/kurikulum-test-data.sql"})
 class KurikulumCrudFunctionalTest extends BaseSeleniumTests {
 
     @Autowired
     private KurikulumRepository kurikulumRepository;
 
     @Test
-    @DisplayName("Should display empty kurikulum list initially")
-    void shouldDisplayEmptyKurikulumListInitially() {
-        // Given - Empty database
+    @DisplayName("Should display existing kurikulum from test data")
+    void shouldDisplayExistingKurikulumFromTestData() {
+        // Given - Database with base + additional kurikulum test data
         KurikulumListPage listPage = new KurikulumListPage(webDriver, getHostUrl() + "/kurikulum");
         
-        // Then - Should show empty state
+        // Then - Should show existing kurikulum (3 base + 3 additional = 6 total)
         assertTrue(listPage.isPageLoaded());
-        assertTrue(listPage.isEmptyStateDisplayed());
-        assertEquals(0, listPage.getKurikulumCount());
-        assertNotNull(listPage.getEmptyStateMessage());
+        assertEquals(6, listPage.getKurikulumCount());
+        
+        // Should display the base test kurikulum
+        assertTrue(listPage.isKurikulumVisible("K001"));
+        assertTrue(listPage.isKurikulumVisible("K002"));
+        assertTrue(listPage.isKurikulumVisible("K003"));
+        
+        // Should display the additional test kurikulum
+        assertTrue(listPage.isKurikulumVisible("K004"));
+        assertTrue(listPage.isKurikulumVisible("K005"));
+        assertTrue(listPage.isKurikulumVisible("K006"));
     }
 
     @Test
@@ -80,7 +88,7 @@ class KurikulumCrudFunctionalTest extends BaseSeleniumTests {
         // Verify the kurikulum was created by checking the data (more reliable than flash message)
         assertTrue(listPage.isKurikulumVisible(kode));
         assertTrue(listPage.isKurikulumVisibleByNama(nama));
-        assertEquals(1, listPage.getKurikulumCount());
+        assertEquals(7, listPage.getKurikulumCount()); // 6 existing + 1 new
         
         // Success message is nice to have but not critical for test pass
         // Note: Success message detection may fail due to timing issues with flash attributes
@@ -197,7 +205,7 @@ class KurikulumCrudFunctionalTest extends BaseSeleniumTests {
         
         // Then - Should be deleted successfully
         assertFalse(listPage.isKurikulumVisible(kode));
-        assertEquals(0, listPage.getKurikulumCount());
+        assertEquals(5, listPage.getKurikulumCount()); // 6 existing - 1 deleted
         
         // Success message is nice to have but not critical for test pass
         boolean hasSuccessMessage = listPage.isSuccessMessageDisplayed();

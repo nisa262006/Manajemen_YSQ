@@ -26,7 +26,7 @@ import com.sahabatquran.app.web.selenium.pages.MataPelajaranListPage;
 import com.sahabatquran.app.web.selenium.pages.KurikulumFormPage;
 
 @DisplayName("Mata Pelajaran CRUD Functional Tests")
-@Sql(scripts = {"classpath:/sql/clear-data.sql"})
+@Sql(scripts = {"classpath:/sql/clear-data.sql", "classpath:/sql/base-test-data.sql", "classpath:/sql/mata-pelajaran-test-data.sql"})
 class MataPelajaranCrudFunctionalTest extends BaseSeleniumTests {
 
     @Autowired
@@ -35,28 +35,35 @@ class MataPelajaranCrudFunctionalTest extends BaseSeleniumTests {
     @Autowired
     private KurikulumRepository kurikulumRepository;
 
-    private String testKurikulumKode;
-    private String testKurikulumNama;
+    private String testKurikulumKode = "K001";
+    private String testKurikulumNama = "Kurikulum Dasar Tahfidz";
 
     @BeforeEach
     void setupTestData() {
-        // Create a test kurikulum for mata pelajaran tests
-        testKurikulumKode = "KTEST01";
-        testKurikulumNama = "Test Kurikulum";
-        createTestKurikulum(testKurikulumKode, testKurikulumNama, true);
+        // Test kurikulum already loaded from SQL scripts
+        // No need to create test data programmatically
     }
 
     @Test
-    @DisplayName("Should display empty mata pelajaran list initially")
-    void shouldDisplayEmptyMataPelajaranListInitially() {
-        // Given - Empty mata pelajaran table
+    @DisplayName("Should display existing mata pelajaran from test data")
+    void shouldDisplayExistingMataPelajaranFromTestData() {
+        // Given - Database with base + additional mata pelajaran test data
         MataPelajaranListPage listPage = new MataPelajaranListPage(webDriver, getHostUrl() + "/mata-pelajaran");
         
-        // Then - Should show empty state
+        // Then - Should show existing mata pelajaran (4 base + 3 additional = 7 total)
         assertTrue(listPage.isPageLoaded());
-        assertTrue(listPage.isEmptyStateDisplayed());
-        assertEquals(0, listPage.getMataPelajaranCount());
-        assertNotNull(listPage.getEmptyStateMessage());
+        assertEquals(7, listPage.getMataPelajaranCount());
+        
+        // Should display the base test mata pelajaran
+        assertTrue(listPage.isMataPelajaranVisible("MP001"));
+        assertTrue(listPage.isMataPelajaranVisible("MP002"));
+        assertTrue(listPage.isMataPelajaranVisible("MP003"));
+        assertTrue(listPage.isMataPelajaranVisible("MP004"));
+        
+        // Should display the additional test mata pelajaran
+        assertTrue(listPage.isMataPelajaranVisible("MP005"));
+        assertTrue(listPage.isMataPelajaranVisible("MP006"));
+        assertTrue(listPage.isMataPelajaranVisible("MP007"));
     }
 
     @Test
@@ -96,7 +103,7 @@ class MataPelajaranCrudFunctionalTest extends BaseSeleniumTests {
         }
         assertTrue(listPage.isMataPelajaranVisible(kode));
         assertTrue(listPage.isMataPelajaranVisibleByNama(nama));
-        assertEquals(1, listPage.getMataPelajaranCount());
+        assertEquals(8, listPage.getMataPelajaranCount()); // 7 existing + 1 new
         
         // And - Should be saved in database
         assertTrue(mataPelajaranRepository.existsByKode(kode));
@@ -218,7 +225,7 @@ class MataPelajaranCrudFunctionalTest extends BaseSeleniumTests {
             System.out.println("Warning: Success message not displayed, but operation completed successfully");
         }
         assertFalse(listPage.isMataPelajaranVisible(kode));
-        assertEquals(0, listPage.getMataPelajaranCount());
+        assertEquals(6, listPage.getMataPelajaranCount()); // 7 existing - 1 deleted
         
         // And - Should be deleted from database
         assertFalse(mataPelajaranRepository.existsByKode(kode));
@@ -267,13 +274,13 @@ class MataPelajaranCrudFunctionalTest extends BaseSeleniumTests {
         formPage.submitAndGoToList();
         
         MataPelajaranListPage listPage = new MataPelajaranListPage(webDriver, getHostUrl() + "/mata-pelajaran");
-        assertEquals(2, listPage.getMataPelajaranCount());
+        assertEquals(9, listPage.getMataPelajaranCount()); // 7 existing + 2 newly created
         
         // When - User filters by first kurikulum
         listPage.filterByKurikulum(testKurikulumNama);
         
-        // Then - Should show only mata pelajaran from first kurikulum
-        assertEquals(1, listPage.getMataPelajaranCount());
+        // Then - Should show mata pelajaran from first kurikulum (4 from base + 1 newly created = 5)
+        assertEquals(5, listPage.getMataPelajaranCount());
         assertTrue(listPage.isMataPelajaranVisible("MP01"));
         assertFalse(listPage.isMataPelajaranVisible("MP02"));
     }
@@ -320,7 +327,7 @@ class MataPelajaranCrudFunctionalTest extends BaseSeleniumTests {
         if (!listPage.isSuccessMessageDisplayed()) {
             System.out.println("Warning: Success message not displayed, but operation completed successfully");
         }
-        assertEquals(2, listPage.getMataPelajaranCount());
+        assertEquals(9, listPage.getMataPelajaranCount()); // 7 existing + 2 newly created
     }
 
     @Test

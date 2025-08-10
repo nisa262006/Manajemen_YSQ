@@ -23,23 +23,31 @@ import com.sahabatquran.app.web.selenium.pages.PengajarFormPage;
 import com.sahabatquran.app.web.selenium.pages.PengajarListPage;
 
 @DisplayName("Pengajar CRUD Functional Tests")
-@Sql(scripts = {"classpath:/sql/clear-data.sql"})
+@Sql(scripts = {"classpath:/sql/clear-data.sql", "classpath:/sql/base-test-data.sql", "classpath:/sql/pengajar-test-data.sql"})
 class PengajarCrudFunctionalTest extends BaseSeleniumTests {
 
     @Autowired
     private PengajarRepository pengajarRepository;
 
     @Test
-    @DisplayName("Should display empty pengajar list initially")
-    void shouldDisplayEmptyPengajarListInitially() {
-        // Given - Empty database
+    @DisplayName("Should display existing pengajar from test data")
+    void shouldDisplayExistingPengajarFromTestData() {
+        // Given - Database with base + additional pengajar test data
         PengajarListPage listPage = new PengajarListPage(webDriver, getHostUrl() + "/pengajar");
         
-        // Then - Should show empty state
+        // Then - Should show existing pengajar (3 base + 3 additional = 6 total)
         assertTrue(listPage.isPageLoaded());
-        assertTrue(listPage.isEmptyStateDisplayed());
-        assertEquals(0, listPage.getPengajarCount());
-        assertNotNull(listPage.getEmptyStateMessage());
+        assertEquals(6, listPage.getPengajarCount());
+        
+        // Should display the base test pengajar
+        assertTrue(listPage.isPengajarVisible("Ahmad Pengajar Test"));
+        assertTrue(listPage.isPengajarVisible("Siti Pengajar Test"));
+        assertTrue(listPage.isPengajarVisible("Muhammad Pengajar Test"));
+        
+        // Should display the additional test pengajar
+        assertTrue(listPage.isPengajarVisible("Ahmad Fulan"));
+        assertTrue(listPage.isPengajarVisible("Siti Khadijah"));
+        assertTrue(listPage.isPengajarVisible("Muhammad Ali"));
     }
 
     @Test
@@ -79,7 +87,7 @@ class PengajarCrudFunctionalTest extends BaseSeleniumTests {
             System.out.println("Warning: Success message not displayed, but operation completed successfully");
         }
         assertTrue(listPage.isPengajarVisible(nama));
-        assertEquals(1, listPage.getPengajarCount());
+        assertEquals(7, listPage.getPengajarCount()); // 6 existing + 1 new
         
         // And - Should be saved in database
         assertTrue(pengajarRepository.existsByEmail(email));
@@ -197,7 +205,7 @@ class PengajarCrudFunctionalTest extends BaseSeleniumTests {
             System.out.println("Warning: Success message not displayed, but operation completed successfully");
         }
         assertFalse(listPage.isPengajarVisible(nama));
-        assertEquals(0, listPage.getPengajarCount());
+        assertEquals(5, listPage.getPengajarCount()); // 6 existing - 1 deleted
         
         // And - Should be deleted from database
         assertFalse(pengajarRepository.existsByEmail(email));

@@ -26,7 +26,7 @@ import com.sahabatquran.app.web.selenium.pages.KelasFormPage;
 import com.sahabatquran.app.web.selenium.pages.KelasListPage;
 
 @DisplayName("Kelas CRUD Functional Tests")
-@Sql(scripts = {"classpath:/sql/clear-data.sql"})
+@Sql(scripts = {"classpath:/sql/clear-data.sql", "classpath:/sql/base-test-data.sql", "classpath:/sql/kelas-test-data.sql"})
 class KelasCrudFunctionalTest extends BaseSeleniumTests {
 
     @Autowired
@@ -46,38 +46,25 @@ class KelasCrudFunctionalTest extends BaseSeleniumTests {
 
     @BeforeEach
     void setupTestData() {
-        // Create test kurikulum
-        Kurikulum testKurikulum = new Kurikulum();
-        testKurikulum.setKode("K001");
-        testKurikulum.setNama("Kurikulum Dasar Tahfidz");
-        testKurikulum = kurikulumRepository.save(testKurikulum);
-
-        // Create test pengajar
-        testPengajar = new Pengajar();
-        testPengajar.setNama("Ahmad Pengajar Test");
-        testPengajar.setEmail("ahmad.pengajar@test.com");
-        testPengajar.setNomorHandphone("081234567890");
-        testPengajar = pengajarRepository.save(testPengajar);
-
-        // Create test mata pelajaran
-        testMataPelajaran = new MataPelajaran();
-        testMataPelajaran.setKode("MP001");
-        testMataPelajaran.setNama("Tahfidz Al-Quran");
-        testMataPelajaran.setKurikulum(testKurikulum);
-        testMataPelajaran = mataPelajaranRepository.save(testMataPelajaran);
+        // Get test data from SQL scripts
+        testPengajar = pengajarRepository.findById("p001").orElseThrow();
+        testMataPelajaran = mataPelajaranRepository.findById("mp001").orElseThrow();
     }
 
     @Test
-    @DisplayName("Should display empty kelas list initially")
-    void shouldDisplayEmptyKelasListInitially() {
-        // Given - Empty kelas database
+    @DisplayName("Should display existing kelas from test data")
+    void shouldDisplayExistingKelasFromTestData() {
+        // Given - Database with kelas test data
         KelasListPage listPage = new KelasListPage(webDriver, getHostUrl() + "/kelas");
         
-        // Then - Should show empty state
+        // Then - Should show existing kelas (3 from kelas-test-data.sql)
         assertTrue(listPage.isPageLoaded());
-        assertTrue(listPage.isEmptyStateDisplayed());
-        assertEquals(0, listPage.getKelasCount());
-        assertNotNull(listPage.getEmptyStateMessage());
+        assertEquals(3, listPage.getKelasCount());
+        
+        // Should display the test kelas
+        assertTrue(listPage.isKelasVisible("Tahfidz Pagi A"));
+        assertTrue(listPage.isKelasVisible("Tahfidz Sore B"));
+        assertTrue(listPage.isKelasVisible("Tajwid Pagi"));
     }
 
     @Test
@@ -115,7 +102,7 @@ class KelasCrudFunctionalTest extends BaseSeleniumTests {
         // Then - Should be redirected to list with success message
         assertTrue(listPage.isSuccessMessageDisplayed());
         assertTrue(listPage.isKelasVisible(namaKelas));
-        assertEquals(1, listPage.getKelasCount());
+        assertEquals(4, listPage.getKelasCount()); // 3 existing + 1 new
         
         // Verify kelas details in list
         assertEquals(testPengajar.getNama(), listPage.getKelasPengajar(namaKelas));
@@ -209,7 +196,7 @@ class KelasCrudFunctionalTest extends BaseSeleniumTests {
         
         // Then - Kelas should be removed from list
         assertFalse(listPage.isKelasVisible(testKelas.getNama()));
-        assertEquals(0, listPage.getKelasCount());
+        assertEquals(2, listPage.getKelasCount()); // 3 existing - 1 deleted
         
         // Check success message but don't fail if not present
         if (!listPage.isSuccessMessageDisplayed()) {
@@ -220,8 +207,8 @@ class KelasCrudFunctionalTest extends BaseSeleniumTests {
     @Test
     @DisplayName("Should search kelas by name")
     void shouldSearchKelasByName() {
-        // Given - Multiple kelas exist in database
-        Kelas kelas1 = createTestKelasWithName("Tahfidz Pagi");
+        // Given - Multiple kelas exist in database (3 existing + 2 new = 5)
+        Kelas kelas1 = createTestKelasWithName("Tahfidz Pagi New");
         Kelas kelas2 = createTestKelasWithName("Tahsin Sore");
         
         KelasListPage listPage = new KelasListPage(webDriver, getHostUrl() + "/kelas");
@@ -229,10 +216,11 @@ class KelasCrudFunctionalTest extends BaseSeleniumTests {
         // When - User searches for specific kelas
         listPage.searchKelas("Tahfidz");
         
-        // Then - Should show only matching kelas
+        // Then - Should show matching kelas (1 existing "Tahfidz Pagi A" + 1 new "Tahfidz Pagi New" = 2)
         assertTrue(listPage.isKelasVisible(kelas1.getNama()));
+        assertTrue(listPage.isKelasVisible("Tahfidz Pagi A"));
         assertFalse(listPage.isKelasVisible(kelas2.getNama()));
-        assertEquals(1, listPage.getKelasCount());
+        assertEquals(2, listPage.getKelasCount());
     }
 
     @Test
