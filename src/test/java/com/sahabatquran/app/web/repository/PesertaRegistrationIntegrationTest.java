@@ -3,39 +3,48 @@ package com.sahabatquran.app.web.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 import com.sahabatquran.app.web.TestcontainersConfiguration;
 import com.sahabatquran.app.web.entity.Peserta;
-
-import jakarta.validation.ConstraintViolationException;
 
 @DataJpaTest
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("Peserta Registration Integration Tests")
+@Sql(scripts = "/test-data/cleanup-peserta.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Transactional
+@Rollback
 class PesertaRegistrationIntegrationTest {
 
     @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
     private PesertaRepository pesertaRepository;
-
-    @BeforeEach
-    void setUp() {
-        pesertaRepository.deleteAll();
-        entityManager.flush();
+    
+    private final Validator validator;
+    
+    public PesertaRegistrationIntegrationTest() {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            this.validator = factory.getValidator();
+        }
     }
 
     @Test
@@ -49,7 +58,6 @@ class PesertaRegistrationIntegrationTest {
 
         // When
         Peserta savedPeserta = pesertaRepository.save(peserta);
-        entityManager.flush();
 
         // Then
         assertThat(savedPeserta.getId()).isNotNull();
@@ -67,7 +75,6 @@ class PesertaRegistrationIntegrationTest {
         peserta.setEmail("siti.khadijah@example.com");
         peserta.setNomorHandphone("081234567891");
         pesertaRepository.save(peserta);
-        entityManager.flush();
 
         // When & Then
         assertThat(pesertaRepository.existsByEmail("siti.khadijah@example.com")).isTrue();
@@ -83,7 +90,6 @@ class PesertaRegistrationIntegrationTest {
         peserta.setEmail("muhammad.ali@example.com");
         peserta.setNomorHandphone("081234567892");
         pesertaRepository.save(peserta);
-        entityManager.flush();
 
         // When & Then
         assertThat(pesertaRepository.existsByNomorHandphone("081234567892")).isTrue();
@@ -92,6 +98,7 @@ class PesertaRegistrationIntegrationTest {
 
     @Test
     @DisplayName("Should prevent duplicate email registration")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void shouldPreventDuplicateEmail() {
         // Given
         Peserta peserta1 = new Peserta();
@@ -99,7 +106,6 @@ class PesertaRegistrationIntegrationTest {
         peserta1.setEmail("fatimah.test@example.com");
         peserta1.setNomorHandphone("081234567893");
         pesertaRepository.save(peserta1);
-        entityManager.flush();
 
         // When
         Peserta peserta2 = new Peserta();
@@ -108,14 +114,14 @@ class PesertaRegistrationIntegrationTest {
         peserta2.setNomorHandphone("081234567894");
 
         // Then
-        assertThrows(org.hibernate.exception.ConstraintViolationException.class, () -> {
+        assertThrows(DataIntegrityViolationException.class, () -> {
             pesertaRepository.save(peserta2);
-            entityManager.flush();
         });
     }
 
     @Test
     @DisplayName("Should prevent duplicate phone number registration")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void shouldPreventDuplicatePhone() {
         // Given
         Peserta peserta1 = new Peserta();
@@ -123,7 +129,6 @@ class PesertaRegistrationIntegrationTest {
         peserta1.setEmail("umar@example.com");
         peserta1.setNomorHandphone("081234567895");
         pesertaRepository.save(peserta1);
-        entityManager.flush();
 
         // When
         Peserta peserta2 = new Peserta();
@@ -132,9 +137,8 @@ class PesertaRegistrationIntegrationTest {
         peserta2.setNomorHandphone("081234567895"); // Same phone
 
         // Then
-        assertThrows(org.hibernate.exception.ConstraintViolationException.class, () -> {
+        assertThrows(DataIntegrityViolationException.class, () -> {
             pesertaRepository.save(peserta2);
-            entityManager.flush();
         });
     }
 
@@ -147,10 +151,9 @@ class PesertaRegistrationIntegrationTest {
         pesertaWithoutName.setNomorHandphone("081234567896");
 
         // When & Then
-        assertThrows(ConstraintViolationException.class, () -> {
-            pesertaRepository.save(pesertaWithoutName);
-            entityManager.flush();
-        });
+        var violations = validator.validate(pesertaWithoutName);
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).anyMatch(v -> v.getPropertyPath().toString().equals("nama"));
 
         // Given - Peserta with null email
         Peserta pesertaWithoutEmail = new Peserta();
@@ -158,10 +161,9 @@ class PesertaRegistrationIntegrationTest {
         pesertaWithoutEmail.setNomorHandphone("081234567897");
 
         // When & Then
-        assertThrows(ConstraintViolationException.class, () -> {
-            pesertaRepository.save(pesertaWithoutEmail);
-            entityManager.flush();
-        });
+        var emailViolations = validator.validate(pesertaWithoutEmail);
+        assertThat(emailViolations).isNotEmpty();
+        assertThat(emailViolations).anyMatch(v -> v.getPropertyPath().toString().equals("email"));
     }
 
     @Test
@@ -174,10 +176,9 @@ class PesertaRegistrationIntegrationTest {
         pesertaWithInvalidEmail.setNomorHandphone("081234567898");
 
         // When & Then
-        assertThrows(ConstraintViolationException.class, () -> {
-            pesertaRepository.save(pesertaWithInvalidEmail);
-            entityManager.flush();
-        });
+        var violations = validator.validate(pesertaWithInvalidEmail);
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).anyMatch(v -> v.getPropertyPath().toString().equals("email"));
     }
 
     @Test
@@ -190,10 +191,9 @@ class PesertaRegistrationIntegrationTest {
         pesertaWithShortName.setNomorHandphone("081234567899");
 
         // When & Then
-        assertThrows(ConstraintViolationException.class, () -> {
-            pesertaRepository.save(pesertaWithShortName);
-            entityManager.flush();
-        });
+        var violations = validator.validate(pesertaWithShortName);
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).anyMatch(v -> v.getPropertyPath().toString().equals("nama"));
     }
 
     @Test
@@ -205,7 +205,6 @@ class PesertaRegistrationIntegrationTest {
         peserta.setEmail("khalid@example.com");
         peserta.setNomorHandphone("081234567800");
         pesertaRepository.save(peserta);
-        entityManager.flush();
 
         // When
         var foundPeserta = pesertaRepository.findByEmail("khalid@example.com");
@@ -224,7 +223,6 @@ class PesertaRegistrationIntegrationTest {
         peserta.setEmail("salahuddin@example.com");
         peserta.setNomorHandphone("081234567801");
         pesertaRepository.save(peserta);
-        entityManager.flush();
 
         // When
         var foundPeserta = pesertaRepository.findByNomorHandphone("081234567801");
