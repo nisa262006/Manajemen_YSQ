@@ -79,7 +79,7 @@
                     </div>
                     <div class="card-body p-4">
                         <!-- Error Message -->
-                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                        <div th:if="${errorMessage}" id="generalErrorAlert" class="alert alert-danger" role="alert">
                             <i class="fas fa-exclamation-circle me-2"></i>
                             <span th:text="${errorMessage}"></span>
                         </div>
@@ -96,7 +96,7 @@
                                        th:classappend="${#fields.hasErrors('nama')} ? 'is-invalid' : ''"
                                        placeholder="Masukkan nama lengkap Anda"
                                        required>
-                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nama')}" th:errors="*{nama}"></div>
+                                <div id="namaError" class="invalid-feedback" th:if="${#fields.hasErrors('nama')}" th:errors="*{nama}"></div>
                             </div>
                             
                             <div class="mb-3">
@@ -110,7 +110,7 @@
                                        th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
                                        placeholder="contoh@email.com"
                                        required>
-                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                                <div id="emailError" class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                             </div>
                             
                             <div class="mb-4">
@@ -124,7 +124,7 @@
                                        th:classappend="${#fields.hasErrors('nomorHandphone')} ? 'is-invalid' : ''"
                                        placeholder="08xxxxxxxxxx"
                                        required>
-                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nomorHandphone')}" th:errors="*{nomorHandphone}"></div>
+                                <div id="nomorHandphoneError" class="invalid-feedback" th:if="${#fields.hasErrors('nomorHandphone')}" th:errors="*{nomorHandphone}"></div>
                                 <small class="form-text text-muted">Format: 08xxxxxxxxxx</small>
                             </div>
                             

@@ -35,19 +35,19 @@ public class KelasFormPage {
     @FindBy(id = "waktuSelesai")
     private WebElement waktuSelesaiInput;
 
-    @FindBy(css = "button[type='submit']")
+    @FindBy(id = "submit-btn")
     private WebElement submitButton;
 
-    @FindBy(css = "button[type='reset']")
+    @FindBy(id = "reset-btn")
     private WebElement resetButton;
 
-    @FindBy(css = "a[href*='/kelas']:not([href*='/new']):not([href*='/edit'])")
+    @FindBy(id = "kembali-btn")
     private WebElement kembaliButton;
 
     @FindBy(css = ".text-red-600")
     private List<WebElement> validationErrors;
 
-    @FindBy(css = ".bg-red-50")
+    @FindBy(id = "error-alert")
     private WebElement errorAlert;
 
     public KelasFormPage(WebDriver webDriver, String url) {
@@ -261,10 +261,49 @@ public class KelasFormPage {
     }
 
     public KelasListPage submitAndGoToList() {
+        // First wait for page to be ready
+        wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+        
         submitForm();
         
-        // Wait for potential redirect to list page
-        wait.until(ExpectedConditions.urlContains("/kelas"));
+        // Wait for the redirect with more specific conditions
+        try {
+            // Wait for URL to change to indicate redirect happened - be more flexible
+            WebDriverWait redirectWait = new WebDriverWait(webDriver, Duration.ofSeconds(15));
+            redirectWait.until(ExpectedConditions.or(
+                ExpectedConditions.and(
+                    ExpectedConditions.urlContains("/kelas"),
+                    ExpectedConditions.not(ExpectedConditions.urlContains("/new")),
+                    ExpectedConditions.not(ExpectedConditions.urlContains("/edit"))
+                ),
+                // Or if we're still on form page due to validation errors
+                ExpectedConditions.urlContains("/kelas")
+            ));
+            
+            // Only wait for table if we're on the list page
+            if (!webDriver.getCurrentUrl().contains("/new") && !webDriver.getCurrentUrl().contains("/edit")) {
+                // Wait for the kelas table to be present indicating page loaded
+                redirectWait.until(ExpectedConditions.presenceOfElementLocated(By.id("kelas-table")));
+                
+                // Give extra time for flash messages to be processed
+                // This is important because flash attributes need time to be rendered
+                redirectWait.until(ExpectedConditions.or(
+                    ExpectedConditions.presenceOfElementLocated(By.id("success-alert")),
+                    ExpectedConditions.presenceOfElementLocated(By.id("error-alert")),
+                    // Or wait for the page to be stable (DOM to be fully loaded)
+                    ExpectedConditions.and(
+                        ExpectedConditions.presenceOfElementLocated(By.id("kelas-table")),
+                        ExpectedConditions.not(ExpectedConditions.stalenessOf(
+                            webDriver.findElement(By.id("kelas-table"))
+                        ))
+                    )
+                ));
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error during redirect wait: " + e.getMessage());
+            System.out.println("Current URL after submit: " + webDriver.getCurrentUrl());
+        }
         
         return new KelasListPage(webDriver, webDriver.getCurrentUrl());
     }

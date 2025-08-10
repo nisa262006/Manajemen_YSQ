@@ -25,7 +25,7 @@ public class PendaftaranPage {
     @FindBy(id = "nomorHandphone")
     private WebElement phoneField;
 
-    @FindBy(xpath = "//button[@type='submit']")
+    @FindBy(css = "button[type='submit']")
     private WebElement submitButton;
 
     @FindBy(id = "registrationTitle")
@@ -70,19 +70,26 @@ public class PendaftaranPage {
 
     public boolean isErrorMessageDisplayed(String expectedError) {
         try {
-            // Check for validation error messages
-            WebElement errorElement = wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//div[contains(@class, 'invalid-feedback') and contains(text(), '" + expectedError + "')]")));
-            return errorElement.isDisplayed();
+            // Check for general alert message
+            WebElement alertElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("generalErrorAlert")));
+            return alertElement.isDisplayed() && alertElement.getText().contains(expectedError);
         } catch (Exception e) {
+            // Check for specific field validation errors
             try {
-                // Also check for general alert messages
-                WebElement alertElement = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//div[contains(@class, 'alert') and contains(text(), '" + expectedError + "')]")));
-                return alertElement.isDisplayed();
+                if (expectedError.toLowerCase().contains("nama")) {
+                    WebElement namaError = webDriver.findElement(By.id("namaError"));
+                    return namaError.isDisplayed() && namaError.getText().contains(expectedError);
+                } else if (expectedError.toLowerCase().contains("email")) {
+                    WebElement emailError = webDriver.findElement(By.id("emailError"));
+                    return emailError.isDisplayed() && emailError.getText().contains(expectedError);
+                } else if (expectedError.toLowerCase().contains("handphone") || expectedError.toLowerCase().contains("nomor")) {
+                    WebElement phoneError = webDriver.findElement(By.id("nomorHandphoneError"));
+                    return phoneError.isDisplayed() && phoneError.getText().contains(expectedError);
+                }
             } catch (Exception ex) {
-                return false;
+                // Continue to return false
             }
+            return false;
         }
     }
 
@@ -101,6 +108,6 @@ public class PendaftaranPage {
 
     public WebElement getFieldErrorMessage(String fieldId) {
         return wait.until(ExpectedConditions.presenceOfElementLocated(
-            By.xpath("//input[@id='" + fieldId + "']/following-sibling::div[@class='invalid-feedback']")));
+            By.id(fieldId + "Error")));
     }
 }

@@ -13,7 +13,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class HomePage {
 
-    @FindBy(xpath = "//*[@id='appTitle']")
+    @FindBy(id = "appTitle")
     private WebElement appTitle;
 
     private WebDriver webDriver;

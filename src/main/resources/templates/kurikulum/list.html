@@ -35,7 +35,7 @@
                     </form>
                     
                     <!-- Add Button -->
-                    <a th:href="@{/kurikulum/new}" 
+                    <a id="tambah-kurikulum-btn" th:href="@{/kurikulum/new}" 
                        class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200">
                         <i class="fas fa-plus mr-2"></i>
                         Tambah Kurikulum
@@ -56,7 +56,7 @@
             </div>
             
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table id="kurikulum-table" class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>

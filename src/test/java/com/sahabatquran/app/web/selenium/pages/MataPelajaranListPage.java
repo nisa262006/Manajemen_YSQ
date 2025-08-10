@@ -32,10 +32,10 @@ public class MataPelajaranListPage {
     @FindBy(css = "table tbody")
     private WebElement tableBody;
 
-    @FindBy(css = ".bg-green-50")
+    @FindBy(id = "success-alert")
     private WebElement successAlert;
 
-    @FindBy(css = ".bg-red-50")
+    @FindBy(id = "error-alert")
     private WebElement errorAlert;
 
     public MataPelajaranListPage(WebDriver webDriver, String url) {
@@ -54,7 +54,7 @@ public class MataPelajaranListPage {
 
     public boolean isPageLoaded() {
         try {
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mata-pelajaran-table")));
             return true;
         } catch (Exception e) {
             return false;
@@ -99,7 +99,7 @@ public class MataPelajaranListPage {
     }
 
     public int getMataPelajaranCount() {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mata-pelajaran-table")));
         
         // Check if there's an empty state message
         List<WebElement> emptyStateElements = webDriver.findElements(By.cssSelector("td[colspan='6']"));
@@ -111,7 +111,7 @@ public class MataPelajaranListPage {
     }
 
     public boolean isMataPelajaranVisible(String kode) {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mata-pelajaran-table")));
         
         for (WebElement row : mataPelajaranRows) {
             List<WebElement> cells = row.findElements(By.tagName("td"));
@@ -126,7 +126,7 @@ public class MataPelajaranListPage {
     }
 
     public boolean isMataPelajaranVisibleByNama(String nama) {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("mata-pelajaran-table")));
         
         for (WebElement row : mataPelajaranRows) {
             List<WebElement> cells = row.findElements(By.tagName("td"));

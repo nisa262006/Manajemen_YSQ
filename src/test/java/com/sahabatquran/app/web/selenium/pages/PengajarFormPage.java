@@ -25,19 +25,19 @@ public class PengajarFormPage {
     @FindBy(id = "nomorHandphone")
     private WebElement nomorHandphoneInput;
 
-    @FindBy(css = "button[type='submit']")
+    @FindBy(id = "submitBtn")
     private WebElement submitButton;
 
-    @FindBy(css = "button[type='reset']")
+    @FindBy(id = "resetBtn")
     private WebElement resetButton;
 
-    @FindBy(css = "a[href*='/pengajar']:not([href*='/new']):not([href*='/edit'])")
+    @FindBy(id = "kembaliBtn")
     private WebElement kembaliButton;
 
     @FindBy(css = ".text-red-600")
     private WebElement validationError;
 
-    @FindBy(css = ".bg-red-50")
+    @FindBy(id = "error-alert")
     private WebElement errorAlert;
 
     public PengajarFormPage(WebDriver webDriver, String url) {
@@ -129,7 +129,11 @@ public class PengajarFormPage {
 
     public boolean hasValidationError() {
         try {
-            return !webDriver.findElements(By.cssSelector(".text-red-600")).isEmpty();
+            // Check for any validation error by ID
+            return !webDriver.findElements(By.id("namaError")).isEmpty() ||
+                   !webDriver.findElements(By.id("emailError")).isEmpty() ||
+                   !webDriver.findElements(By.id("nomorHandphoneError")).isEmpty() ||
+                   !webDriver.findElements(By.cssSelector(".text-red-600")).isEmpty();
         } catch (Exception e) {
             return false;
         }

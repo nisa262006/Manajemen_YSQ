@@ -16,22 +16,22 @@ public class PengajarListPage {
     private final WebDriver webDriver;
     private final WebDriverWait wait;
 
-    @FindBy(css = "input[name='search']")
+    @FindBy(id = "searchInput")
     private WebElement searchInput;
 
-    @FindBy(css = "a[href*='/pengajar/new']")
+    @FindBy(id = "tambahPengajarBtn")
     private WebElement tambahPengajarButton;
 
-    @FindBy(css = "table tbody tr")
+    @FindBy(css = "#pengajar-table tbody tr:not(#empty-state)")
     private List<WebElement> pengajarRows;
 
-    @FindBy(css = "table tbody")
+    @FindBy(css = "#pengajar-table tbody")
     private WebElement tableBody;
 
-    @FindBy(css = ".bg-green-50")
+    @FindBy(id = "success-alert")
     private WebElement successAlert;
 
-    @FindBy(css = ".bg-red-50")
+    @FindBy(id = "error-alert")
     private WebElement errorAlert;
 
     public PengajarListPage(WebDriver webDriver, String url) {
@@ -50,7 +50,7 @@ public class PengajarListPage {
 
     public boolean isPageLoaded() {
         try {
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pengajar-table")));
             return true;
         } catch (Exception e) {
             return false;
@@ -76,11 +76,11 @@ public class PengajarListPage {
     }
 
     public int getPengajarCount() {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pengajar-table")));
         
         // Check if there's an empty state message
-        List<WebElement> emptyStateElements = webDriver.findElements(By.cssSelector("td[colspan='5']"));
-        if (!emptyStateElements.isEmpty()) {
+        List<WebElement> emptyStateElements = webDriver.findElements(By.id("empty-state"));
+        if (!emptyStateElements.isEmpty() && emptyStateElements.get(0).isDisplayed()) {
             return 0;
         }
         
@@ -88,13 +88,13 @@ public class PengajarListPage {
     }
 
     public boolean isPengajarVisible(String nama) {
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pengajar-table")));
         
         for (WebElement row : pengajarRows) {
-            List<WebElement> cells = row.findElements(By.tagName("td"));
-            if (cells.size() >= 2) {
-                String namaInRow = cells.get(1).getText(); // Assuming nama is in second column
-                if (namaInRow.contains(nama)) {
+            // Try to find by ID first for better performance
+            List<WebElement> namaElements = row.findElements(By.cssSelector("div[id^='pengajar-nama-']"));
+            for (WebElement element : namaElements) {
+                if (element.getText().contains(nama)) {
                     return true;
                 }
             }
@@ -132,15 +132,28 @@ public class PengajarListPage {
 
     private WebElement findActionButton(String nama, String iconClass) {
         for (WebElement row : pengajarRows) {
-            List<WebElement> cells = row.findElements(By.tagName("td"));
-            if (cells.size() >= 2) {
-                String namaInRow = cells.get(1).getText();
-                if (namaInRow.contains(nama)) {
-                    // Find the action button with specific icon
-                    List<WebElement> buttons = cells.get(cells.size() - 1)
-                        .findElements(By.cssSelector("a i." + iconClass + ", button i." + iconClass));
-                    if (!buttons.isEmpty()) {
-                        return buttons.get(0).findElement(By.xpath(".."));
+            // Try to find by ID first
+            List<WebElement> namaElements = row.findElements(By.cssSelector("div[id^='pengajar-nama-']"));
+            for (WebElement namaElement : namaElements) {
+                if (namaElement.getText().contains(nama)) {
+                    // Extract pengajar ID from the nama element's ID
+                    String pengajarId = namaElement.getAttribute("id").replace("pengajar-nama-", "");
+                    
+                    // Find the specific action button by ID
+                    String buttonId = null;
+                    if (iconClass.equals("fa-eye")) {
+                        buttonId = "view-btn-" + pengajarId;
+                    } else if (iconClass.equals("fa-edit")) {
+                        buttonId = "edit-btn-" + pengajarId;
+                    } else if (iconClass.equals("fa-trash")) {
+                        buttonId = "delete-btn-" + pengajarId;
+                    }
+                    
+                    if (buttonId != null) {
+                        List<WebElement> buttons = webDriver.findElements(By.id(buttonId));
+                        if (!buttons.isEmpty()) {
+                            return buttons.get(0);
+                        }
                     }
                 }
             }
@@ -179,13 +192,13 @@ public class PengajarListPage {
     }
 
     public boolean isEmptyStateDisplayed() {
-        List<WebElement> emptyStateElements = webDriver.findElements(By.cssSelector("td[colspan='5']"));
+        List<WebElement> emptyStateElements = webDriver.findElements(By.id("empty-state"));
         return !emptyStateElements.isEmpty() && emptyStateElements.get(0).isDisplayed();
     }
 
     public String getEmptyStateMessage() {
         if (isEmptyStateDisplayed()) {
-            WebElement emptyState = webDriver.findElement(By.cssSelector("td[colspan='5']"));
+            WebElement emptyState = webDriver.findElement(By.id("empty-state"));
             return emptyState.getText();
         }
         return null;
@@ -194,8 +207,8 @@ public class PengajarListPage {
     public List<String> getAllPengajarNames() {
         return pengajarRows.stream()
             .map(row -> {
-                List<WebElement> cells = row.findElements(By.tagName("td"));
-                return cells.size() >= 2 ? cells.get(1).getText() : "";
+                List<WebElement> namaElements = row.findElements(By.cssSelector("div[id^='pengajar-nama-']"));
+                return namaElements.size() > 0 ? namaElements.get(0).getText() : "";
             })
             .filter(name -> !name.isEmpty())
             .toList();

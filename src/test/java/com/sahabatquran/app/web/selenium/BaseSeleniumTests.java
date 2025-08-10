@@ -19,7 +19,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Import(TestcontainersConfiguration.class)
-@SpringBootTest(useMainMethod = UseMainMethod.WHEN_AVAILABLE, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    useMainMethod = UseMainMethod.WHEN_AVAILABLE, 
+    webEnvironment = WebEnvironment.RANDOM_PORT,
+    properties = {
+        "server.servlet.session.tracking-modes=cookie",
+        "server.servlet.session.cookie.http-only=false",
+        "server.servlet.session.cookie.secure=false",
+        "server.servlet.session.cookie.same-site=none"
+    }
+)
 public abstract class BaseSeleniumTests {
 
     WebDriver webDriver;
