@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pendaftaran Berhasil | Sahabat Qur'an Bogor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #e6e7c5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
+      color: #182246;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background segitiga */
+    .bg-shape {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 45vh;
+      background: 
+        linear-gradient(135deg, #0F473D 50%, transparent 50%), 
+        linear-gradient(225deg, #B3943E 50%, transparent 50%);
+      background-repeat: no-repeat;
+      background-position: left top, right top;
+      background-size: 50% 100%;
+      z-index: -1;
+    }
+
+    img.logo {
+      width: 140px;
+      margin-top: 50px;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0F2141;
+      margin: 40px 0 20px;
+      opacity: 0;
+      animation: fadeIn 2s ease 0.5s forwards;
+    }
+
+    .checkmark {
+      width: 90px;
+      height: 90px;
+      background-color: #00b894;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px auto 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: scale(0.5) rotate(-30deg);
+      animation: popIn 1s ease forwards 1s;
+    }
+
+    .checkmark::after {
+      content: '✔';
+      font-size: 45px;
+      color: white;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #182246;
+      max-width: 600px;
+      margin: 0 auto 30px;
+      opacity: 0;
+      animation: fadeInUp 1.2s ease 1.5s forwards;
+    }
+
+    a {
+      display: inline-block;
+      text-decoration: none;
+      background: linear-gradient(to right, #D7B766, #A88634);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: 0.3s;
+      opacity: 0;
+      animation: fadeInUp 1.2s ease 2s forwards;
+    }
+
+    a:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(-30deg);
+      }
+      80% {
+        transform: scale(1.1) rotate(5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-shape"></div>
+
+  <img src="/images/logo.png" alt="Logo">
+
+  <h1>Alhamdulillah,<br>Pendaftaran Berhasil!</h1>
+
+  <div class="checkmark"></div>
+
+  <p>Data kamu telah kami terima. Silakan tunggu konfirmasi jadwal dan informasi selanjutnya melalui WhatsApp yang kamu daftarkan.</p>
+
+  <a href="index.html">Kembali ke Beranda</a>
+</body>
+</html>

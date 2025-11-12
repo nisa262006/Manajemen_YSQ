@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Sahabat Qur'an</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #dfe2b6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: #184d3b;
+      padding: 50px;
+      border-radius: 25px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      width: 400px;
+      color: white;
+      text-align: center;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 30px;
+      color: #d7b766;
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-bottom: 2px solid #d7b766;
+      background: transparent;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #b8c4b2;
+    }
+
+    button {
+      background: linear-gradient(to bottom, #d7b766, #a87936);
+      color: white;
+      border: none;
+      padding: 12px 40px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    .forgot {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #cfcfcf;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <img src="/images/logo.png" alt="Logo">
+    <h2>Login Santri</h2>
+
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Kata Sandi" required />
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="forgot">Lupa Kata Sandi?</div>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const validEmail = "santri1@gmail.com";
+      const validPassword = "123456"
+
+      // Simpan ke localStorage agar bisa dibaca di dashboard
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("userPassword", password);
+      localStorage.setItem("userName", "Nama Jingga");
+      localStorage.setItem("userLevel", "Tahsin Level A");
+
+      // Arahkan ke dashboard.html
+      window.location.href = "dashboardsantri.html";
+    });
+  </script>
+</body>
+</html>

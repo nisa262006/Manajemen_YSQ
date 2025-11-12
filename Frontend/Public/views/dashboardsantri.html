@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Santri | Sahabat Qur'an</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #dfe2b6;
+      color: #1a1a1a;
+    }
+
+    header {
+      background-color: #184d3b;
+      color: #d7b766;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    nav {
+      display: flex;
+      gap: 30px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #c9a84e;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: white;
+    }
+
+    .main {
+      padding: 40px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      color: #184d3b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #184d3b;
+      color: #d7b766;
+    }
+
+    .logout-btn {
+      display: inline-block;
+      background: #a75d2a;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 30px;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #8a4a21;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="left">
+      <img src="/images/logo.png" alt="Logo">
+      <strong>YAYASAN SAHABAT QUR’AN</strong>
+    </div>
+    <nav>
+      <a href="#">Dashboard</a>
+      <a href="#">Riwayat Absen</a>
+      <a href="#">Raport</a>
+      <a href="#">Tagihan</a>
+    </nav>
+  </header>
+
+  <div class="main">
+    <div class="card">
+      <h2>Informasi Santri</h2>
+      <p><b>Nama:</b> <span id="nama"></span></p>
+      <p><b>Email:</b> <span id="email"></span></p>
+      <p><b>Password:</b> <span id="password"></span></p>
+      <p><b>Kelas:</b> <span id="kelas"></span></p>
+    </div>
+
+    <div class="card">
+      <h2>Jadwal Kelas</h2>
+      <table>
+        <tr>
+          <th>NO</th>
+          <th>Subjek</th>
+          <th>Hari</th>
+          <th>Jam</th>
+          <th>Guru</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Tahsin</td>
+          <td>Selasa</td>
+          <td>08.00 - 10.30</td>
+          <td>ustadzah@gmail.com</td>
+        </tr>
+      </table>
+    </div>
+
+    <a href="login.html" class="logout-btn" onclick="logout()">Logout</a>
+  </div>
+
+  <script>
+    // Ambil data dari localStorage
+    const nama = localStorage.getItem("userName");
+    const email = localStorage.getItem("userEmail");
+    const password = localStorage.getItem("userPassword");
+    const level = localStorage.getItem("userLevel");
+
+    // Tampilkan ke halaman
+    document.getElementById("nama").innerText = nama || "-";
+    document.getElementById("email").innerText = email || "-";
+    document.getElementById("password").innerText = password ? "********" : "-";
+    document.getElementById("kelas").innerText = level || "-";
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

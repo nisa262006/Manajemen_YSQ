@@ -1,9 +1,0 @@
-testName,entityType,searchParam,expectedCount,description
-searchPesertaByName,Peserta,Ahmad,1,Should find peserta with name containing Ahmad
-searchPesertaByEmail,Peserta,ahmad.fauzi@email.com,1,Should find peserta by exact email
-searchPesertaByEmailDomain,Peserta,gmail.com,3,Should find 3 peserta with gmail domain
-searchPengajarByName,Pengajar,Abdul,1,Should find pengajar with name containing Abdul
-searchPengajarByEmail,Pengajar,abdul.rahman@sahabatquran.com,1,Should find pengajar by exact email
-searchPengajarByPhoneNumber,Pengajar,081234567000,1,Should find pengajar by phone number
-checkPesertaExists,Peserta,siti.nurhaliza@email.com,1,Should confirm peserta exists by email
-checkPengajarExists,Pengajar,aminah.zahra@sahabatquran.com,1,Should confirm pengajar exists by email

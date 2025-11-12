@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrasi Santri Baru | Sahabat Qur'an Bogor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #cdd1a3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      width: 1000px;
+      height: 600px;
+      border-radius: 25px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      background-color: #d9dbb2;
+    }
+
+    /* Bagian kiri */
+    .left-panel {
+      position: relative;
+      background: linear-gradient(135deg, #0f3e33 35%, #092c24 65%);
+      width: 40%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .left-panel::after {
+      content: '';
+      position: absolute;
+      right: -60px;
+      width: 120px;
+      height: 100%;
+      background: linear-gradient(135deg, #0f3e33, #b89345);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+
+    .left-panel h2 {
+      color: #d7b965;
+      font-size: 32px;
+      font-weight: 700;
+      transform: rotate(-90deg);
+      letter-spacing: 1px;
+    }
+
+    /* Bagian kanan */
+    .right-panel {
+      flex: 1;
+      padding: 50px 60px;
+      background-color: #e1e3b6;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h1 {
+      color: #0f3e33;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #b0772d;
+      font-size: 15px;
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"] {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .checkbox input {
+      accent-color: #b0772d;
+    }
+
+    .checkbox label {
+      font-size: 14px;
+      color: #0f3e33;
+    }
+
+    button {
+      margin-top: 10px;
+      width: 150px;
+      background: linear-gradient(to right, #deb34f, #b2762f);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    a.kembali {
+      margin-top: 20px;
+      display: inline-block;
+      color: #0f3e33;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    a.kembali:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+    </div>
+
+    <div class="right-panel">
+      <h1>Registrasi Santri Baru</h1>
+      <p>Isi data berikut untuk mendaftar sebagai santriwati Yayasan Sahabat Qur’an</p>
+
+      <form action="berhasil.html" method="post">
+        <input type="text" name="nama" placeholder="Nama Lengkap" required>
+        <div class="input-group">
+          <input type="text" name="tempat_lahir" placeholder="Tempat Lahir" required>
+          <input type="date" name="tanggal_lahir" required>
+        </div>
+        <input type="text" name="telepon" placeholder="Nomor Telepon" required>
+        <input type="email" name="email" placeholder="Email" required>
+
+        <div class="checkbox">
+          <input type="checkbox" id="setuju" required>
+          <label for="setuju">Saya menyetujui Syarat dan Ketentuan yang berlaku.</label>
+        </div>
+
+        <button type="submit">Daftar</button>
+      </form>
+      
+      <a href="index.html" class="kembali">← Kembali ke Beranda</a>
+    </div>
+  </div>
+</body>
+</html>
+
