@@ -1,6 +1,7 @@
 # Projek yayasan sahabat quran
 
-## Yayasan Sahabat Quran (YSQ) merupakan lembaga pendidikan yang berdedikasi tinggi dalam pengajaran Al-Quran. Seiring dengan perkembangannya, YSQ menghadapi tantangan dalam manajemen operasional karena sebagian besar proses masih dilakukan secara manual. Proses-proses kunci seperti pendaftaran siswa, penjadwalan kelas, pencatatan kehadiran, hingga pemantauan progres belajar masih bergantung pada pencatatan fisik dan aplikasi perkantoran standar (seperti Google Forms dan Spreadsheet). Ketergantungan pada metode manual ini tidak hanya memakan waktu tetapi juga rentan terhadap kesalahan manusia (human error), yang dapat menghambat efisiensi dan skalabilitas layanan pendidikan yang ditawarkan.
+## Pendahuluan
+Yayasan Sahabat Quran (YSQ) merupakan lembaga pendidikan yang berdedikasi tinggi dalam pengajaran Al-Quran. Seiring dengan perkembangannya, YSQ menghadapi tantangan dalam manajemen operasional karena sebagian besar proses masih dilakukan secara manual. Proses-proses kunci seperti pendaftaran siswa, penjadwalan kelas, pencatatan kehadiran, hingga pemantauan progres belajar masih bergantung pada pencatatan fisik dan aplikasi perkantoran standar (seperti Google Forms dan Spreadsheet). Ketergantungan pada metode manual ini tidak hanya memakan waktu tetapi juga rentan terhadap kesalahan manusia (human error), yang dapat menghambat efisiensi dan skalabilitas layanan pendidikan yang ditawarkan.
 Untuk mengatasi tantangan tersebut dan mendukung visi yayasan, diperlukan sebuah sistem manajemen terpusat berbasis teknologi. Proyek ini diusulkan untuk merancang dan membangun sebuah aplikasi manajemen berbasis web yang dapat mengotomatisasi dan mengintegrasikan proses-proses operasional utama di YSQ.
 
 ## Tujuan 
