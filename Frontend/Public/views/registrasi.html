@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrasi | Yayasan Sahabat Qur'an</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/admin.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <img src="logoYSQ.png" alt="Logo Sahabat Quran" class="logo">
+    <h2 class="yayasan">SAHABAT QUR'AN BOGOR</h2>
+    <nav>
+      <a href="dashboard-admin.html"><i>🏠</i> Dashboard</a>
+      <a href="#"><i>🗓️</i> Daftar Jadwal</a>
+      <a href="#"><i>🏫</i> Daftar Kelas</a>
+      <a href="#"><i>👨‍🎓</i> Daftar Santri</a>
+      <a href="#"><i>👩‍🏫</i> Daftar Pengajar</a>
+      <a href="#"><i>📋</i> Riwayat Absensi</a>
+      <a href="#"><i>📘</i> Rapor</a>
+      <a href="#" class="active"><i>📊</i> Laporan</a>
+    </nav>
+  </aside>
+
+  <!-- Konten Utama -->
+  <main class="main-content">
+    <header class="topbar">
+      <h1>Registrasi</h1>
+      <div class="topbar-right">
+        <span class="admin-text">Admin</span>
+        <div class="profile-icon">👤</div>
+      </div>
+    </header>
+
+    <!-- Statistik -->
+    <section class="stats">
+      <div class="stat-card"><p>Pendaftar</p><h3 class="green">12</h3></div>
+      <div class="stat-card"><p>Menunggu verifikasi</p><h3 class="green">12</h3></div>
+      <div class="stat-card"><p>Diterima</p><h3 class="green">12</h3></div>
+      <div class="stat-card"><p>Sisa kuota</p><h3 class="green">12</h3></div>
+    </section>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Cari nama santri...">
+      <button onclick="searchTable()">Cari</button>
+    </div>
+
+    <!-- Tabel -->
+    <section class="table-section">
+      <h2>Siswa Pendaftar</h2>
+      <table id="tabelPendaftar">
+        <thead>
+          <tr>
+            <th>No</th><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>Nomor WhatsApp</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div class="bottom-buttons">
+        <a href="dashboardadmin.html" class="btn kembali">⬅ Kembali</a>
+        <button class="btn eksport" onclick="exportToExcel()">📁 Ekspor Laporan</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <h2>Detail Pendaftar</h2>
+
+      <div class="detail-group">
+        <label>Nama</label>
+        <p id="detailNama">-</p>
+      </div>
+      <div class="detail-group">
+        <label>Tempat, Tanggal Lahir</label>
+        <p id="detailTTL">-</p>
+      </div>
+      <div class="detail-group">
+        <label>Nomor WhatsApp</label>
+        <p id="detailWA">-</p>
+      </div>
+      <div class="detail-group">
+        <label>Email</label>
+        <p id="detailEmail">-</p>
+      </div>
+
+      <h3>Status Menunggu Verifikasi</h3>
+      <div class="status-buttons">
+        <button class="btn-status diterima" onclick="setStatus('Diterima')">Diterima</button>
+        <button class="btn-status ditolak" onclick="setStatus('Ditolak')">Ditolak</button>
+      </div>
+
+      <button class="close-btn" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>
+
+  <script>
+  // === Simulasi data awal pendaftar ===
+  let pendaftar = [
+    { nama: "David", tempat: "Bogor", tanggal: "34 Mei 2009", whatsapp: "088882464738", email: "david@gmail.com", status: "Diterima" },
+    { nama: "Jingga", tempat: "Bogor", tanggal: "7 Mei 2009", whatsapp: "088882464738", email: "jingga@gmail.com", status: "Ditolak" },
+    { nama: "Rani", tempat: "Bogor", tanggal: "10 Mei 2009", whatsapp: "088882464739", email: "rani@gmail.com", status: "Menunggu" }
+  ];
+
+  // Simpan data awal jika belum ada
+  if (!localStorage.getItem("pendaftarData")) {
+    localStorage.setItem("pendaftarData", JSON.stringify(pendaftar));
+  } else {
+    pendaftar = JSON.parse(localStorage.getItem("pendaftarData"));
+  }
+
+  // Render tabel
+  const tbody = document.getElementById("tabelPendaftar");
+  function renderTable() {
+    tbody.innerHTML = pendaftar.map((item, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${item.nama}</td>
+        <td>${item.tempat}</td>
+        <td>${item.tanggal}</td>
+        <td>${item.whatsapp}</td>
+        <td>
+          ${item.status === "Menunggu"
+            ? `<span class="status detail" onclick="openDetail('${i}')">Lihat Detail</span>`
+            : `<span class="status ${item.status.toLowerCase()}">${item.status}</span>`}
+        </td>
+      </tr>
+    `).join("");
+  }
+  renderTable();
+
+  // === Modal Detail ===
+  function openDetail(index) {
+    const data = pendaftar[index];
+    document.getElementById("detailNama").textContent = data.nama;
+    document.getElementById("detailTTL").textContent = `${data.tempat}, ${data.tanggal}`;
+    document.getElementById("detailWA").textContent = data.whatsapp;
+    document.getElementById("detailEmail").textContent = data.email;
+    document.getElementById("detailModal").style.display = "flex";
+
+    // Simpan index sementara untuk update nanti
+    document.getElementById("detailModal").setAttribute("data-index", index);
+  }
+
+  function closeModal() {
+    document.getElementById("detailModal").style.display = "none";
+  }
+
+  // === Update Status ===
+  function setStatus(status) {
+    const modal = document.getElementById("detailModal");
+    const index = modal.getAttribute("data-index");
+    pendaftar[index].status = status;
+
+    // Simpan ke localStorage
+    localStorage.setItem("pendaftarData", JSON.stringify(pendaftar));
+
+    // Update tabel tanpa reload
+    renderTable();
+
+    alert(`Status ${pendaftar[index].nama} telah diubah menjadi ${status}.`);
+    closeModal();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin | Yayasan Sahabat Qur'an</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* --- Modal Tambah Kelas --- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      width: 450px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .modal-content h2 {
+      text-align: center;
+      color: #1d4b2c;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .modal-content label {
+      display: block;
+      margin-top: 10px;
+      color: #1d4b2c;
+      font-weight: 600;
+    }
+
+    .modal-content input, 
+    .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #1d4b2c;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+    }
+
+    .btn-batal {
+      background-color: #d46a6a;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-simpan {
+      background-color: #b7903d;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo-dash" />
+  <h2 class="yayasan">SAHABAT QUR'AN BOGOR</h2>
+  <nav>
+    <a href="dashboardadmin.html" class="active">🏠 Dashboard</a>
+    <a href="jadwaladmin.html">🗓️ Daftar Jadwal</a>
+    <a href="kelasadmin.html">🏫 Daftar Kelas</a>
+    <a href="daftarsantri.html">👨‍🎓 Daftar Santri</a>
+    <a href="daftarpengajar.html">👩‍🏫 Daftar Pengajar</a>
+    <a href="riwayatabsensi.html">📋 Riwayat Absensi</a>
+    <a href="rapor.html">📘 Rapor</a>
+    <a href="laporan.html">📊 Laporan</a>
+  </nav>
+</aside>
+
+<!-- Konten Utama -->
+<main class="main-content">
+  <header class="topbar">
+    <h1>Dashboard</h1>
+    <div class="topbar-right">
+      <span class="admin-text">Admin</span>
+      <div class="profile-icon">👤</div>
+    </div>
+  </header>
+
+  <!-- Statistik -->
+  <section class="stats">
+    <div class="stat-card"><p>Total Santri Dewasa</p><h3 class="green">12</h3></div>
+    <div class="stat-card"><p>Total Santri Anak-Anak</p><h3 class="green">12</h3></div>
+    <div class="stat-card"><p>Total Pengajar</p><h3 class="red">12</h3></div>
+    <div class="stat-card"><p>Total Kelas</p><h3 id="totalKelas" class="red">0</h3></div>
+    <div class="stat-card"><p>Total Pendaftar</p><h3 class="red">12</h3></div>
+  </section>
+
+  <!-- Aksi Cepat -->
+  <section class="quick-action">
+    <h2>⚡ Aksi Cepat</h2>
+    <div class="action-buttons">
+      <button class="action-btn">➕ Tambah Siswa</button>
+      <button class="action-btn">➕ Tambah Pengajar</button>
+      <button class="action-btn" onclick="openModal()">➕ Tambah Kelas</button>
+    </div>
+  </section>
+
+  <!-- Modal Tambah Kelas -->
+  <div id="modalTambahKelas" class="modal">
+    <div class="modal-content">
+      <h2>Tambah Kelas</h2>
+      <label>Kelas/Tingkatan</label>
+      <input type="text" id="namaKelas" placeholder="Masukkan nama kelas">
+
+      <label>Pengajar</label>
+      <select id="pengajar">
+        <option value="">Pilih Pengajar</option>
+        <option value="Ustadzah Nur">Ustadzah Nur</option>
+        <option value="Ustadz Ahmad">Ustadz Ahmad</option>
+      </select>
+
+      <label>Kapasitas</label>
+      <input type="number" id="kapasitas" placeholder="Masukkan kapasitas">
+
+      <label>Kategori</label>
+      <input type="text" id="kategori" placeholder="Dewasa / Anak-anak">
+
+      <label>Waktu Awal Periode</label>
+      <input type="date" id="awal">
+
+      <label>Waktu Selesai Periode</label>
+      <input type="date" id="selesai">
+
+      <div class="modal-buttons">
+        <button class="btn-batal" onclick="closeModal()">Batalkan</button>
+        <button class="btn-simpan" onclick="simpanKelas()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabel Data Siswa -->
+  <section class="table-section">
+    <h2>Siswa Pendaftar</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Nama Lengkap</th>
+          <th>Tempat Lahir</th>
+          <th>Tanggal Lahir</th>
+          <th>Nomor WhatsApp</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tabelDashboard"></tbody>
+    </table>
+    <div class="footer-btn">
+      <a href="registrasi.html?from=dashboard" class="btn-buka">Buka</a>
+    </div>
+  </section>
+</main>
+
+<!-- Script -->
+<script>
+  // === Tampilkan data dari localStorage ===
+  document.addEventListener("DOMContentLoaded", () => {
+    const tbody = document.getElementById("tabelDashboard");
+    const data = JSON.parse(localStorage.getItem("pendaftarData")) || [];
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6">Belum ada data pendaftar</td></tr>`;
+    } else {
+      tbody.innerHTML = data.map((item, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${item.nama}</td>
+          <td>${item.tempat}</td>
+          <td>${item.tanggal}</td>
+          <td>${item.whatsapp}</td>
+          <td><span class="status ${item.status.toLowerCase()}">${item.status}</span></td>
+        </tr>
+      `).join("");
+    }
+
+    // Hitung total kelas dari localStorage
+    const daftarKelas = JSON.parse(localStorage.getItem("daftarKelas")) || [];
+    document.getElementById("totalKelas").textContent = daftarKelas.length;
+  });
+
+  // === Modal Tambah Kelas ===
+  const modal = document.getElementById("modalTambahKelas");
+  function openModal() { modal.style.display = "flex"; }
+  function closeModal() { modal.style.display = "none"; }
+
+  function simpanKelas() {
+    const namaKelas = document.getElementById("namaKelas").value.trim();
+    const pengajar = document.getElementById("pengajar").value.trim();
+    const kapasitas = document.getElementById("kapasitas").value.trim();
+    const kategori = document.getElementById("kategori").value.trim();
+    const awal = document.getElementById("awal").value.trim();
+    const selesai = document.getElementById("selesai").value.trim();
+
+    if (!namaKelas || !pengajar || !kapasitas || !kategori) {
+      alert("Mohon lengkapi semua data kelas!");
+      return;
+    }
+
+    const daftarKelas = JSON.parse(localStorage.getItem("daftarKelas")) || [];
+    daftarKelas.push({ namaKelas, pengajar, kapasitas, kategori, awal, selesai });
+    localStorage.setItem("daftarKelas", JSON.stringify(daftarKelas));
+
+    // Update total kelas langsung
+    document.getElementById("totalKelas").textContent = daftarKelas.length;
+
+    alert("✅ Kelas baru berhasil ditambahkan!");
+    closeModal();
+  }
+
+  // Tutup modal kalau klik di luar
+  window.onclick = (e) => {
+    if (e.target === modal) closeModal();
+  };
+</script>
+
+</body>
+</html>

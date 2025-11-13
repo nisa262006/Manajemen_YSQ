@@ -11,7 +11,6 @@
     <header>
       <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo-dash" />
       <h1>Assalamu’alaikum, <span id="namaSantri">Santri Sahabat Qur’an</span></h1>
-      <p>Selamat datang di halaman santri Yayasan Sahabat Qur’an Bogor</p>
     </header>
 
     <section class="menu-dashboard">
@@ -32,6 +31,18 @@
         <p>Cek kehadiran kamu selama kegiatan belajar.</p>
         <button class="btn btn-gold">Lihat Absensi</button>
       </div>
+
+      <div class="menu-card">
+        <h3>📖 Raport Santri</h3>
+        <p>Lihat hasil evaluasi dan capaian hafalan kamu.</p>
+        <button class="btn btn-gold">Lihat Raport</button>
+      </div>
+
+      <div class="menu-card">
+        <h3>💳 Pembayaran Santri</h3>
+        <p>Cek status pembayaran dan tagihan bulanan.</p>
+        <button class="btn btn-gold">Lihat Pembayaran</button>
+      </div>
     </section>
 
     <footer>
@@ -40,12 +51,9 @@
   </div>
 
   <script>
-    // Saat login berhasil, kita bisa simpan nama ke localStorage (dummy sementara)
+    // Simulasi ambil nama santri (dari login)
     const nama = localStorage.getItem("namaSantri") || "Santri Sahabat Qur’an";
-    if (namaUser) {
-      document.querySelector(".user").textContent = "👤 " + namaUser;
-
-    }
+    document.getElementById("namaSantri").innerText = nama;
   </script>
 </body>
 </html>

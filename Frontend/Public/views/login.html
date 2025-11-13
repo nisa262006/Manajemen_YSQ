@@ -49,7 +49,18 @@
         // Arahkan ke dashboard pengajar
         window.location.href = "dashboardPengajar.html";
   
-      } else {
+      }  else if (email === "admin@gmail.com" && pass === "admin123") {
+        alert("Login berhasil! Selamat datang admin.");
+  
+        // Simpan role dan nama
+        localStorage.setItem("role", "admin");
+        localStorage.setItem("nama", "Riska");
+  
+        // Arahkan ke dashboard pengajar
+        window.location.href = "../views/dashboardadmin.html";
+
+    
+      }else {
         alert("Email atau kata sandi salah!");
       }
     });

@@ -3,113 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Santri - Yayasan Sahabat Qur'an</title>
+  <title>Dashboard Pengajar | Yayasan Sahabat Qur'an</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
-  <div class="container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="logo-container">
-        <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo">
-      </div>
-      <nav>
-        <ul>
-          <li class="active"><i class="icon">🏠</i> Dashboard</li>
-          <li><i class="icon">📅</i> Jadwal Kelas</li>
-          <li><i class="icon">📝</i> Absensi</li>
-          <li><i class="icon">📚</i> Materi Ajar</li>
-          <li><i class="icon">📄</i> Rapor</li>
-          <li><i class="icon">📊</i> Laporan</li>
-        </ul>
-      </nav>
-    </aside>
 
-    <!-- Konten utama -->
-    <main class="main-content">
-      <header>
-        <h1>Dashboard</h1>
-        <div class="user-menu">
-          <span>🔔</span>
-          <span class="user">👤 Pengajar</span>
-        </div>
-      </header>
-
-      <!-- Kartu Informasi -->
-      <section class="info-section">
-        <div class="info-card">
-          <img src="../images/kelas.jpg" alt="Kelas" class="kelas-img">
-          <div class="info-text">
-            <h3>Informasi Kelas Tahsin</h3>
-            <p>Nama Jingga</p>
-            <p>Level A</p>
-            <p>Jadwal : Selasa, Kamis</p>
-          </div>
-        </div>
-
-        <div class="stats">
-          <div class="stat-box">
-            <span class="icon">📆</span>
-            <h2>2</h2>
-            <p>Kelas Hari Ini</p>
-          </div>
-          <div class="stat-box">
-            <span class="icon">👥</span>
-            <h2>95%</h2>
-            <p>Persentase Kehadiran</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Tabel Jadwal -->
-      <section class="table-section">
-        <h2>Jadwal Kelas Hari Ini</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Hari</th>
-              <th>Waktu</th>
-              <th>Kelas</th>
-              <th>Ruangan</th>
-              <th>Jumlah Ketemuan</th>
-              <th>Persensi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Senin</td>
-              <td>08.00 - 10.00</td>
-              <td>Usmanil</td>
-              <td>1</td>
-              <td>1</td>
-              <td><button class="btn-gold">Persensi</button></td>
-            </tr>
-            <tr>
-              <td>Senin</td>
-              <td>10.00 - 12.00</td>
-              <td>Tahfidz</td>
-              <td>2</td>
-              <td>2</td>
-              <td><button class="btn-gold">Persensi</button></td>
-            </tr>
-            <tr>
-              <td>Senin</td>
-              <td>10.00 - 12.00</td>
-              <td>Tahfidz</td>
-              <td>2</td>
-              <td>2</td>
-              <td><button class="btn-gold">Persensi</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </main>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo-dash" />
+    <h2>SAHABAT QUR'AN BOGOR</h2>
+    <div class="nav">
+      <a href="#" class="active"><i>🏠</i> Dashboard</a>
+      <a href="#"><i>📅</i> Jadwal Kelas</a>
+      <a href="#"><i>🧾</i> Absensi</a>
+      <a href="#"><i>📘</i> Materi Ajar</a>
+      <a href="#"><i>📊</i> Rapor</a>
+      <a href="#"><i>📈</i> Laporan</a>
+    </div>
   </div>
-  <script>
-    const namaUser = localStorage.getItem("nama");
-    if (namaUser) {
-      document.querySelector(".user").textContent = "👤 " + namaUser;
-    }
-  </script>  
+
+  <!-- Main content -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-right">
+        <i>🔔</i>
+        <span>Pengajar</span>
+        <i>👤</i>
+      </div>
+    </div>
+
+    <!-- Info cards -->
+    <div class="info-section">
+      <div class="info-card">
+        <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=500" alt="Kelas">
+        <div class="info-text">
+          <strong>Informasi pengajar</strong><br>
+          Nama Jingga<br>
+          status aktif<br>
+          Jadwal: Selasa, Kamis
+        </div>
+      </div>
+
+      <div class="info-box">
+        <i>📆</i>
+        <h2>2</h2>
+        <p>Kelas Hari Ini</p>
+      </div>
+
+      <div class="info-box">
+        <i>👥</i>
+        <h2>95%</h2>
+        <p>Persentase Kehadiran</p>
+      </div>
+    </div>
+
+    <!-- Jadwal Kelas Hari Ini -->
+    <div class="schedule">
+      <h2>Jadwal Kelas Hari Ini</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Hari</th>
+            <th>Waktu</th>
+            <th>Kelas</th>
+            <th>Ruangan</th>
+            <th>Jumlah Ketemuan</th>
+            <th>Persensi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Senin</td>
+            <td>08.00 - 10.00</td>
+            <td>Usmani1</td>
+            <td>1</td>
+            <td>1</td>
+            <td><button class="btn-persensi">Persensi</button></td>
+          </tr>
+          <tr>
+            <td>Senin</td>
+            <td>10.00 - 12.00</td>
+            <td>Tahfidz</td>
+            <td>2</td>
+            <td>2</td>
+            <td><button class="btn-persensi">Persensi</button></td>
+          </tr>
+          <tr>
+            <td>Senin</td>
+            <td>10.00 - 12.00</td>
+            <td>Tahfidz</td>
+            <td>2</td>
+            <td>2</td>
+            <td><button class="btn-persensi">Persensi</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
 </html>
