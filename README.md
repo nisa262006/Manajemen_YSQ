@@ -39,14 +39,16 @@ Untuk mengatasi tantangan tersebut dan mendukung visi yayasan, diperlukan sebuah
 8. FR.013 – Manajemen Event Insidental
  Modul pengelolaan kegiatan non-rutin seperti parenting, seminar, dan lomba.
 
- ### Teknologi yang digunakan
+## Struktur Folder
+
+### Teknologi yang digunakan
  - HTML
  - Tailwind CSS
  - JavaScript/React sederhana
  - PostgreSQL 17
  - Docker Compose Volume
 
- ### Struktur Tim
+### Struktur Tim
 - Project Manager & System Analyst (Rizka)
 - Back-end & Database Developer (Fikri)
 - Front-end & UI/UX Developer (Nisa)
