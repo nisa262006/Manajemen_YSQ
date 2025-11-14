@@ -1,31 +1,22 @@
-// Simple static file server using Bun
-const server = Bun.serve({
-  port: 3000,
-  async fetch(req) {
-    const url = new URL(req.url);
-    let filePath = url.pathname;
+// Import library
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
 
-    // Default route ke login.html
-    if (filePath === '/') {
-      filePath = '/login.html';
-    }
+// Inisialisasi aplikasi
+const app = express();
 
-    // Baca file dari filesystem
-    try {
-      const file = Bun.file(`.${filePath}`);
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-      // Cek apakah file exists
-      if (await file.exists()) {
-        return new Response(file);
-      }
-
-      // File tidak ditemukan
-      return new Response('404 - File Not Found', { status: 404 });
-    } catch (error) {
-      return new Response('500 - Internal Server Error', { status: 500 });
-    }
-  },
+// Tes endpoint (untuk cek backend hidup)
+app.get("/", (req, res) => {
+  res.send("YSQ Backend Running...");
 });
 
-console.log(`🚀 Server running at http://localhost:${server.port}`);
-console.log(`📝 Open http://localhost:${server.port} to view the login page`);
+// Jalankan Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server berjalan di port ${PORT}`);
+});
