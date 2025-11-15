@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:17
+    container_name: manajemen_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: manajemen_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: ysq_backend
+    restart: always
+    depends_on:
+      - lockalhost
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgres://admin:admin123@db:5432/manajemen_db
+      JWT_SECRET: rahasiadong
+      NODE_ENV: development
+    volumes:
+      - ./backend:/app
+    command: npm start
