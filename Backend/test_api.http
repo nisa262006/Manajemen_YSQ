@@ -1,48 +1,8 @@
-GET http://localhost:5000/
-
-### registrasi
-POST http://localhost:5000/api/santri/register
+### LOGIN TEST
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "username": "riskaaa12",
-  "password": "santri2",
-  "nama": "riskaa",
-  "kategori_id": 1
-}
-
-
-
-### Login Santri/Admin/Pengajar
-POST http://localhost:5000/api/auth/login
-Content-Type: application/json
-
-{
-  "username": "admin1",
-  "password": "admin123"
-}
-
-### Login Santri/Admin/Pengajar
-POST http://localhost:5000/api/auth/login
-Content-Type: application/json
-
-{
-  "username": "alya_test",
-  "password": "pass123"
-}
-
-### Get list santri (khusus admin/staf)
-GET http://localhost:5000/api/santri
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InNhbnRyaSIsImlhdCI6MTc2MzE5MzI0NywiZXhwIjoxNzYzMjA3NjQ3fQ.gEtCWJlRarLUTL4qKh_9VRDpnpcun1GZVopyXjQWA6E>
-
-### Tambah Kelas Baru
-POST http://localhost:5000/api/kelas
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9>
-Content-Type: application/json
-
-{
-  "id_program": 1,
-  "id_pengajar": 2,
-  "nama_kelas": "Tahsin Pagi",
-  "kapasitas": 20
+  "email": "admin@mail.com",
+  "password": "12345"
 }

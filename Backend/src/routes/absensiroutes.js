@@ -1,13 +1,41 @@
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth");
-const allow = require("../middleware/role");
-const { absenSantri, getAbsensiBySantri } = require("../controllers/absensicontrollers");
 
-// Pengajar atau staff mencatat absensi
-router.post("/", auth, allow(['pengajar','staf']), absenSantri);
+const {
+  catatAbsensiSantri,
+  updateAbsensiSantri,
+  getAbsensiKelasPengajar,
+  getAbsensiSantri,
+  getAllAbsensiSantri,
 
-// Lihat absensi per santri (admin/staf/pengajar)
-router.get("/santri/:id_santri", auth, allow(['admin','staf','pengajar','santri']), getAbsensiBySantri);
+  catatAbsensiPengajar,
+  getAbsensiPengajar,
+  getAllAbsensiPengajar
+} = require("../controllers/absensicontrollers");
+
+const {
+  verifyToken,
+  onlyAdmin,
+  onlyPengajar,
+  onlySantri
+} = require("../middleware/auth");
+
+// ===================== ADMIN =============================
+router.get("/santri/all", verifyToken, onlyAdmin, getAllAbsensiSantri);
+router.get("/pengajar/all", verifyToken, onlyAdmin, getAllAbsensiPengajar);
+
+// ===================== PENGAJAR =============================
+
+// ABSENSI SANTRI
+router.post("/santri", verifyToken, onlyPengajar, catatAbsensiSantri);
+router.put("/santri/:id_presensi", verifyToken, onlyPengajar, updateAbsensiSantri);
+router.get("/santri/kelas/me", verifyToken, onlyPengajar, getAbsensiKelasPengajar);
+
+// ABSENSI PENGAJAR (DIRINYA SENDIRI)
+router.post("/pengajar", verifyToken, onlyPengajar, catatAbsensiPengajar);
+router.get("/pengajar/me", verifyToken, onlyPengajar, getAbsensiPengajar);
+
+// ===================== SANTRI =============================
+router.get("/santri/me", verifyToken, onlySantri, getAbsensiSantri);
 
 module.exports = router;

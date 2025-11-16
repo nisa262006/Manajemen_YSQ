@@ -1,77 +1,162 @@
-const pool = require("../config/db");
+const db = require("../config/db");
 
+// ===================== ADMIN ===============================
+
+// Tambah kelas
 exports.tambahKelas = async (req, res) => {
-  const { id_program, id_pengajar, nama_kelas, kapasitas } = req.body;
-  if (!nama_kelas) return res.status(400).json({ message: "nama_kelas diperlukan" });
+  const { nama_kelas, kapasitas, id_pengajar } = req.body;
 
-  try {
-    const q = `INSERT INTO kelas (id_program, id_pengajar, nama_kelas, kapasitas) VALUES ($1,$2,$3,$4) RETURNING *`;
-    const r = await pool.query(q, [id_program || null, id_pengajar || null, nama_kelas, kapasitas || 20]);
-    res.status(201).json({ message: "Kelas dibuat", kelas: r.rows[0] });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Gagal membuat kelas" });
-  }
+  await db.query(
+    "INSERT INTO kelas(nama_kelas, kapasitas, id_pengajar) VALUES($1,$2,$3)",
+    [nama_kelas, kapasitas, id_pengajar]
+  );
+
+  res.json({ message: "Kelas berhasil ditambahkan" });
 };
 
-exports.getKelas = async (req, res) => {
-  try {
-    const q = `SELECT k.*, p.nama_program, pg.nama as pengajar_nama FROM kelas k
-               LEFT JOIN program p ON k.id_program = p.id
-               LEFT JOIN pengajar pg ON k.id_pengajar = pg.id
-               ORDER BY k.id`;
-    const r = await pool.query(q);
-    res.json(r.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Gagal mengambil kelas" });
-  }
+
+// List kelas
+exports.getAllKelas = async (req, res) => {
+  const result = await db.query(`
+    SELECT 
+      k.id_kelas, 
+      k.nama_kelas, 
+      k.kapasitas,
+      u.nama_lengkap AS pengajar
+    FROM kelas k
+    LEFT JOIN users u ON k.id_pengajar = u.id_user
+    ORDER BY k.id_kelas ASC
+  `);
+
+  res.json(result.rows);
 };
 
+
+// Detail kelas (santri + jadwal)
+exports.getDetailKelas = async (req, res) => {
+  const { id_kelas } = req.params;
+
+  const kelas = await db.query("SELECT * FROM kelas WHERE id_kelas = $1", [id_kelas]);
+  if (kelas.rowCount === 0)
+    return res.status(404).json({ message: "Kelas tidak ditemukan" });
+
+  const santri = await db.query(
+    "SELECT id_santri, nama FROM santri WHERE id_kelas = $1",
+    [id_kelas]
+  );
+
+  const jadwal = await db.query(
+    "SELECT * FROM jadwal WHERE id_kelas = $1",
+    [id_kelas]
+  );
+
+  res.json({
+    kelas: kelas.rows[0],
+    santri: santri.rows,
+    jadwal: jadwal.rows
+  });
+};
+
+
+// Update kelas
 exports.updateKelas = async (req, res) => {
-  const { id } = req.params;
-  const { id_program, id_pengajar, nama_kelas, kapasitas, status } = req.body;
-  try {
-    await pool.query(`UPDATE kelas SET id_program=$1, id_pengajar=$2, nama_kelas=$3, kapasitas=$4, status=$5 WHERE id=$6`,
-      [id_program, id_pengajar, nama_kelas, kapasitas, status, id]);
-    res.json({ message: "Kelas diperbarui" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Gagal memperbarui kelas" });
-  }
+  const { id_kelas } = req.params;
+  const { nama_kelas, kapasitas, id_pengajar } = req.body;
+
+  await db.query(
+    `UPDATE kelas 
+     SET nama_kelas = $1, kapasitas = $2, id_pengajar = $3 
+     WHERE id_kelas = $4`,
+    [nama_kelas, kapasitas, id_pengajar, id_kelas]
+  );
+
+  res.json({ message: "Kelas berhasil diupdate" });
 };
 
-exports.hapusKelas = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await pool.query("DELETE FROM kelas WHERE id=$1", [id]);
-    res.json({ message: "Kelas dihapus" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Gagal menghapus kelas" });
-  }
+
+// Hapus kelas
+exports.deleteKelas = async (req, res) => {
+  const { id_kelas } = req.params;
+
+  await db.query("DELETE FROM kelas WHERE id_kelas = $1", [id_kelas]);
+
+  res.json({ message: "Kelas berhasil dihapus" });
 };
 
-// Penempatan santri ke kelas (single atau massal)
-exports.penempatanSantri = async (req, res) => {
-  // body: { id_kelas, ids_santri: [1,2,3] }
-  const { id_kelas, ids_santri } = req.body;
-  if (!id_kelas || !Array.isArray(ids_santri)) return res.status(400).json({ message: "id_kelas dan ids_santri [] diperlukan" });
 
-  const client = await pool.connect();
+// Tambah santri ke kelas
+exports.tambahSantriKeKelas = async (req, res) => {
+  const { id_kelas } = req.params;
+  const { id_santri } = req.body;
+
+  await db.query(
+    "UPDATE santri SET id_kelas = $1 WHERE id_santri = $2",
+    [id_kelas, id_santri]
+  );
+
+  res.json({ message: "Santri ditambahkan ke kelas" });
+};
+
+
+// Pindah santri antar kelas
+exports.pindahSantriKelas = async (req, res) => {
+  const { id_santri } = req.params;
+  const { id_kelas_baru } = req.body;
+
+  await db.query(
+    "UPDATE santri SET id_kelas = $1 WHERE id_santri = $2",
+    [id_kelas_baru, id_santri]
+  );
+
+  res.json({ message: "Santri berhasil dipindahkan" });
+};
+
+
+
+// ===================== PENGAJAR ===============================
+
+// Melihat kelas miliknya
+exports.kelasPengajar = async (req, res) => {
+  const result = await db.query(
+    "SELECT * FROM kelas WHERE id_pengajar = $1",
+    [req.user.id_user]
+  );
+
+  res.json(result.rows);
+};
+
+
+
+// ===================== SANTRI ===============================
+
+// ===================== SANTRI ===============================
+
+// Santri lihat kelas miliknya
+exports.kelasSantri = async (req, res) => {
   try {
-    await client.query("BEGIN");
-    for (const id_santri of ids_santri) {
-      // cek unik
-      await client.query(`INSERT INTO santri_kelas (id_santri, id_kelas) VALUES ($1,$2) ON CONFLICT (id_santri, id_kelas) DO NOTHING`, [id_santri, id_kelas]);
+    console.log("USER:", req.user); // debugging
+
+    if (!req.user || !req.user.id_user) {
+      return res.status(401).json({ message: "User tidak terautentikasi" });
     }
-    await client.query("COMMIT");
-    res.json({ message: "Penempatan selesai" });
-  } catch (err) {
-    await client.query("ROLLBACK");
-    console.error(err);
-    res.status(500).json({ message: "Gagal melakukan penempatan" });
-  } finally {
-    client.release();
+
+    const result = await db.query(
+      `SELECT k.* 
+       FROM kelas k
+       JOIN santri s ON k.id_kelas = s.id_kelas
+       WHERE s.id_user = $1`,
+      [req.user.id_user]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Santri belum punya kelas." });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Terjadi kesalahan server", error });
   }
 };
+
