@@ -8,6 +8,7 @@
 </head>
 <body>
   <div style="max-width:1080px;margin:24px auto;background:var(--cream);padding:18px;border-radius:18px;box-shadow:var(--shadow)">
+    
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h2>Registrasi Pendaftar</h2>
       <div>
@@ -17,18 +18,27 @@
     </div>
 
     <div style="margin-top:16px;display:flex;gap:18px">
+      
+      <!-- LIST PENDAFTAR -->
       <div style="flex:1">
         <div class="table-card">
           <h3>Daftar Pendaftar</h3>
           <table id="list">
             <thead>
-              <tr><th>No</th><th>Nama</th><th>Jenis</th><th>Status</th><th>Aksi</th></tr>
+              <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Tempat Lahir</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
 
+      <!-- DETAIL PENDAFTAR -->
       <div style="width:380px">
         <div class="table-card">
           <h3>Detail Pendaftar</h3>
@@ -37,141 +47,169 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
 <script>
-  const LS_KEYS = {
-    PROFILE:'ysq_profile',
-    PENGAJAR:'ysq_pengajar',
-    KELAS:'ysq_kelas',
-    PENDAFTAR:'ysq_pendaftar'
-  };
-  function read(k){ return JSON.parse(localStorage.getItem(k) || 'null'); }
-  function write(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+/* ========================
+   HELPER FUNCTION
+======================== */
 
-  function uid(prefix='id'){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+function goBack() {
+  window.location.href = 'dashboardadmin.html';
+}
 
-  function goBack(){ window.location.href = 'dashboardadmin.html'; }
+function renderBadge(status) {
+  if (!status) return '<span class="badge wait">Menunggu</span>';
+  if (status === 'diterima') return '<span class="badge accept">Diterima</span>';
+  if (status === 'ditolak') return '<span class="badge reject">Ditolak</span>';
+  return '<span class="badge wait">Menunggu</span>';
+}
 
-  function getQueryParam(name){
-    const u = new URL(location.href);
-    return u.searchParams.get(name);
-  }
+/* ========================
+   LOAD DATA DARI BACKEND
+======================== */
 
-  function renderList(){
-    const tbody = document.querySelector('#list tbody');
-    tbody.innerHTML = '';
-    const list = read(LS_KEYS.PENDAFTAR) || [];
-    list.forEach((p,i)=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${i+1}</td>
-        <td>${p.nama}</td>
-        <td>${p.jenis || ''}</td>
-        <td>${renderBadge(p.status)}</td>
-        <td><button class="btn btn-neutral" onclick="selectPendaftar('${p.id}')">Lihat / Ubah</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+async function loadPendaftar() {
+  const res = await fetch("http://localhost:5000/pendaftar", {
+    headers: { 
+      "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+  });
 
-  function renderBadge(status){
-    if(!status) return '<span class="badge wait">Menunggu</span>';
-    if(status.toLowerCase().includes('diterima')) return '<span class="badge accept">Diterima</span>';
-    if(status.toLowerCase().includes('ditolak')) return '<span class="badge reject">Ditolak</span>';
-    return `<span class="badge wait">${status}</span>`;
-  }
+  return await res.json();
+}
 
-  let currentId = null;
-  function selectPendaftar(id){
-    currentId = id;
-    const list = read(LS_KEYS.PENDAFTAR) || [];
-    const p = list.find(x=>x.id===id);
-    if(!p) return;
-    const detail = document.getElementById('detailArea');
-    detail.innerHTML = `
-      <label>Nama</label>
-      <input class="input" id="d_nama" value="${p.nama}">
-      <label>Tempat</label>
-      <input class="input" id="d_ttl" value="${p.ttl || ''}">
-      <label>Tanggal Lahir</label>
-      <input class="input" type="date" id="d_tgl" value="${p.tglLahir || ''}">
-      <label>No. WhatsApp</label>
-      <input class="input" id="d_wa" value="${p.whatsapp || ''}">
-      <label>Status</label>
-      <select id="d_status" class="input">
-        <option ${p.status==='Menunggu Verifikasi'?'selected':''}>Menunggu Verifikasi</option>
-        <option ${p.status==='Diterima'?'selected':''}>Diterima</option>
-        <option ${p.status==='Ditolak'?'selected':''}>Ditolak</option>
-      </select>
-      <div style="text-align:right;margin-top:8px">
-        <button class="btn" onclick="resetDetail()">Tutup</button>
-        <button class="btn btn-add" onclick="saveDetail()">Simpan Perubahan</button>
-      </div>
+/* ========================
+   RENDER TABLE LIST PENDAFTAR
+======================== */
+async function renderList() {
+  const tbody = document.querySelector('#list tbody');
+  tbody.innerHTML = '';
+
+  const list = await loadPendaftar();
+
+  list.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${p.nama}</td>
+      <td>${p.tempat_lahir || '-'}</td>
+      <td>${renderBadge(p.status)}</td>
+      <td>
+        <button class="btn btn-neutral" onclick="selectPendaftar(${p.id_pendaftar})">Lihat</button>
+      </td>
     `;
-  }
+    tbody.appendChild(tr);
+  });
+}
 
-  function resetDetail(){
-    currentId = null;
-    document.getElementById('detailArea').innerHTML = '<p>Pilih pendaftar untuk melihat detail.</p>';
-  }
+/* ========================
+   RENDER DETAIL PENDAFTAR
+======================== */
 
-  function saveDetail(){
-    if(!currentId) return;
-    const list = read(LS_KEYS.PENDAFTAR) || [];
-    const idx = list.findIndex(x=>x.id===currentId);
-    if(idx===-1) return alert('Data tidak ditemukan');
-    list[idx].nama = document.getElementById('d_nama').value || list[idx].nama;
-    list[idx].ttl = document.getElementById('d_ttl').value || list[idx].ttl;
-    list[idx].tglLahir = document.getElementById('d_tgl').value || list[idx].tglLahir;
-    list[idx].whatsapp = document.getElementById('d_wa').value || list[idx].whatsapp;
-    const oldStatus = list[idx].status;
-    const newStatus = document.getElementById('d_status').value;
-    list[idx].status = newStatus;
-    write(LS_KEYS.PENDAFTAR, list);
+async function selectPendaftar(id) {
+  const list = await loadPendaftar();
+  const p = list.find(x => x.id_pendaftar == id);
 
-    // Notify via storage event (useful if dashboard open in other tab)
-    localStorage.setItem('ysq_last_update', Date.now());
+  if (!p) return;
 
-    alert('Perubahan disimpan');
-    renderList();
-    selectPendaftar(currentId); // refresh detail
-  }
+  currentId = id;
 
-  function exportPendaftar(){
-    const list = read(LS_KEYS.PENDAFTAR) || [];
-    if(!list.length) return alert('Belum ada data');
-    let csv = 'Nama,Tempat,Tanggal Lahir,WhatsApp,Status,Jenis\\n';
-    list.forEach(r=>{
-      csv += `"${r.nama}","${r.ttl}","${r.tglLahir}","${r.whatsapp}","${r.status}","${r.jenis}"\\n`;
-    });
-    const blob = new Blob([csv], {type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pendaftar_ysq.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  const area = document.getElementById("detailArea");
+  area.innerHTML = `
+    <label>Nama</label>
+    <input class="input" value="${p.nama}" disabled>
 
-  // when page loads: if ?id=... present, open that pendaftar
-  window.addEventListener('DOMContentLoaded', ()=>{
-    renderList();
-    const id_from_q = getQueryParam('id');
-    if(id_from_q){
-      // small timeout to ensure table rendered
-      setTimeout(()=> selectPendaftar(id_from_q), 200);
+    <label>Tempat Lahir</label>
+    <input class="input" value="${p.tempat_lahir || ''}" disabled>
+
+    <label>Tanggal Lahir</label>
+    <input class="input" value="${p.tanggal_lahir || ''}" disabled>
+
+    <label>Email</label>
+    <input class="input" value="${p.email}" disabled>
+
+    <label>No WA</label>
+    <input class="input" value="${p.no_wa}" disabled>
+
+    <label>Status Saat Ini</label>
+    ${renderBadge(p.status)}
+
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn" onclick="resetDetail()">Tutup</button>
+      <button class="btn btn-add" onclick="terima(${p.id_pendaftar})">Terima</button>
+      <button class="btn btn-neutral" onclick="tolak(${p.id_pendaftar})">Tolak</button>
+    </div>
+  `;
+}
+
+function resetDetail() {
+  document.getElementById("detailArea").innerHTML = '<p>Pilih pendaftar untuk melihat detail.</p>';
+}
+
+/* ========================
+   ACTION: TERIMA / TOLAK
+======================== */
+
+async function terima(id) {
+  const res = await fetch(`http://localhost:5000/pendaftar/terima/${id}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
     }
   });
 
-  // handle storage event (sync)
-  window.addEventListener('storage', (e)=>{
-    if(e.key === 'ysq_last_update' || e.key === LS_KEYS.PENDAFTAR){
-      renderList();
-      if(currentId) selectPendaftar(currentId);
+  const data = await res.json();
+  alert(data.message);
+  renderList();
+  resetDetail();
+}
+
+async function tolak(id) {
+  const res = await fetch(`http://localhost:5000/pendaftar/tolak/${id}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("token")
     }
   });
+
+  const data = await res.json();
+  alert(data.message);
+  renderList();
+  resetDetail();
+}
+
+/* ========================
+   EXPORT CSV
+======================== */
+
+async function exportPendaftar() {
+  const list = await loadPendaftar();
+  if (!list.length) return alert("Tidak ada data");
+
+  let csv = "Nama,Tempat,Tanggal Lahir,WA,Email,Status\n";
+
+  list.forEach(r => {
+    csv += `"${r.nama}","${r.tempat_lahir}","${r.tanggal_lahir}","${r.no_wa}","${r.email}","${r.status}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "pendaftar.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ========================
+   INITIAL LOAD
+======================== */
+
+window.addEventListener('DOMContentLoaded', renderList);
 </script>
+
 </body>
 </html>

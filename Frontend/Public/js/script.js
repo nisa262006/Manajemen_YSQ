@@ -24,6 +24,7 @@ const LS = {
   PENGAJAR: 'ysq_pengajar'
 };
 
+
 function read(k) { return JSON.parse(localStorage.getItem(k) || "[]"); }
 function write(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
 

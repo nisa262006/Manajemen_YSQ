@@ -3,6 +3,41 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@mail.com",
-  "password": "12345"
+  "email": "admin@ysq.com",
+  "password": "123456"
 }
+
+### LOGIN PENGAJAR
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "pengajar1@ysq.com",
+  "password": "123456"
+}
+
+### LOGIN SANTRI
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "santri1@ysq.com",
+  "password": "123456"
+}
+
+### Pendaftar Daftar
+POST http://localhost:5000/pendaftar/daftar
+Content-Type: application/json
+
+{
+  "nama": "Lis Maryatun",
+  "tempat_lahir": "Bogor",
+  "tanggal_lahir": "2005-08-26",
+  "email": "lis@gmail.com",
+  "no_wa": "081023479589"
+}
+
+### Admin Terima Pendaftar
+PUT http://localhost:5000/pendaftar/terima/1
+Authorization: Bearer <TOKEN_ADMIN>
+Content-Type: application/json

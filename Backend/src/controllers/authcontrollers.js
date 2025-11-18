@@ -6,8 +6,11 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log("REQUEST MASUK: ", email);
+
+    // WAJIB pakai db.query, bukan pool.query
     const result = await db.query(
-      "SELECT * FROM users WHERE email = $1",
+      'SELECT * FROM "users" WHERE email = $1',
       [email]
     );
 
@@ -17,8 +20,8 @@ exports.login = async (req, res) => {
 
     const user = result.rows[0];
 
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) {
+    const validPassword = await bcrypt.compare(password, user.password_hash);
+    if (!validPassword) {
       return res.status(400).json({ message: "Email atau password salah" });
     }
 
@@ -31,9 +34,12 @@ exports.login = async (req, res) => {
     res.json({
       message: "Login berhasil",
       token,
-      role: user.role
+      role: user.role,
+      userId: user.id_user
     });
+
   } catch (err) {
-    res.status(500).json({ message: "Terjadi kesalahan server", error: err });
+    console.error("LOGIN ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };

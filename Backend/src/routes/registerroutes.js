@@ -4,22 +4,26 @@ const router = express.Router();
 const {
   daftarPendaftar,
   getAllPendaftar,
-  updateStatus,
+  terimaPendaftar,
+  tolakPendaftar,
   deletePendaftar
 } = require("../controllers/registercontrollers");
 
 const { verifyToken, onlyAdmin } = require("../middleware/auth");
 
-// Publik: daftar
+// publik daftar
 router.post("/daftar", daftarPendaftar);
 
-// Admin: lihat semua
+// admin: lihat seluruh pendaftar
 router.get("/", verifyToken, onlyAdmin, getAllPendaftar);
 
-// Admin: update status (Diterima / Ditolak)
-router.put("/status/:id_santri", verifyToken, onlyAdmin, updateStatus);
+// admin: terima pendaftar
+router.put("/terima/:id_pendaftar", verifyToken, onlyAdmin, terimaPendaftar);
 
-// Admin: hapus
-router.delete("/:id_santri", verifyToken, onlyAdmin, deletePendaftar);
+// admin: tolak pendaftar
+router.put("/tolak/:id_pendaftar", verifyToken, onlyAdmin, tolakPendaftar);
+
+// admin: hapus data pendaftar
+router.delete("/:id_pendaftar", verifyToken, onlyAdmin, deletePendaftar);
 
 module.exports = router;

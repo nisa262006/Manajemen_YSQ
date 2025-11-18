@@ -6,64 +6,28 @@
   <title>Login - Yayasan Sahabat Qur'an</title>
   <link rel="stylesheet" href="../css/style.css" />
 </head>
+
 <body>
   <div class="login-container">
     <div class="login-box">
       <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
       <h2>Login Aplikasi Sahabat Qur'an</h2>
+
       <form id="loginForm">
         <input type="email" id="email" placeholder="Email" required />
         <input type="password" id="password" placeholder="Kata Sandi" required />
         <button type="submit" class="btn btn-gold">Masuk</button>
       </form>
+
+      <p id="error" style="color:red;"></p>
+
       <p class="back">
         <a href="index.html">← Kembali ke Beranda</a>
       </p>
     </div>
   </div>
 
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      const pass = document.getElementById("password").value.trim();
-  
-      // Cek akun berdasarkan role
-      if (email === "santri@gmail.com" && pass === "12345") {
-        alert("Login berhasil! Selamat datang Santri.");
-  
-        // Simpan role dan nama
-        localStorage.setItem("role", "santri");
-        localStorage.setItem("nama", "Ahmad Fathurrahman");
-  
-        // Arahkan ke dashboard santri
-        window.location.href = "dashboardSantri.html";
-  
-      } else if (email === "pengajar@gmail.com" && pass === "67890") {
-        alert("Login berhasil! Selamat datang Pengajar.");
-  
-        // Simpan role dan nama
-        localStorage.setItem("role", "pengajar");
-        localStorage.setItem("nama", "Ustadzah Rahma Fitria");
-  
-        // Arahkan ke dashboard pengajar
-        window.location.href = "dashboardPengajar.html";
-  
-      }  else if (email === "admin@gmail.com" && pass === "admin123") {
-        alert("Login berhasil! Selamat datang admin.");
-  
-        // Simpan role dan nama
-        localStorage.setItem("role", "admin");
-        localStorage.setItem("nama", "Riska");
-  
-        // Arahkan ke dashboard pengajar
-        window.location.href = "../views/dashboardadmin.html";
-
-    
-      }else {
-        alert("Email atau kata sandi salah!");
-      }
-    });
-  </script>  
+  <!-- HANYA ADA INI -->
+  <script src="/Frontend/Public/js/login.js"></script>
 </body>
 </html>

@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard Admin - Yayasan Sahabat Qur'an</title>
   <link rel="stylesheet" href="../css/admin.css" />
 </head>
+
 <body>
   <div class="app">
+
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <img src="../images/LogoYSQ.png" alt="logo" class="logo" onerror="this.style.display='none'"/>
+      <img src="../images/LogoYSQ.png" alt="logo" class="logo" onerror="this.style.display='none'" />
+
       <div class="profile">
         <div class="avatar" id="sidebarAvatar">👤</div>
         <h3 id="sidebarName">Nama Admin</h3>
@@ -30,8 +34,12 @@
       </div>
 
       <div style="margin-top:auto;width:100%;display:flex;flex-direction:column;gap:10px">
-        <button class="btn" style="background:var(--accent);color:#fff;padding:10px;border-radius:12px" onclick="openProfile()">Setting Profil</button>
-        <button class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px;border-radius:12px" onclick="logout()">Keluar</button>
+        <button class="btn" style="background:var(--accent);color:#fff;padding:10px;border-radius:12px"
+          onclick="openProfile()">Setting Profil</button>
+
+        <button class="btn"
+          style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:10px;border-radius:12px"
+          onclick="logout()">Keluar</button>
       </div>
     </aside>
 
@@ -71,23 +79,16 @@
         </div>
       </div>
 
-      <!-- actions -->
-      <div class="actions">
-        <strong>Aksi Cepat</strong>
-        <div class="btns">
-          <button class="btn btn-add" onclick="openAddModal('siswa')">+ Tambah Siswa</button>
-          <button class="btn btn-add" onclick="openAddModal('pengajar')">+ Tambah Pengajar</button>
-          <button class="btn btn-add" onclick="openAddModal('kelas')">+ Tambah Kelas</button>
-        </div>
-      </div>
-
       <!-- pendaftar table -->
       <div class="table-card">
         <h3>Siswa Pendaftar</h3>
+
         <div style="margin:8px 0" class="top-actions">
-          <input id="searchInput" type="text" placeholder="Cari nama..." class="input" style="max-width:300px" oninput="renderPendaftar()" />
+          <input id="searchInput" type="text" placeholder="Cari nama..." class="input"
+            style="max-width:300px" oninput="renderPendaftar()" />
           <button class="btn btn-neutral" onclick="exportPendaftar()">Ekspor Semua Pendaftar</button>
         </div>
+
         <table id="pendaftarTable">
           <thead>
             <tr>
@@ -103,35 +104,27 @@
           <tbody></tbody>
         </table>
       </div>
+
     </main>
   </div>
 
-  <!-- MODAL: Add entity (siswa/pengajar/kelas) -->
-  <div class="modal-backdrop" id="modalBackdrop">
-    <div class="modal" id="modal">
-      <h3 id="modalTitle">Tambah</h3>
-      <div id="modalBody">
-        <!-- form injected via JS -->
-      </div>
-      <div style="text-align:right">
-        <button class="btn" onclick="closeModal()">Batal</button>
-        <button class="btn btn-add" id="modalSaveBtn">Simpan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: profile -->
+  <!-- MODAL PROFIL -->
   <div class="modal-backdrop" id="profileBackdrop">
     <div class="modal">
       <h3>Profil Admin</h3>
+
       <label>Email</label>
       <input id="profileEmail" class="input" />
+
       <label>Nama</label>
       <input id="profileNama" class="input" />
+
       <label>No. tlp</label>
       <input id="profilePhone" class="input" />
+
       <label>Alamat</label>
       <input id="profileAlamat" class="input" />
+
       <div style="text-align:right">
         <button class="btn" onclick="closeProfile()">Tutup</button>
         <button class="btn btn-add" onclick="saveProfile()">Simpan</button>
@@ -139,91 +132,69 @@
     </div>
   </div>
 
+  <!-- SCRIPT -->
   <script>
-    /* ===== Helper for localStorage data model =====
-       - adminProfile: {email,name,phone,alamat}
-       - pengajar: array of {id,name,phone}
-       - kelas: array of {id,name,kapasitas}
-       - pendaftar: array of {id,nama,ttl,tglLahir,whatsapp,status,jenis: "Dewasa"/"Anak"}
-    */
-    const LS_KEYS = {
-      PROFILE:'ysq_profile',
-      PENGAJAR:'ysq_pengajar',
-      KELAS:'ysq_kelas',
-      PENDAFTAR:'ysq_pendaftar'
-    };
+    const API = "http://localhost:5000";
 
-    function uid(prefix='id'){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+    /* ============================================
+        CEK LOGIN & ROLE
+    ============================================ */
+    function checkAuth() {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
 
-    function initData(){
-      // if not exist, create sample data
-      if(!localStorage.getItem(LS_KEYS.PROFILE)){
-        localStorage.setItem(LS_KEYS.PROFILE, JSON.stringify({
-          email:'admin@gmail.com', name:'Riska', phone:'08123456789', alamat:'Bogor'
-        }));
+      if (!token || role !== "admin") {
+        alert("Akses ditolak. Silakan login sebagai admin.");
+        window.location.href = "../login.html";
       }
-      if(!localStorage.getItem(LS_KEYS.PENGAJAR)){
-        localStorage.setItem(LS_KEYS.PENGAJAR, JSON.stringify([
-          {id:uid('p'), name:'Ustadzah Rahma', phone:'0811111111'}
-        ]));
-      }
-      if(!localStorage.getItem(LS_KEYS.KELAS)){
-        localStorage.setItem(LS_KEYS.KELAS, JSON.stringify([
-          {id:uid('k'), name:'Tahsin Pagi A', kapasitas:20}
-        ]));
-      }
-      if(!localStorage.getItem(LS_KEYS.PENDAFTAR)){
-        const sample = [
-          {id:uid('s'), nama:'David', ttl:'Bogor', tglLahir:'2009-05-34', whatsapp:'088882464738', status:'Diterima', jenis:'Dewasa'},
-          {id:uid('s'), nama:'Jingga', ttl:'Bogor', tglLahir:'2009-05-07', whatsapp:'088882464738', status:'Menunggu Verifikasi', jenis:'Anak'},
-          {id:uid('s'), nama:'Alya', ttl:'Bogor', tglLahir:'2010-03-10', whatsapp:'088882464739', status:'Ditolak', jenis:'Anak'}
-        ];
-        localStorage.setItem(LS_KEYS.PENDAFTAR, JSON.stringify(sample));
+    }
+    checkAuth();
+
+
+    /* ============================================
+        LOAD DATA PENDAFTAR (BACKEND)
+    ============================================ */
+    let DATA_PENDAFTAR = [];
+
+    async function loadPendaftar() {
+      try {
+        const res = await fetch(`${API}/pendaftar`, {
+          headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+        });
+
+        const data = await res.json();
+        DATA_PENDAFTAR = Array.isArray(data) ? data : [];
+
+        renderPendaftar();
+        renderStats();
+      } catch (err) {
+        console.error(err);
+        alert("Gagal memuat data pendaftar dari server.");
       }
     }
 
-    function read(key){ return JSON.parse(localStorage.getItem(key) || 'null'); }
-    function write(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
 
-    /* ========== rendering ========== */
-    function renderSidebarProfile(){
-      const prof = read(LS_KEYS.PROFILE) || {};
-      document.getElementById('sidebarName').textContent = prof.name || 'Nama Admin';
-      document.getElementById('sidebarEmail').textContent = prof.email || '';
-      document.getElementById('sidebarPhone').textContent = prof.phone || '';
-      // avatar initial
-      const av = document.getElementById('sidebarAvatar');
-      av.textContent = (prof.name ? prof.name.split(' ').map(s=>s[0]).slice(0,2).join('') : '👤');
-    }
+    /* ============================================
+        RENDER PENDAFTAR
+    ============================================ */
+    function renderPendaftar() {
+      const tbody = document.querySelector("#pendaftarTable tbody");
+      tbody.innerHTML = "";
 
-    function renderStats(){
-      const pendaftar = read(LS_KEYS.PENDAFTAR) || [];
-      const pengajar = read(LS_KEYS.PENGAJAR) || [];
-      const kelas = read(LS_KEYS.KELAS) || [];
+      const q = (document.getElementById("searchInput").value || "").toLowerCase();
 
-      const totalDewasa = pendaftar.filter(x=>x.jenis==='Dewasa' && x.status==='Diterima').length;
-      const totalAnak = pendaftar.filter(x=>x.jenis==='Anak' && x.status==='Diterima').length;
-      document.getElementById('totalDewasa').textContent = totalDewasa;
-      document.getElementById('totalAnak').textContent = totalAnak;
-      document.getElementById('totalPengajar').textContent = pengajar.length;
-      document.getElementById('totalKelas').textContent = kelas.length;
-      document.getElementById('totalPendaftar').textContent = pendaftar.length;
-    }
+      const list = DATA_PENDAFTAR.filter(p =>
+        p.nama?.toLowerCase().includes(q)
+      );
 
-    function renderPendaftar(){
-      const tbody = document.querySelector('#pendaftarTable tbody');
-      tbody.innerHTML = '';
-      const q = (document.getElementById('searchInput').value || '').toLowerCase();
-      const list = read(LS_KEYS.PENDAFTAR) || [];
-      const filtered = list.filter(item => item.nama.toLowerCase().includes(q));
-      filtered.forEach((p, i) => {
-        const tr = document.createElement('tr');
+      list.forEach((p, i) => {
+        const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${i+1}</td>
+          <td>${i + 1}</td>
           <td>${p.nama}</td>
-          <td>${p.ttl || ''}</td>
-          <td>${p.tglLahir || ''}</td>
-          <td>${p.whatsapp || ''}</td>
+          <td>${p.ttl || "-"}</td>
+          <td>${p.tglLahir || "-"}</td>
+          <td>${p.whatsapp || "-"}</td>
           <td>${renderStatusBadge(p.status)}</td>
           <td><button class="btn btn-neutral" onclick="openRegistrant('${p.id}')">Buka</button></td>
         `;
@@ -231,150 +202,109 @@
       });
     }
 
-    function renderStatusBadge(status){
-      if(!status) return '<span class="badge wait">Menunggu</span>';
-      if(status.toLowerCase().includes('diterima')) return '<span class="badge accept">Diterima</span>';
-      if(status.toLowerCase().includes('ditolak')) return '<span class="badge reject">Ditolak</span>';
+    function renderStatusBadge(status) {
+      if (!status) return '<span class="badge wait">Menunggu</span>';
+      if (status.toLowerCase().includes("diterima")) return '<span class="badge accept">Diterima</span>';
+      if (status.toLowerCase().includes("ditolak")) return '<span class="badge reject">Ditolak</span>';
       return `<span class="badge wait">${status}</span>`;
     }
 
-    /* ====== Date ====== */
-    function updateDate(){
-      const d = new Date();
-      const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
-      document.getElementById('todayDate').textContent = d.toLocaleDateString('id-ID', opts);
+
+    /* ============================================
+        STATISTIK
+    ============================================ */
+    function renderStats() {
+      document.getElementById("totalPendaftar").textContent = DATA_PENDAFTAR.length;
+      document.getElementById("totalDewasa").textContent =
+        DATA_PENDAFTAR.filter(p => p.jenis === "Dewasa" && p.status === "Diterima").length;
+
+      document.getElementById("totalAnak").textContent =
+        DATA_PENDAFTAR.filter(p => p.jenis === "Anak" && p.status === "Diterima").length;
     }
 
-    /* ====== Modal for Add ====== */
-    let currentAddType = null;
-    function openAddModal(type){
-      currentAddType = type;
-      document.getElementById('modalBackdrop').style.display='flex';
-      const title = document.getElementById('modalTitle');
-      const body = document.getElementById('modalBody');
-      title.textContent = type==='siswa' ? 'Tambah Siswa Pendaftar' : type==='pengajar' ? 'Tambah Pengajar' : 'Tambah Kelas';
-      if(type==='siswa'){
-        body.innerHTML = `
-          <label>Nama</label><input id="m_nama" class="input"/>
-          <label>Tempat</label><input id="m_ttl" class="input"/>
-          <label>Tanggal Lahir</label><input id="m_tgl" type="date" class="input"/>
-          <label>No WhatsApp</label><input id="m_wa" class="input"/>
-          <label>Jenis (Dewasa/Anak)</label>
-          <select id="m_jenis" class="input"><option>Dewasa</option><option>Anak</option></select>
-          <label>Status</label>
-          <select id="m_status" class="input"><option>Menunggu Verifikasi</option><option>Diterima</option><option>Ditolak</option></select>
-        `;
-      } else if(type==='pengajar'){
-        body.innerHTML = `
-          <label>Nama</label><input id="m_nama" class="input"/>
-          <label>No. Tlp</label><input id="m_wa" class="input"/>
-        `;
-      } else {
-        body.innerHTML = `
-          <label>Nama Kelas</label><input id="m_nama" class="input"/>
-          <label>Kapasitas</label><input id="m_wa" type="number" class="input" value="20"/>
-        `;
-      }
-      document.getElementById('modalSaveBtn').onclick = saveModal;
+
+    /* ============================================
+        PROFIL ADMIN
+    ============================================ */
+    function openProfile() {
+      document.getElementById("profileBackdrop").style.display = "flex";
+
+      document.getElementById("profileEmail").value = localStorage.getItem("admin_email") || "";
+      document.getElementById("profileNama").value = localStorage.getItem("admin_nama") || "";
+      document.getElementById("profilePhone").value = localStorage.getItem("admin_phone") || "";
+      document.getElementById("profileAlamat").value = localStorage.getItem("admin_alamat") || "";
     }
 
-    function closeModal(){
-      document.getElementById('modalBackdrop').style.display='none';
+    function closeProfile() {
+      document.getElementById("profileBackdrop").style.display = "none";
     }
 
-    function saveModal(){
-      if(currentAddType==='siswa'){
-        const nama = document.getElementById('m_nama').value.trim();
-        if(!nama){alert('Isi nama'); return;}
-        const pendaftar = read(LS_KEYS.PENDAFTAR) || [];
-        pendaftar.unshift({
-          id:uid('s'), nama,
-          ttl:document.getElementById('m_ttl').value||'',
-          tglLahir:document.getElementById('m_tgl').value||'',
-          whatsapp:document.getElementById('m_wa').value||'',
-          status:document.getElementById('m_status').value||'Menunggu Verifikasi',
-          jenis:document.getElementById('m_jenis').value||'Dewasa'
-        });
-        write(LS_KEYS.PENDAFTAR, pendaftar);
-      } else if(currentAddType==='pengajar'){
-        const peng = read(LS_KEYS.PENGAJAR) || [];
-        peng.push({id:uid('p'), name:document.getElementById('m_nama').value||'Pengajar', phone:document.getElementById('m_wa').value||''});
-        write(LS_KEYS.PENGAJAR,peng);
-      } else {
-        const kelas = read(LS_KEYS.KELAS) || [];
-        kelas.push({id:uid('k'), name:document.getElementById('m_nama').value||'Kelas baru', kapasitas:parseInt(document.getElementById('m_wa').value||20)});
-        write(LS_KEYS.KELAS,kelas);
-      }
-      closeModal();
-      renderAll();
-    }
+    function saveProfile() {
+      localStorage.setItem("admin_email", document.getElementById("profileEmail").value);
+      localStorage.setItem("admin_nama", document.getElementById("profileNama").value);
+      localStorage.setItem("admin_phone", document.getElementById("profilePhone").value);
+      localStorage.setItem("admin_alamat", document.getElementById("profileAlamat").value);
 
-    /* ===== profile modal ===== */
-    function openProfile(){
-      const prof = read(LS_KEYS.PROFILE) || {};
-      document.getElementById('profileEmail').value = prof.email || '';
-      document.getElementById('profileNama').value = prof.name || '';
-      document.getElementById('profilePhone').value = prof.phone || '';
-      document.getElementById('profileAlamat').value = prof.alamat || '';
-      document.getElementById('profileBackdrop').style.display='flex';
-    }
-    function closeProfile(){ document.getElementById('profileBackdrop').style.display='none'; }
-    function saveProfile(){
-      const prof = {
-        email: document.getElementById('profileEmail').value || '',
-        name: document.getElementById('profileNama').value || '',
-        phone: document.getElementById('profilePhone').value || '',
-        alamat: document.getElementById('profileAlamat').value || ''
-      };
-      write(LS_KEYS.PROFILE, prof);
       closeProfile();
       renderSidebarProfile();
     }
 
-    /* ===== export pendaftar => CSV ===== */
-    function exportPendaftar(){
-      const list = read(LS_KEYS.PENDAFTAR) || [];
-      if(!list.length) return alert('Belum ada data pendaftar');
-      let csv = 'Nama,Tempat,Tanggal Lahir,WhatsApp,Status,Jenis\\n';
-      list.forEach(r=>{
-        csv += `"${r.nama}","${r.ttl}","${r.tglLahir}","${r.whatsapp}","${r.status}","${r.jenis}"\\n`;
-      });
-      const blob = new Blob([csv], {type:'text/csv'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'pendaftar_ysq.csv';
-      a.click();
-      URL.revokeObjectURL(url);
+    function renderSidebarProfile() {
+      document.getElementById("sidebarEmail").textContent = localStorage.getItem("admin_email") || "-";
+      document.getElementById("sidebarName").textContent = localStorage.getItem("admin_nama") || "Admin";
+      document.getElementById("sidebarPhone").textContent = localStorage.getItem("admin_phone") || "-";
+
+      const name = localStorage.getItem("admin_nama") || "A";
+      document.getElementById("sidebarAvatar").textContent =
+        name.split(" ").map(s => s[0]).join("").toUpperCase();
     }
 
-    function openRegistrant(id){
-      // navigate to registrasi page with id param
+
+    /* ============================================
+        EXPORT CSV
+    ============================================ */
+    function exportPendaftar() {
+      if (!DATA_PENDAFTAR.length) return alert("Tidak ada data");
+
+      let csv = "Nama,Tempat,Tanggal Lahir,WhatsApp,Status,Jenis\n";
+
+      DATA_PENDAFTAR.forEach(p => {
+        csv += `"${p.nama}","${p.ttl}","${p.tglLahir}","${p.whatsapp}","${p.status}","${p.jenis}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "pendaftar_ysq.csv";
+      a.click();
+    }
+
+
+    /* ============================================
+        NAVIGASI
+    ============================================ */
+    function openRegistrant(id) {
       window.location.href = `registrasi.html?id=${id}`;
     }
 
     function logout() {
-  localStorage.removeItem('role');
-  window.location.href = '../login.html';
-}
-
-    function renderAll(){
-      renderSidebarProfile();
-      renderStats();
-      renderPendaftar();
-      updateDate();
+      localStorage.clear();
+      window.location.href = "../login.html";
     }
 
-    /* Listen to localStorage changes (sync across tabs) */
-    window.addEventListener('storage', (e)=>{
-      if([LS_KEYS.PENDAFTAR, LS_KEYS.KELAS, LS_KEYS.PENGAJAR, LS_KEYS.PROFILE].includes(e.key)){
-        renderAll();
-      }
-    });
 
-    // init
-    initData();
-    renderAll();
+    /* ============================================
+        HALAMAN READY
+    ============================================ */
+    loadPendaftar();
+    renderSidebarProfile();
+    document.getElementById("todayDate").textContent =
+      new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
   </script>
+
 </body>
+
 </html>
