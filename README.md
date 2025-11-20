@@ -40,7 +40,7 @@ Untuk mengatasi tantangan tersebut dan mendukung visi yayasan, diperlukan sebuah
  Modul pengelolaan kegiatan non-rutin seperti parenting, seminar, dan lomba.
 
 ## Struktur Folder
-'''
+```
 SAHABAT-QURAN-WEB/
 ├── Backend/
 │   ├── package.json
@@ -103,7 +103,7 @@ SAHABAT-QURAN-WEB/
 ├── .gitignore
 ├── package-lock.json
 └── README.md/
-'''
+```
 
 ### Teknologi yang digunakan
  - HTML
