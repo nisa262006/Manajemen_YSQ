@@ -40,6 +40,70 @@ Untuk mengatasi tantangan tersebut dan mendukung visi yayasan, diperlukan sebuah
  Modul pengelolaan kegiatan non-rutin seperti parenting, seminar, dan lomba.
 
 ## Struktur Folder
+'''
+SAHABAT-QURAN-WEB/
+├── Backend/
+│   ├── package.json
+│   ├── src/
+│   │    ├── app/
+│   │    ├── config/
+│   │    │     ├── db.js
+│   │    │     ├── hash.js
+│   │    │     └── testconnetions.js
+│   │    ├── controllers/
+│   │    │     ├── absensicontrollers.js
+│   │    │     ├── authcontrollers.js
+│   │    │     ├── jadwalcontrollers.js
+│   │    │     ├── kelascontrollers.js
+│   │    │     ├── registercontrollers.js
+│   │    │     ├── santricontrollers.js
+│   │    │     └── usercontrollers.js
+│   │    ├── middleware/
+│   │    │     ├── auth.js
+│   │    │     └── role.js
+│   │    ├── routes/
+│   │    │     ├── absensiroutes.js
+│   │    │     ├── authroutes.js
+│   │    │     ├── jadwalroutes.js
+│   │    │     ├── kelasroutes.js
+│   │    │     ├── registerroutes.js
+│   │    │     ├── santriroutes.js
+│   │    │     └── userroutes.js
+│   │    └── app.js
+│   ├── .env
+│   ├── package.json
+│   ├── package-lock.json
+│   └── test_api.http
+│
+├── Frontend/
+│   ├── Public/
+│   │   ├── css/
+│   │   │   ├── admin.css
+│   │   │   └── style.css
+│   │   ├── images/
+│   │   │   ├── img.png
+│   │   │   ├── kelas.png
+│   │   │   └── LogoYSQ.png
+│   │   └── js/
+│   │       ├── login.js
+│   │       ├── register.js
+│   │       └── script.js
+│   ├── views/
+│   │    ├── berhasil.html
+│   │    ├── daftar.html
+│   │    ├── dashboardadmin.html
+│   │    ├── dashboardpengajar.html
+│   │    ├── dashboardsantri.html
+│   │    ├── index.html
+│   │    ├── jadwaladmin.html
+│   │    ├── kelasadmin.html
+│   │    ├── login.html
+│   │    └── registrasi.html
+│   └── test/
+├── .gitignore
+├── package-lock.json
+└── README.md/
+'''
 
 ### Teknologi yang digunakan
  - HTML
