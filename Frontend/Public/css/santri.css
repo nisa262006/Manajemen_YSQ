@@ -1,0 +1,434 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #D4D7AF;
+}
+
+/* --- HEADER / NAVIGASI UTAMA --- */
+.header {
+    background-color: #0b4528; /* Hijau Gelap */
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.logo-section img {
+    height: 95px;
+    margin-right: 10px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    font-size: 1.17em;
+}
+
+.user-info span {
+    margin-right: 8px; /* Menambah jarak antara teks "Siswa" dan ikon */
+}
+
+.user-info .icon {
+    margin-left: 5px;
+    font-size: 1.2em;
+}
+
+/* --- KONTEN UTAMA & CARD --- */
+.main-container {
+    padding: 20px;
+}
+
+.dashboard-card, .attendance-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card h1, .attendance-card h1 {
+    font-size: 1.8em;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* --- SUB-NAVIGASI (Dashboard & Absen) --- */
+.sub-nav {
+    display: flex;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sub-nav button {
+    background-color: transparent;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #444;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    flex-grow: 1; /* Biarkan tombol tumbuh mengisi ruang */
+    width: 25%;   /* Setiap tombol memiliki lebar dasar 25% */
+    
+    /* Hapus margin-right yang sebelumnya digunakan untuk jarak */
+    margin-right: 0; 
+    
+    /* Gunakan padding yang seimbang untuk teks di tengah area 25% */
+    padding: 10px 0; /* Padding horizontal 0 karena lebar sudah diatur oleh width/flex */
+    text-align: center; /* Rata tengah teks di dalam area 25% */
+}
+
+.sub-nav button.active {
+    background-color: transparent;
+    color: #0b4528;
+    border-bottom: 3px solid #0b4528;
+}
+
+/* --- SUB-NAVIGASI (Dashboard & Absen) --- */
+/* Targetkan BUTTON dan TAUTAN (A) agar terlihat seragam */
+.sub-nav button, 
+.sub-nav a { 
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #444; /* Warna teks disamakan dengan tombol non-aktif */
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+    
+    /* Tambahkan ini untuk menghilangkan garis bawah dan warna biru pada tautan */
+    text-decoration: none; 
+    
+    /* Properti yang membuat tombol rata */
+    flex-grow: 1; 
+    width: 25%;   
+    padding: 10px 0; 
+    text-align: center; 
+    display: flex; /* Tambahkan flex agar text-align center bekerja konsisten */
+    justify-content: center;
+    align-items: center;
+}
+
+/* ========================================================= */
+/* --- BAGIAN DASBOARD SISWA --- */
+/* ========================================================= */
+
+.info-tahsin {
+    background-color: #e8e8e8;
+    border-radius: 6px;
+    padding: 15px;
+    display: flex; 
+    align-items: center; /* Pusatkan vertikal */
+    gap: 30px; /* Jarak antara gambar dan detail */
+    margin-bottom: 30px;
+}
+
+.info-tahsin-image {
+    width: 120px; 
+    height: 120px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.info-tahsin-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-grow: 1; /* Konten mengisi sisa ruang */
+}
+
+.info-tahsin-detail {
+    flex-shrink: 0; 
+    /* Hapus p margin dari sini */
+}
+
+/* Mengatur setiap baris detail (label + nilai) di blok KIRI */
+.info-detail-row {
+    display: flex;
+    margin: 4px 0; /* Margin atas/bawah untuk setiap baris (Nama, Level, Jadwal) */
+}
+
+.info-detail-label {
+    width: 70px; /* Lebar tetap untuk label (Nama, Level, Jadwal) */
+    font-weight: normal; 
+    color: #555;
+    margin-right: 5px; 
+}
+
+.info-detail-value {
+    font-weight: bold;
+}
+
+/* Pengaturan Margin untuk blok KANAN (ID Santri) */
+.info-tahsin-id {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.info-tahsin-id p:first-child {
+    margin: 15px 0 86px 0; /* Margin atas 0, kanan 0, bawah 2px, kiri 0 */
+}
+
+.info-tahsin-id .info-tahsin-level {
+    margin: 0 0 0 0;
+}
+
+.info-tahsin-level {
+    font-weight: bold;
+    color: #0b4528;
+    font-size: 1.1em;
+}
+
+/* --- TABEL INFORMASI KULIAH / EVENT (Dashboard) --- */
+.student-event-tabs {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.student-event-tabs button {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 8px 15px;
+    margin-right: 5px;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    font-weight: bold;
+}
+
+.student-event-tabs button.active {
+    background-color: #0b4528;
+    color: white;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.info-table th, .info-table td {
+    width: 16.66%; /* 100% dibagi 6 kolom */
+    padding: 10px; /* Pertahankan padding standar agar konten tidak terlalu menempel */
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box; 
+}
+
+.info-table th {
+    background-color: #0b4528;
+    color: white;
+    font-weight: bold;
+}
+
+.info-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.info-table td i {
+    font-size: 1.5em; /* Ukuran ikon */
+    color: #444;
+}
+
+/* ========================================================= */
+/* --- BAGIAN ABSEN --- */
+/* ========================================================= */
+
+.summary-cards {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.summary-card {
+    background-color: #e8e8e8;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-align: center;
+    flex: 1 1 auto;
+    min-width: 80px;
+}
+
+.summary-card-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #0b4528;
+}
+
+.summary-card-label {
+    font-size: 0.8em;
+    color: #555;
+    white-space: nowrap; /* Mencegah label Mustamilah terpotong */
+}
+
+/* Filter Tanggal */
+.attendance-card h2 {
+    font-size: 1.4em;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.date-filter label {
+    font-weight: bold;
+}
+
+.date-filter input[type="date"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.date-filter button {
+    background-color: #17a2b8; /* Biru muda untuk Export Excel */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: auto; /* Dorong tombol ke kanan */
+}
+
+/* Tabel Absensi */
+.attendance-table th {
+    background-color: #f3f3c3; /* Warna krem/kuning muda untuk header tabel */
+    color: #333;
+}
+
+.status-hadir {
+    background-color: #c8e6c9; /* Hijau muda */
+    color: #1b5e20;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.status-sakit {
+    background-color: #fff9c4; /* Kuning muda */
+    color: #fbc02d;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+/* Tambahkan status lain jika diperlukan (Alfa, Izin) */
+
+/* --- KARTU RINGKASAN ABSENSI (Absen) --- */
+.summary-cards {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.summary-card {
+    background-color: #e8e8e8;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-align: center;
+    flex: 1 1 auto;
+    min-width: 100px;
+}
+
+.summary-card-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #0b4528;
+}
+
+.summary-card-label {
+    font-size: 0.8em;
+    color: #555;
+}
+
+/* --- FILTER TANGGAL (Absen) --- */
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.date-filter label {
+    font-weight: bold;
+}
+
+.date-filter input[type="date"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.date-filter button {
+    background-color: #17a2b8; /* Biru muda untuk Export Excel */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* --- TABEL ABSENSI (Absen) --- */
+.attendance-table th, .attendance-table td {
+    width: 20%;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+    font-size: 0.9em;
+    box-sizing: border-box;
+}
+
+.attendance-table th {
+    background-color: #f3f3c3; /* Warna krem/kuning muda untuk header tabel */
+    font-weight: bold;
+}
+
+.status-hadir {
+    background-color: #c8e6c9; /* Hijau muda */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #1b5e20;
+}
+
+.status-sakit {
+    background-color: #fff9c4; /* Kuning muda */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #fbc02d;
+}
+
+.status-alfa {
+    background-color: #ffcdd2; /* Merah muda */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #c62828;
+}
+
+/* Tambahan: Pastikan ikon folder terlihat seperti ikon */
+.icon-folder {
+    font-size: 1.2em;
+    color: #444;
+}

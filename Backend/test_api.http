@@ -12,7 +12,16 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "pengajar1@ysq.com",
+  "email": "Maya.pengajar@ysq.com",
+  "password": "123456"
+}
+
+### LOGIN SANTRI
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "santri1@ysq.com",
   "password": "123456"
 }
 
@@ -30,14 +39,14 @@ POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama": "Lis Maryatun",
+  "nama": "Yesi Mediatama",
   "tempat_lahir": "Bogor",
-  "tanggal_lahir": "2005-08-26",
-  "email": "lis@gmail.com",
-  "no_wa": "081023479589"
+  "tanggal_lahir": "2005-11-20",
+  "email": "yesi@gmail.com",
+  "no_wa": "08102097658"
 }
 
 ### Admin Terima Pendaftar
 PUT http://localhost:5000/pendaftar/terima/1
-Authorization: Bearer <TOKEN_ADMIN>
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM1NTI2NjYsImV4cCI6MTc2MzYzOTA2Nn0.4vnq2rsr0MYsMfj_SIqwxmuKga6aJg78e0-dVi8oBtM
 Content-Type: application/json

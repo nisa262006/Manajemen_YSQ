@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABSEN</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="../css/santri.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-section">
+            <img src="../images/LogoYSQ.png" alt="Logo Yayasan">
+            <h2>YAYASAN SAHABAT QUR'AN</h2>
+        </div>
+        <div class="user-info">
+            <span>Siswa</span>
+            <i class='bx bx-user'></i> </div>
+    </header>
+
+    <div class="main-container">
+        <div class="attendance-card">
+            <h1>ABSENSI</h1>
+
+            <div class="sub-nav">
+                <a href="dashboardsiswa.html">Dashboard</a>
+                <button class="active">Riwayat Absen</button>
+                <button>Raport</button>
+                <button>Student Bill</button>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-card-value">23</div>
+                    <div class="summary-card-label">Total Pertemuan</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value">12</div>
+                    <div class="summary-card-label">Hadir</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value">8</div>
+                    <div class="summary-card-label">Izin</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value">1</div>
+                    <div class="summary-card-label">Sakit</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value">1</div>
+                    <div class="summary-card-label">Alfa</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value">2</div>
+                    <div class="summary-card-label">Mustamilah</div>
+                </div>
+            </div>
+
+            <div class="date-filter">
+                <label>Start Date:</label>
+                <input type="date" value="2023-08-26">
+                <label>End Date:</label>
+                <input type="date" value="2023-09-05">
+                <button>Export Excel</button>
+            </div>
+
+            <table class="info-table attendance-table">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Pelajaran</th>
+                        <th>Jam</th>
+                        <th>Catatan</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>26/08/2023</td>
+                        <td>Tahsin</td>
+                        <td>08.00 - 09.00</td>
+                        <td></td>
+                        <td><span class="status-hadir">Hadir</span></td>
+                    </tr>
+                    <tr>
+                        <td>26/08/2023</td>
+                        <td>Tahsin</td>
+                        <td>08.00 - 09.00</td>
+                        <td>Asap</td>
+                        <td><span class="status-sakit">Sakit</span></td>
+                    </tr>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

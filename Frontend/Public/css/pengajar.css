@@ -1,0 +1,512 @@
+/* -- Font Import -- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* -- Variables -- */
+:root {
+    --color-dark-green: #155332; 
+    --color-light-green: #ffffff; 
+    --color-white: #ffffff;
+    --color-grey-light: #D4D7AF ; 
+    --color-text-dark: #333;
+    --color-btn-yellow: #C3AF40; 
+    --color-light-grey: #f1f1f1;
+    --color-detail-bg: #e0d0a8; /* Warna krem untuk detail item */
+}
+
+/* -- Global Reset & Setup -- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--color-grey-light);
+    color: var(--color-text-dark);
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: 195px; 
+    background-color: var(--color-dark-green);
+    color: var(--color-white);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; 
+}
+.logo-section { padding: 0 20px 30px; text-align: center; }
+.logo-section img { width: 160px; margin-bottom: 5px; }
+.nav-menu { flex-grow: 1; }
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--color-white);
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+.nav-item i { font-size: 22px; margin-right: 15px; }
+.nav-item:hover, .nav-item.active {
+    background-color: #163528;
+    border-right: 4px solid var(--color-light-green);
+}
+
+/* --- Main Content & Header --- */
+.main-content {
+    flex-grow: 1;
+    padding: 20px 40px; 
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+.header h1 { font-size: 24px; font-weight: 500; text-transform: capitalize; }
+.user-info { display: flex; align-items: center; font-weight: 500; }
+.user-info i { font-size: 30px; margin-left: 10px; color: var(--color-dark-green); }
+
+/* --- Content Visibility (Controlled by JS) --- */
+.content-section {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+.content-section.active {
+    display: block;
+}
+
+/* ========================================================= */
+/* --- DASHBOARD ELEMENTS --- */
+/* ========================================================= */
+.dashboard-grid {
+    display: grid;
+    gap: 40px; 
+}
+
+.info-card-container {
+    display: flex;
+    gap: 30px; 
+    margin-bottom: 1px; 
+}
+.info-card {
+    background-color: var(--color-white);
+    border-radius: 12px;
+    padding: 30px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Kartu Informasi Kelas Hari Ini (TANPA GAMBAR) --- */
+.tahsin-info { flex: 3; color: var(--color-text-dark); }
+.tahsin-info h2 { font-size: 18px; margin-bottom: 20px; text-align: center; color: var(--color-text-dark); }
+.info-detail-row { display: flex; margin: 10px 0; align-items: flex-start; }
+.info-detail-label { width: 140px; font-weight: normal; color: var(--color-text-dark); margin-right: 5px; text-align: left; }
+.info-detail-value { font-weight: bold; color: var(--color-dark-green); flex-grow: 1; text-align: left; }
+
+/* --- Kartu Kelas Hari Ini & Persentase (Sejajar) --- */
+.class-count, .attendance-rate {
+    flex: 2; 
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-dark-green);
+}
+.info-card i { font-size: 40px; margin-bottom: 10px; }
+.info-card .value { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+
+/* ========================================================= */
+/* --- JADWAL KELAS ELEMENTS --- */
+/* ========================================================= */
+
+/* --- Filter Section --- */
+.filter-container {
+    background-color: var(--color-white);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+.filter-section {
+    display: flex;
+    gap: 40px; /* Jarak antara grup filter */
+}
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+.custom-select {
+    padding: 8px 30px 8px 12px; /* Padding kanan besar untuk ikon */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: var(--color-white);
+    min-width: 140px;
+    font-size: 16px;
+}
+
+/* --- Tabel Umum & Jadwal --- */
+.schedule-section, .schedule-table-full {
+    background-color: var(--color-white);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table th, .data-table td {
+    padding: 12px 5px;
+    width: 16.66%;; 
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    box-sizing: border-box;
+    vertical-align: middle;
+    text-align: center;
+}
+.data-table th {
+    background-color: var(--color-light-grey);
+    font-weight: 600;
+}
+.btn-presensi, .btn-detail {
+    background-color: #275238; /* Warna hijau gelap untuk Detail */
+    color: var(--color-white);
+    border: none;
+    padding: 6px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+.btn-presensi:hover, .btn-detail:hover { background-color: #163528; }
+
+/* --- Styling Khusus Modal Input File/Link --- */
+
+#fileInputModal .modal-content {
+    /* Menyesuaikan lebar modal jika perlu, tapi menggunakan max-width 500px harusnya sudah cukup */
+    max-width: 550px; 
+}
+
+#linkTextInput {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px; /* Jarak atas/bawah */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: vertical; /* Memungkinkan pengguna mengubah tinggi */
+    font-size: 14px;
+}
+
+.file-upload-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    margin-top: 15px; /* Jarak dari textarea di atasnya */
+}
+
+.hidden-file-input {
+    display: none; /* KRUSIAL: Menyembunyikan input file asli */
+}
+
+/* Styling untuk tombol Pilih Dokumen kustom dan nama file */
+.btn-file-upload {
+    background-color: #d1d8a4; /* Warna hijau muda/krem */
+    color: var(--color-dark-green);
+    border: 1px solid #c0c0c0;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-right: 10px;
+    transition: background-color 0.2s;
+}
+
+#fileNameDisplay {
+    font-size: 0.85em;
+    color: #777;
+    display: inline-block; /* Agar sejajar dengan tombol */
+}
+/* --- ROW DETAIL JADWAL (Fitur Meluas) --- */
+.detail-row {
+    display: none; /* Sembunyikan secara default */
+    background-color: var(--color-white);
+}
+
+.detail-row.active {
+    display: table-row; /* Tampilkan baris saat aktif */
+}
+
+.detail-row td {
+    padding: 0; 
+    border-bottom: 5px solid var(--color-grey-light); /* Garis pemisah tebal */
+    background-color: var(--color-white); 
+    border-left: none; /* Hapus border samping */
+    border-right: none;
+}
+
+.detail-content-grid {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    gap: 20px;
+}
+
+.detail-item {
+    flex: 1; 
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 10px;
+    background-color: var(--color-light-grey); /* Latar belakang item detail */
+}
+
+.detail-item label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.detail-item a {
+    display: block;
+    font-size: 0.85em;
+    color: #555;
+    margin-bottom: 10px;
+    text-decoration: none;
+}
+.btn-materi, .btn-absensi, .btn-tugas {
+    background-color: var(--color-detail-bg); 
+    color: var(--color-text-dark);
+}
+
+/* --- ABSENSI HARIAN STYLING --- */
+.absensi-header-filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 25px;
+    background-color: var(--color-white);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.absensi-header-filters .filter-group {
+    /* Mengatur jarak label dan input di filter */
+    gap: 5px; 
+}
+
+.btn-tambah-catatan {
+    background-color: #f1f1f1;
+    color: var(--color-text-dark);
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Bar Informasi Jam Absen */
+.absensi-info-bar {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 20px;
+    background-color: var(--color-btn-yellow); /* Kuning */
+    color: var(--color-text-dark);
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+.absensi-info-bar h3 {
+    font-size: 1em;
+    font-weight: 600;
+    margin-right: 15px;
+}
+
+/* Styling Tabel Absensi Harian */
+.absensi-harian-table {
+    width: 100%;
+}
+
+.absensi-harian-table th, .absensi-harian-table td {
+    padding: 10px 15px;
+}
+
+.absensi-harian-table th:nth-child(1) { width: 5%; text-align: center; } /* No */
+.absensi-harian-table th:nth-child(2) { width: 30%; } /* Nama */
+.absensi-harian-table th:nth-child(3) { width: 25%; } /* Status */
+.absensi-harian-table th:nth-child(4) { width: 40%; } /* Catatan */
+
+.status-select, .input-catatan {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 14px;
+}
+
+/* Footer Tombol */
+.absensi-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0 10px;
+}
+
+.btn-simpan {
+    background-color: var(--color-btn-yellow);
+    color: var(--color-text-dark);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.btn-riwayat {
+    background-color: var(--color-dark-green);
+    color: var(--color-white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* --- MODAL POPUP STYLING (Untuk Tambah Catatan) --- */
+.modal {
+    display: none; /* Sembunyikan modal secara default */
+    position: fixed;
+    z-index: 1000; /* Pastikan modal berada di atas semua konten lain */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); /* Latar belakang gelap transparan */
+}
+
+.modal-content {
+    background-color: var(--color-white);
+    margin: 10% auto; /* Jarak dari atas dan tengah horizontal */
+    padding: 30px;
+    border-radius: 10px;
+    width: 80%; /* Lebar modal */
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#classNoteInput {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+#saveNoteButton {
+    background-color: var(--color-dark-green);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    float: right;
+}
+
+/* Toast Notification Styling - DIREVISI untuk ukuran kecil */
+#toastNotification {
+    /* Posisi Awal (Tersembunyi) */
+    visibility: hidden; 
+    
+    /* ======== UKURAN DAN POSISI ======== */
+    min-width: 180px; /* Diperkecil dari 250px */
+    max-width: 300px;
+    margin-left: -90px; /* Disesuaikan untuk min-width 180px (180/2 = 90) */
+    padding: 10px 15px; /* Diperkecil padding */
+    
+    /* Posisi Layar (Tengah Atas) */
+    position: fixed;
+    z-index: 9999; 
+    left: 50%;
+    top: 30px; 
+    
+    /* Tampilan */
+    background-color: #275238; /* Hijau */
+    color: #fff;
+    text-align: center;
+    border-radius: 6px; /* Disesuaikan agar terlihat lebih kecil */
+    font-size: 15px; /* Ukuran font sedikit dikecilkan */
+    
+    /* Transisi */
+    opacity: 0;
+    transition: opacity 0.5s, visibility 0s 0.5s; 
+}
+
+/* Class yang diubah oleh JavaScript untuk memunculkan Toast */
+#toastNotification.show {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.5s, visibility 0s 0s; 
+}
+
+/* Menyesuaikan jarak di bagian bawah modal */
+.modal-actions {
+    /* Tambahkan ruang di atas elemen, sehingga mendorong tombol ke bawah */
+    margin-top: 20px; 
+    /* Pastikan tombol rata kanan jika itu desain yang diinginkan */
+    text-align: right; 
+    padding-top: 10px; /* Opsional: menambah padding ekstra di atas */
+}
+
+/* Jika Anda ingin tombolnya sendiri yang memiliki margin atas: */
+#simpanFileInputButton {
+    /* Ini akan memberikan ruang di atas tombol itu sendiri */
+    margin-top: 5px; 
+}
+
+/* Styling umum untuk tombol di modal (Jika belum ada) */
+.modal-actions button {
+    padding: 10px 20px; /* Tambahkan padding yang cukup */
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-left: 10px; /* Jarak antar tombol */
+    /* Pastikan tinggi (height) sama atau biarkan padding menentukannya */
+}
+
+/* Styling untuk tombol Batal (agar ukurannya sama dengan tombol Simpan) */
+#batalSimpanButton {
+    /* MENGATUR LEBAR AGAR SAMA DENGAN TOMBOL KUNING (jika tombol kuning punya lebar tetap) */
+    min-width: 120px; /* Atur lebar minimum yang mendekati tombol 'Ya, Simpan Data' */
+    
+    /* Ganti background dan warna sesuai desain Batal Anda (biasanya abu-abu atau putih) */
+    background-color: #f0f0f0; /* Contoh: Abu-abu muda */
+    color: #333;
+}
+
+/* Styling untuk tombol Simpan (Tombol Kuning) */
+#lanjutkanSimpanButton {
+    min-width: 120px; /* Pastikan tombol kuning juga punya lebar ini agar konsisten */
+    /* background-color: var(--color-primary-yellow); */ 
+    /* warna kuning dashboard Anda */
+    color: #fff;
+}
