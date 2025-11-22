@@ -21,6 +21,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // --- Import dan Mount Router ---
+app.use(express.static(path.join(__dirname, "../../Frontend/Public")));
 
 // Import Router
 const authRoutes = require("./routes/authroutes");

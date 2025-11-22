@@ -34,19 +34,30 @@ Content-Type: application/json
   "password": "123456"
 }
 
-### Pendaftar Daftar
+### PENDAFTARAN
 POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama": "Yesi Mediatama",
-  "tempat_lahir": "Bogor",
-  "tanggal_lahir": "2005-11-20",
-  "email": "yesi@gmail.com",
-  "no_wa": "08102097658"
+  "nama":"siti",
+  "email":"nisa@gmail.com",
+  "no_wa":"081234567890",
+  "tempat_lahir":"Bogor",
+  "tanggal_lahir":"2000-01-01"
 }
+
+### get pendaftaran
+GET http://localhost:5000/pendaftar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM3OTYyNTgsImV4cCI6MTc2Mzg4MjY1OH0.6bpDBn9tGr-MquBdGSTpgF3ZW7S0sDu_ZSGZct7D3No
 
 ### Admin Terima Pendaftar
 PUT http://localhost:5000/pendaftar/terima/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjM1NTI2NjYsImV4cCI6MTc2MzYzOTA2Nn0.4vnq2rsr0MYsMfj_SIqwxmuKga6aJg78e0-dVi8oBtM
-Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM3OTU4OTksImV4cCI6MTc2Mzg4MjI5OX0.DkZKla-VREtBlWwWXaFoRoX-OWbR-T3_4EWA_w607S0
+
+### DELETE PENDAFTAR
+DELETE http://localhost:5000/pendaftar/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM3OTMzNzgsImV4cCI6MTc2Mzg3OTc3OH0.lx8ZNWC7ONdAukCsixcti6iZGpEyYR5r46kZig8-5xU
+
+### RESET PENDAFTAR (HAPUS SEMUA KECUALI YANG DITERIMA)
+DELETE http://localhost:5000/pendaftar/reset/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM3OTMzNzgsImV4cCI6MTc2Mzg3OTc3OH0.lx8ZNWC7ONdAukCsixcti6iZGpEyYR5r46kZig8-5xU

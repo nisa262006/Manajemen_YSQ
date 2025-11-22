@@ -6,24 +6,28 @@ const {
   getAllPendaftar,
   terimaPendaftar,
   tolakPendaftar,
-  deletePendaftar
+  deletePendaftar,
+  resetAllPendaftar,
+  exportExcelPendaftar
 } = require("../controllers/registercontrollers");
 
 const { verifyToken, onlyAdmin } = require("../middleware/auth");
 
-// publik daftar
+// PUBLIC
 router.post("/daftar", daftarPendaftar);
 
-// admin: lihat seluruh pendaftar
+// ADMIN – STATIC ROUTES (WAJIB DI ATAS ROUTE DINAMIS)
+router.delete("/reset/all", verifyToken, onlyAdmin, resetAllPendaftar);
+router.get("/export/excel", verifyToken, onlyAdmin, exportExcelPendaftar);
+
+// ADMIN – GET ALL
 router.get("/", verifyToken, onlyAdmin, getAllPendaftar);
 
-// admin: terima pendaftar
+// ADMIN – ACTION
 router.put("/terima/:id_pendaftar", verifyToken, onlyAdmin, terimaPendaftar);
-
-// admin: tolak pendaftar
 router.put("/tolak/:id_pendaftar", verifyToken, onlyAdmin, tolakPendaftar);
 
-// admin: hapus data pendaftar
+// ADMIN – HAPUS SATU
 router.delete("/:id_pendaftar", verifyToken, onlyAdmin, deletePendaftar);
 
 module.exports = router;
