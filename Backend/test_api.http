@@ -39,8 +39,8 @@ POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama":"siti",
-  "email":"nisa@gmail.com",
+  "nama":"siti ainun",
+  "email":"siti@gmail.com",
   "no_wa":"081234567890",
   "tempat_lahir":"Bogor",
   "tanggal_lahir":"2000-01-01"

@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-// Import controller
-const { login } = require("../controllers/authcontrollers");
+const { login, getMe } = require("../controllers/authcontrollers");
+const { verifyToken } = require("../middleware/auth");
 
-// Route login
+// LOGIN
 router.post("/login", login);
+
+// GET PROFILE (dashboard santri/admin/pengajar)
+router.get("/me", verifyToken, getMe);
 
 module.exports = router;
