@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+// ================= VERIFY TOKEN ==================
 exports.verifyToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader)
@@ -11,16 +12,33 @@ exports.verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.users = decoded;   // hasil: { id_user: 4, role: "santri" }
+    req.users = decoded; 
     next();
   } catch (err) {
     return res.status(403).json({ message: "Invalid token" });
   }
 };
 
+// ================= ADMIN ONLY ==================
 exports.onlyAdmin = (req, res, next) => {
   if (req.users.role !== "admin") {
     return res.status(403).json({ message: "Admin only" });
+  }
+  next();
+};
+
+// ================= SANTRI ONLY ==================
+exports.onlySantri = (req, res, next) => {
+  if (req.users.role !== "santri") {
+    return res.status(403).json({ message: "Santri only" });
+  }
+  next();
+};
+
+// ================= PENGAJAR ONLY ==================
+exports.onlyPengajar = (req, res, next) => {
+  if (req.users.role !== "pengajar") {
+    return res.status(403).json({ message: "Pengajar only" });
   }
   next();
 };

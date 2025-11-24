@@ -34,6 +34,7 @@ Content-Type: application/json
   "password": "123456"
 }
 
+============= REGISTRASI ======================
 ### PENDAFTARAN
 POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
@@ -61,3 +62,106 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ### RESET PENDAFTAR (HAPUS SEMUA KECUALI YANG DITERIMA)
 DELETE http://localhost:5000/pendaftar/reset/all
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM3OTMzNzgsImV4cCI6MTc2Mzg3OTc3OH0.lx8ZNWC7ONdAukCsixcti6iZGpEyYR5r46kZig8-5xU
+
+============== KELAS ===================
+
+##################################################
+### 1. TAMBAH KELAS (ADMIN)
+##################################################
+
+POST http://localhost:5000/kelas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+Content-Type: application/json
+
+{
+  "nama_kelas": "Tahsin Dewasa D",
+  "kapasitas": 20,
+  "id_pengajar": 1,
+  "id_program": 1,
+  "kategori": "dewasa"
+}
+
+
+##################################################
+### 2. LIST SEMUA KELAS (ADMIN)
+##################################################
+
+GET http://localhost:5000/kelas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+
+==================================================================
+##################################################
+### 3. DETAIL KELAS (ADMIN)
+##################################################
+
+GET http://localhost:5000/kelas/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+
+##################################################
+### 4. UPDATE KELAS (ADMIN)
+##################################################
+
+PUT http://localhost:5000/kelas/edit/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+
+{
+  "nama_kelas": "Kelas Tahsin D",
+  "kapasitas": 20,
+  "id_pengajar": 1,
+  "id_program": 1,
+  "kategori": "anak"
+}
+
+
+##################################################
+### 5. DELETE KELAS (ADMIN)
+##################################################
+
+DELETE http://localhost:5000/kelas/5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+
+
+##################################################
+### 6. TAMBAH SANTRI KE KELAS (ADMIN)
+### memasukkan santri ke tabel santri_kelas (betul)
+##################################################
+
+POST http://localhost:5000/kelas/1/santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+Content-Type: application/json
+
+{
+  "id_santri": 3
+}
+
+
+##################################################
+### 7. PINDAH SANTRI KE KELAS LAIN (ADMIN)
+### menghapus dari kelas lama → tambah ke kelas baru
+##################################################
+
+PUT http://localhost:5000/kelas/pindah/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+Content-Type: application/json
+
+{
+  "id_kelas_lama": 1,
+  "id_kelas_baru": 2
+}
+===============================================================
+
+##################################################
+### 8. PENGAJAR MELIHAT KELAS YANG DIA AMPU
+##################################################
+
+GET http://localhost:5000/kelas/pengajar/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwicm9sZSI6InBlbmdhamFyIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5ODY1MDUsImV4cCI6MTc2NDA3MjkwNX0.D_kI2jb6iSWIvM9_VatE6_55minoSUJ-VBy6JRcJ89Q
+
+
+##################################################
+### 9. SANTRI MELIHAT KELAS MILIKNYA
+##################################################
+
+GET http://localhost:5000/kelas/santri/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Mywicm9sZSI6InNhbnRyaSIsInN0YXR1cyI6IkFrdGlmIiwiaWF0IjoxNzYzOTg2NTI5LCJleHAiOjE3NjQwNzI5Mjl9.TwnNufI8EOVjqX5ySGDjcrFy2VDIP8b1chg-RBa_NDA

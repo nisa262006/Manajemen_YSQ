@@ -20,39 +20,20 @@ const {
   onlySantri
 } = require("../middleware/auth");
 
-// ======================== ADMIN ============================
 
-// Tambah kelas
-router.post("/", verifyToken, onlyAdmin, tambahKelas);
-
-// List semua kelas
-router.get("/", verifyToken, onlyAdmin, getAllKelas);
-
-// Detail kelas
-router.get("/:id_kelas", verifyToken, onlyAdmin, getDetailKelas);
-
-// Update kelas
-router.put("/:id_kelas", verifyToken, onlyAdmin, updateKelas);
-
-// Delete kelas
-router.delete("/:id_kelas", verifyToken, onlyAdmin, deleteKelas);
-
-// Tambah santri ke kelas
-router.post("/:id_kelas/santri", verifyToken, onlyAdmin, tambahSantriKeKelas);
-
-// Pindahkan santri antar kelas
-router.put("/pindah/:id_santri", verifyToken, onlyAdmin, pindahSantriKelas);
-
-
-// ==================== PENGAJAR ===============================
-
-// Melihat kelas yang dia ampu
+// ================= PENGAJAR ====================
 router.get("/pengajar/me", verifyToken, onlyPengajar, kelasPengajar);
 
-
-// ===================== SANTRI ===============================
-
-// Santri lihat kelas miliknya
+// ================= SANTRI ======================
 router.get("/santri/me", verifyToken, onlySantri, kelasSantri);
 
-module.exports = router;
+// ================= ADMIN ======================= 
+router.post("/", verifyToken, onlyAdmin, tambahKelas);
+router.get("/", verifyToken, onlyAdmin, getAllKelas);
+router.post("/:id_kelas/santri", verifyToken, onlyAdmin, tambahSantriKeKelas);
+router.put("/pindah/:id_santri", verifyToken, onlyAdmin, pindahSantriKelas);
+
+// ROUTE DINAMIS PALING BAWAH (HARUS BERADA TERAKHIR)
+router.get("/detail/:id_kelas", verifyToken, onlyAdmin, getDetailKelas);
+router.put("/edit/:id_kelas", verifyToken, onlyAdmin, updateKelas);
+router.delete("/hapus/:id_kelas", verifyToken, onlyAdmin, deleteKelas);

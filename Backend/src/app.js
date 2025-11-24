@@ -1,4 +1,3 @@
-// app.js (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\backend\src\app.js)
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
@@ -20,29 +19,24 @@ app.use((req, res, next) => {
 // Middleware JSON
 app.use(express.json());
 
-// --- Import dan Mount Router ---
-app.use(express.static(path.join(__dirname, "../../Frontend/Public")));
-
-// Import Router
+// ======================= R O U T E S  ===========================
 const authRoutes = require("./routes/authroutes");
 const registerRoutes = require("./routes/registerroutes");
-// Tambahkan router lain di sini jika ada
+const kelasRoutes = require("./routes/kelasroutes");
 
-// Mount Router
 app.use("/auth", authRoutes);
 app.use("/pendaftar", registerRoutes);
+app.use("/kelas", kelasRoutes);
 
+// ======================= STATIC FILE (PINDAHKAN KE BAWAH) =======
+app.use(express.static(path.join(__dirname, "../../Frontend/Public")));
 
-// Default route
 app.get("/", (req, res) => {
   res.send("API Sahabat Quran berjalan");
 });
 
-// --- Start Server ---
-
-// Mengambil port dari .env atau default 5000
+// ======================= START SERVER ===========================
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
