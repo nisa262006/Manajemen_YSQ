@@ -13,12 +13,14 @@ const {
   kelasSantri
 } = require("../controllers/kelascontrollers");
 
+// PERBAIKI BAGIAN INI ↓↓↓
 const {
   verifyToken,
   onlyAdmin,
   onlyPengajar,
   onlySantri
 } = require("../middleware/auth");
+// PERBAIKAN ↑↑↑
 
 
 // ================= PENGAJAR ====================
@@ -33,7 +35,9 @@ router.get("/", verifyToken, onlyAdmin, getAllKelas);
 router.post("/:id_kelas/santri", verifyToken, onlyAdmin, tambahSantriKeKelas);
 router.put("/pindah/:id_santri", verifyToken, onlyAdmin, pindahSantriKelas);
 
-// ROUTE DINAMIS PALING BAWAH (HARUS BERADA TERAKHIR)
+// ROUTE DINAMIS PALING BAWAH (HARUS TERAKHIR)
 router.get("/detail/:id_kelas", verifyToken, onlyAdmin, getDetailKelas);
 router.put("/edit/:id_kelas", verifyToken, onlyAdmin, updateKelas);
 router.delete("/hapus/:id_kelas", verifyToken, onlyAdmin, deleteKelas);
+
+module.exports = router;
