@@ -74,7 +74,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 Content-Type: application/json
 
 {
-  "nama_kelas": "Tahsin Dewasa E",
+  "nama_kelas": "Tahsin Dewasa F",
   "kapasitas": 20,
   "id_pengajar": 1,
   "id_program": 1,
@@ -94,19 +94,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ### 3. DETAIL KELAS (ADMIN)
 ##################################################
 
-GET http://localhost:5000/kelas/4
+GET http://localhost:5000/kelas/detail/10
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 ##################################################
 ### 4. UPDATE KELAS (ADMIN) BENER
 ##################################################
 
-PUT http://localhost:5000/kelas/edit/9
+PUT http://localhost:5000/kelas/edit/10
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 {
-  "nama_kelas": "Kelas Tahsin D",
+  "nama_kelas": "Kelas Tahsin F anak",
   "kapasitas": 25,
   "id_pengajar": 1,
   "id_program": 1,
@@ -118,7 +118,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ### 5. DELETE KELAS (ADMIN)
 ##################################################
 
-DELETE http://localhost:5000/kelas/7
+DELETE http://localhost:5000/kelas/hapus/10
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 
@@ -127,12 +127,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ### memasukkan santri ke tabel santri_kelas (betul)
 ##################################################
 
-POST http://localhost:5000/kelas/1/santri
+POST http://localhost:5000/kelas/10/santri
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 Content-Type: application/json
 
 {
-  "id_santri": 4
+  "id_santri": 50
 }
 
 
@@ -141,14 +141,15 @@ Content-Type: application/json
 ### menghapus dari kelas lama → tambah ke kelas baru
 ##################################################
 
-PUT http://localhost:5000/kelas/pindah/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5NjUyODcsImV4cCI6MTc2NDA1MTY4N30.fhPU5gcLNDowRrRFs1l_EF0cyzpIzODgsA0o-JO7-0g
+PUT http://localhost:5000/kelas/pindah/10
+Authorization: Bearer eyJh...
 Content-Type: application/json
 
 {
-  "id_kelas_lama": 1,
-  "id_kelas_baru": 2
+  "id_kelas_lama": 10,
+  "id_kelas_baru": 9
 }
+
 ===============================================================
 
 ##################################################
@@ -163,5 +164,5 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwic
 ### 9. SANTRI MELIHAT KELAS MILIKNYA
 ##################################################
 
-GET http://localhost:5000/kelas/santri/localhost:5000/kelas/santri/me
+GET http://localhost:5000/kelas/santri/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Mywicm9sZSI6InNhbnRyaSIsInN0YXR1cyI6IkFrdGlmIiwiaWF0IjoxNzYzOTg2NTI5LCJleHAiOjE3NjQwNzI5Mjl9.TwnNufI8EOVjqX5ySGDjcrFy2VDIP8b1chg-RBa_NDA
