@@ -54,15 +54,14 @@ Backend akan berjalan di:
 http://localhost:5000
 ```
 ```
-3️⃣ Setup Database (PostgreSQL via Docker)
-Jalankan PostgreSQL menggunakan docker compose
-docker-compose up -d
+3️⃣ Setup Database (PostgreSQL via pgAdmin4)
+Jalankan PostgreSQL 
 ```
 ```
 4️⃣ Menjalankan Frontend
 Jika frontend menggunakan file statis:
 Cukup buka:
-/frontend/index.html
+http://127.0.0.1:5500/frontend/index.html
 ```
 
 ## Struktur Folder
