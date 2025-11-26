@@ -1,0 +1,85 @@
+<header class="dashboard-header page-header-form">
+    <h1 class="header-title" id="page-content-title">Tambah Pengajar</h1>
+    <div class="admin-profile">
+        <span class="admin-text">Rabu, 19 November 2025</span>
+    </div>
+</header>
+<div class="header-separator"></div>
+
+
+<div class="form-container">
+    <form id="form-tambah-pengajar">
+        
+        <h3 style="color: var(--color-dark-green); border-bottom: 1px solid var(--color-dark-green); padding-bottom: 5px; margin-bottom: 20px;">
+            <i class="fas fa-user"></i> Data Personal
+        </h3>
+        
+        <div class="form-group full-width">
+            <label for="nama_lengkap">Nama Lengkap</label>
+            <input type="text" id="nama_lengkap" class="profile-input" placeholder="Masukkan nama lengkap pengajar">
+        </div>
+        
+        <div class="form-group full-width">
+            <label for="alamat">Alamat</label>
+            <input type="text" id="alamat" class="profile-input" placeholder="Masukkan alamat lengkap">
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-half">
+                <label for="tempat_lahir">Tempat Lahir</label>
+                <input type="text" id="tempat_lahir" class="profile-input">
+            </div>
+            <div class="form-group col-half">
+                <label for="tanggal_lahir">Tanggal Lahir</label>
+                <input type="date" id="tanggal_lahir" class="profile-input">
+            </div>
+        </div>
+
+        <h3 style="color: var(--color-dark-green); border-bottom: 1px solid var(--color-dark-green); padding-bottom: 5px; margin-top: 30px; margin-bottom: 20px;">
+             <i class="fas fa-book-open"></i> Detail Kontak & Kualifikasi
+        </h3>
+
+        <div class="form-row">
+            <div class="form-group col-half">
+                <label for="umur">Usia</label>
+                <input type="number" id="umur" class="profile-input" placeholder="Umur (dalam tahun)">
+            </div>
+            <div class="form-group col-half"> 
+                <label for="mapel_diampu">Mapel yang Diampu/Role</label>
+                <input type="text" id="mapel_diampu" class="profile-input" placeholder="Contoh: Tahfidz, Tajwid">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-half">
+                <label for="email_pengajar">Email</label>
+                <input type="email" id="email_pengajar" class="profile-input" placeholder="Email untuk login & kontak">
+            </div>
+            <div class="form-group col-half">
+                <label for="no_telp">NO Telepon</label>
+                <input type="tel" id="no_telp" class="profile-input">
+            </div>
+        </div>
+
+        <h3 style="color: var(--color-dark-green); border-bottom: 1px solid var(--color-dark-green); padding-bottom: 5px; margin-top: 30px; margin-bottom: 20px;">
+            <i class="fas fa-lock"></i> Akses Akun
+        </h3>
+
+        <div class="form-row">
+            <div class="form-group col-half">
+                <label for="password_pengajar">Password</label>
+                <input type="password" id="password_pengajar" class="profile-input">
+            </div>
+            <div class="form-group col-half">
+                <label for="ulangi_password">Ulangi Password</label>
+                <input type="password" id="ulangi_password" class="profile-input">
+            </div>
+        </div>
+
+        
+        <div class="popup-actions form-action-row" style="margin-top: 30px;">
+            <button type="submit" class="action-btn" style="width: 180px;">Simpan</button>
+            </button>
+        </div>
+    </form>
+</div>

@@ -12,7 +12,18 @@ exports.verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.users = decoded; 
+
+    // Validasi struktur JWT baru
+    if (!decoded.id_users || !decoded.username || !decoded.role) {
+      return res.status(403).json({ message: "Invalid token payload" });
+    }
+
+    // Cek apakah status user masih aktif
+    if (decoded.status_user && decoded.status_user !== "aktif") {
+      return res.status(403).json({ message: "Akun tidak aktif / diblokir" });
+    }
+
+    req.users = decoded;
     next();
   } catch (err) {
     return res.status(403).json({ message: "Invalid token" });

@@ -113,22 +113,48 @@ exports.tambahSantriKeKelas = async (req, res) => {
 // Pindah santri antar kelas
 exports.pindahSantriKelas = async (req, res) => {
   const { id_santri } = req.params;
-  const { id_kelas_baru, id_kelas_lama } = req.body;
+  const { id_kelas_baru } = req.body;
 
-  await db.query(
-    "DELETE FROM santri_kelas WHERE id_santri=$1 AND id_kelas=$2",
-    [id_santri, id_kelas_lama]
-  );
+  if (!id_kelas_baru) {
+    return res.status(400).json({ message: "id_kelas_baru wajib dikirim" });
+  }
 
-  await db.query(
-    `INSERT INTO santri_kelas (id_santri, id_kelas)
-     VALUES ($1, $2)
-     ON CONFLICT (id_santri, id_kelas) DO NOTHING`,
-    [id_santri, id_kelas_baru]
- ); 
+  try {
+    // 1. Pastikan santri ada
+    const cekSantri = await db.query(
+      `SELECT * FROM santri WHERE id_santri = $1`,
+      [id_santri]
+    );
 
-  res.json({ message: "Santri berhasil dipindahkan ke kelas baru" });
+    if (cekSantri.rows.length === 0) {
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
+
+    // 2. Hapus kelas lama
+    await db.query(
+      `DELETE FROM santri_kelas WHERE id_santri = $1`,
+      [id_santri]
+    );
+
+    // 3. Tambahkan ke kelas baru
+    await db.query(
+      `INSERT INTO santri_kelas (id_santri, id_kelas)
+       VALUES ($1, $2)`,
+      [id_santri, id_kelas_baru]
+    );
+
+    res.json({
+      message: "Santri berhasil dipindahkan ke kelas baru",
+      id_santri,
+      id_kelas_baru
+    });
+
+  } catch (err) {
+    console.error("PINDAH SANTRI ERROR:", err);
+    res.status(500).json({ message: "Gagal memindahkan santri" });
+  }
 };
+
 
 // ===================== PENGAJAR ===============================
 exports.kelasPengajar = async (req, res) => {

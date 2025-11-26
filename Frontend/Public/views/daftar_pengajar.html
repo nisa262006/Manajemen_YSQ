@@ -1,0 +1,97 @@
+<header class="dashboard-header">
+    <h1 class="header-title" id="page-content-title">Daftar Pengajar</h1>
+    <div class="admin-profile">
+        <span class="admin-text">Admin</span>
+        <i class="fas fa-user-circle admin-icon"></i>
+    </div>
+</header>
+
+<div class="header-actions" style="
+    display: flex; 
+    justify-content: space-between; 
+    margin-top: 20px; 
+    gap: 10px;
+    align-items: center; 
+">
+    <input 
+        type="text" 
+        placeholder="Cari Pengajar..." 
+        class="search-input" 
+        style="
+            flex-grow: 1; 
+            padding: 10px 15px; /* Menyesuaikan padding untuk tampilan yang lebih baik */
+            border: 1px solid #ccc; /* Menambahkan border untuk visual */
+            border-radius: 10px;
+        "
+    >
+    
+    <button class="action-btn export-btn" style="
+        padding: 10px 15px; 
+        white-space: nowrap;
+        font-size: 14px;
+    ">
+        <i class="fas fa-file-export"></i> Ekspor Data
+    </button>
+</div>
+<section class="pendaftar-table" style="margin-top: 30px;">
+    <div class="section-title">Data Pengajar</div>
+    <div class="table-wrapper"> 
+        <table id="pengajar-list-table">
+            <thead>
+                <tr class="table-header-row">
+                    <th>NO</th>
+                    <th>NIM</th>
+                    <th>Nama</th>
+                    <th>Kelas</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="pengajar-table-body">
+                <tr class="table-data-row" data-id="1">
+                    <td>1</td>
+                    <td>249078561</td>
+                    <td>David</td>
+                    <td>Quran</td>
+                    <td>pengajar@gmail.ac.id</td>
+                    <td class="status-cell">
+                        <span class="status-button status-accepted status-toggle" data-status="aktif">Aktif</span>
+                    </td>
+                    <td class="table-actions">
+                         <button class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i></button>
+                    </td>
+                </tr>
+                 <tr class="table-data-row" data-id="2">
+                    <td>2</td>
+                    <td>249078561</td>
+                    <td>David</td>
+                    <td>Quran</td>
+                    <td>pengajar@gmail.ac.id</td>
+                    <td class="status-cell">
+                        <span class="status-button status-accepted status-toggle" data-status="aktif">Aktif</span>
+                    </td>
+                    <td class="table-actions">
+                         <button class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i></button>  
+                    </td>
+                </tr>
+                <tr class="table-data-row" data-id="2">
+                    <td>2</td>
+                    <td>249078561</td>
+                    <td>David</td>
+                    <td>Quran</td>
+                    <td>pengajar@gmail.ac.id</td>
+                    <td class="status-cell">
+                        <span class="status-button status-accepted status-toggle" data-status="aktif">Aktif</span>
+                    </td>
+                    <td class="table-actions">
+                         <button class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i></button>  
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<button id="back-to-dashboard" class="action-btn back-btn" style="margin-top: 20px;">
+    <i class="fas fa-arrow-left"></i> Kembali
+</button>

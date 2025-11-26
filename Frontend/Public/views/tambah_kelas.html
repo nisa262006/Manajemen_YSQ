@@ -1,0 +1,112 @@
+<header class="dashboard-header">
+    <h1 class="header-title" id="page-content-title">Tambah Kelas</h1>
+    <div class="admin-profile">
+        <span class="admin-text">Rabu, 19 November 2025</span>
+    </div>
+</header>
+<div class="class-action-area" style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 30px;">
+    
+    <div class="form-group class-select-group" style="flex-grow: 1; display: flex; align-items: center; gap: 15px;">
+        
+        <label for="kelas-tingkatan" style="margin-bottom: 0; font-weight: bold; min-width: 120px; text-align: right;">
+            Kelas/Tingkatan
+        </label>
+        
+        <select id="kelas-tingkatan" class="profile-input" style="flex-grow: 1;">
+            <option value="">-- Pilih Tingkatan --</option>
+            <option value="idat_awal">Idat Awal</option>
+            <option value="dewasa">Dewasa</option>
+        </select>
+    </div>
+
+    <button id="btn-tambah-kelas" class="action-btn" style="padding: 10px 15px; height: 45px; white-space: nowrap;">
+        <i class="fas fa-plus-circle"></i> Tambah Kelas
+    </button>
+</div>
+
+
+<section class="pendaftar-table">
+    <div class="table-wrapper"> 
+        <table id="kelas-list-table">
+            <thead>
+                <tr class="table-header-row">
+                    <th>No.</th>
+                    <th>Nama Kelas</th>
+                    <th>Kapasitas</th>
+                    <th>Kategori</th>
+                    <th>Pengajar</th>
+                    <th style="width: 100px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="kelas-table-body">
+                <tr class="table-data-row" data-id="1">
+                    <td>1</td>
+                    <td>Idat Awal</td>
+                    <td>15-20</td>
+                    <td>dewasa</td>
+                    <td>SITI</td>
+                    <td class="table-actions">
+                        <button class="btn-action btn-add-pengajar"><i class="fas fa-plus"></i></button>
+                        <button class="btn-action btn-delete-kelas"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+<div id="tambah-kelas-modal" class="custom-modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Tambah Kelas</h2>
+            <span class="close-btn" id="close-kelas-modal">&times;</span>
+        </div>
+        <form id="form-tambah-kelas" class="modal-form">
+            <div class="form-row-popup">
+                <label for="kelas-tingkatan-popup">Kelas/Tingkatan</label>
+                <input type="text" id="kelas-tingkatan-popup" class="profile-input" placeholder="Masukkan Tingkatan Kelas">
+            </div>
+            
+            <div class="form-row-popup split-2">
+                <div class="form-group-popup">
+                    <label for="pengajar-popup">Pengajar</label>
+                    <select id="pengajar-popup" class="profile-input">
+                        <option value="">-- Pilih Pengajar --</option>
+                        <option value="SITI">SITI</option>
+                        <option value="DAVID">DAVID</option>
+                    </select>
+                </div>
+                <div class="form-group-popup">
+                    <label for="kapasitas-popup">Kapasitas</label>
+                    <input type="number" id="kapasitas-popup" class="profile-input" placeholder="Misalnya: 15">
+                </div>
+            </div>
+
+            <div class="form-row-popup">
+                <label for="kategori-popup">Kategori</label>
+                <input type="text" id="kategori-popup" class="profile-input" placeholder="Misalnya: Dewasa">
+            </div>
+
+            <div class="form-row-popup split-2">
+                <div class="form-group-popup">
+                    <label for="waktu-awal-popup">Waktu Awal Periode</label>
+                    <input type="date" id="waktu-awal-popup" class="profile-input">
+                </div>
+                <div class="form-group-popup">
+                    <label for="waktu-selesai-popup">Waktu Selesai Periode</label>
+                    <input type="date" id="waktu-selesai-popup" class="profile-input">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="action-btn save-btn" id="btn-simpan-kelas-modal">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<button id="back-to-dashboard" class="action-btn back-btn" style="margin-top: 20px;">
+    <i class="fas fa-arrow-left"></i> Kembali
+</button>

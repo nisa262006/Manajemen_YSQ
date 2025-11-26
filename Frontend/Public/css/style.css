@@ -87,65 +87,177 @@
   
 
   /* ------------------- LOGIN PAGE ------------------- */
+/* Halaman Login */
+body {
+  /* Background menggunakan img.jpg di tengah layar */
+  background-color: #1A473D; 
+  background-image: url('../images/img.jpg');
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
 .login-container {
-    height: 100vh;
-    width: 100%;
-    background: url("../images/img.jpg") no-repeat center center/cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  /* Latar Belakang semi-transparan dengan efek Blur */
+  background-color: rgba(26, 71, 61, 0.90); /* Hijau gelap semi-transparan */
+ 
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  width: 350px;
+  text-align: center;
+  border: 1px solid #154A38; /* Garis emas tipis */
+}
+
+.header {
+  margin-bottom: 30px; /* Jarak antara header dan input pertama */
+}
+
+/* --- Styling Logo dan Teks di Bawahnya --- */
+.logo-image {
+  max-width: 150px; /* Ukuran logo disesuaikan */
+  height: auto; 
+  margin-bottom: 5px; /* Jarak logo ke teks di bawahnya */
+}
+
+.organization-name {
+  color: #C5AA6F; /* Warna emas */
+  font-size: 15x; /* Ukuran font subtitle */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0; 
+  margin-bottom: 25px; /* Jarak subtitle ke input pertama */
+}
+
+/* --- Styling Form Input dan Tombol --- */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px 45px 15px 15px;
+  border: 1px solid #4A8C7B;
+  border-radius: 20px; /* Sudut input melengkung */
+  background-color: #246050; 
+  color: white;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.input-group input::placeholder {
+  color: #A9A9A9;
+}
+
+.input-group input:focus {
+  border: 1px solid var(--color-gold); /* Border emas saat fokus */
+  background-color: #4A8C7B; /* Sedikit lebih terang saat fokus */
+  outline: none; /* Hilangkan garis default browser */
+}
+
+/* Efek ketika input sudah terisi/tidak kosong (opsional) */
+.input-group input:not(:placeholder-shown) {
+  border: 1px solid #246050; 
+}
+
+.input-group .icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #C5AA6F; /* Warna ikon emas */
+  pointer-events: none;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 15px; 
+  top: 50%;
+  transform: translateY(-50%);
+  color: #C5AA6F; /* Warna ikon emas */
+  cursor: pointer; /* WAJIB: Agar bisa diklik */
+  pointer-events: auto;
+  z-index: 10;
+  font-size: 1.2em;
+}
+
+.forgot-password {
+  color: #C5AA6F; /* Warna teks emas */
+  text-decoration: none;
+  font-size: 14px;
+  text-align: right;
+  margin-bottom: 30px;
+  display: block;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.login-button {
+  /* Gradient tombol Login */
+  background: linear-gradient(to bottom, #E8A848, #C5AA6F); 
+  color: #1A473D;
+  border: none;
+  padding: 15px;
+  border-radius: 20px; /* Sudut tombol melengkung */
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.login-button:hover {
+  background: linear-gradient(to top, #E8A848, #C5AA6F);
+}
+
+/* Menonaktifkan ikon mata bawaan dari Chrome/Browser */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+::-webkit-reveal,
+::-webkit-input-placeholder {
+  opacity: 1 !important;
+}
+/* Menghilangkan ikon 'show password' bawaan di Chrome */
+input[type="password"]::-ms-reveal {
+  display: none;
+}
+/* Menyembunyikan ikon bawaan yang ditambahkan di beberapa browser modern */
+input[type="password"]::-webkit-reveal {
+  display: none;
+}
+
+/* Pastikan input tidak memiliki padding kanan yang terlalu kecil */
+.input-group input {
+  /* Pastikan padding kanan ini cukup besar untuk menampung ikon emas Anda (misal 45px) */
+  padding: 15px 45px 15px 15px; 
+}
+
+/* Media Queries untuk Responsif */
+@media (max-width: 400px) {
+  .login-container {
+      width: 90%;
+      padding: 30px 20px;
   }
-  
-  .login-box {
-    background-color: rgba(0, 50, 50, 0.8);
-    padding: 40px 50px;
-    border-radius: 20px;
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-  }
-  
-  .login-box .logo {
-    width: 100px;
-    margin-bottom: 15px;
-  }
-  
-  .login-box h2 {
-    color: #d4a017;
-    margin-bottom: 25px;
-  }
-  
-  .login-box input {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border: none;
-    border-radius: 8px;
-    outline: none;
-    font-size: 15px;
-  }
-  
-  .login-box button {
-    width: 100%;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .login-box .back {
-    margin-top: 15px;
-  }
-  
-  .login-box .back a {
-    color: #fff;
-    text-decoration: none;
-    transition: 0.3s;
-  }
-  
-  .login-box .back a:hover {
-    color: #d4a017;
-  }
+}
   
 
 /* ------------------- REGISTRASI PAGE ------------------- */

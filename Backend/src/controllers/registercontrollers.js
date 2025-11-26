@@ -48,14 +48,13 @@ exports.getAllPendaftar = async (req, res) => {
   }
 };
 
+
 /* ================================
-   3. Terima pendaftar
+   3. Terima pendaftar (FINAL)
 ================================ */
 exports.terimaPendaftar = async (req, res) => {
   try {
-
     const id = req.params.id_pendaftar;
-    console.log("ID PARAM :", id); // cek di terminal
 
     const cek = await db.query(
       `SELECT * FROM pendaftar WHERE id_pendaftar = $1`,
@@ -68,35 +67,55 @@ exports.terimaPendaftar = async (req, res) => {
 
     const p = cek.rows[0];
 
-    // 2. Umur -> kategori
+    /* ============================
+       1. Tentukan kategori umur
+    ============================= */
     const tahunLahir = new Date(p.tanggal_lahir).getFullYear();
     const tahunSekarang = new Date().getFullYear();
     const umur = tahunSekarang - tahunLahir;
-
     const kategori = umur <= 12 ? "anak" : "dewasa";
 
-    // 3. Hash password default
+    /* ============================
+       2. Hash password default
+    ============================= */
     const bcrypt = require("bcrypt");
     const defaultPass = await bcrypt.hash("default123", 10);
 
-    // 4. Buat akun user baru (sesuai tabel)
-    const newUser = await db.query(
-      `INSERT INTO users (email, password_hash, role, status_user)
-       VALUES ($1, $2, 'santri', 'aktif')
-       RETURNING id_users`,
-      [p.email, defaultPass]
-    );
-
-    const id_users = newUser.rows[0].id_users;
-
-    // 5. Auto-generate NIS
+    /* ============================
+       3. Generate NIS otomatis
+    ============================= */
     const getMax = await db.query(`SELECT MAX(id_santri) AS max FROM santri`);
     const next = (getMax.rows[0].max || 0) + 1;
 
     const tahun = new Date().getFullYear();
-    const nis = `YSQ-${tahun}-${String(next).padStart(4, "0")}`;
+    const nis = `YSQ-${tahun}-${String(next).padStart(4, "0")}`; // YSQ-2025-0001
 
-    // 6. Insert santri
+    /* ============================
+       4. Generate USERNAME wajib
+          Format: nis_nama (lowercase)
+    ============================= */
+    const username = `${nis}_${p.nama.toLowerCase().replace(/\s+/g, "")}`;
+
+    /* ============================
+       5. Buat user
+       email boleh null
+    ============================= */
+    const newUser = await db.query(
+      `INSERT INTO users (email, username, password_hash, role, status_user)
+       VALUES ($1, $2, $3, 'santri', 'aktif')
+       RETURNING id_users`,
+      [
+        p.email || null,     // boleh null
+        username,            // WAJIB
+        defaultPass
+      ]
+    );
+
+    const id_users = newUser.rows[0].id_users;
+
+    /* ============================
+       6. Insert ke tabel santri
+    ============================= */
     await db.query(
       `INSERT INTO santri 
        (id_users, nis, nama, kategori, no_wa, email, tempat_lahir, tanggal_lahir, status)
@@ -107,13 +126,15 @@ exports.terimaPendaftar = async (req, res) => {
         p.nama,
         kategori,
         p.no_wa,
-        p.email,
+        p.email || null,
         p.tempat_lahir,
         p.tanggal_lahir,
       ]
     );
 
-    // 7. Update status pendaftar
+    /* ============================
+       7. Update status pendaftar
+    ============================= */
     await db.query(
       `UPDATE pendaftar SET status='diterima' WHERE id_pendaftar=$1`,
       [id]
@@ -123,7 +144,8 @@ exports.terimaPendaftar = async (req, res) => {
       message: "Pendaftar berhasil diterima",
       id_users,
       nis,
-      kategori,
+      username,
+      kategori
     });
 
   } catch (err) {

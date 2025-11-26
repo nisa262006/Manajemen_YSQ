@@ -1,0 +1,57 @@
+ <header class="content-header page-header">
+                <h1 class="header-title" id="page-content-title">Tambah Siswa</h1> 
+                <div class="admin-profile">
+                    <span class="admin-text">Rabu, 19 November 2025</span>
+                </div>
+            </header>
+
+            <section class="stats-cards content-stats-page">
+                <div class="stat-card"><span class="stat-label">Pendaftar</span><span class="stat-value">12</span></div>
+                <div class="stat-card"><span class="stat-label">Menunggu verifikasi</span><span class="stat-value">12</span></div>
+                <div class="stat-card"><span class="stat-label">Diterima</span><span class="stat-value">12</span></div>
+                <div class="stat-card"><span class="stat-label">Sisa kuota</span><span class="stat-value">12</span></div>
+            </section>
+
+            <div class="header-actions">
+                <input type="text" placeholder="Cari Siswa..." class="search-input">
+                <div>
+                    <button class="action-btn export-btn"><i class="fas fa-file-export"></i> Ekspor Laporan</button>
+                    <button class="action-btn reset-btn">Reset Pendaftaran Tahunan</button>
+                </div>
+            </div>
+
+            <section class="pendaftar-table">
+                <div class="section-title">Daftar Siswa</div>
+                <div class="table-wrapper"> 
+                    <table id="siswa-list-table">
+                        <thead>
+                            <tr class="table-header-row">
+                                <th>No.</th><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>Nomor WhatsApp</th><th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="siswa-table-body">
+                            <tr class="table-data-row">
+                                <td>1</td><td>Ahmad Zaki</td><td>Bogor</td><td>28 Oktober 2010</td><td>0986478997543</td>
+                                <td class="status-cell">
+                                   <button class="status-button status-detail">Lihat Detail</button>
+                                </td>
+                            </tr>
+                            <tr class="table-data-row">
+                                <td>2</td><td>Siti Aminah</td><td>Bandung</td><td>10 Mar 2010</td><td>0855xxxxxx</td>
+                                <td class="status-cell">
+                                <button class="status-button status-detail">Lihat Detail</button>
+                                </td>
+                            </tr>
+                            <tr class="table-data-row">
+                                <td>3</td><td>Budi Santoso</td><td>Jakarta</td><td>20 Jan 2005</td><td>0812xxxxxx</td>
+                                <td class="status-cell">
+                                <button class="status-button status-detail">Lihat Detail</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <button id="back-to-dashboard" class="action-btn back-btn" style="margin-top: 20px;">
+    <i class="fas fa-arrow-left"></i> Kembali
+            </button>

@@ -5,50 +5,54 @@ const jwt = require("jsonwebtoken");
 // ==================== LOGIN ====================
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body; 
+    // identifier = username ATAU email
 
-    console.log("REQUEST MASUK: ", email);
+    console.log("REQUEST MASUK LOGIN:", identifier);
 
-    // Query user dari database
+    // Query user berdasarkan username ATAU email
     const result = await db.query(
-      'SELECT * FROM "users" WHERE email = $1',
-      [email]
+      `SELECT * FROM "users" 
+       WHERE username = $1 OR email = $1`,
+      [identifier]
     );
 
     if (result.rowCount === 0) {
-      return res.status(400).json({ message: "Email atau password salah" });
+      return res.status(400).json({ message: "Username/Email atau password salah" });
     }
 
     const user = result.rows[0];
 
-    // Cocokkan password hash
+    // Periksa password
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
-      return res.status(400).json({ message: "Email atau password salah" });
+      return res.status(400).json({ message: "Username/Email atau password salah" });
     }
 
-    // Buat JWT token
+    // Buat token baru
     const token = jwt.sign(
       {
         id_users: user.id_users,
+        username: user.username, // ditambahkan
         role: user.role,
-        status: user.status_user
+        status_user: user.status_user
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    res.json({
+    return res.json({
       message: "Login berhasil",
       token,
-      role: user.role,
       userId: user.id_users,
+      username: user.username,
+      role: user.role,
       status: user.status_user
     });
 
   } catch (err) {
     console.error("LOGIN ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
 
@@ -56,10 +60,11 @@ exports.login = async (req, res) => {
 // ==================== GET ME ====================
 exports.getMe = async (req, res) => {
   try {
-    const userId = req.users.id_users;
+    const userId = req.users.id_users; // dari middleware JWT
 
     const result = await db.query(
-      'SELECT id_users, nama_users, email, role, status_user FROM "users" WHERE id_users = $1',
+      `SELECT id_users, username, nama_users, email, role, status_user 
+       FROM "users" WHERE id_users = $1`,
       [userId]
     );
 
@@ -67,10 +72,10 @@ exports.getMe = async (req, res) => {
       return res.status(404).json({ message: "User tidak ditemukan" });
     }
 
-    res.json(result.rows[0]);
+    return res.json(result.rows[0]);
 
   } catch (err) {
     console.error("GETME ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };

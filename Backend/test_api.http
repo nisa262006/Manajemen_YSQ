@@ -3,7 +3,7 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@ysq.com",
+  "identifier": "admin@ysq.com",
   "password": "123456"
 }
 
@@ -12,7 +12,7 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "Maya.pengajar@ysq.com",
+  "identifier": "Maya.pengajar@ysq.com",
   "password": "123456"
 }
 
@@ -21,7 +21,7 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "santri1@ysq.com",
+  "identifier": "ne@gmail.com",
   "password": "123456"
 }
 
@@ -40,8 +40,8 @@ POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama":"yusra",
-  "email":"yusra@gmail.com",
+  "nama":"nene",
+  "email":"ne@gmail.com",
   "no_wa":"081234567890",
   "tempat_lahir":"Bogor",
   "tanggal_lahir":"2000-06-01"
@@ -49,19 +49,19 @@ Content-Type: application/json
 
 ### get pendaftaran
 GET http://localhost:5000/pendaftar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 ### Admin Terima Pendaftar
-PUT http://localhost:5000/pendaftar/terima/10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+PUT http://localhost:5000/pendaftar/terima/13
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 ### DELETE PENDAFTAR
-DELETE http://localhost:5000/pendaftar/12
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+DELETE http://localhost:5000/pendaftar/13
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 ### RESET PENDAFTAR (HAPUS SEMUA KECUALI YANG DITERIMA)
 DELETE http://localhost:5000/pendaftar/reset/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 ============== KELAS ===================
 
@@ -70,15 +70,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ##################################################
 
 POST http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 Content-Type: application/json
 
 {
-  "nama_kelas": "Tahsin Dewasa F",
+  "nama_kelas": "Tahsin Dewasa A anak",
   "kapasitas": 20,
   "id_pengajar": 1,
   "id_program": 1,
-  "kategori": "dewasa"
+  "kategori": "anak"
 }
 
 
@@ -87,26 +87,26 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 
 ##################################################
 ### 3. DETAIL KELAS (ADMIN) BENER
 ##################################################
 
-GET http://localhost:5000/kelas/detail/9
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+GET http://localhost:5000/kelas/detail/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 ##################################################
 ### 4. UPDATE KELAS (ADMIN) BENER
 ##################################################
 
-PUT http://localhost:5000/kelas/edit/10
+PUT http://localhost:5000/kelas/edit/11
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 {
-  "nama_kelas": "Kelas Tahsin F anak",
+  "nama_kelas": "Kelas Tahsin A anak",
   "kapasitas": 15,
   "id_pengajar": 1,
   "id_program": 1,
@@ -118,8 +118,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ### 5. DELETE KELAS (ADMIN) BENER
 ##################################################
 
-DELETE http://localhost:5000/kelas/hapus/9
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+DELETE http://localhost:5000/kelas/hapus/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 
 ##################################################
@@ -127,12 +127,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwic
 ### memasukkan santri ke tabel santri_kelas (betul)
 ##################################################
 
-POST http://localhost:5000/kelas/10/santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
+POST http://localhost:5000/kelas/11/santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 Content-Type: application/json
 
 {
-  "id_santri": 11
+  "id_santri": 14
 }
 
 
@@ -141,13 +141,13 @@ Content-Type: application/json
 ### menghapus dari kelas lama → tambah ke kelas baru
 ##################################################
 
-PUT http://localhost:5000/kelas/pindah/5
-Authorization: Bearer <token_admin>
+PUT http://localhost:5000/kelas/pindah/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 Content-Type: application/json
 
 {
-  "id_kelas_lama": 10,
-  "id_kelas_baru": 9
+  "id_kelas_lama": 14,
+  "id_kelas_baru": 4
 }
 
 
@@ -157,7 +157,7 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwicm9sZSI6InBlbmdhamFyIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5ODY1MDUsImV4cCI6MTc2NDA3MjkwNX0.D_kI2jb6iSWIvM9_VatE6_55minoSUJ-VBy6JRcJ89Q
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOm51bGwsInJvbGUiOiJwZW5nYWphciIsInN0YXR1c191c2VyIjoiQWt0aWYiLCJpYXQiOjE3NjQxNjExNjQsImV4cCI6MTc2NDI0NzU2NH0.DVIXXb7iTt8IB8msusgcQa7PK-2DIBDsMPpGNm2IwFM
 
 
 ##################################################
@@ -165,4 +165,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwic
 ##################################################
 
 GET http://localhost:5000/kelas/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Mywicm9sZSI6InNhbnRyaSIsInN0YXR1cyI6IkFrdGlmIiwiaWF0IjoxNzY0MDc0NDI5LCJleHAiOjE3NjQxNjA4Mjl9.KoKG6QH6QHCNaSEpbFjgfChf49vQH7BE2LAdFO5ScJc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTIsInVzZXJuYW1lIjpudWxsLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDE2MjgzNiwiZXhwIjoxNzY0MjQ5MjM2fQ.b30-O5KYvD3fnVDGR2OEvEJu32bi7pS-8c8_jUbELCs
