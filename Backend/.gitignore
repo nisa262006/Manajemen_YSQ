@@ -1,10 +1,11 @@
-# Dependencies
+# file penting, jangan dicommit
 /node_modules
 
-# Environment variables
+# Environment variables file peniting, jangan dicommit
 .env
+package-lock.json
 
-# Docker
+# Docker file penting, jangan dicommit
 manajemen_db
 
 # Konfig personal, jangan dicommit

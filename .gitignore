@@ -1,0 +1,11 @@
+# Dependencies
+/node_modules
+
+# Environment variables
+.env
+
+# Docker
+manajemen_db
+
+# Konfig personal, jangan dicommit
+.vscode
