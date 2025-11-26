@@ -1,11 +1,16 @@
-# Dependencies
-/node_modules
+# ========================================
+#  FILE & FOLDER PENTING (JANGAN DI-COMMIT)
+# ========================================
+
+# Node modules (besar dan tidak perlu masuk git)
+node_modules/
 
 # Environment variables
-.env
+Backend/.env
 
-# Docker
-manajemen_db
+# Jika manajemen_db adalah file, pakai yang ini:
+manajemen_db/
+db.js/
 
-# Konfig personal, jangan dicommit
-.vscode
+# VSCode personal settings
+.vscode/
