@@ -10,7 +10,7 @@ Backend/.env
 
 # Jika manajemen_db adalah file, pakai yang ini:
 manajemen_db/
-db.js/
+Backend/src/config/db.js
 
 # VSCode personal settings
 .vscode/
