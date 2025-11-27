@@ -165,3 +165,76 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 
 GET http://localhost:5000/kelas/santri/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDIyMTc1MSwiZXhwIjoxNzY0MzA4MTUxfQ.x6BWQLJgdN_eVnWVmhOpCB5Q30F3T1IeDDVMtOJmTFc
+
+
+
+
+##################################################
+### 1. TAMBAH JADWAL (ADMIN ONLY)
+##################################################
+
+POST http://localhost:5000/jadwal
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+Content-Type: application/json
+
+{
+  "id_kelas": 8,
+  "hari": "Senin",
+  "jam_mulai": "08:00",
+  "jam_selesai": "10:00",
+  "lokasi": "Ruang Kelas 1"
+}
+
+
+
+##################################################
+### 2. LIST SEMUA JADWAL (ADMIN)
+##################################################
+
+GET http://localhost:5000/jadwal
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+
+
+##################################################
+### 3. UPDATE JADWAL (ADMIN)
+##################################################
+
+PUT http://localhost:5000/jadwal/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+Content-Type: application/json
+
+{
+  "hari": "Senin",
+  "jam_mulai": "09:00",
+  "jam_selesai": "11:00",
+  "lokasi": "Aula Utama"
+}
+
+
+
+##################################################
+### 4. DELETE JADWAL (ADMIN)
+##################################################
+
+DELETE http://localhost:5000/jadwal/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+
+
+
+##################################################
+### 5. JADWAL PENGAJAR (KHUSUS PENGAJAR)
+### Hanya menampilkan jadwal kelas yang dia ampu
+##################################################
+
+GET http://localhost:5000/jadwal/pengajar/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjIxMzgyLCJleHAiOjE3NjQzMDc3ODJ9.rc7aLUfiYDMG4FYFFIjCanmUJtxlYQbe2NhSfjxlf18
+
+
+
+##################################################
+### 6. JADWAL SANTRI (KHUSUS SANTRI)
+### Mengambil jadwal dari kelas tempat santri terdaftar
+##################################################
+
+GET http://localhost:5000/jadwal/santri/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDIyMTc1MSwiZXhwIjoxNzY0MzA4MTUxfQ.x6BWQLJgdN_eVnWVmhOpCB5Q30F3T1IeDDVMtOJmTFc
