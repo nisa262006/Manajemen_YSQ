@@ -3,7 +3,7 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "admin@ysq.com",
+  "identifier": "admin1",
   "password": "123456"
 }
 
@@ -21,7 +21,7 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "ne@gmail.com",
+  "identifier": "YSQ-2025-0015_neng",
   "password": "123456"
 }
 
@@ -40,8 +40,8 @@ POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama":"nene",
-  "email":"ne@gmail.com",
+  "nama":"neng",
+  "email":"neng@gmail.com",
   "no_wa":"081234567890",
   "tempat_lahir":"Bogor",
   "tanggal_lahir":"2000-06-01"
@@ -49,11 +49,11 @@ Content-Type: application/json
 
 ### get pendaftaran
 GET http://localhost:5000/pendaftar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
 
 ### Admin Terima Pendaftar
-PUT http://localhost:5000/pendaftar/terima/13
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+PUT http://localhost:5000/pendaftar/terima/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
 
 ### DELETE PENDAFTAR
 DELETE http://localhost:5000/pendaftar/13
@@ -70,11 +70,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ##################################################
 
 POST http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
 Content-Type: application/json
 
 {
-  "nama_kelas": "Tahsin Dewasa A anak",
+  "nama_kelas": "Tahsin Dewasa B anak",
   "kapasitas": 20,
   "id_pengajar": 1,
   "id_program": 1,
@@ -87,14 +87,14 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
 
 
 ##################################################
 ### 3. DETAIL KELAS (ADMIN) BENER
 ##################################################
 
-GET http://localhost:5000/kelas/detail/3
+GET http://localhost:5000/kelas/detail/12
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 ##################################################
@@ -106,7 +106,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
 {
-  "nama_kelas": "Kelas Tahsin A anak",
+  "nama_kelas": "Kelas Tahsin B anak",
   "kapasitas": 15,
   "id_pengajar": 1,
   "id_program": 1,
@@ -118,8 +118,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### 5. DELETE KELAS (ADMIN) BENER
 ##################################################
 
-DELETE http://localhost:5000/kelas/hapus/10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+DELETE http://localhost:5000/kelas/hapus/12
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
 
 
 ##################################################
@@ -127,12 +127,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### memasukkan santri ke tabel santri_kelas (betul)
 ##################################################
 
-POST http://localhost:5000/kelas/11/santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+POST http://localhost:5000/kelas/6/santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
 Content-Type: application/json
 
 {
-  "id_santri": 14
+  "id_santri": 15
 }
 
 
@@ -141,13 +141,13 @@ Content-Type: application/json
 ### menghapus dari kelas lama → tambah ke kelas baru
 ##################################################
 
-PUT http://localhost:5000/kelas/pindah/14
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+PUT http://localhost:5000/kelas/pindah/15
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
 Content-Type: application/json
 
 {
-  "id_kelas_lama": 14,
-  "id_kelas_baru": 4
+  "id_kelas_lama": 6,
+  "id_kelas_baru": 8
 }
 
 
@@ -157,12 +157,11 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOm51bGwsInJvbGUiOiJwZW5nYWphciIsInN0YXR1c191c2VyIjoiQWt0aWYiLCJpYXQiOjE3NjQxNjExNjQsImV4cCI6MTc2NDI0NzU2NH0.DVIXXb7iTt8IB8msusgcQa7PK-2DIBDsMPpGNm2IwFM
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjIxMzgyLCJleHAiOjE3NjQzMDc3ODJ9.rc7aLUfiYDMG4FYFFIjCanmUJtxlYQbe2NhSfjxlf18
 
 ##################################################
 ### 9. SANTRI MELIHAT KELAS MILIKNYA (BELUM)
 ##################################################
 
 GET http://localhost:5000/kelas/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTIsInVzZXJuYW1lIjpudWxsLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDE2MjgzNiwiZXhwIjoxNzY0MjQ5MjM2fQ.b30-O5KYvD3fnVDGR2OEvEJu32bi7pS-8c8_jUbELCs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDIyMTc1MSwiZXhwIjoxNzY0MzA4MTUxfQ.x6BWQLJgdN_eVnWVmhOpCB5Q30F3T1IeDDVMtOJmTFc

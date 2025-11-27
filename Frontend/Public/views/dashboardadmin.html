@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Sahabat Quran</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
 
     <div class="container">
+
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="logo">
                 <img src="../images/LogoYSQ.png" alt="Sahabat Quran" class="logo-img">
@@ -38,7 +43,9 @@
             </div>
         </aside>
 
+        <!-- MAIN CONTENT -->
         <main class="main-content">
+
             <header class="dashboard-header">
                 <h1 class="header-title">Dashboard</h1>
                 <div class="admin-profile">
@@ -47,6 +54,7 @@
                 </div>
             </header>
 
+            <!-- STAT CARDS -->
             <section class="stats-cards">
                 <div class="stat-card total-santri-dewasa">
                     <span class="stat-label">Total Santri Dewasa</span>
@@ -70,6 +78,7 @@
                 </div>
             </section>
 
+            <!-- QUICK ACTION -->
             <section class="quick-actions">
                 <div class="section-title"><i class="fas fa-check-circle"></i> Aksi Cepat</div>
                 <div class="action-buttons">
@@ -79,8 +88,10 @@
                 </div>
             </section>
 
+            <!-- TABLE PENDAFTAR -->
             <section class="pendaftar-table">
                 <div class="section-title">Siswa Pendaftar</div>
+
                 <table>
                     <thead>
                         <tr>
@@ -92,6 +103,7 @@
                             <th>Status</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <tr>
                             <td>1.</td>
@@ -120,9 +132,12 @@
                     </tbody>
                 </table>
             </section>
+
         </main>
-</section>
+
     </div>
+
+    <!-- MINI PROFILE POPUP -->
     <div id="popup-profile-mini" class="popup-mini-container">
         <div class="profile-card mini-card">
             <div class="profile-avatar-mini">R</div>
@@ -134,10 +149,12 @@
         </div>
     </div>
 
+    <!-- PROFILE SETTING POPUP -->
     <div id="popup-profile-setting" class="popup-overlay">
         <div class="popup-content">
             <h3 class="popup-title">Profile</h3>
             <span class="close-btn" id="close-setting-popup">&times;</span>
+
             <div class="profile-form-card">
                 <div class="avatar-edit-area">
                     <div class="profile-avatar-large">R</div>
@@ -148,10 +165,12 @@
                         <label>Nama Lengkap :</label> 
                         <input type="text" id="profile-name-input" value="Rizka Sugiarto" class="profile-input">
                     </div>
+
                     <div>
                         <label>Email :</label> 
                         <input type="email" id="profile-email-input" value="admin@pesantren.com" class="profile-input">
                     </div>
+
                     <div>
                         <label>No. Telepon :</label> 
                         <input type="text" id="profile-phone-input" value="0812-xxx-xxx" class="profile-input">
@@ -161,55 +180,59 @@
                 <div class="popup-actions">
                     <button class="action-btn-popup save-btn">Simpan</button>
                     <button class="action-btn-popup cancel-btn">Batal</button>
-            </div>
-            </div>
-        </div>
-    </div>
-            <div id="popup-detail-pendaftar" class="popup-overlay">
-    <div class="popup-content popup-detail-content">
-        <h3 class="popup-title">Detail Pendaftar</h3>
-        <span class="close-btn" id="close-detail-popup">&times;</span>
-        
-        <div class="detail-form-card">
-            
-            <div class="detail-field">
-                <label>Nama</label>
-                <div class="detail-value" id="detail-name"></div>
-            </div>
-
-            <div class="detail-field">
-                <label>Tempat Lahir</label>
-                <div class="detail-value" id="detail-tempat-lahir"></div>
-            </div>
-
-            <div class="detail-field">
-                <label>Tanggal Lahir</label>
-                <div class="detail-value" id="detail-tanggal-lahir"></div>
-            </div>
-
-            <div class="detail-field">
-                <label>Nomor WhatsApp</label>
-                <div class="detail-value" id="detail-whatsapp"></div>
-            </div>
-
-            <div class="detail-field">
-                <label>Email</label>
-                <div class="detail-value" id="detail-email"></div>
-            </div>
-
-            <h4 class="status-title" id="detail-status-title">Status Menunggu Verifikasi</h4>
-            
-            <div class="popup-actions detail-actions">
-                <button class="action-btn-popup detail-diterima">Diterima</button>
-                <button class="action-btn-popup detail-ditolak">Ditolak</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- DETAIL PENDAFTAR -->
+    <div id="popup-detail-pendaftar" class="popup-overlay">
+        <div class="popup-content popup-detail-content">
+
+            <h3 class="popup-title">Detail Pendaftar</h3>
+            <span class="close-btn" id="close-detail-popup">&times;</span>
+            
+            <div class="detail-form-card">
+                <div class="detail-field">
+                    <label>Nama</label>
+                    <div class="detail-value" id="detail-name"></div>
+                </div>
+
+                <div class="detail-field">
+                    <label>Tempat Lahir</label>
+                    <div class="detail-value" id="detail-tempat-lahir"></div>
+                </div>
+
+                <div class="detail-field">
+                    <label>Tanggal Lahir</label>
+                    <div class="detail-value" id="detail-tanggal-lahir"></div>
+                </div>
+
+                <div class="detail-field">
+                    <label>Nomor WhatsApp</label>
+                    <div class="detail-value" id="detail-whatsapp"></div>
+                </div>
+
+                <div class="detail-field">
+                    <label>Email</label>
+                    <div class="detail-value" id="detail-email"></div>
+                </div>
+
+                <h4 class="status-title" id="detail-status-title">Status Menunggu Verifikasi</h4>
+                
+                <div class="popup-actions detail-actions">
+                    <button class="action-btn-popup detail-diterima">Diterima</button>
+                    <button class="action-btn-popup detail-ditolak">Ditolak</button>
+                </div>
+            </div>
+
         </div>
-        <div id="notification-toast" class="toast-notification"></div>
-</div>
-</body>
+    </div>
+
+    <div id="notification-toast" class="toast-notification"></div>
+
+    <!-- JAVASCRIPT -->
     <script src="../js/admin.js"></script>
+
 </body>
 </html>

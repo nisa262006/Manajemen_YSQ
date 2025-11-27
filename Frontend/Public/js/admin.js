@@ -309,7 +309,7 @@ class UIManager {
     // **********************************************
     async loadDaftarKelasSantriContent() {
         // Panggil loadContent untuk memuat daftar_kelas_santri.html dan mengaktifkan sidebar 'Daftar Kelas'
-        this.loadContent('Daftar Kelas', 'daftar_kelas_santri.html'); 
+        this.loadContent('Daftar Kelas', './views/daftar_kelas_santri.html'); 
     }
 
     // **********************************************
@@ -319,7 +319,7 @@ class UIManager {
         if (!this.mainContent) return;
 
         try {
-            const targetFilename = 'tambah_kelas.html'; 
+            const targetFilename = './views/tambah_kelas.html'; 
             const response = await fetch(targetFilename);
             
             if (!response.ok) {
@@ -532,7 +532,7 @@ class UIManager {
                     );
                     if (pengajarMenuItem) {
                         pengajarMenuItem.classList.add('active');
-                        this.loadContent('Daftar Pengajar', 'daftar_pengajar.html');
+                        this.loadContent('Daftar Pengajar', './views/daftar_pengajar.html');
                     } else {
                         this.loadDashboardContent(); // Default ke Dashboard
                     }
@@ -567,7 +567,7 @@ class UIManager {
         }
 
         try {
-            const targetFilename = 'detail_pengajar.html'; 
+            const targetFilename = './views/detail_pengajar.html'; 
             const response = await fetch(targetFilename);
             
             if (!response.ok) {
@@ -614,14 +614,14 @@ class UIManager {
 
             // Menentukan file yang akan di-fetch
             if (pageTitle === 'Tambah Siswa') {
-                targetFilename = 'tambah_siswa.html';
+                targetFilename = './views/tambah_siswa.html';
             } else if (pageTitle === 'Tambah Pengajar') {
-                targetFilename = 'tambah_pengajar.html'; 
+                targetFilename = './views/tambah_pengajar.html'; 
             } else if (pageTitle === 'Daftar Pengajar') { 
-                targetFilename = 'daftar_pengajar.html'; 
+                targetFilename = './views/daftar_pengajar.html'; 
             } else if (pageTitle === 'Daftar Kelas') {
                 // KOREKSI NAMA FILE: daftar_kelas_santri.html
-                targetFilename = 'daftar_kelas_santri.html';
+                targetFilename = './views/daftar_kelas_santri.html';
             }
             
             const response = await fetch(targetFilename);
@@ -784,32 +784,52 @@ class UIManager {
     // * FUNGSI MODIFIKASI: initMenuNavigation *
     // **********************************************
     initMenuNavigation() {
-        this.menuItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Hanya hapus kelas active, tapi jangan segera tambahkan kelas active di sini
-                // Karena loadContent akan menanganinya
-                this.menuItems.forEach(i => i.classList.remove('active'));
-                // item.classList.add('active'); // Dihapus sementara
-                
-                const menuText = item.textContent.trim();
-                let filename = `${menuText.toLowerCase().replace(/\s/g, '_')}.html`;
+    this.menuItems.forEach(item => {
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
 
-                if (menuText === 'Dashboard') {
+            const menu = item.textContent.trim();
+            this.menuItems.forEach(i => i.classList.remove("active"));
+            item.classList.add("active");
+
+            // Routing FIX
+            switch (menu) {
+
+                case "Dashboard":
                     this.loadDashboardContent();
-                } else if (menuText === 'Daftar Kelas') { 
-                    // Menggunakan loadContent untuk memastikan sidebar aktif dan nama file baru dimuat
-                    this.loadContent(menuText, 'daftar_kelas_santri.html');
-                } else if (!menuText.includes('Setting') && !menuText.includes('Keluar')) {
-                    
-                    if (menuText === 'Daftar Pengajar') {
-                        filename = 'daftar_pengajar.html';
-                    }
-                    this.loadContent(menuText, filename);
-                }
-            });
+                    break;
+            
+                case "Daftar Pengajar":
+                    this.loadContent("Daftar Pengajar", "../views/daftar_pengajar.html");
+                    break;
+            
+                case "Daftar Kelas":
+                    this.loadContent("Daftar Kelas", "../views/daftar_kelas_santri.html");
+                    break;
+            
+                case "Daftar Santri":
+                    this.loadContent("Daftar Santri", "../views/daftar_santri.html");
+                    break;
+            
+                case "Daftar Jadwal":
+                    this.loadContent("Daftar Jadwal", "../views/daftar_jadwal.html");
+                    break;
+            
+                case "Riwayat Absensi":
+                    this.loadContent("Riwayat Absensi", "../views/riwayat_absensi.html");
+                    break;
+            
+                case "Rapor":
+                    this.loadContent("Rapor", "../views/rapor.html");
+                    break;
+            
+                case "Laporan":
+                    this.loadContent("Laporan", "../views/laporan.html");
+                    break;
+            }            
         });
-    }
+    });
+}
 
     // **********************************************
     // * FUNGSI MODIFIKASI: initQuickActions *
@@ -825,11 +845,11 @@ class UIManager {
 
             if (btnText.includes('Tambah Siswa')) {
                 newBtn.addEventListener('click', () => {
-                    this.loadContent('Tambah Siswa', 'tambah_siswa.html', null);
+                    this.loadContent('Tambah Siswa', './views/tambah_siswa.html', null);
                 });
             } else if (btnText.includes('Tambah Pengajar')) {
                 newBtn.addEventListener('click', () => {
-                    this.loadContent('Tambah Pengajar', 'tambah_pengajar.html', null); 
+                    this.loadContent('Tambah Pengajar', './views/tambah_pengajar.html', null); 
                 });
             } else if (btnText.includes('Tambah Kelas')) { 
                 newBtn.addEventListener('click', () => {

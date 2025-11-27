@@ -13,19 +13,21 @@ exports.verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Validasi struktur JWT baru
+    // VALIDASI PAYLOAD
     if (!decoded.id_users || !decoded.username || !decoded.role) {
       return res.status(403).json({ message: "Invalid token payload" });
     }
 
-    // Cek apakah status user masih aktif
-    if (decoded.status_user && decoded.status_user !== "aktif") {
+    // NORMALISASI STATUS USER
+    if (decoded.status_user && decoded.status_user.toLowerCase() !== "aktif") {
       return res.status(403).json({ message: "Akun tidak aktif / diblokir" });
     }
 
     req.users = decoded;
     next();
+
   } catch (err) {
+    console.error("JWT ERROR:", err);
     return res.status(403).json({ message: "Invalid token" });
   }
 };

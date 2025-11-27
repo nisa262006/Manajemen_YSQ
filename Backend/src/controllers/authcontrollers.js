@@ -33,13 +33,14 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         id_users: user.id_users,
-        username: user.username, // ditambahkan
+        username: user.email,        // middleware membutuhkan ini
         role: user.role,
         status_user: user.status_user
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
+    
 
     return res.json({
       message: "Login berhasil",
