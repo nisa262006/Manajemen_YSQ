@@ -4,12 +4,12 @@ const db = require("../config/db");
 
 // Tambah jadwal
 exports.tambahJadwal = async (req, res) => {
-  const { id_kelas, hari, jam_mulai, jam_selesai, lokasi } = req.body;
+  const { id_kelas, hari, jam_mulai, jam_selesai, lokasi, id_pengajar } = req.body;
 
   await db.query(
-    `INSERT INTO jadwal(id_kelas, hari, jam_mulai, jam_selesai, lokasi)
-     VALUES($1,$2,$3,$4,$5)`,
-    [id_kelas, hari, jam_mulai, jam_selesai, lokasi]
+    `INSERT INTO jadwal(id_kelas, hari, jam_mulai, jam_selesai, lokasi, id_pengajar)
+     VALUES($1,$2,$3,$4,$5,$6)`,
+    [id_kelas, hari, jam_mulai, jam_selesai, lokasi, id_pengajar]
   );
 
   res.json({ message: "Jadwal berhasil ditambahkan" });
@@ -24,7 +24,7 @@ exports.getAllJadwal = async (req, res) => {
       p.nama AS pengajar
     FROM jadwal j
     JOIN kelas k ON j.id_kelas = k.id_kelas
-    LEFT JOIN pengajar p ON p.id_pengajar = k.id_pengajar
+    LEFT JOIN pengajar p ON p.id_pengajar = j.id_pengajar
     ORDER BY j.id_jadwal ASC
   `);
 
@@ -34,13 +34,13 @@ exports.getAllJadwal = async (req, res) => {
 // Update jadwal
 exports.updateJadwal = async (req, res) => {
   const { id_jadwal } = req.params;
-  const { hari, jam_mulai, jam_selesai, lokasi } = req.body;
+  const { hari, jam_mulai, jam_selesai, lokasi, id_pengajar } = req.body;
 
   await db.query(
     `UPDATE jadwal 
-     SET hari=$1, jam_mulai=$2, jam_selesai=$3, lokasi=$4
-     WHERE id_jadwal=$5`,
-    [hari, jam_mulai, jam_selesai, lokasi, id_jadwal]
+     SET hari=$1, jam_mulai=$2, jam_selesai=$3, lokasi=$4, id_pengajar=$5
+     WHERE id_jadwal=$6`,
+    [hari, jam_mulai, jam_selesai, lokasi, id_pengajar, id_jadwal]
   );
 
   res.json({ message: "Jadwal berhasil diupdate" });
@@ -60,15 +60,15 @@ exports.deleteJadwal = async (req, res) => {
 
 // Jadwal kelas pengajar
 exports.jadwalPengajar = async (req, res) => {
-  const { id_users } = req.users;
+  const id_pengajar = req.users.id_users;
 
   const result = await db.query(
     `SELECT j.*, k.nama_kelas 
      FROM jadwal j
      JOIN kelas k ON j.id_kelas = k.id_kelas
-     JOIN pengajar p ON p.id_pengajar = k.id_pengajar
-     WHERE p.id_users = $1`,
-    [id_users]
+     WHERE j.id_pengajar = $1
+    `,
+    [id_pengajar]
   );
 
   res.json(result.rows);

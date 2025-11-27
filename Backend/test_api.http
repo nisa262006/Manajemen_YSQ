@@ -178,11 +178,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 Content-Type: application/json
 
 {
-  "id_kelas": 8,
-  "hari": "Senin",
+  "id_kelas": 11,
+  "hari": "selasa",
   "jam_mulai": "08:00",
   "jam_selesai": "10:00",
-  "lokasi": "Ruang Kelas 1"
+  "lokasi": "Ruang Kelas 1",
+  "id_pengajar": 1
 }
 
 
@@ -207,7 +208,8 @@ Content-Type: application/json
   "hari": "Senin",
   "jam_mulai": "09:00",
   "jam_selesai": "11:00",
-  "lokasi": "Aula Utama"
+  "lokasi": "Aula Utama",
+  "id_pengajar": 1
 }
 
 
@@ -238,3 +240,96 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 
 GET http://localhost:5000/jadwal/santri/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDIyMTc1MSwiZXhwIjoxNzY0MzA4MTUxfQ.x6BWQLJgdN_eVnWVmhOpCB5Q30F3T1IeDDVMtOJmTFc
+
+
+
+###############################################################
+### 1. ADMIN — LIHAT SEMUA ABSENSI SANTRI
+###############################################################
+
+GET http://localhost:5000/absensi/santri/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+
+
+###############################################################
+### 2. ADMIN — LIHAT SEMUA ABSENSI PENGAJAR
+###############################################################
+
+GET http://localhost:5000/absensi/pengajar/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+
+
+
+###############################################################
+### 3. PENGAJAR — CATAT ABSENSI SANTRI
+###############################################################
+
+POST http://localhost:5000/absensi/santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjQ0NzIxLCJleHAiOjE3NjQzMzExMjF9.OXvtawreNymOAv8N1oblOLWsQdBXhP7XYwvqsYpKJKI
+Content-Type: application/json
+
+{
+  "id_santri": 15,
+  "id_jadwal": 1,
+  "tanggal": "2025-02-10",
+  "status_absensi": "Hadir",
+  "catatan": "Tepat waktu"
+}
+
+
+
+###############################################################
+### 4. PENGAJAR — UPDATE ABSENSI SANTRI
+###############################################################
+
+PUT http://localhost:5000/absensi/santri/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjQ0NzIxLCJleHAiOjE3NjQzMzExMjF9.OXvtawreNymOAv8N1oblOLWsQdBXhP7XYwvqsYpKJKI
+Content-Type: application/json
+
+{
+  "status_absensi": "Izin"
+}
+
+
+
+###############################################################
+### 5. PENGAJAR — LIHAT ABSENSI SEMUA SANTRI DI KELASNYA
+###############################################################
+
+GET http://localhost:5000/absensi/santri/kelas/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjQ0NzIxLCJleHAiOjE3NjQzMzExMjF9.OXvtawreNymOAv8N1oblOLWsQdBXhP7XYwvqsYpKJKI
+
+
+###############################################################
+### 6. SANTRI — LIHAT ABSENSI DIRINYA SENDIRI
+###############################################################
+
+GET http://localhost:5000/absensi/santri/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDIyMTc1MSwiZXhwIjoxNzY0MzA4MTUxfQ.x6BWQLJgdN_eVnWVmhOpCB5Q30F3T1IeDDVMtOJmTFc
+
+
+
+###############################################################
+### 7. PENGAJAR — CATAT ABSENSI DIRINYA SENDIRI
+###############################################################
+
+POST http://localhost:5000/absensi/pengajar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjIxMzgyLCJleHAiOjE3NjQzMDc3ODJ9.rc7aLUfiYDMG4FYFFIjCanmUJtxlYQbe2NhSfjxlf18
+Content-Type: application/json
+
+{
+  "id_jadwal": 1,
+  "tanggal": "2025-02-10",
+  "status_absensi": "Hadir",
+  "catatan": "Mengajar sesuai jadwal"
+}
+
+
+
+###############################################################
+### 8. PENGAJAR — LIHAT ABSENSI DIRI SENDIRI
+###############################################################
+
+GET http://localhost:5000/absensi/pengajar/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjIxMzgyLCJleHAiOjE3NjQzMDc3ODJ9.rc7aLUfiYDMG4FYFFIjCanmUJtxlYQbe2NhSfjxlf18
+
