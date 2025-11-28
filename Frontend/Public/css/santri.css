@@ -411,12 +411,20 @@ body {
     color: #1b5e20;
 }
 
+.status-Izin {
+    background-color: #c8e6c9; /* Hijau muda */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #D2A047;
+}
+
 .status-sakit {
     background-color: #fff9c4; /* Kuning muda */
     padding: 3px 8px;
     border-radius: 4px;
     font-weight: bold;
-    color: #fbc02d;
+    color: #e0b74f;
 }
 
 .status-alfa {
@@ -425,6 +433,14 @@ body {
     border-radius: 4px;
     font-weight: bold;
     color: #c62828;
+}
+
+.status-Mustamilah {
+    background-color: #c8e6c9; /* Hijau muda */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #3490E4;
 }
 
 /* Tambahan: Pastikan ikon folder terlihat seperti ikon */

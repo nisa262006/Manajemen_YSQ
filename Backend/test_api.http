@@ -16,6 +16,7 @@ Content-Type: application/json
   "password": "123456"
 }
 
+
 ### LOGIN SANTRI
 POST http://localhost:5000/auth/login
 Content-Type: application/json
@@ -25,6 +26,7 @@ Content-Type: application/json
   "password": "123456"
 }
 
+
 ### LOGIN SANTRI
 POST http://localhost:5000/auth/login
 Content-Type: application/json
@@ -33,6 +35,10 @@ Content-Type: application/json
   "email": "santri1@ysq.com",
   "password": "123456"
 }
+
+### liat data me
+GET http://localhost:5000/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDMyNzEyOSwiZXhwIjoxNzY0NDEzNTI5fQ.ZLN0dA6Q1N7jjDWFRwzgk-oGyUcpFaMQ8-AacCbUpn0
 
 ============= REGISTRASI ======================
 ### PENDAFTARAN
@@ -305,7 +311,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 ###############################################################
 
 GET http://localhost:5000/absensi/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDIyMTc1MSwiZXhwIjoxNzY0MzA4MTUxfQ.x6BWQLJgdN_eVnWVmhOpCB5Q30F3T1IeDDVMtOJmTFc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDMxNzYxNSwiZXhwIjoxNzY0NDA0MDE1fQ.uclDGV-YPgT3WwlulkVcgc52wFsMKeQ0tOQ_ljYeF6g
 
 
 

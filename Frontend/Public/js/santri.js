@@ -12,7 +12,7 @@ async function loadSantriDashboard() {
     try {
 
         // ============================
-        // 1. AMBIL PROFIL SANTRI
+        // 1. AMBIL kelas SANTRI
         // ============================
         const profilRes = await fetch("http://localhost:5000/kelas/santri/me", {
             headers: { "Authorization": `Bearer ${token}` }
