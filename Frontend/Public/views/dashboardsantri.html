@@ -15,7 +15,7 @@
             <h2>YAYASAN SAHABAT QUR'AN</h2>
         </div>
         <div class="user-info">
-            <span>Siswa</span>
+            <span id="role-user">Siswa</span>
             <i class='bx bx-user'></i>
         </div>
     </header>
@@ -39,15 +39,13 @@
                     
                     <div class="info-tahsin-detail">
                         <p><strong>Informasi Kelas Tahsin</strong></p>
-                        <p>Nama: Jingga</p>
-                        <p>Level: Level A</p>
-                        <p>Jadwal: Selasa, Kamis</p>
+                        <p>Nama: <span id="nama-santri"></span></p>
+                        <p class="nis-santri" id="nis-santri"></p>
+                        <p>Kategori: <span id="kategori-santri"></span></p>
+                        <p>Kelas: <span id="kelas-santri"></span></p>
+                        <p>Jadwal: <span id="jadwal-santri"></span></p>
                     </div>
 
-                    <div class="info-tahsin-id">
-                        <p>ID Santri</p>
-                        <p class="info-tahsin-level">Tahsin Level A</p>
-                    </div>
                 </div>
             </div>
 
@@ -68,36 +66,13 @@
                             <th>Materi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>1.</td>
-                            <td>Tahsin</td>
-                            <td>Senin</td>
-                            <td>08.00 - 10.00</td>
-                            <td>pengajar@gmail.co.id</td>
-                            <td><i class='bx bx-file'></i></td>
-                        </tr>
-                        <tr>
-                            <td>2.</td>
-                            <td>Tahsin</td>
-                            <td>Senin</td>
-                            <td>10.00 - 11.30</td>
-                            <td>pengajar@gmail.co.id</td>
-                            <td><i class='bx bx-file'></i></td>
-                        </tr>
-                        <tr>
-                            <td>3.</td>
-                            <td>Tahsin</td>
-                            <td>Senin</td>
-                            <td>08.00 - 09.00</td>
-                            <td>pengajar@gmail.co.id</td>
-                            <td><i class='bx bx-file'></i></td>
-                        </tr>
-                        </tbody>
+                    <tbody id="jadwal-body">
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <script src="../js/santri.js"></script>
 </body>
 </html>

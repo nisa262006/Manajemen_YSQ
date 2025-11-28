@@ -1,58 +1,40 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Santri - Yayasan Sahabat Qur'an</title>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - YSQ</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body>
     <div class="login-container">
         <div class="header">
-            <img src="../images/LogoYSQ.png" alt="Sahabat Quran Bogor Logo" class="logo-image">
+            <img src="../images/LogoYSQ.png" class="logo-image" alt="Logo">
             <p class="organization-name">YAYASAN SAHABAT QUR'AN</p>
         </div>
 
-        <form class="login-form">
-          <div class="input-group">
-            <input type="text" id="identifier" placeholder="Username atau Email" required>
-            <i class='bx bx-user icon'></i> 
-          </div>
-        
+        <form class="login-form" id="loginForm">
+            <div class="input-group">
+                <input type="text" id="identifier" placeholder="Username atau Email" required>
+                <i class="bx bx-user icon"></i>
+            </div>
 
             <div class="input-group">
                 <input type="password" id="password" placeholder="Kata Sandi" required>
-                <i class='bx bx-hide toggle-password' id="togglePassword"></i> 
+                <i class="bx bx-hide toggle-password" id="togglePassword"></i>
             </div>
-            
+
             <a href="reset_password.html" class="forgot-password">Lupa Kata Sandi?</a>
 
             <button type="submit" class="login-button">Login</button>
+
+            <!-- ERROR MESSAGE FIX -->
+            <p id="error" style="color:#ffb3b3; margin-top:12px; font-size:14px;"></p>
         </form>
     </div>
 
-    <script>
-        const passwordInput = document.getElementById('password');
-        const togglePassword = document.getElementById('togglePassword'); 
-
-        if (passwordInput && togglePassword) {
-            togglePassword.addEventListener('click', function () {
-                // 1. Toggle tipe input (password <-> text)
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                
-                // 2. Toggle ikon (bx-hide <-> bx-show)
-                if (type === 'text') {
-                    this.classList.remove('bx-hide'); // Hapus mata tertutup
-                    this.classList.add('bx-show'); // Tambah mata terbuka
-                } else {
-                    this.classList.remove('bx-show'); // Hapus mata terbuka
-                    this.classList.add('bx-hide'); // Tambah mata tertutup
-                }
-            });
-        }
-    </script>
+    <script src="../js/login.js"></script>
 </body>
 </html>

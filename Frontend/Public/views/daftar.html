@@ -13,7 +13,7 @@
 
         <div class="registrasi-header">
             <h1 class="title">Registrasi Santri Baru</h1>
-            <p class="subtitle">Isi data berikut untuk mendaftar sebagai santriwati Yayasan Sahabat Qur'an</p>
+            <p class="subtitle">Isi data berikut untuk mendaftar sebagai santri Yayasan Sahabat Qur'an</p>
         </div>
 
         <form class="register-form" id="registrationForm">
@@ -51,21 +51,11 @@
             </div>
 
             <button type="submit" class="btn daftar-btn">Daftar</button>
-
         </form>
 
     </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-          const form = document.getElementById("registrationForm");
-  
-          form.addEventListener("submit", (e) => {
-              e.preventDefault();
-              window.location.href = "berhasil.html";
-          });
-      });
-  </script>  
-
+    <!-- LOAD register.js -->
+    <script src="../js/register.js"></script>
 </body>
 </html>

@@ -3,35 +3,41 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   const identifier = document.getElementById("identifier").value;
   const password = document.getElementById("password").value;
+  const errorBox = document.getElementById("error");
+
+  errorBox.innerText = ""; // reset error
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier, password })   // <-- PERUBAHAN WAJIB
-    });
+      const res = await fetch("http://127.0.0.1:5000/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier, password })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!res.ok) {
-      document.getElementById("error").innerText = data.message;
-      return;
-    }
+      if (!res.ok) {
+          errorBox.innerText = data.message || "Login gagal";
+          return;
+      }
 
-    // simpan token
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("role", data.role);
+      // SIMPAN TOKEN + ROLE + ID USERS
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("id_users", data.id_users);
 
-    // redirect sesuai role
-    if (data.role === "admin") {
-      window.location.href = "/Frontend/Public/views/dashboardadmin.html";
-    } else if (data.role === "pengajar") {
-      window.location.href = "/Frontend/Public/views/dashboardpengajar.html";
-    } else {
-      window.location.href = "/Frontend/Public/views/dashboardsantri.html";
-    }
+      // REDIRECT SESUAI ROLE
+      if (data.role === "admin") {
+          window.location.href = "./dashboardadmin.html";
+      } 
+      else if (data.role === "pengajar") {
+          window.location.href = "./dashboardpengajar.html";
+      } 
+      else {
+          window.location.href = "./dashboardsantri.html";
+      }
 
   } catch (err) {
-    document.getElementById("error").innerText = "Tidak dapat terhubung ke server";
+      errorBox.innerText = "Tidak dapat terhubung ke server";
   }
 });
