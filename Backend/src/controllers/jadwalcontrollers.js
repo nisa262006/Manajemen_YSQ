@@ -60,18 +60,44 @@ exports.deleteJadwal = async (req, res) => {
 
 // Jadwal kelas pengajar
 exports.jadwalPengajar = async (req, res) => {
-  const id_pengajar = req.users.id_users;
+  try {
+    const { id_users } = req.users;
 
-  const result = await db.query(
-    `SELECT j.*, k.nama_kelas 
-     FROM jadwal j
-     JOIN kelas k ON j.id_kelas = k.id_kelas
-     WHERE j.id_pengajar = $1
-    `,
-    [id_pengajar]
-  );
+    // Dapatkan id_pengajar dulu
+    const pg = await db.query(
+      `SELECT id_pengajar FROM pengajar WHERE id_users = $1`,
+      [id_users]
+    );
 
-  res.json(result.rows);
+    if (pg.rowCount === 0) {
+      return res.status(404).json({ message: "Pengajar tidak ditemukan" });
+    }
+
+    const id_pengajar = pg.rows[0].id_pengajar;
+
+    // Ambil jadwal pengajar
+    const result = await db.query(`
+      SELECT 
+        j.id_jadwal,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        j.lokasi,
+        k.nama_kelas,
+        p.nama AS nama_pengajar
+      FROM jadwal j
+      LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+      LEFT JOIN pengajar p ON j.id_pengajar = p.id_pengajar
+      WHERE j.id_pengajar = $1
+      ORDER BY j.hari, j.jam_mulai
+    `, [id_pengajar]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("ERR jadwalPengajar:", err);
+    res.status(500).json({ message: "Gagal mengambil jadwal pengajar" });
+  }
 };
 
 
@@ -82,12 +108,18 @@ exports.jadwalSantri = async (req, res) => {
   const { id_users } = req.users;
 
   const result = await db.query(
-    `SELECT j.*, k.nama_kelas
-     FROM jadwal j
-     JOIN kelas k ON j.id_kelas = k.id_kelas
-     JOIN santri_kelas sk ON sk.id_kelas = k.id_kelas
-     JOIN santri s ON s.id_santri = sk.id_santri
-     WHERE s.id_users = $1`,
+    `SELECT 
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        k.nama_kelas,
+        p.nama AS nama_pengajar
+    FROM jadwal j
+    JOIN kelas k ON j.id_kelas = k.id_kelas
+    LEFT JOIN pengajar p ON p.id_pengajar = j.id_pengajar
+    JOIN santri_kelas sk ON sk.id_kelas = k.id_kelas
+    JOIN santri s ON s.id_santri = sk.id_santri
+    WHERE s.id_users = $1`,
     [id_users]
   );
 

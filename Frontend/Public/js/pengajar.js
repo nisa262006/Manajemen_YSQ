@@ -1,3 +1,163 @@
+/* ======================================================
+   LOAD DATA PENGAJAR (Profil + Kelas + Jadwal)
+====================================================== */
+async function loadPengajarData() {
+  const token = localStorage.getItem("token");
+  if (!token) return location.href = "../login.html";
+
+  try {
+    // --- PROFIL (opsional jika diperlukan) ---
+    const resProfile = await fetch("http://localhost:5000/auth/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const profile = await resProfile.json();
+    if (profile?.profile?.nama) {
+      document.querySelector(".user-name").textContent = profile.profile.nama;
+    }
+
+    // --- KELAS PENGAJAR ---
+    const resKelas = await fetch("http://localhost:5000/kelas/pengajar/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const kelas = await resKelas.json();
+
+    // --- JADWAL PENGAJAR ---
+    const resJadwal = await fetch("http://localhost:5000/jadwal/pengajar/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const jadwal = await resJadwal.json();
+
+    // --- MASUKKAN KE DASHBOARD ---
+    fillDashboardKelas(kelas, jadwal);
+    renderDashboardJadwal(jadwal);
+
+  } catch (err) {
+    console.error("Gagal memuat data pengajar:", err);
+  }
+}
+
+/* ======================================================
+   ISI INFORMASI KELAS DI DASHBOARD
+====================================================== */
+function fillDashboardKelas(kelas, jadwal) {
+  const dNamaKelas = document.querySelector(".nama_kelas");
+  const dJadwal = document.querySelector(".jadwal_kelas");
+  const dJumlahSantri = document.querySelector(".jumlah_santri");
+
+  // --- Informasi kelas ---
+  if (Array.isArray(kelas) && kelas.length > 0) {
+    const k = kelas[0];
+    dNamaKelas.textContent = k.nama_kelas ?? "-";
+    dJumlahSantri.textContent = k.kapasitas ?? "-";
+  }
+
+  // --- Hari jadwal ---
+  if (Array.isArray(jadwal) && jadwal.length > 0) {
+    const hari = jadwal.map(j => j.hari).join(", ");
+    dJadwal.textContent = hari || "-";
+  }
+}
+
+/* ======================================================
+   RENDER JADWAL DI DASHBOARD
+====================================================== */
+function renderDashboardJadwal(jadwal) {
+  const tbody = document.querySelector("#dashboardTable tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  jadwal.forEach(j => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${j.hari}</td>
+        <td>${j.jam_mulai} - ${j.jam_selesai}</td>
+        <td>${j.nama_kelas}</td>
+        <td>${j.lokasi ?? "-"}</td>
+        <td>${j.pertemuan_ke ?? "-"}</td>
+      </tr>
+    `;
+  });
+}
+
+/* ======================================================
+   LOAD JADWAL UNTUK HALAMAN "JADWAL KELAS"
+====================================================== */
+async function loadPageJadwal() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://localhost:5000/jadwal/pengajar/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const jadwal = await res.json();
+    renderPageJadwal(jadwal);
+
+  } catch (err) {
+    console.error("Gagal load jadwal:", err);
+  }
+}
+
+/* ======================================================
+   RENDER TABLE JADWAL DETAIL
+====================================================== */
+function renderPageJadwal(jadwal) {
+  const tbody = document.getElementById("table_jadwal");
+  tbody.innerHTML = "";
+
+  jadwal.forEach((j, i) => {
+    tbody.innerHTML += `
+      <tr class="main-row">
+        <td>${j.hari}</td>
+        <td>${j.jam_mulai} - ${j.jam_selesai}</td>
+        <td>${j.nama_kelas}</td>
+        <td>${j.lokasi ?? "-"}</td>
+        <td>${j.nama_pengajar ?? "Pengajar"}</td>
+        <td><button class="btn-detail" onclick="toggleDetail(${i})">Detail</button></td>
+      </tr>
+
+      <tr id="detail-${i}" class="detail-row" style="display:none;">
+        <td colspan="6">
+          <div class="detail-box">
+            <div class="box">Materi<br><span>kosong</span></div>
+            <div class="box">Absensi<br><span>kosong</span></div>
+            <div class="box">Tugas<br><span>kosong</span></div>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+/* ======================================================
+   TOGGLE DETAIL TIAP JADWAL
+====================================================== */
+function toggleDetail(id) {
+  const row = document.getElementById(`detail-${id}`);
+  row.style.display = row.style.display === "none" ? "table-row" : "none";
+}
+
+/* ======================================================
+   MENU NAV — LOAD JADWAL SAAT MASUK MENU JADWAL
+====================================================== */
+document.querySelectorAll(".nav-item").forEach(nav => {
+  nav.addEventListener("click", () => {
+    const target = nav.getAttribute("data-content-id");
+
+    if (target === "jadwal-content") {
+      loadPageJadwal();
+    }
+  });
+});
+
+/* ======================================================
+   INIT AWAL
+====================================================== */
+loadPengajarData();
+
+
 /* pengajar.js --- behavior untuk dashboard pengajar */
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -35,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const absenPengajarInfo = document.getElementById('absenPengajarInfo');
   
     const toast = document.getElementById('toastNotification');
-  
+
     // helper: toast
     function showToast(msg) {
       if (!toast) return;
@@ -396,4 +556,3 @@ document.addEventListener('DOMContentLoaded', () => {
   
     // done
   }); // DOMContentLoaded end
-  

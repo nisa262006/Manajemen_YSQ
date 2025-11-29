@@ -58,19 +58,19 @@
         <div class="dashboard-grid">
           <div class="info-card-container">
             <div class="info-card tahsin-info">
-              <h2>Informasi Kelas Hari Ini</h2>
+              <h2>Informasi Kelas</h2>
               <div class="class-info-details">
                 <div class="info-detail-row">
                   <span class="info-detail-label">Nama Kelas :</span>
-                  <span class="info-detail-value">Usmani 1</span>
+                  <span class="info-detail-value nama_kelas">-</span>
                 </div>
                 <div class="info-detail-row">
                   <span class="info-detail-label">Jadwal Kelas :</span>
-                  <span class="info-detail-value">Senin, Kamis</span>
+                  <span class="info-detail-value jadwal_kelas">-</span>
                 </div>
                 <div class="info-detail-row">
                   <span class="info-detail-label">Jumlah Santri :</span>
-                  <span class="info-detail-value">20</span>
+                  <span class="info-detail-value jumlah_santri">-</span>
                 </div>
               </div>
             </div>
@@ -144,51 +144,31 @@
             </div>
           </div>
         </div>
-
+      
         <div class="schedule-table-full">
           <h2>Jadwal</h2>
+      
           <table class="data-table full-width-table" id="jadwalTable">
             <thead>
               <tr>
-                <th>Hari</th><th>Waktu</th><th>Kelas</th><th>Ruangan</th><th>Pengajar</th><th>Presensi</th>
+                <th>Hari</th>
+                <th>Waktu</th>
+                <th>Kelas</th>
+                <th>Ruangan</th>
+                <th>Pengajar</th>
+                <th>Presensi</th>
               </tr>
             </thead>
-            <tbody>
-              <tr class="main-row">
-                <td>Senin</td><td>08.00 - 10.00</td><td>Usmanil</td><td>1</td><td>Pengajar</td>
-                <td><button class="btn-detail btn-toggle" data-target="detail-4">Detail</button></td>
-              </tr>
-              <tr class="detail-row detail-4">
-                <td colspan="6">
-                  <div class="detail-content-grid">
-                    <div class="detail-item">
-                      <label>Materi</label>
-                      <div class="link-text-trigger">Masukkan Link/File Materi</div>
-                      <button class="btn-materi btn-detail-simpan status-kosong">kosong</button>
-                    </div>
-                    <div class="detail-item">
-                      <label>Absensi</label>
-                      <div class="link-text-trigger">Masukkan Link/File Materi</div>
-                      <button class="btn-absensi btn-detail-simpan status-kosong">kosong</button>
-                    </div>
-                    <div class="detail-item">
-                      <label>Tugas</label>
-                      <div class="link-text-trigger">Masukkan Link/File Materi</div>
-                      <button class="btn-tugas btn-detail-simpan status-kosong">kosong</button>
-                    </div>
-                  </div>
-                  <div class="detail-actions" style="text-align:center; margin-top:12px;">
-                    <button class="btn-presensi btn-absen-pengajar" data-jadwal="4">Simpan (Absen Pengajar)</button>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- more rows as needed -->
+      
+            <!-- INI YANG BENAR -->
+            <tbody id="table_jadwal">
+              <!-- Jadwal backend akan masuk di sini -->
             </tbody>
+            
           </table>
         </div>
       </section>
-
+      
       <!-- ABSENSI -->
       <section class="content-section" id="absensi-content">
         <div class="schedule-table-full">

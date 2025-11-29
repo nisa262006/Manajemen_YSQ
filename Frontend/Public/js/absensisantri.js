@@ -12,7 +12,7 @@ function initAbsensi() {
   // set default tanggal (mis. 30 hari terakhir)
   const now = new Date();
   const prior = new Date();
-  prior.setDate(now.getDate() - 30);
+  prior.setMonth(now.getMonth() - 6);   // ⟵ 6 bulan kebelakang
   if (startDateEl && !startDateEl.value) startDateEl.value = formatISODate(prior);
   if (endDateEl && !endDateEl.value) endDateEl.value = formatISODate(now);
 

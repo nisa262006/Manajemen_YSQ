@@ -121,15 +121,48 @@ body {
 /* --- BAGIAN DASBOARD SISWA --- */
 /* ========================================================= */
 
+/* Membuat kontainer informasi melebar ke samping */
 .info-tahsin {
     background-color: #e8e8e8;
     border-radius: 6px;
     padding: 15px;
-    display: flex; 
-    align-items: center; /* Pusatkan vertikal */
-    gap: 30px; /* Jarak antara gambar dan detail */
+    display: flex;
+    align-items: center;
+    gap: 25px;
     margin-bottom: 30px;
+    width: 97%;          /* WAJIB */
+    max-width: 100%;      /* WAJIB */
 }
+
+/* Bagian isi */
+.info-tahsin-body {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; 
+    align-items: flex-start;
+}
+
+/* KIRI */
+.info-left p {
+    margin: 5px 0;
+}
+
+/* KANAN */
+.info-right {
+    text-align: right;
+    min-width: 120px;
+}
+
+.info-right p {
+    margin: 5px 0;
+}
+
+.nis-value {
+    font-size: 1.4em;
+    color: #0b4528;
+    font-weight: bold;
+}
+
 
 .info-tahsin-image {
     width: 120px; 
