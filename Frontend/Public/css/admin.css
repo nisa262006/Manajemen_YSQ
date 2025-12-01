@@ -1143,3 +1143,630 @@ body {
     /* Posisi tombol simpan di kanan atas */
     align-self: flex-start;
 }
+
+/* Popup Data Siswa
+/* Pastikan modal untuk siswa lebih lebar jika perlu */
+.large-modal {
+    max-width: 700px; /* Lebar modal disesuaikan */
+    width: 90%;
+}
+
+/* Styling dasar tabel di dalam modal (gunakan styling yang sama dengan tabel utama) */
+#siswa-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#siswa-table th, #siswa-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+#siswa-table thead th {
+    background-color: #1a432e; /* Warna hijau gelap seperti header tabel utama */
+    color: white;
+}
+
+/* Styling Umum untuk Modal Besar (Popup Siswa) */
+#siswa-list-modal .modal-content {
+    display: flex; /* Aktifkan Flexbox */
+    flex-direction: column; /* Konten diatur vertikal */
+    max-width: 700px; /* Lebar maksimum yang nyaman */
+    max-height: 90vh; /* Kunci 1: Tinggi maksimum modal (90% dari tinggi viewport) */
+    width: 90%;
+}
+
+/* ========================================================= */
+/* 2. SOLUSI SCROLL MODAL SISWA (KUNCI VITAL) */
+/* ========================================================= */
+
+/* Kunci 0: Memastikan Body dan HTML memiliki tinggi penuh */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* overflow: hidden; *Opsional: Jika ingin mencegah scroll pada body utama* */
+}
+
+/* Kunci 1: Batasan Tinggi Modal Container */
+#siswa-list-modal .modal-content {
+    display: flex;             /* Mengaktifkan Flexbox */
+    flex-direction: column;    /* Menyusun header dan body secara vertikal */
+    max-width: 700px;          
+    max-height: 90vh;          /* KUNCI: Menetapkan batas tinggi maksimum berdasarkan viewport */
+    width: 90%;
+}
+
+/* Kunci 2: Area Scrollable (Modal Body) */
+#siswa-list-modal .modal-body.scrollable-table-area {
+    flex-grow: 1;              /* Mengambil semua sisa ruang vertikal yang tersedia */
+    overflow-y: auto;          /* KUNCI AKTIVASI SCROLL BAR */
+    padding: 15px;
+}
+
+/* Kunci 3: Header Tabel Tetap di Tempat (Sticky) */
+#siswa-table thead {
+    position: sticky;          /* Membuat header menempel */
+    top: 0;                    /* Menempel di bagian paling atas area scroll */
+    background-color: #1a432e; 
+    z-index: 10;
+}
+
+/* ========================================================= */
+/* PENGATURAN GLOBAL TABEL SISWA (Modal) */
+/* ========================================================= */
+
+#siswa-table {
+    table-layout: fixed; /* Kunci 1: Memaksa lebar kolom TH dihormati oleh TD */
+    width: 100%;
+    /* Optional: Jika menggunakan border di antara sel */
+    border-collapse: collapse; 
+}
+
+/* Memastikan PADDING dan ALIGNMENT sama di semua sel */
+#siswa-table th, 
+#siswa-table td {
+    /* Kunci 2: Padding harus identik agar teks sejajar */
+    padding: 10px 15px; 
+    text-align: center;
+    /* Optional: Border bawah untuk pemisah baris */
+    border-bottom: 1px solid #ddd;
+}
+
+/* Menghilangkan border bawah pada header (jika diinginkan) */
+#siswa-table thead th {
+    border-bottom: none; 
+}
+
+/* ========================================================= */
+/* PENENTUAN LEBAR KOLOM (TH) */
+/* ========================================================= */
+
+/* Hanya atur lebar pada TH. TD akan mengikutinya karena table-layout: fixed */
+
+/* 1. Kolom No. */
+#siswa-table th:nth-child(1) {
+    width: 50px;
+}
+
+/* 2. Kolom NIM */
+#siswa-table th:nth-child(2) {
+    width: 150px; 
+}
+
+/* 3. Kolom Nama Siswa (Ambil sisa ruang) */
+#siswa-table th:nth-child(3) {
+    /* width: auto; tidak selalu bekerja optimal dengan fixed, tapi bisa dicoba. 
+       Lebih aman tentukan lebar yang pasti dan biarkan kolom lain 'terjepit'. */
+    width: auto; 
+}
+
+/* 4. Kolom Umur */
+#siswa-table th:nth-child(4) {
+    width: 80px;
+}
+
+/* 5. Kolom Kelas */
+#siswa-table th:nth-child(5) {
+    width: 100px;
+}
+
+/* ========================================================== */
+/* A. LAYOUT & HEADER KONTROL (Filter dan Tombol Simpan) */
+/* ========================================================== */
+
+.page-container-left-aligned {
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+}
+
+.header-content-actions {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-end; 
+    margin-top: 15px;
+    width: 100%; 
+    gap: 15px;
+}
+
+/* Input Filter */
+.class-filter-select-wrapper {
+    width: 280px; 
+}
+
+.profile-input.class-filter-select {
+    width: 100%; 
+    max-width: 280px; 
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #275238; /* Hijau Tua */
+    border-radius: 10px;
+}
+
+/* Tombol Simpan */
+.save-action-wrapper {
+    margin-left: auto;
+}
+
+.action-btn.primary-btn {
+    background-color: #e5a546; /* Kuning/Orange */
+    color: white; 
+    padding: 10px 40px; 
+    border: none; 
+    border-radius: 5px;
+    font-weight: bold;
+    height: 45px; 
+}
+
+---
+
+/* ========================================================== */
+/* B. STYLING TABEL SANTRI (#santri-kelas-list-table) */
+/* ========================================================== */
+
+.santri-class-table-section {
+    margin-top: 20px; 
+    width: 100%; 
+}
+
+.table-wrapper {
+    overflow-x: auto; 
+}
+
+.standard-table {
+    width: 100%; 
+    /* Pengaturan untuk radius yang sempurna */
+    border-collapse: separate; 
+    border-spacing: 0;
+    border-radius: 10px; 
+    overflow: hidden; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    table-layout: fixed;
+}
+
+/* Base style untuk semua cell */
+.standard-table th, .standard-table td {
+    padding: 10px;
+    border: none; 
+    /* PERATAAN: SEMUA RATA TENGAH HORIZONTAL dan Vertikal */
+    text-align: center; 
+    vertical-align: middle; 
+}
+
+/* --- Kolom Checklist (Pertama) - Kerapatan Tinggi --- */
+#santri-kelas-list-table th:first-child,
+#santri-kelas-list-table td:first-child {
+    width: 20px; 
+    min-width: 20px;
+    padding: 10px 4px; /* Mengurangi padding horizontal */
+}
+/* ----------------------------------------------------- */
+
+
+/* 1. HEADER (Hijau Tua & Radius Sudut Atas) */
+#santri-kelas-list-table thead {
+    background-color: #275238; 
+    border-bottom: 2px solid #275238;
+}
+
+#santri-kelas-list-table th {
+    background-color: #275238; 
+    color: white; 
+    font-weight: bold;
+    padding: 12px 10px;
+}
+
+/* Terapkan radius pada sel sudut atas */
+#santri-kelas-list-table thead tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+}
+#santri-kelas-list-table thead tr:first-child th:last-child {
+    border-top-right-radius: 10px;
+}
+
+
+/* KOREKSI: HAPUS latar belakang putih dari sel data */
+#santri-kelas-list-table tbody tr {
+    border-bottom: 1px solid #e0e0e0; 
+}
+
+#santri-kelas-list-table tbody td {
+    background-color: transparent; 
+}
+
+/* Hapus border-bottom pada baris terakhir untuk tampilan bersih */
+#santri-kelas-list-table tbody tr:last-child {
+    border-bottom: none; 
+}
+
+/* KOREKSI RADIUS SUDUT BAWAH (di baris terakhir) */
+#santri-kelas-list-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+    background-color: white; 
+}
+
+#santri-kelas-list-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+    background-color: white; 
+}
+
+
+/* --- Kolom Aksi --- */
+.standard-table th.column-action, 
+.standard-table td.table-actions {
+    width: 100px; 
+    min-width: 100px;
+    text-align: center;
+}
+
+/* ========================================================== */
+/* C. STYLING STATUS TAG (Badge Warna) - DISESUAIKAN FINAL */
+/* ========================================================== */
+
+.status-tag {
+    /* Base styling, untuk yang tidak memiliki status spesifik */
+    display: inline-block;
+    padding: 5px 10px;
+    /* Jaminan diterapkan pada status-tag dasar */
+    border-radius: 10px;
+    font-size: 12px;
+    color: white;
+    background-color: #666; 
+    white-space: nowrap;
+}
+
+/* Status Santri: Aktif (Dipertahankan dari skema lama) */
+.status-accepted, .status-toggle[data-status="aktif"] {
+    background-color: #38761d !important; /* Hijau Tua */
+    color: white !important;
+    border-radius: 5px !important; /* Dikuatkan */
+    font-size: 12px !important; /* Dikuatkan */
+}
+
+/* Status Kelas: Sudah Ada Kelas (Positif) */
+.status-sudah-kelas {
+    background-color: #38761d !important; 
+    color: white !important;
+    border-radius: 7px !important; /* Dikuatkan */
+    font-size: 13px !important; /* Dikuatkan */
+}
+
+/* Status Kelas: Belum Ada Kelas (Negatif) */
+.status-belum-kelas {
+    background-color: #cc0000 !important; /* Merah */
+    color: white !important;
+    border-radius: 7px !important; /* Dikuatkan */
+    font-size: 13px !important; /* Dikuatkan */
+}
+
+/* Status Non-aktif / Ditolak (Jika ada) - Jaga agar tidak menimpa status baru */
+.status-rejected, .status-toggle[data-status="tidak-aktif"] {
+    background-color: #cc0000 !important; /* Merah */
+    color: white !important;
+    border-radius: 7px !important; /* Dikuatkan */
+    font-size: 13px !important; /* Dikuatkan */
+}
+
+/* ========================================================== */
+/* D. STYLING KHUSUS DAFTAR JADWAL */
+/* ========================================================== */
+
+/* Hapus aturan lama untuk .jadwal-filter-container */
+
+/* Kontrol Header Baru (Filter dan Tombol) */
+.jadwal-header-controls {
+    display: flex;
+    justify-content: space-between; /* Pisahkan filter dan tombol ke kiri dan kanan */
+    align-items: center; /* Sejajarkan vertikal di tengah */
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Wrapper untuk filter (Pilih Kelas dan Kategori) */
+.jadwal-filter-group-wrapper {
+    display: flex;
+    gap: 45px; /* Jarak antara Pilih Kelas dan Kategori */
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-group label {
+    font-weight: bold;
+    color: #275238; /* Hijau Tua */
+}
+
+/* Memastikan filter dropdown memiliki lebar yang cukup */
+.jadwal-filter-container .class-filter-select,
+.jadwal-header-controls .class-filter-select { /* Tambahkan selector ini */
+    width: 220px;
+    max-width: 220px;
+    padding: 8px 20px;
+}
+
+.section-title {
+    color: #275238;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+}
+
+/* Styling Table Jadwal (Memastikan ia menggunakan styling standar) */
+#jadwal-list-table {
+    margin-top: 10px;
+}
+
+/* ------------------------------------------------------------- */
+/* STYLING KHUSUS UNTUK TABEL DAFTAR JADWAL (#jadwal-list-table) */
+/* ------------------------------------------------------------- */
+
+/* Latar Belakang Header (Hijau Tua) */
+#jadwal-list-table thead {
+    background-color: #275238; /* Menggunakan Hijau Tua */
+    border-bottom: 2px solid #275238;
+}
+
+/* Warna Teks Header (Putih) */
+#jadwal-list-table th {
+    /* Pastikan warna teks menjadi Putih agar kontras dengan background hijau tua */
+    color: white; 
+    font-weight: bold;
+    background-color: #275238; /* Ditambahkan untuk memastikan radius sudut tertutup */
+    padding: 12px 10px;
+    
+    /* Atur font-size jika sebelumnya ada masalah */
+    font-size: 14px; /* Sesuaikan dengan ukuran teks data Anda */
+}
+
+/* Terapkan radius pada sel sudut atas untuk Jadwal */
+#jadwal-list-table thead tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+}
+#jadwal-list-table thead tr:first-child th:last-child {
+    border-top-right-radius: 10px;
+}
+
+/* ========================================================== */
+/* E. STYLING MODAL EDIT JADWAL (Final & Tanpa Tombol Tambah Sesi) */
+/* ========================================================== */
+
+.modal-content.modal-content-large {
+    max-width: 600px;
+    width: 90%;
+    /* Tanpa scroll, membiarkan browser menangani */
+    padding: 20px;
+    box-sizing: border-box; 
+}
+
+/* KONTROL HEADER SESI (Sekarang hanya untuk judul) */
+.sesi-header-wrapper {
+    display: flex;
+    justify-content: flex-start; /* Sejajarkan judul ke kiri */
+    align-items: center; 
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0; 
+    padding-bottom: 5px;
+    /* PASTIKAN TIDAK ADA BACKGROUND-COLOR DI SINI */
+    background-color: transparent; 
+}
+
+/* Styling Judul Bagian di Modal */
+.data-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #275238; 
+    margin: 0; 
+    padding: 0; 
+    /* PASTIKAN TIDAK ADA BACKGROUND-COLOR DI SINI */
+    background-color: transparent; 
+}
+
+/* Penyesuaian jarak input di dalam modal */
+.form-row-popup.split-2 {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group-popup {
+    flex-grow: 1;
+    margin-bottom: 10px;
+}
+
+/* Input/Select Profile Styling */
+.profile-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* HAPUS STYLING UNTUK .btn-tambah-sesi karena tombolnya sudah dihapus dari HTML */
+/* Jika Anda memiliki tombol lain dengan class ini di tempat lain, pisahkan stylenya. */
+/* Jika tidak, bisa dihapus total dari sini. */
+/* .action-btn.primary-btn.btn-tambah-sesi { ... } */
+
+/* Tabel Sesi di dalam modal */
+.small-table {
+    font-size: 13px;
+    table-layout: auto;
+}
+.small-table th {
+    background-color: #f0f0f0 !important;
+    color: #333 !important;
+    font-weight: normal;
+    padding: 8px;
+}
+.small-table td {
+    padding: 8px;
+    text-align: center;
+}
+
+.btn-hapus-sesi {
+    color: #cc0000;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Tombol Bawah Modal */
+.modal-actions.modal-actions-bottom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+#btn-simpan-edit {
+    background-color: #007bff; /* Biru Solid */
+    color: white;
+    font-weight: bold;
+}
+#btn-batal-edit {
+    background-color: #ccc;
+    color: #333;
+    font-weight: bold;
+} 
+
+/* ========================================================== */
+/* F. STYLING MODAL TAMBAH JADWAL BARU */
+/* ========================================================== */
+
+/* Atur lebar khusus untuk modal Tambah Jadwal */
+.modal-content.modal-content-small {
+    max-width: 450px;
+    width: 90%;
+    padding: 25px;
+}
+
+/* Mengatur warna tombol Simpan (Orange sesuai desain) */
+.action-btn.primary-btn-orange {
+    background-color: #e5a546; /* Kuning/Orange */
+    color: white; 
+}
+
+/* Mengatur warna tombol Batal (Merah Muda sesuai desain) */
+#btn-batal-tambah-baru {
+    background-color: #cc0000; /* Merah Muda */
+    color: white;
+}
+
+/* ========================================================== */
+/* G. STYLING KHUSUS DAFTAR SANTRI */
+/* ========================================================== */
+
+/* Kontrol Header Daftar Santri */
+.header-content-actions {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; /* Pastikan responsif jika layar kecil */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.santri-filter-wrapper {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-group label {
+    font-weight: bold;
+    color: #275238;
+}
+
+/* Ukuran kecil untuk filter di halaman daftar santri */
+.filter-small {
+    width: 120px; 
+    max-width: 120px;
+    padding: 8px 10px;
+    font-size: 15px;
+}
+
+/* Wrapper untuk Search dan Export */
+.action-right-wrapper {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-left: auto; /* Dorong ke kanan */
+}
+
+/* Kotak Pencarian */
+.search-box-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 10px 10px 10px 35px; /* Tambahkan ruang untuk ikon */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 250px;
+    box-sizing: border-box;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    color: #999;
+}
+
+/* Tombol Ekspor Data */
+.export-btn {
+    background-color: #e5a546; 
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 8px;
+    font-weight: normal;
+}
+
+/* Styling Khusus Badge Jenjang (Anak/Dewasa) */
+/* Kita menggunakan class status-sudah-kelas/belum-kelas untuk warna (hijau/merah) */
+#santri-list-table .status-belum-kelas { 
+    background-color: #f1a9a0 !important; /* Warna Merah Muda untuk Jenjang Anak */
+    color: #275238 !important; /* Teks Hijau Tua */
+    font-weight: bold;
+    border-radius: 5px !important;
+}
+#santri-list-table .status-sudah-kelas { 
+    background-color: #d8ead8 !important; /* Warna Hijau Muda untuk Jenjang Dewasa */
+    color: #275238 !important; /* Teks Hijau Tua */
+    font-weight: bold;
+    border-radius: 5px !important;
+}

@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   daftarPendaftar,
   getAllPendaftar,
+  getPendaftarById,
   terimaPendaftar,
   tolakPendaftar,
   deletePendaftar,
@@ -22,6 +23,9 @@ router.get("/export/excel", verifyToken, onlyAdmin, exportExcelPendaftar);
 
 // ADMIN – GET ALL
 router.get("/", verifyToken, onlyAdmin, getAllPendaftar);
+
+// DETAIL PENDAFTAR
+router.get("/:id_pendaftar", verifyToken, onlyAdmin, getPendaftarById);
 
 // ADMIN – ACTION
 router.put("/terima/:id_pendaftar", verifyToken, onlyAdmin, terimaPendaftar);

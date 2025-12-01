@@ -1,78 +1,272 @@
+
+const BASE_URL = "http://localhost:5000";
+
+/* ---------- Helper: fetch wrapper with json/error handling ---------- */
+async function fetchJSON(url, opts = {}) {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let body = null;
+    try { body = await res.json(); } catch(e) { body = await res.text().catch(()=>null); }
+    const err = new Error(`HTTP ${res.status} ${res.statusText}`);
+    err.status = res.status;
+    err.body = body;
+    throw err;
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+/* ---------- Helper: token getter ---------- */
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+/* ---------- Helper: debug logger (prints structured output) ---------- */
+function logDebug(tag, obj) {
+  try {
+    console.log(`===== DEBUG ${tag} =====`);
+    console.log(obj);
+  } catch (e) {
+    console.log(tag, obj);
+  }
+}
+
+/* ---------- Clear sample placeholders in HTML so real data shows ---------- */
+function clearPlaceholders() {
+  const dashTbody = document.querySelector("#dashboardTable tbody");
+  if (dashTbody) dashTbody.innerHTML = "";
+
+  const jadwalTbody = document.getElementById("table_jadwal");
+  if (jadwalTbody) jadwalTbody.innerHTML = "";
+
+  const absBody = document.getElementById("absensiBody");
+  if (absBody) absBody.innerHTML = "";
+
+  const riwayat = document.getElementById("riwayatBody");
+  if (riwayat) riwayat.innerHTML = "";
+}
+
+/* ---------- Set all date inputs to today if empty ---------- */
+function setTodayToDateInputs() {
+  const today = new Date().toISOString().split("T")[0];
+  document.querySelectorAll('input[type="date"]').forEach(inp => {
+    if (!inp.value) inp.value = today;
+  });
+}
+
 /* ======================================================
-   LOAD DATA PENGAJAR (Profil + Kelas + Jadwal)
+   LOAD DATA PENGAJAR (GET /pengajar/me)
+   Untuk menampilkan nama di pojok kanan atas
+====================================================== */
+async function loadPengajarName() {
+  const token = getToken();
+  if (!token) {
+    console.warn("Token tidak ditemukan, nama pengajar tidak dimuat.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BASE_URL}/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!res.ok) {
+      console.warn("Gagal ambil nama pengajar", res.status);
+      return;
+    }
+
+    const data = await res.json();
+    logDebug("data pengajar", data);
+
+    // API kamu: { success: true, role: "...", profile: { nama: "Maya..." } }
+    const nama = data?.profile?.nama ?? data?.nama ?? null;
+    if (!nama) {
+      console.warn("Response /me tidak mengandung nama di data.profile.nama");
+      return;
+    }
+
+    // set header name
+    const el = document.querySelector(".user-name");
+    if (el) el.textContent = nama;
+
+    // set absensi panel pengajar (jika ada elemen static-value khusus)
+    const staticVal = document.querySelector(".absensi-header-filters .static-value");
+    if (staticVal) staticVal.textContent = nama;
+
+  } catch (err) {
+    console.error("loadPengajarName error:", err);
+  }
+}
+
+
+/* ======================================================
+   POPULATE CLASS SELECTS
+   GET /kelas/pengajar/me (may return object or array)
+====================================================== */
+async function populateClassSelects() {
+  const token = getToken();
+  if (!token) return;
+
+  try {
+    const resp = await fetch(`${BASE_URL}/kelas/pengajar/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (!resp.ok) {
+      console.warn("/kelas/pengajar/me returned", resp.status);
+      // ensure selects show placeholder
+      document.querySelectorAll("select.custom-select").forEach(sel => {
+        if (sel) sel.innerHTML = `<option value="">Tidak ada kelas</option>`;
+      });
+      return;
+    }
+
+    const raw = await resp.json();
+    logDebug("kelasData (raw)", raw);
+
+    // normalize to array (backend may return object)
+    let kelasList = [];
+    if (Array.isArray(raw)) kelasList = raw;
+    else if (raw && raw.id_kelas) kelasList = [raw];
+    else if (raw && raw.data && Array.isArray(raw.data)) kelasList = raw.data;
+    else if (raw && raw.data && raw.data.id_kelas) kelasList = [raw.data];
+
+    window._kelasList = kelasList;
+    window._selectedKelasId = kelasList[0]?.id_kelas ?? kelasList[0]?.id ?? null;
+
+    // fill selects used in jadwal & absensi & riwayat
+    const selects = document.querySelectorAll("#jadwal-content select.custom-select, #absensi-content select.custom-select, #riwayatKelasSelect");
+    selects.forEach(sel => {
+      if (!sel) return;
+      sel.innerHTML = "";
+      if (kelasList.length === 0) {
+        sel.innerHTML = `<option value="">Tidak ada kelas</option>`;
+        return;
+      }
+      kelasList.forEach(k => {
+        const id = k.id_kelas ?? k.id ?? "";
+        const nama = k.nama_kelas ?? k.nama ?? `Kelas ${id}`;
+        const opt = document.createElement("option");
+        opt.value = id;
+        opt.textContent = nama;
+        sel.appendChild(opt);
+      });
+      // set selected to first
+      sel.value = window._selectedKelasId ?? sel.options[0]?.value;
+    });
+
+  } catch (err) {
+    console.error("populateClassSelects error:", err);
+  }
+}
+
+/* ======================================================
+   LOAD KELAS DETAIL FOR PENGAJAR (GET /kelas/pengajar/detail/:id)
+   Returns normalized { kelas, santri[], jadwal[] }
+====================================================== */
+async function loadKelasDetailForPengajar(kelasId) {
+  if (!kelasId) return null;
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    const detail = await fetchJSON(`${BASE_URL}/kelas/pengajar/detail/${kelasId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    logDebug("detail kelas", detail);
+    return {
+      kelas: detail.kelas ?? detail,
+      santri: Array.isArray(detail.santri) ? detail.santri : (detail.santri ? [detail.santri] : []),
+      jadwal: Array.isArray(detail.jadwal) ? detail.jadwal : (detail.jadwal ? [detail.jadwal] : [])
+    };
+  } catch (err) {
+    console.error("loadKelasDetailForPengajar error:", err);
+    return null;
+  }
+}
+
+/* ======================================================
+   LOAD & RENDER DASHBOARD (nama kelas, hari jadwal, jumlah santri)
+   - Uses /kelas/pengajar/me, /kelas/pengajar/detail/:id, /jadwal/pengajar/me
 ====================================================== */
 async function loadPengajarData() {
   const token = localStorage.getItem("token");
-  if (!token) return location.href = "../login.html";
+  if (!token) return;
 
   try {
-    // --- PROFIL (opsional jika diperlukan) ---
-    const resProfile = await fetch("http://localhost:5000/auth/me", {
+    // === AMBIL DATA KELAS ===
+    const kelas = await fetchJSON(`http://localhost:5000/kelas/pengajar/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    const profile = await resProfile.json();
-    if (profile?.profile?.nama) {
-      document.querySelector(".user-name").textContent = profile.profile.nama;
+
+    console.log("===== DEBUG kelasData (raw) =====");
+    console.log(kelas);
+
+    const namaKelasEl = document.querySelector(".nama_kelas");
+    const jadwalKelasEl = document.querySelector(".jadwal_kelas");
+    const jumlahSantriEl = document.querySelector(".jumlah_santri");
+
+    if (kelas.length > 0) {
+      const k = kelas[0]; // pengajar selalu punya 1 kelas
+
+      namaKelasEl.textContent = k.nama_kelas ?? "-";
+      
+      // ambil jadwal dari endpoint jadwal
+      const jadwal = await fetchJSON(`http://localhost:5000/jadwal/pengajar/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const jadwalHari = jadwal[0]?.hari ?? "-";
+      jadwalKelasEl.textContent = jadwalHari;
+
+      // Ambil jumlah santri dari endpoint detail kelas
+      const detail = await fetchJSON(`http://localhost:5000/kelas/pengajar/detail/${k.id_kelas}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      console.log("===== DEBUG detail kelas =====");
+      console.log(detail);
+
+      jumlahSantriEl.textContent = detail.santri?.length ?? 0;
     }
 
-    // --- KELAS PENGAJAR ---
-    const resKelas = await fetch("http://localhost:5000/kelas/pengajar/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const kelas = await resKelas.json();
-
-    // --- JADWAL PENGAJAR ---
-    const resJadwal = await fetch("http://localhost:5000/jadwal/pengajar/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const jadwal = await resJadwal.json();
-
-    // --- MASUKKAN KE DASHBOARD ---
-    fillDashboardKelas(kelas, jadwal);
-    renderDashboardJadwal(jadwal);
+    // === TAMPILKAN JADWAL HARI INI DI DASHBOARD ===
+    try {
+      const jadwal = await fetchJSON(`http://localhost:5000/jadwal/pengajar/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      renderDashboardJadwal(Array.isArray(jadwal) ? jadwal : [jadwal]);
+    } catch (err) {
+      console.warn("Jadwal load error:", err);
+      renderDashboardJadwal([]);
+    }
 
   } catch (err) {
-    console.error("Gagal memuat data pengajar:", err);
+    console.error("loadPengajarData error:", err);
   }
 }
 
-/* ======================================================
-   ISI INFORMASI KELAS DI DASHBOARD
-====================================================== */
-function fillDashboardKelas(kelas, jadwal) {
-  const dNamaKelas = document.querySelector(".nama_kelas");
-  const dJadwal = document.querySelector(".jadwal_kelas");
-  const dJumlahSantri = document.querySelector(".jumlah_santri");
-
-  // --- Informasi kelas ---
-  if (Array.isArray(kelas) && kelas.length > 0) {
-    const k = kelas[0];
-    dNamaKelas.textContent = k.nama_kelas ?? "-";
-    dJumlahSantri.textContent = k.kapasitas ?? "-";
-  }
-
-  // --- Hari jadwal ---
-  if (Array.isArray(jadwal) && jadwal.length > 0) {
-    const hari = jadwal.map(j => j.hari).join(", ");
-    dJadwal.textContent = hari || "-";
-  }
-}
 
 /* ======================================================
-   RENDER JADWAL DI DASHBOARD
+   RENDER Dashboard Jadwal (table)
 ====================================================== */
 function renderDashboardJadwal(jadwal) {
   const tbody = document.querySelector("#dashboardTable tbody");
   if (!tbody) return;
-
   tbody.innerHTML = "";
 
-  jadwal.forEach(j => {
+  const list = Array.isArray(jadwal) ? jadwal : (jadwal ? [jadwal] : []);
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5">Belum ada jadwal hari ini.</td></tr>`;
+    return;
+  }
+
+  list.forEach(j => {
     tbody.innerHTML += `
       <tr>
-        <td>${j.hari}</td>
-        <td>${j.jam_mulai} - ${j.jam_selesai}</td>
-        <td>${j.nama_kelas}</td>
+        <td>${j.hari ?? "-"}</td>
+        <td>${j.jam_mulai ?? "-"} - ${j.jam_selesai ?? "-"}</td>
+        <td>${j.nama_kelas ?? "-"}</td>
         <td>${j.lokasi ?? "-"}</td>
         <td>${j.pertemuan_ke ?? "-"}</td>
       </tr>
@@ -81,49 +275,50 @@ function renderDashboardJadwal(jadwal) {
 }
 
 /* ======================================================
-   LOAD JADWAL UNTUK HALAMAN "JADWAL KELAS"
-====================================================== */
-async function loadPageJadwal() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  try {
-    const res = await fetch("http://localhost:5000/jadwal/pengajar/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const jadwal = await res.json();
-    renderPageJadwal(jadwal);
-
-  } catch (err) {
-    console.error("Gagal load jadwal:", err);
-  }
-}
-
-/* ======================================================
-   RENDER TABLE JADWAL DETAIL
+   RENDER PAGE JADWAL (detailed)
 ====================================================== */
 function renderPageJadwal(jadwal) {
   const tbody = document.getElementById("table_jadwal");
+  if (!tbody) return;
   tbody.innerHTML = "";
 
-  jadwal.forEach((j, i) => {
+  const list = Array.isArray(jadwal) ? jadwal : (jadwal ? [jadwal] : []);
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6">Belum ada jadwal.</td></tr>`;
+    return;
+  }
+
+  list.forEach((j, i) => {
     tbody.innerHTML += `
       <tr class="main-row">
-        <td>${j.hari}</td>
-        <td>${j.jam_mulai} - ${j.jam_selesai}</td>
-        <td>${j.nama_kelas}</td>
+        <td>${j.hari ?? "-"}</td>
+        <td>${j.jam_mulai ?? "-"} - ${j.jam_selesai ?? "-"}</td>
+        <td>${j.nama_kelas ?? "-"}</td>
         <td>${j.lokasi ?? "-"}</td>
-        <td>${j.nama_pengajar ?? "Pengajar"}</td>
-        <td><button class="btn-detail" onclick="toggleDetail(${i})">Detail</button></td>
+        <td>${j.nama_pengajar ?? "-"}</td>
+        <td><button class="btn-detail" data-detail-index="${i}">Detail</button></td>
       </tr>
-
       <tr id="detail-${i}" class="detail-row" style="display:none;">
-        <td colspan="6">
-          <div class="detail-box">
-            <div class="box">Materi<br><span>kosong</span></div>
-            <div class="box">Absensi<br><span>kosong</span></div>
-            <div class="box">Tugas<br><span>kosong</span></div>
+        <td colspan="7">
+          <div class="detail-container">
+            <div class="detail-card materi-card">
+              <h3>Materi</h3>
+              <p>Masukkan Link/File Materi</p>
+              <button class="btn-input-detail" data-target="materi">Input Materi</button>
+            </div>
+            <div class="detail-card absensi-card">
+              <h3>Absensi</h3>
+              <p>Pencatatan Kehadiran Santri</p>
+              <button class="btn-input-detail" data-target="absensi">Absen Santri</button>
+            </div>
+            <div class="detail-card tugas-card">
+              <h3>Tugas</h3>
+              <p>Masukkan Link/File Tugas</p>
+              <button class="btn-input-detail" data-target="tugas">Input Tugas</button>
+            </div>
+            <button class="btn-simpan-absensi-pengajar btn-absen-pengajar" data-jadwal-id="${j.id_jadwal ?? j.id}">
+                Simpan (Absen Pengajar)
+            </button>
           </div>
         </td>
       </tr>
@@ -132,30 +327,326 @@ function renderPageJadwal(jadwal) {
 }
 
 /* ======================================================
-   TOGGLE DETAIL TIAP JADWAL
+   LOAD absensi santri for a kelasId & tanggal (render absensiBody)
 ====================================================== */
-function toggleDetail(id) {
-  const row = document.getElementById(`detail-${id}`);
-  row.style.display = row.style.display === "none" ? "table-row" : "none";
+async function loadAbsensiSantriFor(kelasId, tanggal) {
+  const tbody = document.getElementById("absensiBody");
+  if (!tbody) return;
+
+  if (!kelasId) {
+    tbody.innerHTML = `<tr><td colspan="4">Pilih kelas terlebih dahulu.</td></tr>`;
+    return;
+  }
+
+  const detail = await loadKelasDetailForPengajar(kelasId);
+  if (!detail || !Array.isArray(detail.santri) || detail.santri.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">Belum ada santri di kelas ini.</td></tr>`;
+    window._jadwalUtama = null;
+    const title = document.querySelector(".absensi-info-bar h3");
+    const time = document.querySelector(".absensi-info-bar span");
+    if (title) title.textContent = "Absen Hari ";
+    if (time) time.textContent = "";
+    return;
+  }
+
+  tbody.innerHTML = "";
+  detail.santri.forEach((s, idx) => {
+    const idSantri = s.id_santri ?? s.id ?? "";
+    tbody.innerHTML += `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${s.nama ?? "-"}</td>
+        <td>
+          <select class="status-select" data-santri-id="${idSantri}">
+            <option value="Hadir">Hadir</option>
+            <option value="Izin">Izin</option>
+            <option value="Sakit">Sakit</option>
+            <option value="Mustamiah">Mustamiah</option>
+            <option value="Alpha">Alpha</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" class="input-catatan" data-santri-id="${idSantri}" placeholder="-">
+        </td>
+      </tr>
+    `;
+  });
+
+  window._jadwalUtama = (detail.jadwal && detail.jadwal.length) ? detail.jadwal[0] : null;
+  const headerTitle = document.querySelector(".absensi-info-bar h3");
+  const headerTime = document.querySelector(".absensi-info-bar span");
+  if (window._jadwalUtama) {
+    if (headerTitle) headerTitle.textContent = `Absen Hari ${window._jadwalUtama.hari ?? ""}`;
+    if (headerTime) headerTime.textContent = `${window._jadwalUtama.jam_mulai ?? ""} - ${window._jadwalUtama.jam_selesai ?? ""}`;
+  } else {
+    if (headerTitle) headerTitle.textContent = `Absen Hari `;
+    if (headerTime) headerTime.textContent = "";
+  }
 }
 
 /* ======================================================
-   MENU NAV — LOAD JADWAL SAAT MASUK MENU JADWAL
+   Save absensi santri (POST /absensi/santri) - per santri
 ====================================================== */
-document.querySelectorAll(".nav-item").forEach(nav => {
-  nav.addEventListener("click", () => {
-    const target = nav.getAttribute("data-content-id");
+async function saveAbsensiSantri() {
+  const token = getToken();
+  if (!token) return alert("Token tidak ditemukan. Silakan login ulang.");
 
-    if (target === "jadwal-content") {
-      loadPageJadwal();
+  const jadwal = window._jadwalUtama;
+  if (!jadwal) return alert("Jadwal tidak ditemukan. Pilih kelas yang memiliki jadwal terlebih dahulu.");
+
+  const tanggal = (document.querySelector("#absensi-content input[type='date']")?.value) || new Date().toISOString().split("T")[0];
+  const rows = document.querySelectorAll("#absensiBody tr");
+  if (!rows || rows.length === 0) return alert("Tidak ada santri untuk disimpan.");
+
+  const btn = document.getElementById("btnSimpanAbsensi");
+  if (btn) { btn.disabled = true; btn.textContent = "Menyimpan..."; }
+
+  try {
+    for (let row of rows) {
+      const select = row.querySelector(".status-select");
+      const input = row.querySelector(".input-catatan");
+      if (!select) continue;
+      const id_santri = select.dataset.santriId;
+      const payload = {
+        id_santri: Number(id_santri),
+        id_jadwal: jadwal.id_jadwal ?? jadwal.id,
+        tanggal,
+        status_absensi: select.value,
+        catatan: input?.value || ""
+      };
+      try {
+        await fetchJSON(`${BASE_URL}/absensi/santri`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`
+          },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn("Gagal simpan absensi untuk santri:", id_santri, e);
+      }
+    }
+    alert("Absensi Santri berhasil disimpan.");
+  } catch (err) {
+    console.error("Error saat menyimpan absensi:", err);
+    alert("Terjadi kesalahan saat menyimpan. Cek console.");
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "Simpan Absensi"; }
+  }
+}
+
+/* ======================================================
+   POST absensi pengajar (from dynamic button)
+====================================================== */
+async function postAbsensiPengajar(id_jadwal) {
+  if (!id_jadwal) return alert("id_jadwal diperlukan.");
+  try {
+    await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({
+        id_jadwal: Number(id_jadwal),
+        tanggal: new Date().toISOString().split("T")[0],
+        status_absensi: "Hadir",
+        catatan: "Mengajar sesuai jadwal"
+      })
+    });
+    alert("Absensi Pengajar tercatat.");
+  } catch (err) {
+    console.error("postAbsensiPengajar error:", err);
+    alert("Gagal mencatat absen pengajar. Cek console.");
+  }
+}
+
+/* ======================================================
+   Riwayat absensi (GET /absensi/santri/kelas/me)
+====================================================== */
+async function loadRiwayatAbsensi() {
+  try {
+    const data = await fetchJSON(`${BASE_URL}/absensi/santri/kelas/me`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    const list = Array.isArray(data) ? data : (data ? [data] : []);
+    renderRiwayatAbsensi(list);
+  } catch (err) {
+    console.error("loadRiwayatAbsensi error:", err);
+    const tbody = document.getElementById("riwayatBody");
+    if (tbody) tbody.innerHTML = `<tr><td colspan="5">Gagal memuat riwayat. Cek console.</td></tr>`;
+  }
+}
+
+function renderRiwayatAbsensi(list) {
+  const tbody = document.getElementById("riwayatBody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!Array.isArray(list) || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5">Belum ada riwayat absensi.</td></tr>`;
+    return;
+  }
+  list.forEach((item, idx) => {
+    const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString("id-ID") : "-";
+    const jam = item.jam_mulai ? `${item.jam_mulai} - ${item.jam_selesai ?? "-"}` : "-";
+    tbody.innerHTML += `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${item.hari ?? "-"}, ${tanggal}</td>
+        <td>${jam}</td>
+        <td>${item.status_absensi ?? "-"}</td>
+        <td>${item.catatan ?? "-"}</td>
+      </tr>
+    `;
+  });
+}
+
+/* ======================================================
+   loadPageJadwalFor(kelasId) - we use jadwal/pengajar/me (no kelas param supported)
+====================================================== */
+async function loadPageJadwalFor(kelasId) {
+  try {
+    // If backend supports kelas-specific jadwal endpoint, you can call it instead.
+    const jadwal = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+    renderPageJadwal(jadwal);
+  } catch (err) {
+    console.error("loadPageJadwalFor error:", err);
+    const tb = document.getElementById("table_jadwal");
+    if (tb) tb.innerHTML = `<tr><td colspan="6">Gagal memuat jadwal. Cek console.</td></tr>`;
+  }
+}
+
+/* ======================================================
+   Event wiring - nav, selects, buttons
+====================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  // nav
+  document.querySelectorAll(".nav-item").forEach(nav => {
+    nav.addEventListener("click", async () => {
+      const target = nav.getAttribute("data-content-id");
+      if (target === "jadwal-content") {
+        await populateClassSelects();
+        setTodayToDateInputs();
+        const kelasSel = document.querySelector("#jadwal-content .filter-group select.custom-select");
+        const kelasId = kelasSel?.value ?? window._selectedKelasId;
+        await loadPageJadwalFor(kelasId);
+        showSectionById("jadwal-content");
+      } else if (target === "absensi-content") {
+        await populateClassSelects();
+        setTodayToDateInputs();
+        const kelasSel = document.querySelector("#absensi-content .filter-group select.custom-select");
+        const kelasId = kelasSel?.value ?? window._selectedKelasId;
+        const tanggal = document.querySelector("#absensi-content input[type='date']")?.value;
+        await loadAbsensiSantriFor(kelasId, tanggal);
+        showSectionById("absensi-content");
+      } else {
+        showSectionById("dashboard-content");
+      }
+    });
+  });
+
+  // dynamic click: detail toggle / absen pengajar
+  document.body.addEventListener("click", (e) => {
+    // toggle detail buttons
+    if (e.target.matches(".btn-detail")) {
+      const idx = e.target.getAttribute("data-detail-index");
+      const row = document.getElementById(`detail-${idx}`);
+      if (row) row.style.display = row.style.display === "none" ? "table-row" : "none";
+    }
+
+    // absen pengajar (button inside jadwal detail)
+    if (e.target.matches(".btn-absen-pengajar")) {
+      const id = e.target.dataset.jadwalId;
+      postAbsensiPengajar(id);
     }
   });
+
+  // selects and date change handling (delegated)
+  document.addEventListener("change", async (e) => {
+    // absensi kelas select change
+    const absKelasSel = document.querySelector("#absensi-content .filter-group select.custom-select");
+    if (e.target === absKelasSel) {
+      window._selectedKelasId = e.target.value;
+      const tanggal = document.querySelector("#absensi-content input[type='date']")?.value;
+      await loadAbsensiSantriFor(e.target.value, tanggal);
+      return;
+    }
+
+    // absensi date change
+    const absDate = document.querySelector("#absensi-content input[type='date']");
+    if (e.target === absDate) {
+      const kelasId = window._selectedKelasId;
+      await loadAbsensiSantriFor(kelasId, e.target.value);
+      return;
+    }
+
+    // jadwal select change
+    const jadKelasSel = document.querySelector("#jadwal-content .filter-group select.custom-select");
+    if (e.target === jadKelasSel) {
+      window._selectedKelasId = e.target.value;
+      await loadPageJadwalFor(e.target.value);
+      return;
+    }
+  });
+
+  // save absensi button
+  const btnSave = document.getElementById("btnSimpanAbsensi");
+  if (btnSave) btnSave.addEventListener("click", saveAbsensiSantri);
+
+  // view riwayat
+  const viewRiway = document.getElementById("btnViewRiwayat");
+  if (viewRiway) viewRiway.addEventListener("click", async () => {
+    showSectionById("riwayat-kehadiran-content");
+    await loadRiwayatAbsensi();
+  });
+
+  // back button
+  const btnBack = document.getElementById("btnKembali");
+  if (btnBack) btnBack.addEventListener("click", () => showSectionById("absensi-content"));
 });
+
+/* ======================================================
+   Helper: show a section by id (hide others)
+====================================================== */
+function showSectionById(id) {
+  document.querySelectorAll(".content-section").forEach(s => s.classList.remove("active"));
+  const el = document.getElementById(id);
+  if (el) el.classList.add("active");
+}
+
+/* ======================================================
+   INIT: run once on load
+====================================================== */
+(async function init() {
+  try {
+    clearPlaceholders();
+    setTodayToDateInputs();
+    await populateClassSelects();
+    await loadPengajarData();
+    await loadPengajarName();
+    // default to dashboard (unless hash asks otherwise)
+    const hash = location.hash.replace("#", "");
+    if (hash === "jadwal") {
+      document.querySelector("[data-content-id='jadwal-content']")?.click();
+    } else if (hash === "absensi") {
+      document.querySelector("[data-content-id='absensi-content']")?.click();
+    } else {
+      showSectionById("dashboard-content");
+    }
+    console.log("pengajar.js init done");
+  } catch (err) {
+    console.error("Init error:", err);
+  }
+})();
+
 
 /* ======================================================
    INIT AWAL
 ====================================================== */
-loadPengajarData();
+  loadPengajarData();
 
 
 /* pengajar.js --- behavior untuk dashboard pengajar */

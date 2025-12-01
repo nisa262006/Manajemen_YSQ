@@ -157,6 +157,8 @@ exports.pindahSantriKelas = async (req, res) => {
 
 
 // ===================== PENGAJAR ===============================
+
+// Ambil kelas yang diajar pengajar login
 exports.kelasPengajar = async (req, res) => {
   const result = await db.query(
     `SELECT k.*
@@ -168,6 +170,59 @@ exports.kelasPengajar = async (req, res) => {
 
   res.json(result.rows);
 };
+
+
+// ===================== DETAIL KELAS UNTUK PENGAJAR ===============================
+
+exports.getDetailKelasPengajar = async (req, res) => {
+  const { id_kelas } = req.params;
+  const id_users = req.users.id_users; // dari token
+
+  try {
+    // 1. Pastikan kelas ini memang diajar oleh pengajar yang login
+    const kelas = await db.query(
+      `SELECT k.*, pg.id_pengajar
+       FROM kelas k
+       JOIN pengajar pg ON pg.id_pengajar = k.id_pengajar
+       WHERE k.id_kelas = $1 AND pg.id_users = $2`,
+      [id_kelas, id_users]
+    );
+
+    if (kelas.rowCount === 0) {
+      return res.status(403).json({ message: "Kelas ini bukan milik pengajar" });
+    }
+
+    const id_pengajar = kelas.rows[0].id_pengajar;
+
+    // 2. Ambil santri dalam kelas
+    const santri = await db.query(
+      `SELECT s.id_santri, s.nama, s.nis
+       FROM santri_kelas sk
+       JOIN santri s ON s.id_santri = sk.id_santri
+       WHERE sk.id_kelas = $1`,
+      [id_kelas]
+    );
+
+    // 3. Ambil jadwal kelas
+    const jadwal = await db.query(
+      `SELECT *
+       FROM jadwal
+       WHERE id_kelas = $1 AND id_pengajar = $2`,
+      [id_kelas, id_pengajar]
+    );
+
+    return res.json({
+      kelas: kelas.rows[0],
+      santri: santri.rows,
+      jadwal: jadwal.rows
+    });
+
+  } catch (err) {
+    console.error("ERROR DETAIL KELAS PENGAJAR:", err);
+    res.status(500).json({ message: "Gagal mengambil detail kelas pengajar" });
+  }
+};
+
 
 // ===================== SANTRI ===============================
 exports.kelasSantri = async (req, res) => {

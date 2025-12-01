@@ -1,0 +1,109 @@
+<body data-page="dashboard"> 
+
+<header class="dashboard-header">
+    <h1 class="header-title" id="page-content-title">Daftar Santri</h1>
+    <div class="admin-profile">
+        <span class="admin-text">Rabu, 19 November 2025</span>
+        <i class="fas fa-user-circle admin-icon"></i>
+    </div>
+</header>
+
+<div class="page-container-left-aligned">
+
+    <div class="header-content-actions">
+        
+        <div class="santri-filter-wrapper">
+            <div class="filter-group">
+                <label for="pilih-kelas-santri">Pilih Kelas:</label>
+                <select id="pilih-kelas-santri" class="profile-input class-filter-select filter-small">
+                    <option value="semua">Usmani 1</option>
+                    <option value="tahsin">Tahsin</option>
+                    <option value="tahfidz">Tahfidz</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="kategori-filter-santri">Kategori:</label>
+                <select id="kategori-filter-santri" class="profile-input class-filter-select filter-small">
+                    <option value="semua">Dewasa</option>
+                    <option value="anak">Anak</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="action-right-wrapper">
+            <div class="search-box-wrapper">
+                <input type="text" id="cari-santri" class="profile-input search-input" placeholder="Cari Nama Santri">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <button class="action-btn primary-btn export-btn" id="btn-export-data">
+                Ekspor Data
+            </button>
+        </div>
+    </div>
+
+    <section class="santri-table-section">
+        <div class="table-wrapper"> 
+            <table id="santri-list-table" class="standard-table">
+                
+                <thead>
+                    <tr class="table-header-row">
+                        <th>NO</th>
+                        <th>NIM</th>
+                        <th>Nama</th>
+                        <th>Kelas</th>
+                        <th>Email</th>
+                        <th>Jenjang</th>
+                        <th>Status</th>
+                        <th class="column-action">Aksi</th>
+                    </tr>
+                </thead>
+                
+                <tbody id="santri-table-body">
+                    <tr class="table-data-row" data-id="1">
+                        <td>1.</td>
+                        <td>249078561</td>
+                        <td>David</td>
+                        <td>Quran</td>
+                        <td>Siswa@gmail.ac.id</td>
+                        <td class="status-cell">
+                            <span class="status-tag status-belum-kelas">Anak</span>
+                        </td>
+                        <td class="status-cell">
+                            <span class="status-tag status-accepted status-toggle" data-status="aktif">Aktif</span>
+                        </td>
+                        <td class="table-actions">
+                            <button class="btn-action btn-edit-santri-detail" data-santri-id="1">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="btn-action btn-delete-santri" data-santri-id="1">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="table-data-row" data-id="2">
+                        <td>2.</td>
+                        <td>249078561</td>
+                        <td>David</td>
+                        <td>Quran</td>
+                        <td>Siswa@gmail.ac.id</td>
+                        <td class="status-cell">
+                            <span class="status-tag status-sudah-kelas">Dewasa</span>
+                        </td>
+                        <td class="status-cell">
+                            <span class="status-tag status-accepted status-toggle" data-status="aktif">Aktif</span>
+                        </td>
+                        <td class="table-actions">
+                            <button class="btn-action btn-edit-santri-detail" data-santri-id="2">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                            <button class="btn-action btn-delete-santri" data-santri-id="2">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>

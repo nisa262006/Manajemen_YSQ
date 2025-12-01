@@ -267,15 +267,13 @@ exports.getAllAbsensiPengajar = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
-        p.*,
-        u.nama_lengkap AS pengajar,
-        k.nama_kelas,
-        j.hari, j.jam_mulai
-      FROM absensi_pengajar p
-      JOIN users u ON p.id_pengajar = u.id_users
-      JOIN jadwal j ON p.id_jadwal = j.id_jadwal
-      JOIN kelas k ON j.id_kelas = k.id_kelas
-      ORDER BY tanggal DESC
+        ap.*, 
+        p.nama AS nama_pengajar,
+        u.email AS email_pengajar
+      FROM absensi_pengajar ap
+      JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
+      JOIN users u ON p.id_users = u.id_users
+      ORDER BY ap.tanggal DESC
     `);
 
     res.json(result.rows);
@@ -283,3 +281,4 @@ exports.getAllAbsensiPengajar = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+

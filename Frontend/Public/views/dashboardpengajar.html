@@ -51,7 +51,6 @@
         </div>
       </header>
 
-  
 
       <!-- DASHBOARD SECTION -->
       <section class="content-section active" id="dashboard-content">
@@ -176,8 +175,8 @@
 
           <div class="absensi-header-filters">
             <div class="filter-group">
-              <label>Pengajar:</label><span class="static-value">Ainun</span>
-            </div>
+              <label>Pengajar:</label><span class="static-value user-name">Pengajar</span>
+            </div>                       
             <div class="filter-group">
               <label>Pilih Kelas:</label><select class="custom-select"><option>Tahsin 1</option></select>
             </div>
@@ -201,35 +200,53 @@
           </div>
 
           <div class="absensi-info-bar">
-            <h3>Absen Hari Ini</h3>
+            <h3>Absen Hari</h3>
             <span>08.00 - 08.30</span>
           </div>
 
-          <table class="data-table absensi-harian-table">
-            <thead>
-              <tr><th>No</th><th>Nama</th><th>Status</th><th>Catatan</th></tr>
-            </thead>
-            <tbody id="absensiBody">
-              <tr><td>1</td><td>Siti Maryam</td><td>
-                <select class="status-select"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select>
-              </td><td><input type="text" value="Kamis Izin" class="input-catatan"></td></tr>
-              <tr><td>2</td><td>Aisyah</td><td>
-                <select class="status-select"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select>
-              </td><td><input type="text" value="-" class="input-catatan"></td></tr>
-              <tr><td>3</td><td>Siti Maryam</td><td>
-                <select class="status-select"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select>
-              </td><td><input type="text" value="Rabu Izin" class="input-catatan"></td></tr>
-              <tr><td>4</td><td>Aisyah</td><td>
-                <select class="status-select"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select>
-              </td><td><input type="text" value="Selasa Sakit" class="input-catatan"></td></tr>
-              <tr><td>5</td><td>Siti Maryam</td><td>
-                <select class="status-select"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select>
-              </td><td><input type="text" value="Jumat Izin" class="input-catatan"></td></tr>
-              <tr><td>6</td><td>Aisyah</td><td>
-                <select class="status-select"><option>Hadir</option><option>Izin</option><option>Sakit</option><option>Alpha</option></select>
-              </td><td><input type="text" value="-" class="input-catatan"></td></tr>
-            </tbody>
-          </table>
+          <div class="absensi-table-wrapper">
+            <table class="absensi-harian-table">          
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama</th>
+                  <th>Status</th>
+                  <th>Catatan</th>
+                </tr>
+              </thead>
+          
+              <tbody id="absensiBody">
+                <tr>
+                  <td>1</td>
+                  <td>Siti Maryam</td>
+                  <td>
+                    <select class="status-select">
+                      <option>Hadir</option>
+                      <option>Izin</option>
+                      <option>Sakit</option>
+                      <option>Alpha</option>
+                    </select>
+                  </td>
+                  <td><input type="text" value="Kamis Izin" class="input-catatan"></td>
+                </tr>
+          
+                <tr>
+                  <td>2</td>
+                  <td>Aisyah</td>
+                  <td>
+                    <select class="status-select">
+                      <option>Hadir</option>
+                      <option>Izin</option>
+                      <option>Sakit</option>
+                      <option>Alpha</option>
+                    </select>
+                  </td>
+                  <td><input type="text" value="-" class="input-catatan"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
 
           <div class="absensi-footer">
             <button class="btn-simpan" id="btnSimpanAbsensi">Simpan Absensi</button>
@@ -318,6 +335,7 @@
   <!-- TOAST -->
   <div id="toastNotification"></div>
 
+  
   <!-- JS -->
   <script src="../js/pengajar.js"></script>
 </body>

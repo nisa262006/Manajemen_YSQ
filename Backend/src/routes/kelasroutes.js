@@ -10,8 +10,10 @@ const {
   tambahSantriKeKelas,
   pindahSantriKelas,
   kelasPengajar,
-  kelasSantri
+  kelasSantri,
+  getDetailKelasPengajar
 } = require("../controllers/kelascontrollers");
+
 
 // PERBAIKI BAGIAN INI ↓↓↓
 const {
@@ -25,6 +27,8 @@ const {
 
 // ================= PENGAJAR ====================
 router.get("/pengajar/me", verifyToken, onlyPengajar, kelasPengajar);
+router.get("/pengajar/detail/:id_kelas", verifyToken, onlyPengajar, getDetailKelasPengajar);
+
 
 // ================= SANTRI ======================
 router.get("/santri/me", verifyToken, onlySantri, kelasSantri);

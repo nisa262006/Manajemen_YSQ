@@ -49,6 +49,27 @@ exports.getAllPendaftar = async (req, res) => {
 };
 
 
+/* Get santri pendaftar (Admin)*/
+exports.getPendaftarById = async (req, res) => {
+  try {
+    const { id_pendaftar } = req.params;
+    const q = await db.query(
+      `SELECT * FROM pendaftar WHERE id_pendaftar = $1`,
+      [id_pendaftar]
+    );
+
+    if (q.rowCount === 0) {
+      return res.status(404).json({ message: "Pendaftar tidak ditemukan" });
+    }
+
+    res.json(q.rows[0]);
+  } catch (err) {
+    console.error("ERROR getPendaftarById:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 /* ================================
    3. Terima pendaftar (FINAL)
 ================================ */

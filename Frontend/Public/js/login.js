@@ -28,7 +28,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
       // REDIRECT SESUAI ROLE
       if (data.role === "admin") {
-          window.location.href = "./dashboardadmin.html";
+          window.location.href = "./Admin.html";
       } 
       else if (data.role === "pengajar") {
           window.location.href = "./dashboardpengajar.html";

@@ -13,8 +13,8 @@ exports.verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // VALIDASI PAYLOAD
-    if (!decoded.id_users || !decoded.username || !decoded.role) {
+    // VALIDASI PAYLOAD — DIPERBAIKI
+    if (!decoded.id_users || !decoded.role) {
       return res.status(403).json({ message: "Invalid token payload" });
     }
 

@@ -38,11 +38,7 @@ Content-Type: application/json
 
 ### liat data me
 GET http://localhost:5000/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
-
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDQwMzYyNSwiZXhwIjoxNzY0NDkwMDI1fQ.ZzxD9n6JURJ06rOaZ8ZOP_n6Ju-YYqM8aanuQXX1YNA
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDQwMDc0OSwiZXhwIjoxNzY0NDg3MTQ5fQ.7ZGaz11RZ3un0GKUaEllCR5TPVqxIzJxDC81ClIqkJg
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDA4MDY1LCJleHAiOjE3NjQ0OTQ0NjV9.agPaNaLnV414lY_j-IDrIH6GnTEoRRuTVzSsaw8aSw4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDU3MTY2MSwiZXhwIjoxNzY0NjU4MDYxfQ.oon2nK8_Q-oRDjv6-fDMrVYmjBrCYuZFVPmVibW27IE
 
 ============= REGISTRASI ======================
 ### PENDAFTARAN
@@ -59,7 +55,11 @@ Content-Type: application/json
 
 ### get pendaftaran
 GET http://localhost:5000/pendaftar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+
+### get pendaftar santri
+GET http://localhost:5000/pendaftar/15
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
 
 ### Admin Terima Pendaftar
 PUT http://localhost:5000/pendaftar/terima/14
@@ -97,15 +97,19 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
 
 
 ##################################################
 ### 3. DETAIL KELAS (ADMIN) BENER
 ##################################################
 
-GET http://localhost:5000/kelas/detail/11
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDQwMzYyNSwiZXhwIjoxNzY0NDkwMDI1fQ.ZzxD9n6JURJ06rOaZ8ZOP_n6Ju-YYqM8aanuQXX1YNA
+GET http://localhost:5000/kelas/detail/8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+
+### PENGAJAR
+GET http://localhost:5000/kelas/pengajar/detail/8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDA4MzAwLCJleHAiOjE3NjQ0OTQ3MDB9.Nv_jmyX48ELWuKUyJ9kweck_GajnBMomPFjWZFKLVMw
 
 ##################################################
 ### 4. UPDATE KELAS (ADMIN) BENER
@@ -202,7 +206,7 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/jadwal
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
 
 
 ##################################################
@@ -228,7 +232,7 @@ Content-Type: application/json
 ##################################################
 
 DELETE http://localhost:5000/jadwal/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDkyMDg4LCJleHAiOjE3NjQ1Nzg0ODh9.mYYtuyThVmP7D9gfXagmwz1dXfOWgjdVwiqmg2WqTIQ
 
 
 
@@ -256,7 +260,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsI
 ###############################################################
 
 GET http://localhost:5000/absensi/santri/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
 
 
 ###############################################################
@@ -264,7 +268,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ###############################################################
 
 GET http://localhost:5000/absensi/pengajar/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
 
 
 
@@ -273,13 +277,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ###############################################################
 
 POST http://localhost:5000/absensi/santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjQ0NzIxLCJleHAiOjE3NjQzMzExMjF9.OXvtawreNymOAv8N1oblOLWsQdBXhP7XYwvqsYpKJKI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
 Content-Type: application/json
 
 {
   "id_santri": 15,
   "id_jadwal": 1,
-  "tanggal": "2025-02-10",
+  "tanggal": "2025-11-1",
   "status_absensi": "Hadir",
   "catatan": "Tepat waktu"
 }
@@ -305,7 +309,7 @@ Content-Type: application/json
 ###############################################################
 
 GET http://localhost:5000/absensi/santri/kelas/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjQ0NzIxLCJleHAiOjE3NjQzMzExMjF9.OXvtawreNymOAv8N1oblOLWsQdBXhP7XYwvqsYpKJKI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
 
 
 ###############################################################
@@ -322,7 +326,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsI
 ###############################################################
 
 POST http://localhost:5000/absensi/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjIxMzgyLCJleHAiOjE3NjQzMDc3ODJ9.rc7aLUfiYDMG4FYFFIjCanmUJtxlYQbe2NhSfjxlf18
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
 Content-Type: application/json
 
 {
@@ -339,5 +343,5 @@ Content-Type: application/json
 ###############################################################
 
 GET http://localhost:5000/absensi/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjIxMzgyLCJleHAiOjE3NjQzMDc3ODJ9.rc7aLUfiYDMG4FYFFIjCanmUJtxlYQbe2NhSfjxlf18
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
 

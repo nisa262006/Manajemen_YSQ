@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
-<body>
+<body data-page="dashboard">
 
     <div class="container">
 
@@ -49,7 +49,7 @@
             <header class="dashboard-header">
                 <h1 class="header-title">Dashboard</h1>
                 <div class="admin-profile">
-                    <span class="admin-text" id="dashboard-admin-name">Admin</span>
+                    <span id="dashboard-admin-name">Admin</span>
                     <i class="fas fa-user-circle admin-icon" id="dashboard-admin-icon"></i>
                 </div>
             </header>
@@ -58,23 +58,23 @@
             <section class="stats-cards">
                 <div class="stat-card total-santri-dewasa">
                     <span class="stat-label">Total Santri Dewasa</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value" id="totalSantriDewasa">0</span>
                 </div>
                 <div class="stat-card total-santri-anak">
                     <span class="stat-label">Total Santri Anak-anak</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value" id="totalSantriAnak">0</span>
                 </div>
                 <div class="stat-card total-pengajar">
                     <span class="stat-label">Total Pengajar</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value" id="totalPengajar">0</span>
                 </div>
                 <div class="stat-card total-kelas">
                     <span class="stat-label">Total Kelas</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value" id="totalKelas">0</span>
                 </div>
                 <div class="stat-card total-pendaftar">
                     <span class="stat-label">Total Pendaftar</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value" id="totalPendaftar">0</span>
                 </div>
             </section>
 
@@ -92,7 +92,7 @@
             <section class="pendaftar-table">
                 <div class="section-title">Siswa Pendaftar</div>
 
-                <table>
+                <table id="tablePendaftar">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -105,30 +105,7 @@
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>1.</td>
-                            <td>David</td>
-                            <td>Bogor</td>
-                            <td>34 Mei 2009</td>
-                            <td>088882464738</td>
-                            <td><button class="status-btn">Lihat Detail</button></td>
-                        </tr>
-                        <tr>
-                            <td>2.</td>
-                            <td>David</td>
-                            <td>Bogor</td>
-                            <td>34 Mei 2009</td>
-                            <td>088882464738</td>
-                            <td><button class="status-btn">Lihat Detail</button></td>
-                        </tr>
-                        <tr>
-                            <td>3.</td>
-                            <td>David</td>
-                            <td>Bogor</td>
-                            <td>34 Mei 2009</td>
-                            <td>088882464738</td>
-                            <td><button class="status-btn">Lihat Detail</button></td>
-                        </tr>
+                        <!-- JS akan mengisi sini -->
                     </tbody>
                 </table>
             </section>
@@ -163,17 +140,17 @@
                 <div class="profile-field-group">
                     <div>
                         <label>Nama Lengkap :</label> 
-                        <input type="text" id="profile-name-input" value="Rizka Sugiarto" class="profile-input">
+                        <input type="text" id="profile_nama">
                     </div>
 
                     <div>
                         <label>Email :</label> 
-                        <input type="email" id="profile-email-input" value="admin@pesantren.com" class="profile-input">
+                        <input type="email" id="profile_email">
                     </div>
 
                     <div>
                         <label>No. Telepon :</label> 
-                        <input type="text" id="profile-phone-input" value="0812-xxx-xxx" class="profile-input">
+                        <input type="text" id="profile_telepon">
                     </div>
                 </div>
 
@@ -232,7 +209,7 @@
     <div id="notification-toast" class="toast-notification"></div>
 
     <!-- JAVASCRIPT -->
-    <script src="../js/admin.js"></script>
+    <script type="module" src="../js/admin.js"></script>
 
 </body>
 </html>
