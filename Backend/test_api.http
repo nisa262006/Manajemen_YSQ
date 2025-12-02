@@ -38,7 +38,7 @@ Content-Type: application/json
 
 ### liat data me
 GET http://localhost:5000/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDU3MTY2MSwiZXhwIjoxNzY0NjU4MDYxfQ.oon2nK8_Q-oRDjv6-fDMrVYmjBrCYuZFVPmVibW27IE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
 ============= REGISTRASI ======================
 ### PENDAFTARAN
@@ -46,8 +46,8 @@ POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama":"neng",
-  "email":"neng@gmail.com",
+  "nama":"fatimah",
+  "email":"fatim@gmail.com",
   "no_wa":"081234567890",
   "tempat_lahir":"Bogor",
   "tanggal_lahir":"2000-06-01"
@@ -55,15 +55,15 @@ Content-Type: application/json
 
 ### get pendaftaran
 GET http://localhost:5000/pendaftar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
 ### get pendaftar santri
-GET http://localhost:5000/pendaftar/15
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+GET http://localhost:5000/pendaftar/28
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
 ### Admin Terima Pendaftar
-PUT http://localhost:5000/pendaftar/terima/14
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
+PUT http://localhost:5000/pendaftar/terima/28
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
 ### DELETE PENDAFTAR
 DELETE http://localhost:5000/pendaftar/13
@@ -73,7 +73,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 DELETE http://localhost:5000/pendaftar/reset/all
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
 
-============== KELAS ===================
+### TAMBAH PENGAJAR
+POST http://localhost:5000/pengajar/tambah
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
+
+{
+  "nama": "Ustadz Budi",
+  "alamat": "Bogor",
+  "tempat_lahir": "Bogor",
+  "tanggal_lahir": "1990-01-01",
+  "mapel": "Tahsin",
+  "email": "budi@example.com",
+  "no_kontak": "08123456789",
+  "password": "budi123",
+  "confirmPassword": "budi123"
+}
 
 ##################################################
 ### 1. TAMBAH KELAS (ADMIN) BENER
@@ -268,7 +283,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ###############################################################
 
 GET http://localhost:5000/absensi/pengajar/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
 
 

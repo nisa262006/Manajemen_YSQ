@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 // ================= VERIFY TOKEN ==================
-exports.verifyToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader)
     return res.status(401).json({ message: "Token required" });
@@ -13,12 +13,10 @@ exports.verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // VALIDASI PAYLOAD — DIPERBAIKI
     if (!decoded.id_users || !decoded.role) {
       return res.status(403).json({ message: "Invalid token payload" });
     }
 
-    // NORMALISASI STATUS USER
     if (decoded.status_user && decoded.status_user.toLowerCase() !== "aktif") {
       return res.status(403).json({ message: "Akun tidak aktif / diblokir" });
     }
@@ -33,7 +31,7 @@ exports.verifyToken = (req, res, next) => {
 };
 
 // ================= ADMIN ONLY ==================
-exports.onlyAdmin = (req, res, next) => {
+const onlyAdmin = (req, res, next) => {
   if (req.users.role !== "admin") {
     return res.status(403).json({ message: "Admin only" });
   }
@@ -41,7 +39,7 @@ exports.onlyAdmin = (req, res, next) => {
 };
 
 // ================= SANTRI ONLY ==================
-exports.onlySantri = (req, res, next) => {
+const onlySantri = (req, res, next) => {
   if (req.users.role !== "santri") {
     return res.status(403).json({ message: "Santri only" });
   }
@@ -49,9 +47,16 @@ exports.onlySantri = (req, res, next) => {
 };
 
 // ================= PENGAJAR ONLY ==================
-exports.onlyPengajar = (req, res, next) => {
+const onlyPengajar = (req, res, next) => {
   if (req.users.role !== "pengajar") {
     return res.status(403).json({ message: "Pengajar only" });
   }
   next();
+};
+
+module.exports = {
+  verifyToken,
+  onlyAdmin,
+  onlySantri,
+  onlyPengajar
 };

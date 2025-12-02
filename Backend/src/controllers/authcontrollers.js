@@ -80,3 +80,58 @@ exports.getMe = async (req, res) => {
     return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
+
+// ==================== CREATE USER AFTER SANTRI ACCEPTED ====================
+exports.createUserAfterSantriAccepted = async (req, res) => {
+  try {
+    const { id_santri } = req.body;
+
+    // 1️⃣ Ambil data santri dari tabel pendaftar/santri
+    const santriData = await db.query(
+      `SELECT nis, nama_santri, email, kategori
+       FROM santri
+       WHERE id_santri = $1`,
+      [id_santri]
+    );
+
+    if (santriData.rowCount === 0) {
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
+
+    const { nis, nama_santri, email, kategori } = santriData.rows[0];
+
+    // 2️⃣ Bersihkan nama → "riska " → "riska"
+    const cleanName = nama_santri.replace(/\s+/g, "").toLowerCase();
+
+    // 3️⃣ Username otomatis → nis_nama
+    const username = `${nis}_${cleanName}`;
+
+    // 4️⃣ Password default → nama + 123
+    const rawPassword = `${cleanName}123`;
+
+    // 5️⃣ Hash password untuk simpan ke database
+    const password_hash = await bcrypt.hash(rawPassword, 10);
+
+    // 6️⃣ Simpan ke tabel users
+    const insertUser = await db.query(
+      `INSERT INTO users (email, username, password_hash, role, status_user)
+       VALUES ($1, $2, $3, 'santri', 'aktif')
+       RETURNING id_users, username`,
+      [email, username, password_hash]
+    );
+
+    // 7️⃣ Return username + password default (yang dibutuhkan admin)
+    return res.json({
+      message: "Pendaftar berhasil diterima",
+      id_users: insertUser.rows[0].id_users,
+      nis,
+      username,
+      kategori,
+      password_default: rawPassword   // <── YANG KAMU MINTA
+    });
+
+  } catch (err) {
+    console.error("CREATE USER ERROR:", err);
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
