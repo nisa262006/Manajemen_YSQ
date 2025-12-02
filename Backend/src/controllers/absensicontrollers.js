@@ -201,32 +201,60 @@ exports.getAbsensiSantri = async (req, res) => {
 
 exports.catatAbsensiPengajar = async (req, res) => {
   try {
-    const { id_jadwal, tanggal, status_absensi, catatan } = req.body;
     const id_users = req.users.id_users;
+    const { id_jadwal, tanggal, status_absensi, catatan } = req.body;
 
+    // Ambil id_pengajar langsung dari token
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar)
       return res.status(403).json({ message: "Anda bukan pengajar" });
 
+    // Validasi input
+    if (!id_jadwal || !tanggal || !status_absensi) {
+      return res.status(400).json({
+        message: "Lengkapi id_jadwal, tanggal dan status_absensi"
+      });
+    }
+
+    // Cek apakah jadwal milik pengajar ini
+    const cekJadwal = await db.query(`
+      SELECT j.id_jadwal
+      FROM jadwal j
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE j.id_jadwal = $1 AND k.id_pengajar = $2
+    `, [id_jadwal, id_pengajar]);
+
+    if (cekJadwal.rowCount === 0)
+      return res.status(403).json({ message: "Jadwal bukan milik Anda" });
+
+    // Cegah absensi duplikat
     const cekDuplikat = await db.query(`
       SELECT 1 FROM absensi_pengajar
       WHERE id_pengajar = $1 AND id_jadwal = $2 AND tanggal = $3
     `, [id_pengajar, id_jadwal, tanggal]);
 
     if (cekDuplikat.rowCount > 0)
-      return res.status(400).json({ message: "Absensi sudah dicatat" });
+      return res.status(400).json({ message: "Absensi sudah tercatat" });
 
-    await db.query(`
-      INSERT INTO absensi_pengajar(id_pengajar, id_jadwal, tanggal, status_absensi, catatan)
+    // Insert absensi pengajar
+    const insert = await db.query(`
+      INSERT INTO absensi_pengajar 
+      (id_pengajar, id_jadwal, tanggal, status_absensi, catatan)
       VALUES ($1, $2, $3, $4, $5)
-    `, [id_pengajar, id_jadwal, tanggal, status_absensi, catatan]);
+      RETURNING *
+    `, [id_pengajar, id_jadwal, tanggal, status_absensi, catatan ?? null]);
 
-    res.json({ message: "Absensi pengajar dicatat" });
+    res.json({
+      success: true,
+      message: "Absensi pengajar dicatat",
+      data: insert.rows[0]
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Gagal mencatat absensi pengajar:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
-
 
 /* ============================================================================
    PENGAJAR → MELIHAT ABSENSI DIRI SENDIRI

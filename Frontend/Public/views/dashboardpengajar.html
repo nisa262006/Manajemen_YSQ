@@ -169,35 +169,47 @@
       </section>
       
       <!-- ABSENSI -->
-      <section class="content-section" id="absensi-content">
-        <div class="schedule-table-full">
-          <h2>Absensi</h2>
+<section class="content-section" id="absensi-content">
+  <div class="schedule-table-full">
+    <h2>Absensi</h2>
 
-          <div class="absensi-header-filters">
-            <div class="filter-group">
-              <label>Pengajar:</label><span class="static-value user-name">Pengajar</span>
-            </div>                       
-            <div class="filter-group">
-              <label>Pilih Kelas:</label><select class="custom-select"><option>Tahsin 1</option></select>
-            </div>
-            <div class="filter-group">
-              <label>Tanggal:</label><input type="date" class="custom-select">
-            </div>
-            <button class="btn-tambah-catatan">Tambah Catatan</button>
-          </div>
+    <div class="absensi-header-filters">
+      <div class="filter-group">
+        <label>Pengajar:</label>
+        <span class="static-value user-name">Pengajar</span>
+      </div>
 
-          <!-- Panel Absen Pengajar Hari Ini -->
-          <div class="absensi-pengajar-box">
-            <label>Absen Pengajar Hari Ini:</label>
-            <select id="absenPengajarSelect">
-              <option value="">Pilih Kehadiran</option>
-              <option value="Hadir">Hadir</option>
-              <option value="Izin">Izin</option>
-              <option value="Tidak Hadir">Tidak Hadir</option>
-            </select>
-            <button id="simpanAbsenPengajar" class="btn-simpan">Simpan</button>
-            <span id="absenPengajarInfo" style="margin-left:12px;color:#275238;font-weight:600"></span>
-          </div>
+      <div class="filter-group">
+        <label>Pilih Kelas:</label>
+        <select id="kelasSelect" class="custom-select">
+          <option value="">-- Pilih Kelas --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Tanggal:</label>
+        <input id="tanggalAbsensiPengajar" type="date" class="custom-select">
+      </div>
+
+      <button class="btn-tambah-catatan">Tambah Catatan</button>
+    </div>
+
+    <!-- Panel Absen Pengajar Hari Ini -->
+    <div class="absensi-pengajar-box">
+      <label>Absen Pengajar Hari Ini:</label>
+
+      <select id="statusAbsensiPengajar">
+        <option value="">Pilih Kehadiran</option>
+        <option value="Hadir">Hadir</option>
+        <option value="Izin">Izin</option>
+        <option value="Tidak Hadir">Tidak Hadir</option>
+      </select>
+
+      <button id="simpanAbsenPengajar" class="btn-simpan">Simpan</button>
+
+      <span id="absenPengajarInfo"
+        style="margin-left:12px;color:#275238;font-weight:600"></span>
+    </div>
 
           <div class="absensi-info-bar">
             <h3>Absen Hari</h3>

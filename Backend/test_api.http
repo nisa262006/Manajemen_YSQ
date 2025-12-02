@@ -324,7 +324,7 @@ Content-Type: application/json
 ###############################################################
 
 GET http://localhost:5000/absensi/santri/kelas/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0Njg4MTA3LCJleHAiOjE3NjQ3NzQ1MDd9.39hEQz5CJxi_c43GrZCR4sK-JPwYQfRadrHDXCSfTK8
 
 
 ###############################################################
@@ -341,12 +341,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsI
 ###############################################################
 
 POST http://localhost:5000/absensi/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0Njg4MTA3LCJleHAiOjE3NjQ3NzQ1MDd9.39hEQz5CJxi_c43GrZCR4sK-JPwYQfRadrHDXCSfTK8
 Content-Type: application/json
 
 {
   "id_jadwal": 1,
-  "tanggal": "2025-02-10",
+  "tanggal": "2025-10-26",
   "status_absensi": "Hadir",
   "catatan": "Mengajar sesuai jadwal"
 }

@@ -387,6 +387,59 @@ async function loadAbsensiSantriFor(kelasId, tanggal) {
 /* ======================================================
    Save absensi santri (POST /absensi/santri) - per santri
 ====================================================== */
+async function postAbsensiPengajar(id_jadwal) {
+  console.log("==== MULAI ABSEN PENGAJAR ====");
+
+  if (!id_jadwal) {
+    alert("id_jadwal diperlukan.");
+    return;
+  }
+
+  try {
+    // Ambil profil dari /me
+    const me = await fetchJSON(`${BASE_URL}/me`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    });
+
+    console.log("DATA /me:", me);
+
+    const id_pengajar = me?.profile?.id_pengajar ?? me?.id_pengajar ?? null;
+    console.log("ID PENGAJAR:", id_pengajar);
+
+    if (!id_pengajar) {
+      alert("ID Pengajar tidak ditemukan di /me");
+      return;
+    }
+
+    const payload = {
+      id_pengajar: Number(id_pengajar),
+      id_jadwal: Number(id_jadwal),
+      tanggal: new Date().toISOString().split("T")[0],
+      status_absensi: "Hadir",
+      catatan: "Mengajar sesuai jadwal"
+    };
+
+    console.log("PAYLOAD DIKIRIM:", payload);
+
+    const result = await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    console.log("RESPON SERVER:", result);
+
+    alert("Absensi Pengajar berhasil dicatat.");
+
+  } catch (err) {
+    console.error("ERROR SAAT ABSEN:", err);
+    alert("Gagal mencatat absensi (lihat console).");
+  }
+}
+
 async function saveAbsensiSantri() {
   const token = getToken();
   if (!token) return alert("Token tidak ditemukan. Silakan login ulang.");
@@ -437,30 +490,83 @@ async function saveAbsensiSantri() {
 }
 
 /* ======================================================
-   POST absensi pengajar (from dynamic button)
+   POST absensi pengajar (FINAL – SESUAI HTML KAMU)
 ====================================================== */
-async function postAbsensiPengajar(id_jadwal) {
-  if (!id_jadwal) return alert("id_jadwal diperlukan.");
-  try {
-    await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`
-      },
-      body: JSON.stringify({
-        id_jadwal: Number(id_jadwal),
-        tanggal: new Date().toISOString().split("T")[0],
-        status_absensi: "Hadir",
-        catatan: "Mengajar sesuai jadwal"
-      })
-    });
-    alert("Absensi Pengajar tercatat.");
-  } catch (err) {
-    console.error("postAbsensiPengajar error:", err);
-    alert("Gagal mencatat absen pengajar. Cek console.");
+async function simpanAbsensiPengajar() {
+  console.log("👉 simpanAbsensiPengajar() dipanggil");
+
+  const status = document.getElementById("statusAbsensiPengajar")?.value;
+  const kelasId = document.getElementById("kelasSelect")?.value;
+  const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
+
+  if (!status) return alert("Pilih status kehadiran.");
+  if (!kelasId) return alert("Pilih kelas.");
+  if (!tanggal) return alert("Pilih tanggal.");
+
+  // --- Ambil ID Pengajar dari /me ---
+  const me = await fetchJSON(`${BASE_URL}/me`, {
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
+
+  const id_pengajar = me?.profile?.id_pengajar;
+  if (!id_pengajar) {
+    console.error("❌ id_pengajar tidak ditemukan di /me", me);
+    return alert("ID Pengajar tidak ditemukan. Silakan login ulang.");
   }
+
+  // --- Ambil jadwal pengajar ---
+  const semuaJadwal = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
+    headers: { Authorization: `Bearer ${getToken()}` }
+  });
+
+  if (!semuaJadwal || semuaJadwal.length === 0)
+    return alert("Tidak ada jadwal untuk pengajar ini.");
+
+  // --- Cocokkan hari berdasarkan tanggal ---
+  const hariTanggal = new Date(tanggal)
+    .toLocaleDateString("id-ID", { weekday: "long" })
+    .toLowerCase();
+
+  const jadwalHariIni = semuaJadwal.find(
+    j => j.hari?.toLowerCase() === hariTanggal
+  );
+
+  if (!jadwalHariIni) {
+    console.warn("❌ Jadwal tidak ditemukan untuk hari:", hariTanggal);
+    return alert(`Tidak ada jadwal pada hari ${hariTanggal}`);
+  }
+
+  const id_jadwal = jadwalHariIni.id_jadwal;
+
+  console.log("📌 DATA DIKIRIM:", {
+    id_pengajar,
+    id_jadwal,
+    tanggal,
+    status
+  });
+
+  // --- Kirim ke backend ---
+  await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`
+    },
+    body: JSON.stringify({
+      id_pengajar,
+      id_jadwal,
+      tanggal,
+      status_absensi: status,
+      catatan: "Absensi pengajar"
+    })
+  });
+
+  document.getElementById("absenPengajarInfo").textContent =
+    `${status} (${tanggal})`;
+
+  alert("Absensi Pengajar berhasil disimpan.");
 }
+
 
 /* ======================================================
    Riwayat absensi (GET /absensi/santri/kelas/me)
@@ -606,7 +712,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // back button
   const btnBack = document.getElementById("btnKembali");
   if (btnBack) btnBack.addEventListener("click", () => showSectionById("absensi-content"));
+
+    // === SIMPAN ABSENSI PENGAJAR ===
+    const btnSimpanPengajar = document.getElementById("simpanAbsenPengajar");
+    if (btnSimpanPengajar) {
+      btnSimpanPengajar.addEventListener("click", () => {
+        console.log("👉 Tombol SIMPAN ABSEN PENGAJAR diklik");
+        simpanAbsensiPengajar();
+      });
+    }
+  
 });
+
 
 /* ======================================================
    Helper: show a section by id (hide others)
