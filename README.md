@@ -82,7 +82,7 @@ SAHABAT-QURAN-WEB/
 │   │    │     ├── kelascontrollers.js
 │   │    │     ├── registercontrollers.js
 │   │    │     ├── santricontrollers.js
-│   │    │     └── usercontrollers.js
+│   │    │     └── mecontrollers.js
 │   │    ├── middleware/
 │   │    │     ├── auth.js
 │   │    │     └── role.js
@@ -93,7 +93,7 @@ SAHABAT-QURAN-WEB/
 │   │    │     ├── kelasroutes.js
 │   │    │     ├── registerroutes.js
 │   │    │     ├── santriroutes.js
-│   │    │     └── userroutes.js
+│   │    │     └── meroutes.js
 │   │    └── app.js
 │   ├── .env
 │   ├── package.json
