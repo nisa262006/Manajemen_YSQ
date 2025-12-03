@@ -1,43 +1,287 @@
-const pool = require("../config/db");
-const bcrypt = require("bcrypt");
+const db = require("../config/db");
+const ExcelJS = require("exceljs");
 
-exports.registerSantri = async (req, res) => {
-  const { username, password, nama, kategori_id, no_hp, alamat, jenis_kelamin, tgl_lahir } = req.body;
-
-  if (!username || !password || !nama || !kategori_id) {
-    return res.status(400).json({ message: "username, password, nama, kategori_id wajib" });
-  }
-
+/* =========================================
+   1. Ambil Semua Santri (Pagination + Search + Filter)
+========================================= */
+exports.getAllSantri = async (req, res) => {
   try {
-    // cek username unik
-    const exists = await pool.query("SELECT id FROM users WHERE username=$1", [username]);
-    if (exists.rows.length) return res.status(400).json({ message: "Username sudah dipakai" });
+    let { page, limit, q, kategori, status } = req.query;
 
-    const hash = await bcrypt.hash(password, 10);
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const offset = (page - 1) * limit;
 
-    const userRes = await pool.query(
-      `INSERT INTO users (username, password_hash, role)
-       VALUES ($1,$2,'santri')
-       RETURNING id`,
-      [username, hash]
+    let where = [];
+    let params = [];
+    let i = 1;
+
+    // SEARCH (nama / NIS)
+    if (q) {
+      where.push(`(LOWER(s.nama) LIKE LOWER($${i}) OR LOWER(s.nis) LIKE LOWER($${i}))`);
+      params.push(`%${q}%`);
+      i++;
+    }
+
+    // FILTER kategori
+    if (kategori) {
+      where.push(`s.kategori = $${i}`);
+      params.push(kategori);
+      i++;
+    }
+
+    // FILTER status
+    if (status) {
+      where.push(`s.status = $${i}`);
+      params.push(status);
+      i++;
+    }
+
+    const whereSQL = where.length > 0 ? "WHERE " + where.join(" AND ") : "";
+
+    const santriQuery = await db.query(
+      `
+      SELECT s.id_santri, s.nis, s.nama, s.kategori,
+             s.no_wa, s.email, s.tempat_lahir, s.tanggal_lahir,
+             s.status,
+             u.username
+      FROM santri s
+      LEFT JOIN users u ON s.id_users = u.id_users
+      ${whereSQL}
+      ORDER BY s.id_santri ASC
+      LIMIT $${i} OFFSET $${i + 1}
+      `,
+      [...params, limit, offset]
     );
 
-    const userId = userRes.rows[0].id;
-
-    const santriRes = await pool.query(
-      `INSERT INTO santri (user_id, kategori_id, nama, no_hp, alamat, jenis_kelamin, tgl_lahir, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,'Menunggu')
-       RETURNING id`,
-      [userId, kategori_id, nama, no_hp || null, alamat || null, jenis_kelamin || null, tgl_lahir || null]
+    const countQuery = await db.query(
+      `SELECT COUNT(*) FROM santri s ${whereSQL}`,
+      params
     );
 
-    res.status(201).json({
-      message: "Registrasi berhasil, menunggu verifikasi admin",
-      santri_id: santriRes.rows[0].id
+    res.json({
+      message: "List santri",
+      filter: { q, kategori, status },
+      pagination: {
+        current_page: page,
+        per_page: limit,
+        total_data: Number(countQuery.rows[0].count),
+        total_page: Math.ceil(Number(countQuery.rows[0].count) / limit)
+      },
+      data: santriQuery.rows
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Gagal register santri" });
+    console.error("GET ALL SANTRI ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+
+
+/* =========================================
+   2. Detail Santri by ID
+========================================= */
+exports.getSantriById = async (req, res) => {
+  try {
+    const { id_santri } = req.params;
+
+    const result = await db.query(
+      `
+      SELECT s.*, u.username, u.email AS user_email
+      FROM santri s
+      LEFT JOIN users u ON s.id_users = u.id_users
+      WHERE s.id_santri = $1
+      `,
+      [id_santri]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
+
+    res.json({
+      message: "Detail santri",
+      data: result.rows[0]
+    });
+
+  } catch (err) {
+    console.error("GET SANTRI ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+
+
+/* =========================================
+   3. Update Santri
+========================================= */
+exports.updateSantri = async (req, res) => {
+  try {
+    const { id_santri } = req.params;
+
+    const {
+      nama,
+      kategori,
+      no_wa,
+      email,
+      tempat_lahir,
+      tanggal_lahir,
+      status
+    } = req.body;
+
+    const check = await db.query(
+      `SELECT * FROM santri WHERE id_santri = $1`,
+      [id_santri]
+    );
+
+    if (check.rowCount === 0) {
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
+
+    const before = check.rows[0];
+
+    await db.query(
+      `
+      UPDATE santri SET
+        nama=$1,
+        kategori=$2,
+        no_wa=$3,
+        email=$4,
+        tempat_lahir=$5,
+        tanggal_lahir=$6,
+        status=$7
+      WHERE id_santri=$8
+      `,
+      [
+        nama,
+        kategori,
+        no_wa,
+        email,
+        tempat_lahir,
+        tanggal_lahir,
+        status,
+        id_santri
+      ]
+    );
+
+    res.json({
+      message: "Santri berhasil diperbarui",
+      id_santri,
+      perubahan: {
+        sebelum: before,
+        sesudah: {
+          nama,
+          kategori,
+          no_wa,
+          email,
+          tempat_lahir,
+          tanggal_lahir,
+          status
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("UPDATE SANTRI ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+
+
+/* =========================================
+   4. Delete Santri
+========================================= */
+exports.deleteSantri = async (req, res) => {
+  try {
+    const { id_santri } = req.params;
+
+    const check = await db.query(
+      `SELECT * FROM santri WHERE id_santri = $1`,
+      [id_santri]
+    );
+
+    if (check.rowCount === 0) {
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
+
+    const id_users = check.rows[0].id_users;
+
+    await db.query(`DELETE FROM santri WHERE id_santri=$1`, [id_santri]);
+    await db.query(`DELETE FROM users WHERE id_users=$1`, [id_users]);
+
+    res.json({
+      message: "Santri berhasil dihapus",
+      id_santri
+    });
+
+  } catch (err) {
+    console.error("DELETE SANTRI ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+
+
+/* =========================================
+   5. Export Santri ke Excel
+========================================= */
+exports.exportSantriExcel = async (req, res) => {
+  try {
+    const santri = await db.query(`
+      SELECT s.id_santri, s.nis, s.nama, s.kategori,
+             s.no_wa, s.email, s.tempat_lahir, s.tanggal_lahir, s.status
+      FROM santri s
+      ORDER BY s.id_santri ASC
+    `);
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Data Santri");
+
+    // Header
+    sheet.addRow([
+      "ID", "NIS", "Nama", "Kategori", "No WA",
+      "Email", "Tempat Lahir", "Tanggal Lahir", "Status"
+    ]);
+
+    // Data
+    santri.rows.forEach(s => {
+      sheet.addRow([
+        s.id_santri,
+        s.nis,
+        s.nama,
+        s.kategori,
+        s.no_wa,
+        s.email,
+        s.tempat_lahir,
+        s.tanggal_lahir,
+        s.status
+      ]);
+    });
+
+    // Style header
+    sheet.getRow(1).eachCell(cell => {
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: "center" };
+    });
+
+    const fileName = `data-santri-${Date.now()}.xlsx`;
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${fileName}`
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+  } catch (err) {
+    console.error("EXPORT EXCEL ERROR:", err);
+    res.status(500).json({ message: "Gagal export Excel" });
   }
 };

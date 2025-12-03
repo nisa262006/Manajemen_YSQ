@@ -90,6 +90,35 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
   "confirmPassword": "budi123"
 }
 
+### LIHAT SEMUA PENGAJAR
+GET http://localhost:5000/pengajar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
+
+### LIHAT PENGAJAR SESUAI ID
+GET http://localhost:5000/pengajar/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
+
+### EDIT DATA PENGAJAR
+PUT http://localhost:5000/pengajar/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
+Content-Type: application/json
+
+{
+  "nama": "maya",
+  "alamat": "Bogor",
+  "tempat_lahir": "Bogor",
+  "tanggal_lahir": "1990-01-01",
+  "mapel": "tahfiz",
+  "email": "maya@ysq.com",
+  "no_kontak": "08123456789",
+  "password": "maya123",
+  "confirmPassword": "maya123"
+}
+
+### HAPUS PENGAJAR
+DELETE http://localhost:5000/pengajar/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
+
 ##################################################
 ### 1. TAMBAH KELAS (ADMIN) BENER
 ##################################################
@@ -112,7 +141,7 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
 
 
 ##################################################
