@@ -1,6 +1,8 @@
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 // ==================== LOGIN ====================
 exports.login = async (req, res) => {
@@ -133,5 +135,128 @@ exports.createUserAfterSantriAccepted = async (req, res) => {
   } catch (err) {
     console.error("CREATE USER ERROR:", err);
     return res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+/* ======================================================
+   4. FORGOT PASSWORD  (Kirim email reset)
+====================================================== */
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email)
+      return res.status(400).json({ message: "Email wajib diisi" });
+
+    const userCheck = await db.query(
+      `SELECT id_users, email FROM users WHERE email=$1`,
+      [email]
+    );
+
+    if (userCheck.rowCount === 0) {
+      return res.status(404).json({
+        message: "Email tidak ditemukan. Jika Anda santri, mohon isi email terlebih dahulu."
+      });
+    }
+
+    const user = userCheck.rows[0];
+
+    if (!user.email) {
+      return res.status(400).json({
+        message: "Akun ini belum memiliki email. Harap hubungi admin."
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const expired_at = new Date(Date.now() + 10 * 60 * 1000);
+
+    await db.query(
+      `DELETE FROM password_reset_tokens WHERE id_users=$1`,
+      [user.id_users]
+    );
+
+    await db.query(
+      `INSERT INTO password_reset_tokens (id_users, token, expired_at)
+       VALUES ($1, $2, $3)`,
+      [user.id_users, token, expired_at]
+    );
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_SENDER,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+    const resetLink = `${process.env.BASE_URL}/views/reset_password.html?token=${token}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_SENDER,
+      to: email,
+      subject: "Reset Password - YSQ Bogor",
+      html: `
+        <p>Halo,</p>
+        <p>Klik link berikut untuk reset password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>Link berlaku 10 menit.</p>
+      `
+    });
+
+    res.json({ message: "Link reset password telah dikirim ke email Anda" });
+
+  } catch (err) {
+    console.error("FORGOT PASSWORD ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+};
+
+
+/* ======================================================
+   5. RESET PASSWORD (Submit password baru)
+====================================================== */
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password, confirmPassword } = req.body;
+
+    if (!token)
+      return res.status(400).json({ message: "Token diperlukan" });
+    if (!password || !confirmPassword)
+      return res.status(400).json({ message: "Password wajib diisi" });
+    if (password !== confirmPassword)
+      return res.status(400).json({ message: "Password tidak sama" });
+
+    const tokenCheck = await db.query(
+      `SELECT * FROM password_reset_tokens WHERE token=$1`,
+      [token]
+    );
+
+    if (tokenCheck.rowCount === 0) {
+      return res.status(400).json({ message: "Token tidak valid" });
+    }
+
+    const data = tokenCheck.rows[0];
+
+    if (new Date() > new Date(data.expired_at)) {
+      return res.status(400).json({ message: "Token expired" });
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+
+    await db.query(
+      `UPDATE users SET password_hash=$1 WHERE id_users=$2`,
+      [password_hash, data.id_users]
+    );
+
+    await db.query(
+      `DELETE FROM password_reset_tokens WHERE id_users=$1`,
+      [data.id_users]
+    );
+
+    res.json({ message: "Password berhasil direset, silakan login kembali" });
+
+  } catch (err) {
+    console.error("RESET PASSWORD ERROR:", err);
+    res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };

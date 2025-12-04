@@ -40,6 +40,26 @@ Content-Type: application/json
 GET http://localhost:5000/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
+### reser password
+POST http://localhost:5000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "rahmafitriatunnisa@gmail.com"
+}
+
+### veryfi token
+GET http://localhost:5000/auth/reset-password/ISI_TOKEN_DISINI
+
+### set password baru
+POST http://localhost:5000/auth/reset-password/ISI_TOKEN_DISINI
+Content-Type: application/json
+
+{
+  "password": "passwordBaru123",
+  "confirmPassword": "passwordBaru123"
+}
+
 ============= REGISTRASI ======================
 ### PENDAFTARAN
 POST http://localhost:5000/pendaftar/daftar
