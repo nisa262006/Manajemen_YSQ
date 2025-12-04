@@ -121,6 +121,12 @@ exports.updateSantri = async (req, res) => {
     const { id_santri } = req.params;
 
     const {
+      // tambahan (READ ONLY, tetap boleh ada di body)
+      nis,
+      username,
+      user_email,
+
+      // data yang boleh diupdate
       nama,
       kategori,
       no_wa,
@@ -130,56 +136,96 @@ exports.updateSantri = async (req, res) => {
       status
     } = req.body;
 
-    const check = await db.query(
-      `SELECT * FROM santri WHERE id_santri = $1`,
-      [id_santri]
-    );
+    /* ==========================
+       CEK DATA SANTRI
+    ========================== */
+    const check = await db.query(`
+      SELECT s.*, u.email AS user_email, u.username, u.id_users
+      FROM santri s
+      LEFT JOIN users u ON s.id_users = u.id_users
+      WHERE s.id_santri = $1
+    `, [id_santri]);
 
     if (check.rowCount === 0) {
       return res.status(404).json({ message: "Santri tidak ditemukan" });
     }
 
-    const before = check.rows[0];
+    const oldData = check.rows[0];
+    const id_users = oldData.id_users;
 
-    await db.query(
-      `
+    /* ==========================
+       UPDATE EMAIL USER (jika berubah)
+    ========================== */
+    if (email && email.toLowerCase().trim() !== oldData.user_email.toLowerCase().trim()) {
+
+      // cek email unik
+      const cekEmail = await db.query(
+        `SELECT email FROM users WHERE email = $1 AND id_users != $2`,
+        [email, id_users]
+      );
+
+      if (cekEmail.rowCount > 0) {
+        return res.status(400).json({ message: "Email sudah digunakan user lain" });
+      }
+
+      // update email user
+      await db.query(
+        `UPDATE users SET email=$1 WHERE id_users=$2`,
+        [email, id_users]
+      );
+    }
+
+    /* ==========================
+       UPDATE DATA SANTRI
+    ========================== */
+    await db.query(`
       UPDATE santri SET
-        nama=$1,
-        kategori=$2,
-        no_wa=$3,
-        email=$4,
-        tempat_lahir=$5,
-        tanggal_lahir=$6,
-        status=$7
-      WHERE id_santri=$8
-      `,
-      [
-        nama,
-        kategori,
-        no_wa,
-        email,
-        tempat_lahir,
-        tanggal_lahir,
-        status,
-        id_santri
-      ]
-    );
+        nama = $1,
+        kategori = $2,
+        no_wa = $3,
+        email = $4,
+        tempat_lahir = $5,
+        tanggal_lahir = $6,
+        status = $7
+      WHERE id_santri = $8
+    `, [
+      nama,
+      kategori,
+      no_wa,
+      email,
+      tempat_lahir,
+      tanggal_lahir,
+      status,
+      id_santri
+    ]);
 
+    /* ==========================
+       BENTUKKAN DATA OUTPUT
+    ========================== */
+    const cleanDate = tanggal_lahir
+      ? tanggal_lahir.split("T")[0]
+      : oldData.tanggal_lahir
+        ? oldData.tanggal_lahir.toISOString().split("T")[0]
+        : null;
+
+    const after = {
+      nis: oldData.nis,                   // tidak berubah
+      nama,
+      kategori,
+      no_wa,
+      email,
+      tempat_lahir,
+      tanggal_lahir: cleanDate,           // format aman YYYY-MM-DD
+      username: oldData.username,         // dari tabel users
+      user_email: email                   // email terbaru
+    };
+
+    /* ==========================
+       RESPONSE AKHIR
+    ========================== */
     res.json({
       message: "Santri berhasil diperbarui",
-      id_santri,
-      perubahan: {
-        sebelum: before,
-        sesudah: {
-          nama,
-          kategori,
-          no_wa,
-          email,
-          tempat_lahir,
-          tanggal_lahir,
-          status
-        }
-      }
+      data: after
     });
 
   } catch (err) {
@@ -187,7 +233,6 @@ exports.updateSantri = async (req, res) => {
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
-
 
 
 /* =========================================

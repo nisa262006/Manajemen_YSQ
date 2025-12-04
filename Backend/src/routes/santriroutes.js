@@ -5,24 +5,25 @@ const {
   getAllSantri,
   getSantriById,
   updateSantri,
-  graduateSantri
-} = require("../controllers/santriController");
+  deleteSantri,
+  exportSantriExcel
+} = require("../controllers/santricontrollers");
 
 const { verifyToken, onlyAdmin } = require("../middleware/auth");
 
-// List Santri
+// GET all santri
 router.get("/", verifyToken, onlyAdmin, getAllSantri);
 
-// Detail Santri
+// GET santri by ID
 router.get("/:id_santri", verifyToken, onlyAdmin, getSantriById);
 
-// Update Santri
+// UPDATE santri
 router.put("/:id_santri", verifyToken, onlyAdmin, updateSantri);
 
-// Luluskan santri
-router.put("/:id_santri/lulus", verifyToken, onlyAdmin, graduateSantri);
+// DELETE santri
+router.delete("/:id_santri", verifyToken, onlyAdmin, deleteSantri);
 
-// export exsel
+// Export Excel
 router.get("/export/excel", verifyToken, onlyAdmin, exportSantriExcel);
 
 module.exports = router;
