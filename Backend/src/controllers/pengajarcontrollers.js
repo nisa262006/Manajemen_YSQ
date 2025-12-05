@@ -151,12 +151,19 @@ exports.getPengajarById = async (req, res) => {
     const { id_pengajar } = req.params;
 
     const result = await db.query(`
-      SELECT p.id_pengajar, p.nama, p.no_kontak, p.mapel, p.status,
-             p.alamat, p.tempat_lahir, p.tanggal_lahir,
-             u.email, u.username
-      FROM pengajar p
-      LEFT JOIN users u ON p.id_users = u.id_users
-      WHERE p.id_pengajar = $1
+      SELECT 
+   p.id_pengajar,
+   p.nama,
+   p.no_kontak,        -- ✔ BETUL
+   p.tempat_lahir,
+   p.tanggal_lahir,
+   p.mapel,
+   p.alamat,
+   p.status,
+   u.email
+FROM pengajar p
+LEFT JOIN users u ON p.id_users = u.id_users
+WHERE p.id_pengajar = $1
     `, [id_pengajar]);
 
     if (result.rowCount === 0) {
