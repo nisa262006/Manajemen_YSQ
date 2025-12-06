@@ -1,59 +1,156 @@
-<body data-page="tambah_Siswa">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Siswa - Sahabat Quran</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    </head>
 
-<header class="content-header page-header">
-    <h1 class="header-title" id="page-content-title">Tambah Siswa</h1> 
-    <div class="admin-profile">
-        <span class="admin-text">Rabu, 19 November 2025</span>
+    <body class="page-tambah-siswa">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../images/LogoYSQ.png" alt="Sahabat Quran" class="logo-img">
+            </div>
+            
+            <nav class="menu">
+                <a href="Admin.html" class="menu-item active"><i class="fas fa-home"></i> Dashboard</a>
+                
+                <a href="daftar_jadwal.html" class="menu-item"><i class="fas fa-calendar-alt"></i> Daftar Jadwal</a>
+                <a href="daftar_kelas.html" class="menu-item"><i class="fas fa-book"></i> Daftar Kelas</a>
+                
+                <a href="daftar_santri.html" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+                
+                <a href="daftar_pengajar.html" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+                <a href="riwayat_absensi.html" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+                <a href="#" class="menu-item"><i class="fas fa-scroll"></i> Rapor</a>
+                <a href="#" class="menu-item"><i class="fas fa-file-alt"></i> Laporan</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="footer-buttons-wrapper"> 
+                    <a href="#" class="footer-btn setting">
+                        <i class="fas fa-cog"></i> Setting Profil
+                    </a>
+                    <a href="#" class="footer-btn logout">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="header-title">Tambah Siswa</h1>
+                <div class="admin-profile">
+                    <span class="header-date" id="current-date-display">Rabu, 19 November 2025</span>
+                </div>
+            </header>
+            
+            <section class="form-section">
+                <div class="form-container-card">
+                    
+                    <h2 class="form-header-title">Tambah Siswa</h2>
+                    
+                    <form id="form-tambah-siswa" class="form-grid-2-col">
+                        
+                        <div class="form-group">
+        <label for="nisn">NISN</label>
+        <input type="text" id="nisn" name="nisn" required>
     </div>
-</header>
+    <div class="form-group">
+        <label for="nama_lengkap">Nama Lengkap</label>
+        <input type="text" id="nama_lengkap" name="nama_lengkap" required>
+    </div>
+    
+    <div class="form-group full-width">
+        <label for="alamat">Alamat</label>
+        <input type="text" id="alamat" name="alamat" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="tempat_lahir">Tempat Lahir</label>
+        <input type="text" id="tempat_lahir" name="tempat_lahir" required>
+    </div>
+    <div class="form-group">
+        <label for="tanggal_lahir">Tanggal Lahir</label>
+        <input type="date" id="tanggal_lahir" name="tanggal_lahir" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="no_telpon">No. Telepon</label>
+        <input type="tel" id="no_telpon" name="no_telpon" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email">
+    </div>
 
-<section class="stats-cards content-stats-page">
-    <div class="stat-card"><span class="stat-label">Pendaftar</span><span class="stat-value">12</span></div>
-    <div class="stat-card"><span class="stat-label">Menunggu verifikasi</span><span class="stat-value">12</span></div>
-    <div class="stat-card"><span class="stat-label">Diterima</span><span class="stat-value">12</span></div>
-    <div class="stat-card"><span class="stat-label">Sisa kuota</span><span class="stat-value">12</span></div>
-</section>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+        <label for="confirm_password">Konfirmasi Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" required>
+    </div>
+    
+    <div class="form-actions full-width">
+        </div>         
+                        <div class="form-group full-width jenjang-group">
+                            <label class="jenjang-label">Jenjang</label>
+                            <div class="radio-options">
+                                <input type="radio" id="dewasa" name="jenjang" value="Dewasa" checked>
+                                <label for="dewasa">Dewasa</label>
+                                
+                                <input type="radio" id="anak" name="jenjang" value="Anak-Anak">
+                                <label for="anak">Anak-Anak</label>
+                            </div>
+                        </div>
 
-<div class="header-actions">
-    <input type="text" placeholder="Cari Siswa..." class="search-input">
-    <div>
-        <button class="action-btn export-btn"><i class="fas fa-file-export"></i> Ekspor Laporan</button>
-        <button class="action-btn reset-btn">Reset Pendaftaran Tahunan</button>
+                        <div class="form-actions full-width">
+                            <button type="submit" class="action-btn-form save-btn">Simpan</button>
+                            <a href="Admin.html" class="action-btn-form back-btn">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+            </main>
+    </div>
+    </div>
+    <div id="notification-toast" class="toast-notification"></div>
+<div id="popup-profile-setting" class="modal-overlay">
+    <div class="profile-setting-content">
+        <button class="close-btn" id="btn-close-profil-x">
+            &times;
+        </button>
+        <div class="profile-avatar-large">R</div>
+        
+        <div class="profile-field-group">
+            <div>
+                <label>Nama</label> :
+                <input type="text" id="profile-name-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>Email</label> :
+                <input type="email" id="profile-email-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>No. Telepon</label> :
+                <input type="tel" id="profile-phone-input" class="profile-input" placeholder="" />
+            </div>
+        </div>
+        
+        <div class="profile-actions">
+            <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+            <button type="submit" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">Simpan</button>
+        </div>
     </div>
 </div>
-
-<section class="pendaftar-table">
-    <div class="section-title">Daftar Siswa</div>
-    <div class="table-wrapper"> 
-        <table id="siswa-list-table">
-            <thead>
-                <tr class="table-header-row">
-                    <th>No.</th><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>Nomor WhatsApp</th><th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="siswa-table-body">
-                <tr class="table-data-row">
-                    <td>1</td><td>Ahmad Zaki</td><td>Bogor</td><td>28 Oktober 2010</td><td>0986478997543</td>
-                    <td class="status-cell">
-                       <button class="status-button status-detail">Lihat Detail</button>
-                    </td>
-                </tr>
-                <tr class="table-data-row">
-                    <td>2</td><td>Siti Aminah</td><td>Bandung</td><td>10 Mar 2010</td><td>0855xxxxxx</td>
-                    <td class="status-cell">
-                    <button class="status-button status-detail">Lihat Detail</button>
-                    </td>
-                </tr>
-                <tr class="table-data-row">
-                    <td>3</td><td>Budi Santoso</td><td>Jakarta</td><td>20 Jan 2005</td><td>0812xxxxxx</td>
-                    <td class="status-cell">
-                    <button class="status-button status-detail">Lihat Detail</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-<button id="back-to-dashboard" class="action-btn back-btn" style="margin-top: 20px;">
-<i class="fas fa-arrow-left"></i> Kembali
-</button>
+<script type="module" src="../js/admin.js"></script>
+</body>
+</html>

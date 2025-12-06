@@ -1,114 +1,149 @@
-<body data-page="tambah_kelas"> 
-
-<header class="dashboard-header">
-    <h1 class="header-title" id="page-content-title">Tambah Kelas</h1>
-    <div class="admin-profile">
-        <span class="admin-text">Rabu, 19 November 2025</span>
-    </div>
-</header>
-<div class="class-action-area" style="display: flex; gap: 20px; align-items: flex-end; margin-bottom: 30px;">
-    
-    <div class="form-group class-select-group" style="flex-grow: 1; display: flex; align-items: center; gap: 15px;">
-        
-        <label for="kelas-tingkatan" style="margin-bottom: 0; font-weight: bold; min-width: 120px; text-align: right;">
-            Kelas/Tingkatan
-        </label>
-        
-        <select id="kelas-tingkatan" class="profile-input" style="flex-grow: 1;">
-            <option value="">-- Pilih Tingkatan --</option>
-            <option value="idat_awal">Idat Awal</option>
-            <option value="dewasa">Dewasa</option>
-        </select>
-    </div>
-
-    <button id="btn-tambah-kelas" class="action-btn" style="padding: 10px 15px; height: 45px; white-space: nowrap;">
-        <i class="fas fa-plus-circle"></i> Tambah Kelas
-    </button>
-</div>
-
-
-<section class="pendaftar-table">
-    <div class="table-wrapper"> 
-        <table id="kelas-list-table">
-            <thead>
-                <tr class="table-header-row">
-                    <th>No.</th>
-                    <th>Nama Kelas</th>
-                    <th>Kapasitas</th>
-                    <th>Kategori</th>
-                    <th>Pengajar</th>
-                    <th style="width: 100px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="kelas-table-body">
-                <tr class="table-data-row" data-id="1">
-                    <td>1</td>
-                    <td>Idat Awal</td>
-                    <td>15-20</td>
-                    <td>dewasa</td>
-                    <td>SITI</td>
-                    <td class="table-actions">
-                        <button class="btn-action btn-add-pengajar"><i class="fas fa-plus"></i></button>
-                        <button class="btn-action btn-delete-kelas"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-<div id="tambah-kelas-modal" class="custom-modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Tambah Kelas</h2>
-            <span class="close-btn" id="close-kelas-modal">&times;</span>
-        </div>
-        <form id="form-tambah-kelas" class="modal-form">
-            <div class="form-row-popup">
-                <label for="kelas-tingkatan-popup">Kelas/Tingkatan</label>
-                <input type="text" id="kelas-tingkatan-popup" class="profile-input" placeholder="Masukkan Tingkatan Kelas">
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Kelas - Sahabat Quran</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="page-tambah-kelas">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../images/LogoYSQ.png" alt="Sahabat Quran" class="logo-img">
             </div>
             
-            <div class="form-row-popup split-2">
-                <div class="form-group-popup">
-                    <label for="pengajar-popup">Pengajar</label>
-                    <select id="pengajar-popup" class="profile-input">
-                        <option value="">-- Pilih Pengajar --</option>
-                        <option value="SITI">SITI</option>
-                        <option value="DAVID">DAVID</option>
-                    </select>
-                </div>
-                <div class="form-group-popup">
-                    <label for="kapasitas-popup">Kapasitas</label>
-                    <input type="number" id="kapasitas-popup" class="profile-input" placeholder="Misalnya: 15">
+            <nav class="menu">
+                <a href="Admin.html" class="menu-item active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="daftar_jadwal.html" class="menu-item"><i class="fas fa-calendar-alt"></i> Daftar Jadwal</a>
+                <a href="daftar_kelas.html" class="menu-item"><i class="fas fa-book"></i> Daftar Kelas</a>
+                <a href="daftar_santri.html" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+                <a href="daftar_pengajar.html" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+                <a href="riwayat_absensi.html" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+                <a href="#" class="menu-item"><i class="fas fa-scroll"></i> Rapor</a>
+                <a href="#" class="menu-item"><i class="fas fa-file-alt"></i> Laporan</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="footer-buttons-wrapper"> 
+                    <button type="button" class="footer-btn setting" id="btn-open-profil">
+                        <i class="fas fa-cog"></i> Setting Profil
+                    </button>
+                    <a href="#" class="footer-btn logout">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </a>
                 </div>
             </div>
+        </aside>
 
-            <div class="form-row-popup">
-                <label for="kategori-popup">Kategori</label>
-                <input type="text" id="kategori-popup" class="profile-input" placeholder="Misalnya: Dewasa">
-            </div>
-
-            <div class="form-row-popup split-2">
-                <div class="form-group-popup">
-                    <label for="waktu-awal-popup">Waktu Awal Periode</label>
-                    <input type="date" id="waktu-awal-popup" class="profile-input">
-                </div>
-                <div class="form-group-popup">
-                    <label for="waktu-selesai-popup">Waktu Selesai Periode</label>
-                    <input type="date" id="waktu-selesai-popup" class="profile-input">
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button type="submit" class="action-btn save-btn" id="btn-simpan-kelas-modal">
-                    Simpan
+        <main class="main-content">
+            <header class="dashboard-header class-header-style">
+                <h1 class="header-title">Tambah Kelas</h1>
+                <span class="header-date"id="current-date-display">Rabu, 19 November 2025</span>
+            </header>
+            
+            <section class="class-controls-section">
+                <div class="class-controls-card">
+                    
+                    <div class="filter-group">
+                        <label for="kelas">Keterangan</label>
+                        <select id="kelas" name="kelas" class="styled-select-filter">
+                            <option value="semua">Semua</option>
+                            <option value="santri">Sudah Ada Kelas</option>
+                            <option value="menunggu">Belum Ada Kelas</option>
+                        </select>
+                    </div>
+                    <div class="action-buttons-group">
+                        <a href="Admin.html" class="action-btn-form back-btn">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                         </a>
+                         <button type="button" id="btn-simpan-kelas-selection" class="action-btn-form add-class-btn">
+                     <i class="fas fa-check"></i> Simpan 
                 </button>
             </div>
-        </form>
+        </div>
+        </section>    
+            <section class="class-table-section">
+                <div class="class-table-container"> <table class="class-list-table header-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" class="select-all-checkbox"></th>
+                                <th>Tanggal</th>
+                                <th>NIM</th>
+                                <th>Nama Siswa</th>
+                                <th>Umur</th>
+                                <th>Status Santri</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                    <div class="table-body-scroll">
+                        <table class="class-list-table data-table">
+                            <thead><tr><th colspan="7" style="display:none;"></th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>1 Oktober 2024</td>
+                                    <td>2459267655</td>
+                                    <td>zizah</td>
+                                    <td>19</td>
+                                    <td><span class="status-badge status-aktif">Aktif</span></td>
+                                    <td><span class="status-badge status-santri">Santri</span></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>1 Oktober 2024</td>
+                                    <td>2459267655</td>
+                                    <td>zizah</td>
+                                    <td>19</td>
+                                    <td><span class="status-badge status-aktif">Aktif</span></td>
+                                    <td><span class="status-badge status-menunggu">Menunggu</span></td>
+                                </tr>
+                                <tr><td><input type="checkbox"></td><td>1 Okt 2024</td><td>2459267655</td><td>zizah</td><td>19</td><td><span class="status-badge status-aktif">Aktif</span></td><td><span class="status-badge status-santri">Santri</span></td></tr>
+                                <tr><td><input type="checkbox"></td><td>2 Okt 2024</td><td>2459267655</td><td>zizah</td><td>19</td><td><span class="status-badge status-aktif">Aktif</span></td><td><span class="status-badge status-menunggu">Menunggu</span></td></tr>
+                                <tr><td><input type="checkbox"></td><td>3 Okt 2024</td><td>2459267655</td><td>zizah</td><td>19</td><td><span class="status-badge status-aktif">Aktif</span></td><td><span class="status-badge status-santri">Santri</span></td></tr>
+                                <tr><td><input type="checkbox"></td><td>4 Okt 2024</td><td>2459267655</td><td>zizah</td><td>19</td><td><span class="status-badge status-aktif">Aktif</span></td><td><span class="status-badge status-menunggu">Menunggu</span></td></tr>
+                                <tr><td><input type="checkbox"></td><td>5 Okt 2024</td><td>2459267655</td><td>zizah</td><td>19</td><td><span class="status-badge status-aktif">Aktif</span></td><td><span class="status-badge status-santri">Santri</span></td></tr>
+                                <tr><td><input type="checkbox"></td><td>6 Okt 2024</td><td>2459267655</td><td>zizah</td><td>19</td><td><span class="status-badge status-aktif">Aktif</span></td><td><span class="status-badge status-menunggu">Menunggu</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
     </div>
 </div>
-
-
-<button id="back-to-dashboard" class="action-btn back-btn" style="margin-top: 20px;">
-    <i class="fas fa-arrow-left"></i> Kembali
-</button>
+<div id="notification-toast" class="toast-notification"></div>
+<div id="popup-profile-setting" class="modal-overlay">
+    <div class="profile-setting-content">
+        <button class="close-btn" id="btn-close-profil-x">
+            &times;
+        </button>
+        <div class="profile-avatar-large">R</div>
+        
+        <div class="profile-field-group">
+            <div>
+                <label>Nama</label> :
+                <input type="text" id="profile-name-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>Email</label> :
+                <input type="email" id="profile-email-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>No. Telepon</label> :
+                <input type="tel" id="profile-phone-input" class="profile-input" placeholder="" />
+            </div>
+        </div>
+        
+        <div class="profile-actions">
+            <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+            <button type="submit" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">Simpan</button>
+        </div>
+    </div>
+</div>
+</main>
+    </div> 
+    <script type="module" src="../js/admin.js"></script>
+</body>
+</html>

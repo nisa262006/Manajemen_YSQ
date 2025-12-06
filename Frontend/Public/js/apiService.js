@@ -1,9 +1,3 @@
-// =======================================================
-// apiService.js - LAYER API GLOBAL UNTUK SEMUA HALAMAN
-// Fungsi ini otomatis menambahkan token dan mempermudah
-// pemanggilan endpoint backend.
-// =======================================================
-
 const BASE_URL = "http://localhost:5000";
 
 // Ambil token dari localStorage
@@ -11,18 +5,27 @@ export function getToken() {
     return localStorage.getItem("token");
 }
 
+// Membuat header dinamis
+function buildHeaders() {
+    const token = getToken();
+    const headers = { "Content-Type": "application/json" };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return headers;
+}
+
 // =============== GET ===============
 export async function apiGet(endpoint) {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
-        headers: {
-            "Authorization": `Bearer ${getToken()}`,
-            "Content-Type": "application/json"
-        }
+        headers: buildHeaders()
     });
 
     if (!res.ok) {
-        console.error(`GET ${endpoint} Gagal`);
-        throw new Error(`GET ${endpoint} gagal`);
+        console.error(`GET ${endpoint} gagal`);
+        throw await res.json();
     }
 
     return res.json();
@@ -32,14 +35,15 @@ export async function apiGet(endpoint) {
 export async function apiPost(endpoint, body) {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: "POST",
-        headers: {
-            "Authorization": `Bearer ${getToken()}`,
-            "Content-Type": "application/json"
-        },
+        headers: buildHeaders(),
         body: JSON.stringify(body)
     });
 
-    if (!res.ok) throw new Error(`POST ${endpoint} gagal`);
+    if (!res.ok) {
+        console.error(`POST ${endpoint} gagal`);
+        throw await res.json();
+    }
+
     return res.json();
 }
 
@@ -47,14 +51,15 @@ export async function apiPost(endpoint, body) {
 export async function apiPut(endpoint, body) {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: "PUT",
-        headers: {
-            "Authorization": `Bearer ${getToken()}`,
-            "Content-Type": "application/json"
-        },
+        headers: buildHeaders(),
         body: JSON.stringify(body)
     });
 
-    if (!res.ok) throw new Error(`PUT ${endpoint} gagal`);
+    if (!res.ok) {
+        console.error(`PUT ${endpoint} gagal`);
+        throw await res.json();
+    }
+
     return res.json();
 }
 
@@ -62,11 +67,13 @@ export async function apiPut(endpoint, body) {
 export async function apiDelete(endpoint) {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: "DELETE",
-        headers: {
-            "Authorization": `Bearer ${getToken()}`
-        }
+        headers: buildHeaders()
     });
 
-    if (!res.ok) throw new Error(`DELETE ${endpoint} gagal`);
+    if (!res.ok) {
+        console.error(`DELETE ${endpoint} gagal`);
+        throw await res.json();
+    }
+
     return res.json();
 }

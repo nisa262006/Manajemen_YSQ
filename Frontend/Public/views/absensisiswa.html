@@ -4,95 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABSEN</title>
+
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="../css/santri.css">
 </head>
 <body>
 
-    <header class="header">
-        <div class="logo-section">
-            <img src="../images/LogoYSQ.png" alt="Logo Yayasan">
-            <h2>YAYASAN SAHABAT QUR'AN</h2>
+<header class="header">
+    <div class="logo-section">
+        <img src="../images/LogoYSQ.png" alt="Logo Yayasan">
+        <h2>YAYASAN SAHABAT QUR'AN</h2>
+    </div>
+
+    <div class="user-info">
+        <span id="nama-santri-top">Siswa</span>
+        <i class='bx bx-user'></i>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="attendance-card">
+
+        <h1>ABSENSI</h1>
+
+        <div class="sub-nav scroll-x">
+            <a href="dashboardsantri.html">Dashboard</a>
+            <button class="active">Riwayat Absen</button>
+            <button>Raport</button>
+            <button>Student Bill</button>
         </div>
-        <div class="user-info">
-            <span id="nama-santri-top">Siswa</span>
-            <i class='bx bx-user'></i>
+
+        <!-- SUMMARY GRID -->
+        <div class="summary-cards summary-grid">
+            <div class="summary-card">
+                <div class="summary-card-value total">0</div>
+                <div class="summary-card-label">Total Pertemuan</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value hadir">0</div>
+                <div class="summary-card-label">Hadir</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value izin">0</div>
+                <div class="summary-card-label">Izin</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value sakit">0</div>
+                <div class="summary-card-label">Sakit</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value alfa">0</div>
+                <div class="summary-card-label">Alfa</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value mustamilah">0</div>
+                <div class="summary-card-label">Mustamilah</div>
+            </div>
         </div>
-    </header>
 
-    <div class="main-container">
-        <div class="attendance-card">
-            <h1>ABSENSI</h1>
+        <!-- FILTER DATE -->
+        <div class="date-filter responsive-filter">
+            <label>Start Date:</label>
+            <input type="date" id="start-date">
 
-            <!-- Sub Navigasi -->
-            <div class="sub-nav">
-                <a href="dashboardsantri.html">Dashboard</a>
-                <button class="active">Riwayat Absen</button>
-                <button onclick="alert('Fitur belum tersedia')">Raport</button>
-                <button onclick="alert('Fitur belum tersedia')">Student Bill</button>
-            </div>
+            <label>End Date:</label>
+            <input type="date" id="end-date">
 
-            <!-- Summary Card -->
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="summary-card-value total">0</div>
-                    <div class="summary-card-label">Total Pertemuan</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-value hadir">0</div>
-                    <div class="summary-card-label">Hadir</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-value izin">0</div>
-                    <div class="summary-card-label">Izin</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-value sakit">0</div>
-                    <div class="summary-card-label">Sakit</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-value alfa">0</div>
-                    <div class="summary-card-label">Alfa</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-card-value mustamilah">0</div>
-                    <div class="summary-card-label">Mustamilah</div>
-                </div>
-            </div>
+            <button id="export-excel">Export Excel</button>
+        </div>
 
-            <!-- Filter Tanggal -->
-            <div class="date-filter">
-                <label>Start Date:</label>
-                <input type="date" id="start-date">
-
-                <label>End Date:</label>
-                <input type="date" id="end-date">
-
-                <button id="export-excel">Export Excel</button>
-            </div>
-
-            <!-- TABEL ABSENSI -->
+        <!-- TABLE -->
+        <div class="table-wrapper">
             <table class="info-table attendance-table">
                 <thead>
                     <tr>
                         <th>Tanggal</th>
-                        <th>kelas</th>
+                        <th>Kelas</th>
                         <th>Jam</th>
                         <th>Catatan</th>
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody id="absensi-body">
-                    <!-- akan diisi otomatis oleh JS -->
-                </tbody>
+                <tbody id="absensi-body"></tbody>
             </table>
         </div>
+
     </div>
+</div>
 
-    <!-- Import file JS yang menghubungkan ke backend -->
-    <script src="../js/absensisantri.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+<script src="../js/absensisantri.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 </body>
 </html>

@@ -85,6 +85,90 @@
     }
   }
   
+  /* ========================================================= */
+/* ========== RESPONSIVE HALAMAN SELAMAT DATANG ============ */
+/* ========================================================= */
+
+/* Tablet (max 900px) */
+@media (max-width: 900px) {
+
+  .overlay {
+    width: 80%;
+    padding: 35px;
+  }
+
+  .logo {
+    width: 120px;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  .btn {
+    padding: 12px 35px;
+    font-size: 0.95rem;
+  }
+}
+
+/* HP (max 600px) */
+@media (max-width: 600px) {
+
+  .container {
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+  }
+
+  .overlay {
+    width: 95%;
+    padding: 25px 20px;
+    border-radius: 15px;
+  }
+
+  .logo {
+    width: 90px;
+    margin-bottom: 15px;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+  }
+
+  .buttons {
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 25px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 260px;
+  }
+}
+
+/* HP kecil (max 380px) */
+@media (max-width: 380px) {
+
+  .overlay {
+    padding: 20px 15px;
+  }
+
+  .logo {
+    width: 75px;
+  }
+
+  h1 {
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    padding: 9px 20px;
+    font-size: 0.85rem;
+    border-radius: 25px;
+  }
+}
 
   /* ------------------- LOGIN PAGE ------------------- */
 /* Halaman Login */
@@ -258,6 +342,92 @@ input[type="password"]::-webkit-reveal {
       padding: 30px 20px;
   }
 }
+
+/* ========================================================= */
+/* ========== RESPONSIVE LOGIN PAGE (TABLET + HP) ========== */
+/* ========================================================= */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .login-container {
+    width: 70%;
+    padding: 35px;
+  }
+
+  .logo-image {
+    max-width: 120px;
+  }
+
+  .login-button {
+    font-size: 16px;
+    padding: 13px;
+  }
+}
+
+/* HP */
+@media (max-width: 600px) {
+
+  body {
+    background-size: cover;
+    background-attachment: scroll;
+  }
+
+  .login-container {
+    width: 90%;
+    padding: 25px 18px;
+    border-radius: 12px;
+  }
+
+  .logo-image {
+    max-width: 90px;
+  }
+
+  .organization-name {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+
+  .input-group input {
+    padding: 12px 40px 12px 15px;
+    font-size: 14px;
+  }
+
+  .toggle-password {
+    right: 12px;
+  }
+
+  .login-button {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 15px;
+  }
+}
+
+/* HP kecil */
+@media (max-width: 380px) {
+
+  .login-container {
+    width: 92%;
+    padding: 20px 15px;
+  }
+
+  .logo-image {
+    max-width: 80px;
+  }
+
+  .organization-name {
+    font-size: 11px;
+  }
+
+  .input-group input {
+    padding: 10px 35px 10px 12px;
+  }
+
+  .login-button {
+    padding: 10px;
+    font-size: 15px;
+  }
+}
   
 
 /* ------------------- REGISTRASI PAGE ------------------- */
@@ -374,7 +544,66 @@ body {
   background: linear-gradient(to top, #E8A848, #C5AA6F);
 }
 
-  
+/* ========================================================= */
+/* ========== RESPONSIVE REGISTRASI PAGE =================== */
+/* ========================================================= */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .register-container {
+    width: 80%;
+    padding: 30px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}
+
+/* HP */
+@media (max-width: 600px) {
+
+  body {
+    background-size: cover;
+    background-attachment: scroll;
+  }
+
+  .register-container {
+    width: 92%;
+    padding: 25px 20px;
+  }
+
+  .two-forms {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .input-group input {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .daftar-btn {
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 20px;
+  }
+}
+
+/* HP kecil */
+@media (max-width: 380px) {
+  .register-container {
+    padding: 18px 15px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+}
   
   /* ------------------- HALAMAN BERHASIL ------------------- */
 .success-container {
@@ -457,4 +686,41 @@ body {
       font-size: 1.5rem;
     }
   }
-  
+
+  /* ========================================================= */
+/* ===== RESPONSIVE: HALAMAN BERHASIL REGISTRASI ========== */
+/* ========================================================= */
+
+@media (max-width: 700px) {
+  .success-box {
+    padding: 35px 20px;
+  }
+
+  .success-box h2 {
+    font-size: 1.6rem;
+  }
+
+  .success-logo {
+    width: 90px;
+  }
+
+  .checkmark {
+    font-size: 60px;
+    padding: 15px 25px;
+  }
+}
+
+@media (max-width: 450px) {
+  .success-box {
+    padding: 25px 15px;
+  }
+
+  .success-box h2 {
+    font-size: 1.3rem;
+  }
+
+  .checkmark {
+    font-size: 50px;
+    padding: 12px 18px;
+  }
+} 

@@ -37,16 +37,25 @@ exports.getAllSantri = async (req, res) => {
       i++;
     }
 
-    const whereSQL = where.length > 0 ? "WHERE " + where.join(" AND ") : "";
+    const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
 
     const santriQuery = await db.query(
       `
-      SELECT s.id_santri, s.nis, s.nama, s.kategori,
-             s.no_wa, s.email, s.tempat_lahir, s.tanggal_lahir,
-             s.status,
-             u.username
+      SELECT 
+        s.id_santri,
+        COALESCE(sk.id_kelas, NULL) AS id_kelas,    -- FIX !!! RELASI KELAS
+        s.nis, 
+        s.nama, 
+        s.kategori,
+        s.no_wa, 
+        s.email, 
+        s.tempat_lahir, 
+        s.tanggal_lahir,
+        s.status,
+        u.username
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
+      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri   -- FIX !!! JOIN KELAS
       ${whereSQL}
       ORDER BY s.id_santri ASC
       LIMIT $${i} OFFSET $${i + 1}
@@ -77,8 +86,6 @@ exports.getAllSantri = async (req, res) => {
   }
 };
 
-
-
 /* =========================================
    2. Detail Santri by ID
 ========================================= */
@@ -88,9 +95,16 @@ exports.getSantriById = async (req, res) => {
 
     const result = await db.query(
       `
-      SELECT s.*, u.username, u.email AS user_email
+      SELECT 
+        s.*, 
+        u.username, 
+        u.email AS user_email,
+        sk.id_kelas,
+        k.nama_kelas
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
+      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
+      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
       WHERE s.id_santri = $1
       `,
       [id_santri]
@@ -110,8 +124,6 @@ exports.getSantriById = async (req, res) => {
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
-
-
 
 /* =========================================
    3. Update Santri

@@ -1,241 +1,206 @@
-<body data-page="dashboard"> 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Jadwal - Sahabat Quran</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
 
-<header class="dashboard-header">
-    <h1 class="header-title" id="page-content-title">Daftar Jadwal</h1>
-    <div class="admin-profile">
-        <span class="admin-text">Rabu, 19 November 2025</span>
-        <i class="fas fa-user-circle admin-icon"></i>
-    </div>
-</header>
+<body>
+<div class="container">
 
-<div class="page-container-left-aligned">
-
-    <div class="jadwal-header-controls">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../images/LogoYSQ.png" alt="Sahabat Quran" class="logo-img">
+        </div>
         
-        <div class="jadwal-filter-group-wrapper">
-            <div class="filter-group">
-                <label for="pilih-kelas">Pilih Kelas:</label>
-                <select id="pilih-kelas" class="profile-input class-filter-select">
-                    <option value="semua">Usmani 1</option>
-                    <option value="tahsin">Tahsin</option>
-                    <option value="tahfidz">Tahfidz</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="kategori-filter">Kategori:</label>
-                <select id="kategori-filter" class="profile-input class-filter-select">
-                    <option value="semua">Dewasa</option>
-                    <option value="anak">Anak</option>
-                </select>
-            </div>
-        </div>
+        <nav class="menu">
+            <a href="Admin.html" class="menu-item"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="daftar_jadwal.html" class="menu-item active"><i class="fas fa-calendar-alt"></i> Daftar Jadwal</a>
+            <a href="daftar_kelas.html" class="menu-item"><i class="fas fa-book"></i> Daftar Kelas</a>
+            <a href="daftar_santri.html" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+            <a href="daftar_pengajar.html" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+            <a href="riwayat_absensi.html" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+            <a href="#" class="menu-item"><i class="fas fa-scroll"></i> Rapor</a>
+            <a href="#" class="menu-item"><i class="fas fa-file-alt"></i> Laporan</a>
+        </nav>
 
-        <div class="save-action-wrapper">
-            <button class="action-btn primary-btn" id="btn-tambah-jadwal">
-                <i class="fas fa-plus"></i> Tambah Jadwal
-            </button>
+        <div class="sidebar-footer">
+            <div class="footer-buttons-wrapper"> 
+                <a href="#" class="footer-btn setting"><i class="fas fa-cog"></i> Setting Profil</a>
+                <a href="#" class="footer-btn logout"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+            </div>
         </div>
-    </div>
-    
-    <div class="schedule-table-section santri-class-table-section">
-        <div class="table-wrapper"> 
-            <table id="jadwal-list-table" class="standard-table">
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="dashboard-header class-header-style">
+            <h1 class="header-title">Daftar Jadwal</h1>
+            <div class="admin-profile">
+                <span class="header-date" id="current-date-display"></span>
+            </div>
+        </header>
+
+        <!-- FILTER AREA -->
+        <section class="schedule-controls-section">
+            <div class="schedule-controls-card">
                 
-                <thead>
-                    <tr class="table-header-row">
-                        <th>NO</th>
-                        <th>Kelas</th>
-                        <th>Pengajar</th>
-                        <th>Hari</th>
-                        <th>Jam</th>
-                        <th>Periode</th>
-                        <th>Status</th>
-                        <th class="column-action">Aksi</th>
-                    </tr>
-                </thead>
-                
-                <tbody id="jadwal-table-body">
-                    <tr class="table-data-row" data-id="1">
-                        <td>1.</td>
-                        <td>Tahsin</td>
-                        <td>Siti</td>
-                        <td>Senin</td>
-                        <td>08.00 - 10.00</td>
-                        <td>02/10/2025</td>
-                        <td class="status-cell">
-                            <span class="status-tag status-accepted status-toggle" data-status="aktif">Aktif</span>
-                        </td>
-                        <td class="table-actions">
-                            <button class="btn-action btn-edit-jadwal" data-jadwal-id="1">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            <button class="btn-action btn-delete-jadwal" data-jadwal-id="1">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="table-data-row" data-id="2">
-                        <td>2.</td>
-                        <td>Tahfiz</td>
-                        <td>Ainun</td>
-                        <td>Senin</td>
-                        <td>08.00 - 10.00</td>
-                        <td>02/10/2025</td>
-                        <td class="status-cell">
-                            <span class="status-tag status-accepted status-toggle" data-status="aktif">Aktif</span>
-                        </td>
-                        <td class="table-actions">
-                            <button class="btn-action btn-edit-jadwal" data-jadwal-id="2">
-                                <i class="fas fa-pencil-alt"></i>
-                            </button>
-                            <button class="btn-action btn-delete-jadwal" data-jadwal-id="2">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                <div class="filter-controls-jadwal">
+                    <div class="filter-group-item">
+                        <label for="pilih_kelas">Pilih Kelas:</label>
+                        <select id="pilih_kelas" class="styled-select-filter"></select>
+                    </div>
 
-</div>
-<div id="edit-jadwal-modal" class="custom-modal" style="display: none;">
-    <div class="modal-content modal-content-large">
-        <div class="modal-header">
-            <h2 id="edit-modal-title">Edit Jadwal Kelas: Usman II (Dewasa)</h2>
-            <span class="close-btn" id="close-edit-jadwal-modal">&times;</span>
-        </div>
+                    <div class="filter-group-item">
+                        <label for="kategori">Kategori:</label>
+                        <select id="kategori" class="styled-select-filter">
+                            <option value="">Semua</option>
+                            <option value="dewasa">Dewasa</option>
+                            <option value="anak">Anak</option>
+                        </select>
+                    </div>
+                </div>
 
-        <form id="form-edit-jadwal" class="modal-form">
-            
-            <h3 class="data-section-title">Data Kelas/Periode</h3>
-            <div class="form-row-popup split-2">
-                <div class="form-group-popup">
-                    <label for="pengajar-utama">Pengajar Utama:</label>
-                    <select id="pengajar-utama" class="profile-input">
-                        <option value="zahra">Zahra</option>
-                        <option value="siti">Siti</option>
-                        <option value="david">David</option>
-                    </select>
-                </div>
-                
-                <div class="form-group-popup">
-                    <label for="periode-mulai">Periode Mulai:</label>
-                    <input type="date" id="periode-mulai" class="profile-input" value="2025-10-02">
-                </div>
+                <button id="btn-add-jadwal" class="action-btn-form add-schedule-btn">
+                    <i class="fas fa-plus"></i> Tambah Jadwal
+                </button>
             </div>
+        </section>
 
-            <div class="form-row-popup split-2">
-                <div class="form-group-popup">
-                    <label for="jumlah-siswa-maks">Jumlah Siswa Maks.:</label>
-                    <input type="number" id="jumlah-siswa-maks" class="profile-input" value="10">
-                </div>
-                <div class="form-group-popup">
-                    <label for="periode-berakhir">Periode Berakhir:</label>
-                    <input type="date" id="periode-berakhir" class="profile-input" value="2025-12-02">
-                </div>
-            </div>
+        <!-- TABLE -->
+        <section class="schedule-table-section">
+            <div class="pendaftar-table">
+                <h2 class="schedule-table-title">Jadwal</h2>
 
-            <div class="sesi-header-wrapper">
-                <h3 class="data-section-title" style="margin: 0; border-bottom: none; padding-bottom: 0;">Daftar Sesi Pembelajaran</h3>
-            </div>
-            <div class="table-wrapper mt-10">
-                <table id="sesi-list-table" class="standard-table small-table">
+                <table class="schedule-list-table">
                     <thead>
                         <tr>
                             <th>NO</th>
-                            <th>Sesi</th>
+                            <th>Kelas</th>
+                            <th>Pengajar</th>
                             <th>Hari</th>
-                            <th>Waktu</th>
+                            <th>Jam</th>
+                            <th>Periode</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="sesi-table-body">
-                        <tr data-sesi-id="1">
-                            <td>1</td>
-                            <td>Tahsin 1</td>
-                            <td>Senin</td>
-                            <td>08.00 - 09.00</td>
-                            <td>Aktif</td>
-                            <td><a href="#" class="btn-hapus-sesi">Hapus</a></td>
-                        </tr>
-                        <tr data-sesi-id="2">
-                            <td>2</td>
-                            <td>Tahfidz</td>
-                            <td>Senin</td>
-                            <td>09.00 - 10.00</td>
-                            <td>Aktif</td>
-                            <td><a href="#" class="btn-hapus-sesi">Hapus</a></td>
-                        </tr>
-                    </tbody>
+
+                    <!-- TABEL DATA OTOMATIS -->
+                    <tbody id="jadwalBody"></tbody>
+
                 </table>
             </div>
+        </section>
 
-            <div class="modal-actions modal-actions-bottom">
-                <button type="button" class="action-btn cancel-btn" id="btn-batal-edit">
-                    Batalkan
-                </button>
-                <button type="submit" class="action-btn save-btn" id="btn-simpan-edit">
-                    Simpan Perubahan
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-<div id="tambah-jadwal-modal" class="custom-modal" style="display: none;">
-    <div class="modal-content modal-content-small">
-        <div class="modal-header">
-            <h2>Tambah Jadwal</h2>
-            <span class="close-btn" id="close-tambah-jadwal-modal">&times;</span>
+        <div class="absensi-footer-actions">
+            <a href="Admin.html" class="action-btn-form back-btn-absensi">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
         </div>
 
-        <form id="form-tambah-jadwal-baru" class="modal-form">
-            
-            <div class="form-row-popup">
-                <label for="kelas-tingkatan-baru">Kelas/Tingkatan</label>
-                <input type="text" id="kelas-tingkatan-baru" class="profile-input" placeholder="Masukkan Kelas/Tingkatan">
-            </div>
+    </main>
+</div>
 
-            <div class="form-row-popup split-2">
-                <div class="form-group-popup">
-                    <label for="pengajar-baru">Pengajar</label>
-                    <select id="pengajar-baru" class="profile-input">
-                        <option value="">-- Pilih Pengajar --</option>
-                        <option value="siti">Siti</option>
-                        <option value="zahra">Zahra</option>
-                        <option value="david">David</option>
-                    </select>
-                </div>
-                <div class="form-group-popup">
-                    <label for="hari-baru">Hari</label>
-                    <input type="text" id="hari-baru" class="profile-input" placeholder="Misalnya: Senin">
-                </div>
-            </div>
+<!-- Toast -->
+<div id="notification-toast" class="toast-notification"></div>
 
-            <div class="form-row-popup split-2">
-                <div class="form-group-popup">
-                    <label for="waktu-mulai-baru">Waktu Mulai</label>
-                    <input type="time" id="waktu-mulai-baru" class="profile-input" value="08:00">
-                </div>
-                <div class="form-group-popup">
-                    </div>
-            </div>
-            
-            <div class="form-row-popup">
-                <label for="waktu-periode-baru">Waktu Periode</label>
-                <input type="text" id="waktu-periode-baru" class="profile-input" placeholder="Misalnya: 08.00 - 10.00">
-            </div>
+<!-- Profile Setting Popup -->
+<div id="popup-profile-setting" class="modal-overlay">
+    <div class="profile-setting-content">
+        <button class="close-btn" id="btn-close-profil-x">&times;</button>
 
+        <div class="profile-avatar-large">R</div>
 
-            <div class="modal-actions modal-actions-bottom">
-                <button type="button" class="action-btn cancel-btn" id="btn-batal-tambah-baru">
-                    Batalkan
-                </button>
-                <button type="submit" class="action-btn save-btn primary-btn-orange" id="btn-simpan-tambah-baru">
-                    Simpan
-                </button>
-            </div>
-        </form>
+        <div class="profile-field-group">
+            <div><label>Nama</label> : <input type="text" id="profile-name-input" class="profile-input"></div>
+            <div><label>Email</label> : <input type="email" id="profile-email-input" class="profile-input"></div>
+            <div><label>No. Telepon</label> : <input type="tel" id="profile-phone-input" class="profile-input"></div>
+        </div>
+
+        <div class="profile-actions">
+            <button class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+            <button class="profile-action-btn profile-save-btn" id="btn-simpan-profil">Simpan</button>
+        </div>
     </div>
 </div>
+
+<!-- POPUP TAMBAH JADWAL -->
+<div id="popup-add-jadwal" class="modal-overlay" style="display:none;">
+    <div class="modal-content small-popup">
+        <h3>Tambah Jadwal</h3>
+
+        <label>Kelas</label>
+        <select id="add-id_kelas" class="styled-select-filter"></select>
+
+        <label>Hari</label>
+        <select id="add-hari" class="styled-select-filter">
+            <option>Senin</option>
+            <option>Selasa</option>
+            <option>Rabu</option>
+            <option>Kamis</option>
+            <option>Jumat</option>
+            <option>Sabtu</option>
+            <option>Minggu</option>
+        </select>
+
+        <label>Jam Mulai</label>
+        <input type="time" id="add-jam_mulai">
+
+        <label>Jam Selesai</label>
+        <input type="time" id="add-jam_selesai">
+
+        <label>Lokasi</label>
+        <input type="text" id="add-lokasi" placeholder="contoh: Aula Utama">
+
+        <div class="modal-actions">
+            <button class="modal-btn cancel" id="btn-cancel-add">Batal</button>
+            <button class="modal-btn save" id="btn-save-add">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<!-- POPUP EDIT JADWAL -->
+<div id="popup-edit-jadwal" class="modal-overlay" style="display:none;">
+    <div class="modal-content small-popup">
+        <h3>Edit Jadwal</h3>
+
+        <label>Kelas</label>
+        <select id="edit-id_kelas" class="styled-select-filter"></select>
+
+        <label>Hari</label>
+        <select id="edit-hari" class="styled-select-filter">
+            <option>Senin</option>
+            <option>Selasa</option>
+            <option>Rabu</option>
+            <option>Kamis</option>
+            <option>Jumat</option>
+            <option>Sabtu</option>
+            <option>Minggu</option>
+        </select>
+
+        <label>Jam Mulai</label>
+        <input type="time" id="edit-jam_mulai">
+
+        <label>Jam Selesai</label>
+        <input type="time" id="edit-jam_selesai">
+
+        <label>Lokasi</label>
+        <input type="text" id="edit-lokasi">
+
+        <div class="modal-actions">
+            <button class="modal-btn cancel" id="edit-cancel">Batal</button>
+            <button class="modal-btn save" id="edit-save">Simpan</button>
+        </div>
+    </div>
+</div>
+
+
+<script type="module" src="../js/admin_jadwal.js"></script>
+</body>
+</html>

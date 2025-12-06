@@ -9,58 +9,59 @@
 </head>
 <body>
 
-    <header class="header">
-        <div class="logo-section">
-            <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
-            <h2>YAYASAN SAHABAT QUR'AN</h2>
+<header class="header">
+    <div class="logo-section">
+        <img src="../images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
+        <h2>YAYASAN SAHABAT QUR'AN</h2>
+    </div>
+
+    <div class="user-info">
+        <span id="role-user">Siswa</span>
+        <i class='bx bx-user'></i>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="dashboard-card">
+
+        <h1>DASBOARD SISWA</h1>
+
+        <!-- SUB NAV RESPONSIF -->
+        <div class="sub-nav scroll-x">
+            <button class="active">Dashboard</button>
+            <a href="absensisiswa.html">Riwayat Absen</a>
+            <button>Raport</button>
+            <button>Student Bill</button>
         </div>
-        <div class="user-info">
-            <span id="role-user">Siswa</span>
-            <i class='bx bx-user'></i>
-        </div>
-    </header>
 
-    <div class="main-container">
-        <div class="dashboard-card">
-            <h1>DASBOARD SISWA</h1>
-            
-            <div class="sub-nav">
-                <button class="active">Dashboard</button>
-                <a href="absensisiswa.html">Riwayat Absen</a>
-                <button>Raport</button>
-                <button>Student Bill</button>
-            </div>
+        <!-- INFORMASI TAHSHIN CARD -->
+        <div class="info-tahsin responsive-card">
+            <img src="../images/kelas.jpg" alt="Ruang Kelas" class="info-tahsin-image">
 
-            <div class="info-tahsin">
-                
-                <img src="../images/kelas.jpg" alt="Ruang Kelas" class="info-tahsin-image">
-            
-                <div class="info-tahsin-body">
-            
-                    <!-- KIRI (Nama, Kategori, Kelas, Jadwal) -->
-                    <div class="info-left">
-                        <p><strong>Informasi Kelas</strong></p>
-                        <p>Nama: <span id="namaSantri">-</span></p>
-                        <p>Kategori: <span id="kategori-santri">-</span></p>
-                        <p>Kelas: <span id="kelas-santri">-</span></p>
-                        <p>Jadwal: <span id="jadwal-santri">-</span></p>
-                    </div>
-            
-                    <!-- KANAN (NIS) -->
-                    <div class="info-tahsin-id">
-                        <p class="info-tahsin-level" id="nisSantri">-</p>
-                    </div>                    
-            
-                </div>
-            </div>
-            
+            <div class="info-tahsin-body">
 
-            <div class="student-event-section">
-                <div class="student-event-tabs">
-                    <button class="active">Student Info</button>
-                    <button>Event</button>
+                <div class="info-left">
+                    <p><strong>Informasi Kelas</strong></p>
+                    <p>Nama: <span id="namaSantri">-</span></p>
+                    <p>Kategori: <span id="kategori-santri">-</span></p>
+                    <p>Kelas: <span id="kelas-santri">-</span></p>
+                    <p>Jadwal: <span id="jadwal-santri">-</span></p>
                 </div>
 
+                <div class="info-tahsin-id">
+                    <p class="info-tahsin-level" id="nisSantri">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB STUDENT INFO / EVENT -->
+        <div class="student-event-section">
+            <div class="student-event-tabs scroll-x">
+                <button class="active">Student Info</button>
+                <button>Event</button>
+            </div>
+
+            <div class="table-wrapper">
                 <table class="info-table">
                     <thead>
                         <tr>
@@ -72,13 +73,14 @@
                             <th>Materi</th>
                         </tr>
                     </thead>
-                    <tbody id="jadwal-body">
-                    </tbody>
+                    <tbody id="jadwal-body"></tbody>
                 </table>
             </div>
         </div>
-    </div>
 
-    <script src="../js/santri.js"></script>
+    </div>
+</div>
+
+<script src="../js/santri.js"></script>
 </body>
 </html>
