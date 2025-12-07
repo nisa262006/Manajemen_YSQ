@@ -297,6 +297,270 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+// ============================
+// DAFTAR SANTRI
+// ============================
+if (window.location.pathname.includes("daftar_santri.html")) {
+
+    console.log("Daftar Santri Page Active");
+
+    const kelasSelect = document.getElementById("pilih_kelas_santri");
+    const kategoriSelect = document.getElementById("kategori_santri");
+    const searchInput = document.querySelector(".santri-search input");
+    const tableBody = document.querySelector(".santri-list-table tbody");
+    const exportBtn = document.querySelector(".export-santri-btn");
+
+    let allSantri = [];
+    let allKelas = [];
+
+    // ==========================================
+    // LOAD DATA SANTRI
+    // ==========================================
+    async function loadSantri() {
+        try {
+            let res = await apiGet("/santri?page=1&limit=5000");
+            allSantri = res?.data ?? [];
+
+            renderSantri();
+
+        } catch (err) {
+            console.error("Error load santri:", err);
+        }
+    }
+
+    // ==========================================
+    // LOAD DATA KELAS (dropdown kelas bisa bertambah otomatis)
+    // ==========================================
+    async function loadKelas() {
+        try {
+            let res = await apiGet("/kelas");
+            allKelas = Array.isArray(res) ? res : res.data ?? [];
+
+            kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+
+            allKelas.forEach(k => {
+                kelasSelect.innerHTML += `
+                    <option value="${k.nama_kelas.toLowerCase()}">${k.nama_kelas}</option>
+                `;
+            });
+
+        } catch (err) {
+            console.error("Error load kelas:", err);
+        }
+    }
+
+    // ==========================================
+    // RENDER TABEL SANTRI
+    // ==========================================
+    function renderSantri() {
+
+        const keyword = searchInput.value.toLowerCase();
+        const kategori = kategoriSelect.value;
+        const kelas = kelasSelect.value;
+
+        let filtered = [...allSantri];
+
+        // Filter kategori
+        if (kategori) {
+            filtered = filtered.filter(s => (s.kategori || "").toLowerCase() === kategori);
+        }
+
+        // Filter kelas
+        if (kelas) {
+            filtered = filtered.filter(s => (s.nama_kelas || "").toLowerCase().includes(kelas));
+        }
+
+        // Search nama
+        if (keyword.length > 0) {
+            filtered = filtered.filter(s => s.nama.toLowerCase().includes(keyword));
+        }
+
+        tableBody.innerHTML = "";
+
+        if (filtered.length === 0) {
+            tableBody.innerHTML = `
+                <tr><td colspan="8" style="text-align:center">Tidak ada data santri.</td></tr>
+            `;
+            return;
+        }
+
+        filtered.forEach((s, i) => {
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${i + 1}.</td>
+                    <td>${s.nis}</td>
+                    <td>${s.nama}</td>
+                    <td>${s.nama_kelas ?? "-"}</td>
+                    <td>${s.email ?? "-"}</td>
+                    <td>
+                        <span class="status-badge status-${s.kategori === "anak" ? "anak" : "dewasa"}">
+                            ${s.kategori}
+                        </span>
+                    </td>
+                    <td><span class="status-badge status-aktif">${s.status}</span></td>
+                    <td class="action-icons">
+                        <button class="icon-btn edit-btn" data-id="${s.id_santri}">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="icon-btn delete-btn" data-id="${s.id_santri}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ==========================================
+    // DELETE SANTRI
+    // ==========================================
+    document.addEventListener("click", async (e) => {
+        if (e.target.closest(".delete-btn")) {
+            const id = e.target.closest(".delete-btn").dataset.id;
+
+            if (!confirm("Yakin ingin menghapus santri ini?")) return;
+
+            try {
+                await apiDelete(`/santri/${id}`);
+                toast("Santri berhasil dihapus", "success");
+                loadSantri();
+            } catch (err) {
+                console.error(err);
+                toast("Gagal menghapus santri", "cancel");
+            }
+        }
+    });
+
+    // ==========================================
+// POPUP EDIT SANTRI
+// ==========================================
+
+// Buka popup edit
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".edit-btn");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+
+    try {
+        const res = await apiGet(`/santri/${id}`);
+        const s = res.data;
+
+        // isi form
+        document.getElementById("edit-id-santri").value          = s.id_santri;
+        document.getElementById("edit-nis").value                = s.nis;
+        document.getElementById("edit-nama").value               = s.nama;
+        document.getElementById("edit-email").value              = s.email ?? "";
+        document.getElementById("edit-no-wa").value              = s.no_wa ?? "";
+        document.getElementById("edit-tempat-lahir").value       = s.tempat_lahir ?? "";
+        document.getElementById("edit-tanggal-lahir").value      = s.tanggal_lahir?.split("T")[0];
+        document.getElementById("edit-kategori").value           = s.kategori;
+
+        // tampilkan popup
+        document.getElementById("popup-edit-santri").style.display = "flex";
+
+    } catch (err) {
+        console.error(err);
+        toast("Gagal memuat data santri", "cancel");
+    }
+});
+
+// Tombol tutup popup (X)
+document.getElementById("close-edit-santri").addEventListener("click", () => {
+    document.getElementById("popup-edit-santri").style.display = "none";
+});
+
+// Tombol batal
+document.getElementById("btn-cancel-edit-santri").addEventListener("click", () => {
+    document.getElementById("popup-edit-santri").style.display = "none";
+});
+
+// Tombol simpan perubahan
+document.getElementById("btn-save-edit-santri").addEventListener("click", async () => {
+
+    const id = document.getElementById("edit-id-santri").value;
+
+    const data = {
+        nama: document.getElementById("edit-nama").value,
+        email: document.getElementById("edit-email").value,
+        no_wa: document.getElementById("edit-no-wa").value,
+        tempat_lahir: document.getElementById("edit-tempat-lahir").value,
+        tanggal_lahir: document.getElementById("edit-tanggal-lahir").value,
+        kategori: document.getElementById("edit-kategori").value
+    };
+
+    try {
+        await apiPut(`/santri/${id}`, data);
+
+        toast("Data santri berhasil diupdate", "success");
+
+        // tutup popup
+        document.getElementById("popup-edit-santri").style.display = "none";
+
+        // refresh data tabel
+        loadSantri();
+
+    } catch (err) {
+        console.error(err);
+        toast("Gagal mengubah data santri", "cancel");
+    }
+});
+
+    // ==========================================
+    // EXPORT SANTRI KE EXCEL
+    // ==========================================
+    exportBtn.addEventListener("click", () => {
+        exportSantriExcel();
+    });
+
+    function exportSantriExcel() {
+        const exportData = allSantri.map((s, i) => ({
+            No: i + 1,
+            NIM: s.nis,
+            Nama: s.nama,
+            Kelas: s.nama_kelas ?? "-",
+            Email: s.email ?? "-",
+            Kategori: s.kategori,
+            Status: s.status
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+
+        ws["!cols"] = [
+            { wch: 5 },
+            { wch: 15 },
+            { wch: 20 },
+            { wch: 15 },
+            { wch: 25 },
+            { wch: 12 },
+            { wch: 12 }
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Daftar Santri");
+
+        const bulan = new Date().toLocaleString("id-ID", { month: "long" });
+        const tahun = new Date().getFullYear();
+
+        XLSX.writeFile(wb, `Daftar_Santri_${bulan}_${tahun}.xlsx`);
+    }
+
+    
+
+    // ==========================================
+    // EVENT LISTENER FILTER & SEARCH
+    // ==========================================
+    kategoriSelect.addEventListener("change", renderSantri);
+    kelasSelect.addEventListener("change", renderSantri);
+    searchInput.addEventListener("keyup", renderSantri);
+
+    // ==========================================
+    // INIT
+    // ==========================================
+    loadKelas();
+    loadSantri();
+}
+ 
 // ===================================================
 // BAGIAN 1: DEFINISI FUNGSI GLOBAL (TOAST)
 // ===================================================
