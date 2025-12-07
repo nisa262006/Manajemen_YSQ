@@ -112,7 +112,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### =======================================
 PUT http://localhost:5000/santri/7
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTEwMDM5NywiZXhwIjoxNzY1MTg2Nzk3fQ.LZSnvn2lEvbgXLjtHxfgaqfH1AsGkz3KpdJMWDp0J5w
 
 {
   "nis": "YSQ-2025-0007",
@@ -168,10 +168,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 
 ### LIHAT PENGAJAR SESUAI ID
 GET http://localhost:5000/pengajar/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTEwMDM5NywiZXhwIjoxNzY1MTg2Nzk3fQ.LZSnvn2lEvbgXLjtHxfgaqfH1AsGkz3KpdJMWDp0J5w
 
 ### EDIT DATA PENGAJAR
-PUT http://localhost:5000/pengajar/3
+PUT http://localhost:5000/pengajar/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
 Content-Type: application/json
 
@@ -183,8 +183,8 @@ Content-Type: application/json
   "mapel": "tahfiz",
   "email": "ainunsiti@ysq.com",
   "no_kontak": "08123456789",
-  "password": "siti123",
-  "confirmPassword": "siti123"
+  "password": "12345",
+  "confirmPassword": "12345"
 }
 
 ### HAPUS PENGAJAR

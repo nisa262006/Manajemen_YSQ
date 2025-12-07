@@ -135,6 +135,59 @@
         </div>
     </div>
 </div>
-    <script type="module" src="../js/admin.js"></script>
+<!-- POPUP EDIT PENGAJAR -->
+<div id="popup-edit-pengajar" class="modal-overlay" style="display:none;">
+    <div class="popup-content pengajar-edit-box">
+        <input type="hidden" id="edit-id-pengajar">
+
+        <button class="close-btn" id="close-edit-pengajar">&times;</button>
+        <h2>Edit Data Pengajar</h2>
+
+        <div class="edit-form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="edit-nama-pengajar">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Tempat Lahir</label>
+            <input type="text" id="edit-tempat-lahir">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Tanggal Lahir</label>
+            <input type="date" id="edit-tanggal-lahir">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Alamat</label>
+            <input type="text" id="edit-alamat">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Mata Pelajaran / Kelas</label>
+            <input type="text" id="edit-mapel">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Email</label>
+            <input type="email" id="edit-email-pengajar">
+        </div>
+
+        <div class="edit-form-group">
+            <label>No. Telepon</label>
+            <input type="text" id="edit-no-kontak">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Password Baru (opsional)</label>
+            <input type="password" id="edit-password-baru" placeholder="Biarkan kosong jika tidak diganti">
+        </div>
+
+        <button class="save-btn" id="btn-simpan-edit-pengajar">
+            Simpan Perubahan
+        </button>
+    </div>
+</div>
+    <script type="module" src="../js/admin_data.js"></script>
 </body>
 </html>

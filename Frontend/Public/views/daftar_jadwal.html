@@ -85,7 +85,7 @@
                             <th>Pengajar</th>
                             <th>Hari</th>
                             <th>Jam</th>
-                            <th>Periode</th>
+                            <th>kategori</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -129,77 +129,6 @@
         </div>
     </div>
 </div>
-
-<!-- POPUP TAMBAH JADWAL -->
-<div id="popup-add-jadwal" class="modal-overlay" style="display:none;">
-    <div class="modal-content small-popup">
-        <h3>Tambah Jadwal</h3>
-
-        <label>Kelas</label>
-        <select id="add-id_kelas" class="styled-select-filter"></select>
-
-        <label>Hari</label>
-        <select id="add-hari" class="styled-select-filter">
-            <option>Senin</option>
-            <option>Selasa</option>
-            <option>Rabu</option>
-            <option>Kamis</option>
-            <option>Jumat</option>
-            <option>Sabtu</option>
-            <option>Minggu</option>
-        </select>
-
-        <label>Jam Mulai</label>
-        <input type="time" id="add-jam_mulai">
-
-        <label>Jam Selesai</label>
-        <input type="time" id="add-jam_selesai">
-
-        <label>Lokasi</label>
-        <input type="text" id="add-lokasi" placeholder="contoh: Aula Utama">
-
-        <div class="modal-actions">
-            <button class="modal-btn cancel" id="btn-cancel-add">Batal</button>
-            <button class="modal-btn save" id="btn-save-add">Simpan</button>
-        </div>
-    </div>
-</div>
-
-<!-- POPUP EDIT JADWAL -->
-<div id="popup-edit-jadwal" class="modal-overlay" style="display:none;">
-    <div class="modal-content small-popup">
-        <h3>Edit Jadwal</h3>
-
-        <label>Kelas</label>
-        <select id="edit-id_kelas" class="styled-select-filter"></select>
-
-        <label>Hari</label>
-        <select id="edit-hari" class="styled-select-filter">
-            <option>Senin</option>
-            <option>Selasa</option>
-            <option>Rabu</option>
-            <option>Kamis</option>
-            <option>Jumat</option>
-            <option>Sabtu</option>
-            <option>Minggu</option>
-        </select>
-
-        <label>Jam Mulai</label>
-        <input type="time" id="edit-jam_mulai">
-
-        <label>Jam Selesai</label>
-        <input type="time" id="edit-jam_selesai">
-
-        <label>Lokasi</label>
-        <input type="text" id="edit-lokasi">
-
-        <div class="modal-actions">
-            <button class="modal-btn cancel" id="edit-cancel">Batal</button>
-            <button class="modal-btn save" id="edit-save">Simpan</button>
-        </div>
-    </div>
-</div>
-
 
 <script type="module" src="../js/admin_jadwal.js"></script>
 </body>

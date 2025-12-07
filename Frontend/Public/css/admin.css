@@ -1373,7 +1373,7 @@ body {
     display: flex;
     justify-content: flex-start; /* Search dan Tombol berada di sisi kiri */
     align-items: center;
-    gap: 20px; /* Jarak antara Search Box dan Tombol Tambah */
+    gap: 500px; /* Jarak antara Search Box dan Tombol Tambah */
     
     background-color: var(--color-form-bg); /* Beige Muda sesuai desain */
     padding: 20px;
@@ -2167,4 +2167,86 @@ body {
 .action-btn.cancel {
     background: #dc3545;
     color: #fff;
+}
+
+/* =======================
+   POPUP EDIT PENGAJAR
+========================== */
+
+#popup-edit-pengajar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.pengajar-edit-box {
+    background: #ffffff;
+    width: 480px;
+    padding: 25px 30px;
+    border-radius: 14px;
+    box-shadow: 0px 4px 25px rgba(0,0,0,0.25);
+    position: relative;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.pengajar-edit-box h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    color: #1B4D3E;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.edit-form-group {
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-form-group label {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.edit-form-group input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cdd2d4;
+    font-size: 14px;
+}
+
+.edit-form-group input:focus {
+    outline: none;
+    border-color: #2b7a78;
+    box-shadow: 0 0 3px rgba(43, 122, 120, 0.4);
+}
+
+/* Tombol Close */
+#close-edit-pengajar {
+    position: absolute;
+    top: 13px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #333;
+}
+
+#close-edit-pengajar:hover {
+    color: #d9534f;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { transform: scale(0.97); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
 }
