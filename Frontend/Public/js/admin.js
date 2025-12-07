@@ -358,8 +358,14 @@ function initTambahPengajar() {
             mapel: document.getElementById("kelas").value,
             email: document.getElementById("email").value.trim(),
             no_kontak: document.getElementById("no_telpon").value.trim(),
-            password: document.getElementById("password").value.trim()
+            password: document.getElementById("password").value.trim(),
+            confirmPassword: document.getElementById("confirm_password").value.trim()
         };
+        
+        if (data.password !== data.confirmPassword) {
+            toast("Password tidak sama", "cancel");
+            return;
+        }        
 
         try {
             await apiPost("/pengajar/tambah", data);
@@ -858,4 +864,12 @@ function showToast(message, type) {
     // PANGGILAN FUNGSI TANGGAL REAL-TIME
     updateRealTimeDate();
 
-}; // Akhir dari window.onload
+}; // Akhir dari window.onload// =============================================
+//   PANGGIL INIT FORM TAMBAH SISWA & PENGAJAR
+// =============================================
+document.addEventListener("DOMContentLoaded", () => {
+    initTambahSiswa();
+    initTambahPengajar();
+});
+
+

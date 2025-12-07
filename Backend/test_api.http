@@ -148,18 +148,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### TAMBAH PENGAJAR
 POST http://localhost:5000/pengajar/tambah
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTA4NTA2NywiZXhwIjoxNzY1MTcxNDY3fQ.ttyX9msQz7zr_ojUSxjkwRSO4YdpLGs6ZhEtXENEqiM
 
 {
-  "nama": "siti",
+  "nama": "sabrina",
   "alamat": "Bogor",
   "tempat_lahir": "Bogor",
   "tanggal_lahir": "1990-01-01",
   "mapel": "Tahfiz",
-  "email": "ainunsiti@gmail.com",
+  "email": "sabrina@gmail.com",
   "no_kontak": "08123456789",
-  "password": "siti123",
-  "confirmPassword": "siti123"
+  "password": "sab123",
+  "confirmPassword": "sab123"
 }
 
 ### LIHAT SEMUA PENGAJAR

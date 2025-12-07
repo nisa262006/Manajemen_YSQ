@@ -229,28 +229,6 @@ exports.updatePengajar = async (req, res) => {
     // ================================
     const changes = {};
 
-    // ================================
-    // Cek & Update email
-    // ================================
-    if (emailReq && emailReq !== emailDB) {
-      const cekEmail = await db.query(
-        `SELECT email FROM users WHERE email = $1 AND id_users != $2`,
-        [emailReq, id_users]
-      );
-
-      if (cekEmail.rowCount > 0) {
-        return res.status(400).json({
-          message: "Email sudah digunakan user lain"
-        });
-      }
-
-      await db.query(
-        `UPDATE users SET email=$1 WHERE id_users=$2`,
-        [emailReq, id_users]
-      );
-
-      changes.email = { old: emailDB, new: emailReq };
-    }
 
     // ================================
     // Cek & Update Password
