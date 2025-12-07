@@ -32,19 +32,32 @@ export async function apiGet(endpoint) {
 }
 
 // =============== POST ===============
-export async function apiPost(endpoint, body) {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
+export async function apiPost(url, data) {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(BASE_URL + url, {
         method: "POST",
-        headers: buildHeaders(),
-        body: JSON.stringify(body)
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
     });
 
-    if (!res.ok) {
-        console.error(`POST ${endpoint} gagal`);
-        throw await res.json();
+    let json;
+    try {
+        json = await res.json();
+    } catch (e) {
+        throw new Error("Response bukan JSON");
     }
 
-    return res.json();
+    // FIX UTAMA: jangan anggap error kalau status 200/201
+    if (!res.ok) {
+        console.error("API Error:", json);
+        throw json;
+    }
+
+    return json;
 }
 
 // =============== PUT ===============
