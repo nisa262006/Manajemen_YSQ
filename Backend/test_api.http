@@ -12,7 +12,7 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "Maya.pengajar@ysq.com",
+  "identifier": "maya@ysq.com",
   "password": "123456"
 }
 
@@ -97,14 +97,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### 2. GET ALL SANTRI (Pagination + Filter + Search)
 ### =======================================
 GET http://localhost:5000/santri?page=2&limit=10&q=&kategori=&status=
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTAyMTExOSwiZXhwIjoxNzY1MTA3NTE5fQ.jO_eioo-HZWoNIJoxcr1wc4hShDQdNKDGB81dmR78FA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
 
 
 ### =======================================
 ### 3. GET SANTRI BY ID
 ### =======================================
 GET http://localhost:5000/santri/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTAyMTExOSwiZXhwIjoxNzY1MTA3NTE5fQ.jO_eioo-HZWoNIJoxcr1wc4hShDQdNKDGB81dmR78FA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
 
 
 ### =======================================
@@ -151,15 +151,15 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTA4NTA2NywiZXhwIjoxNzY1MTcxNDY3fQ.ttyX9msQz7zr_ojUSxjkwRSO4YdpLGs6ZhEtXENEqiM
 
 {
-  "nama": "sabrina",
+  "nama": "nisa",
   "alamat": "Bogor",
   "tempat_lahir": "Bogor",
   "tanggal_lahir": "1990-01-01",
   "mapel": "Tahfiz",
-  "email": "sabrina@gmail.com",
+  "email": "nisa@gmail.com",
   "no_kontak": "08123456789",
-  "password": "sab123",
-  "confirmPassword": "sab123"
+  "password": "nis123",
+  "confirmPassword": "nis123"
 }
 
 ### LIHAT SEMUA PENGAJAR
@@ -168,11 +168,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 
 ### LIHAT PENGAJAR SESUAI ID
 GET http://localhost:5000/pengajar/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTEwMDM5NywiZXhwIjoxNzY1MTg2Nzk3fQ.LZSnvn2lEvbgXLjtHxfgaqfH1AsGkz3KpdJMWDp0J5w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
 
 ### EDIT DATA PENGAJAR
-PUT http://localhost:5000/pengajar/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+PUT http://localhost:5000/pengajar/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
 Content-Type: application/json
 
 {
@@ -213,7 +213,7 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTA4NTA2NywiZXhwIjoxNzY1MTcxNDY3fQ.ttyX9msQz7zr_ojUSxjkwRSO4YdpLGs6ZhEtXENEqiM
 
 
 ##################################################
@@ -303,15 +303,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsI
 ##################################################
 
 POST http://localhost:5000/jadwal
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDQwMzYyNSwiZXhwIjoxNzY0NDkwMDI1fQ.ZzxD9n6JURJ06rOaZ8ZOP_n6Ju-YYqM8aanuQXX1YNA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
 Content-Type: application/json
 
 {
   "id_kelas": 11,
-  "hari": "rabu",
+  "hari": "kamis",
   "jam_mulai": "08:00",
   "jam_selesai": "10:00",
-  "lokasi": "Ruang Kelas 2",
+  "kategori": "dewasa",
   "id_pengajar": 1
 }
 
@@ -322,7 +322,7 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/jadwal
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
 
 
 ##################################################
@@ -358,7 +358,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 ##################################################
 
 GET http://localhost:5000/jadwal/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDA4MzAwLCJleHAiOjE3NjQ0OTQ3MDB9.Nv_jmyX48ELWuKUyJ9kweck_GajnBMomPFjWZFKLVMw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJtYXlhQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY1MTk3ODQxLCJleHAiOjE3NjUyODQyNDF9.JHe-oSZzfu8oAV0Kskh21DjJpD-tDskYXJlJouKodlw
 
 
 ##################################################

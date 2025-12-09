@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   tambahJadwal,
   getAllJadwal,
+  getJadwalById,
   updateJadwal,
   deleteJadwal,
   jadwalPengajar,
@@ -19,31 +20,18 @@ const {
 
 
 // ===================== ADMIN =============================
-
-// Tambah jadwal
 router.post("/", verifyToken, onlyAdmin, tambahJadwal);
-
-// List semua jadwal
 router.get("/", verifyToken, onlyAdmin, getAllJadwal);
 
-
 // ===================== PENGAJAR =============================
-
 router.get("/pengajar/me", verifyToken, onlyPengajar, jadwalPengajar);
 
-
 // ===================== SANTRI =============================
-
 router.get("/santri/me", verifyToken, onlySantri, jadwalSantri);
 
-
-// ===================== ROUTE DINAMIS (HARUS PALING BAWAH) =====================
-
-// Update jadwal
+// ===================== DYNAMIC ROUTES (HARUS PALING BAWAH) ============================
+router.get("/:id_jadwal", verifyToken, onlyAdmin, getJadwalById);
 router.put("/:id_jadwal", verifyToken, onlyAdmin, updateJadwal);
-
-// Delete jadwal
 router.delete("/:id_jadwal", verifyToken, onlyAdmin, deleteJadwal);
-
 
 module.exports = router;

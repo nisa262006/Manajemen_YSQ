@@ -28,7 +28,7 @@ exports.tambahPengajar = async (req, res) => {
       return res.status(400).json({ message: "Password tidak sama" });
     }
 
-    // Email harus unik
+    // Cek Email unik
     const cekEmail = await db.query(
       `SELECT email FROM users WHERE email=$1`,
       [email]
@@ -40,18 +40,22 @@ exports.tambahPengajar = async (req, res) => {
     // Hash password
     const password_hash = await bcrypt.hash(password, 10);
 
-    // Generate NIP
+    // =============================
+    // 1️⃣ Generate NIP otomatis
+    // =============================
     const tahun2 = String(new Date().getFullYear()).slice(2);
     const getMax = await db.query(`SELECT MAX(id_pengajar) AS max FROM pengajar`);
     const next = (getMax.rows[0].max || 0) + 1;
     const nomor = String(next).padStart(3, "0");
     const nip = `YSQ${tahun2}PGJ${nomor}`;
 
-    // Generate username
+    // =============================
+    // 2️⃣ Generate username otomatis
+    // =============================
     const cleanName = nama.toLowerCase().replace(/\s+/g, "");
     const username = `${nip}_${cleanName}`;
 
-    // Username harus unik (antisipasi tabrakan nama sama)
+    // Cek username unik
     const cekUsername = await db.query(
       `SELECT username FROM users WHERE username=$1`,
       [username]
@@ -62,7 +66,9 @@ exports.tambahPengajar = async (req, res) => {
       });
     }
 
-    // Insert ke users
+    // =============================
+    // 3️⃣ Insert ke USERS
+    // =============================
     const newUser = await db.query(
       `INSERT INTO users (email, username, password_hash, role, status_user)
        VALUES ($1, $2, $3, 'pengajar', 'aktif')
@@ -72,66 +78,67 @@ exports.tambahPengajar = async (req, res) => {
 
     const id_users = newUser.rows[0].id_users;
 
-    // Insert pengajar
+    // =============================
+    // 4️⃣ Insert ke PENGAJAR (email & nip WAJIB MASUK)
+    // =============================
     await db.query(
       `INSERT INTO pengajar 
-       (id_users, nama, no_kontak, alamat, tempat_lahir, tanggal_lahir, mapel, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,'aktif')`,
+       (id_users, nip, nama, no_kontak, alamat, tempat_lahir, tanggal_lahir, mapel, email, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'aktif')`,
       [
         id_users,
+        nip,
         nama,
         no_kontak || null,
         alamat || null,
         tempat_lahir || null,
         tanggal_lahir || null,
-        mapel || null
+        mapel || null,
+        email || null
       ]
-    );
+    );    
 
-    res.json({
+    return res.json({
       message: "Pengajar berhasil ditambahkan",
       id_users,
       nip,
       username,
       email,
-      password_plain: password, 
-      password_hash
+      password_plain: password
     });
 
   } catch (err) {
     console.error("TAMBAH PENGAJAR ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
-
-
 
 /* =========================================
    2. Ambil Semua Pengajar (Dengan Pagination)
 ========================================= */
 exports.getAllPengajar = async (req, res) => {
   try {
-    let { page, limit } = req.query;
-    page = parseInt(page) || 1;
-    limit = parseInt(limit) || 10;
-    const offset = (page - 1) * limit;
-
     const result = await db.query(`
-      SELECT p.id_pengajar, p.nama, p.no_kontak, p.mapel, p.status,
-             u.email, u.username
-      FROM pengajar p
-      LEFT JOIN users u ON p.id_users = u.id_users
-      ORDER BY p.id_pengajar
-      LIMIT $1 OFFSET $2
-    `, [limit, offset]);
+      SELECT 
+        p.id_pengajar,
+        p.nip,
+        p.nama,
+        p.email,
+        p.no_kontak,
+        p.status,
+        p.mapel,
+        
+        -- RELASI KE KELAS
+        COALESCE(k.nama_kelas, '-') AS nama_kelas,
+        k.id_kelas
 
-    const count = await db.query(`SELECT COUNT(*) AS total FROM pengajar`);
+      FROM pengajar p
+      LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
+      ORDER BY p.id_pengajar ASC
+    `);
 
     res.json({
       message: "List pengajar",
-      total: Number(count.rows[0].total),
-      page,
-      limit,
       data: result.rows
     });
 
@@ -140,7 +147,6 @@ exports.getAllPengajar = async (req, res) => {
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
-
 
 
 /* =========================================
@@ -152,18 +158,18 @@ exports.getPengajarById = async (req, res) => {
 
     const result = await db.query(`
       SELECT 
-   p.id_pengajar,
-   p.nama,
-   p.no_kontak,        -- ✔ BETUL
-   p.tempat_lahir,
-   p.tanggal_lahir,
-   p.mapel,
-   p.alamat,
-   p.status,
-   u.email
-FROM pengajar p
-LEFT JOIN users u ON p.id_users = u.id_users
-WHERE p.id_pengajar = $1
+        p.*,
+        u.username,
+        u.email AS user_email,
+
+        -- RELASI KELAS
+        k.id_kelas,
+        k.nama_kelas
+
+      FROM pengajar p
+      LEFT JOIN users u ON p.id_users = u.id_users
+      LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
+      WHERE p.id_pengajar = $1
     `, [id_pengajar]);
 
     if (result.rowCount === 0) {
@@ -181,14 +187,13 @@ WHERE p.id_pengajar = $1
   }
 };
 
-
-
 /* =========================================
-   4. Update Pengajar + Show Changed Fields
+   4. Update Pengajar (FIX NIP ERROR)
 ========================================= */
 exports.updatePengajar = async (req, res) => {
   try {
     const { id_pengajar } = req.params;
+
     const {
       nama,
       alamat,
@@ -204,11 +209,10 @@ exports.updatePengajar = async (req, res) => {
 
     // 1. Ambil data lama
     const check = await db.query(`
-      SELECT p.*, u.email AS email_lama, u.username,
-             u.password_hash
+      SELECT p.*, u.email AS user_email, u.username 
       FROM pengajar p
       LEFT JOIN users u ON p.id_users = u.id_users
-      WHERE p.id_pengajar=$1
+      WHERE p.id_pengajar = $1
     `, [id_pengajar]);
 
     if (check.rowCount === 0) {
@@ -218,21 +222,11 @@ exports.updatePengajar = async (req, res) => {
     const oldData = check.rows[0];
     const id_users = oldData.id_users;
 
-    // ================================
-    // Normalisasi email
-    // ================================
-    const emailDB = oldData.email_lama ? oldData.email_lama.toLowerCase().trim() : null;
-    const emailReq = email ? email.toLowerCase().trim() : null;
+    let changes = {};
 
-    // ================================
-    // Prepare object perubahan
-    // ================================
-    const changes = {};
-
-
-    // ================================
-    // Cek & Update Password
-    // ================================
+    /* ===============================
+       UPDATE PASSWORD (jika diisi)
+    =============================== */
     if (password || confirmPassword) {
       if (password !== confirmPassword) {
         return res.status(400).json({ message: "Password tidak sama" });
@@ -245,33 +239,36 @@ exports.updatePengajar = async (req, res) => {
         [password_hash, id_users]
       );
 
-      changes.password = "updated"; // demi keamanan tidak tampilkan lama/baru
+      changes.password = "updated";
     }
 
-    // ================================
-    // Siapkan perubahan data pengajar
-    // ================================
-    const newData = {
+    /* ===============================
+       Kolom pengajar yang boleh diupdate
+    =============================== */
+    const updatePengajar = {
       nama,
       no_kontak,
       alamat,
       tempat_lahir,
       tanggal_lahir,
       mapel,
+      email,
       status
     };
 
-    const fields = ["nama", "no_kontak", "alamat", "tempat_lahir", "tanggal_lahir", "mapel", "status"];
-
-    fields.forEach(field => {
-      if (newData[field] !== undefined && newData[field] !== oldData[field]) {
-        changes[field] = { old: oldData[field], new: newData[field] };
+    // track perubahan
+    for (let key in updatePengajar) {
+      if (
+        updatePengajar[key] !== undefined &&
+        updatePengajar[key] !== oldData[key]
+      ) {
+        changes[key] = { old: oldData[key], new: updatePengajar[key] };
       }
-    });
+    }
 
-    // ================================
-    // Update tabel pengajar
-    // ================================
+    /* ===============================
+       EKSEKUSI UPDATE → tanpa nip!
+    =============================== */
     await db.query(
       `UPDATE pengajar SET 
         nama=$1,
@@ -280,8 +277,9 @@ exports.updatePengajar = async (req, res) => {
         tempat_lahir=$4,
         tanggal_lahir=$5,
         mapel=$6,
-        status=$7
-       WHERE id_pengajar=$8`,
+        email=$7,
+        status=$8
+       WHERE id_pengajar=$9`,
       [
         nama,
         no_kontak,
@@ -289,27 +287,24 @@ exports.updatePengajar = async (req, res) => {
         tempat_lahir,
         tanggal_lahir,
         mapel,
+        email,
         status,
         id_pengajar
       ]
-    );
+    );    
 
-    // ================================
-    // Response final
-    // ================================
     res.json({
       message: "Pengajar berhasil diperbarui",
       id_pengajar,
+      nip: oldData.nip, // nip tetap sama, tidak diedit
       updated_fields: changes
     });
 
   } catch (err) {
     console.error("UPDATE PENGAJAR ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
-
-
 
 /* =========================================
    5. Delete Pengajar

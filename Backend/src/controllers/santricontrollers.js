@@ -16,21 +16,18 @@ exports.getAllSantri = async (req, res) => {
     let params = [];
     let i = 1;
 
-    // SEARCH (nama / NIS)
     if (q) {
       where.push(`(LOWER(s.nama) LIKE LOWER($${i}) OR LOWER(s.nis) LIKE LOWER($${i}))`);
       params.push(`%${q}%`);
       i++;
     }
 
-    // FILTER kategori
     if (kategori) {
       where.push(`s.kategori = $${i}`);
       params.push(kategori);
       i++;
     }
 
-    // FILTER status
     if (status) {
       where.push(`s.status = $${i}`);
       params.push(status);
@@ -42,20 +39,24 @@ exports.getAllSantri = async (req, res) => {
     const santriQuery = await db.query(
       `
       SELECT 
-        s.id_santri,
-        COALESCE(sk.id_kelas, NULL) AS id_kelas,    -- FIX !!! RELASI KELAS
-        s.nis, 
-        s.nama, 
-        s.kategori,
-        s.no_wa, 
-        s.email, 
-        s.tempat_lahir, 
-        s.tanggal_lahir,
-        s.status,
-        u.username
+  s.id_santri,
+  s.nis,
+  s.nama,
+  s.kategori,
+  s.no_wa,
+  s.email,
+  s.tempat_lahir,
+  s.tanggal_lahir,
+  s.alamat,       -- ⭐ TAMBAHKAN INI
+  s.status,
+  u.username,
+  COALESCE(k.nama_kelas, '-') AS nama_kelas
+
+
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
-      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri   -- FIX !!! JOIN KELAS
+      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
+      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas   -- JOIN KELAS FIX
       ${whereSQL}
       ORDER BY s.id_santri ASC
       LIMIT $${i} OFFSET $${i + 1}
@@ -96,19 +97,34 @@ exports.getSantriById = async (req, res) => {
     const result = await db.query(
       `
       SELECT 
-        s.*, 
-        u.username, 
-        u.email AS user_email,
-        sk.id_kelas,
-        k.nama_kelas
+          s.id_santri,
+          s.nis,
+          s.nama,
+          s.kategori,
+          s.no_wa,
+          s.email,
+          s.tempat_lahir,
+          s.tanggal_lahir,
+          s.status,
+          COALESCE(s.alamat, '') AS alamat,
+    
+          u.username,
+          u.email AS user_email,
+    
+          sk.id_kelas,
+          k.nama_kelas
+    
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
       LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
       LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
+    
       WHERE s.id_santri = $1
       `,
       [id_santri]
     );
+    
+    
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Santri tidak ditemukan" });
@@ -145,14 +161,15 @@ exports.updateSantri = async (req, res) => {
       email,
       tempat_lahir,
       tanggal_lahir,
-      status
+      status,
+      alamat
     } = req.body;
 
     /* ==========================
        CEK DATA SANTRI
     ========================== */
     const check = await db.query(`
-      SELECT s.*, u.email AS user_email, u.username, u.id_users
+      SELECT s.*, u.email AS user_email, u.username, u.id_users, s.alamat
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
       WHERE s.id_santri = $1
@@ -198,8 +215,9 @@ exports.updateSantri = async (req, res) => {
         email = $4,
         tempat_lahir = $5,
         tanggal_lahir = $6,
-        status = $7
-      WHERE id_santri = $8
+        status = $7,
+        alamat = $8         -- ⭐ TAMBAHKAN INI
+      WHERE id_santri = $9
     `, [
       nama,
       kategori,
@@ -208,8 +226,10 @@ exports.updateSantri = async (req, res) => {
       tempat_lahir,
       tanggal_lahir,
       status,
+      alamat,
       id_santri
     ]);
+    
 
     /* ==========================
        BENTUKKAN DATA OUTPUT
@@ -227,7 +247,8 @@ exports.updateSantri = async (req, res) => {
       no_wa,
       email,
       tempat_lahir,
-      tanggal_lahir: cleanDate,           // format aman YYYY-MM-DD
+      tanggal_lahir: cleanDate,
+      alamat,           // format aman YYYY-MM-DD
       username: oldData.username,         // dari tabel users
       user_email: email                   // email terbaru
     };
@@ -299,7 +320,7 @@ exports.exportSantriExcel = async (req, res) => {
     // Header
     sheet.addRow([
       "ID", "NIS", "Nama", "Kategori", "No WA",
-      "Email", "Tempat Lahir", "Tanggal Lahir", "Status"
+      "Email", "Tempat Lahir", "Tanggal Lahir","alamat", "Status"
     ]);
 
     // Data
@@ -313,6 +334,7 @@ exports.exportSantriExcel = async (req, res) => {
         s.email,
         s.tempat_lahir,
         s.tanggal_lahir,
+        s.alamat,
         s.status
       ]);
     });
