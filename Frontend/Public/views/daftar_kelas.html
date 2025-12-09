@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="page-jadwal-admin">
-
+<body>
     <div class="container">
         <aside class="sidebar">
             <div class="logo">
@@ -72,7 +71,7 @@
                                 <th>No</th>
                                 <th>Nama Kelas</th>
                                 <th>Kapasitas</th>
-                                <th>Periode</th>
+                                <th>Kategori</th>
                                 <th>Pengajar</th>
                                 <th>Aksi</th>
                             </tr>
@@ -82,10 +81,9 @@
                                 <td>1.</td>
                                 <td>Idat Awal</td>
                                 <td>15-20</td>
-                                <td>22 oktober 2025</td>
+                                <td>dewasa</td>
                                 <td>SITI</td>
                                 <td class="action-icons">
-                                    <button class="icon-btn add-member-btn" title="Tambah Santri"><i class="fas fa-plus"></i></button>
                                     <button class="icon-btn view-details-btn" title="Lihat Detail"><i class="fas fa-eye"></i></button> 
                                     <button class="icon-btn delete-btn" title="Hapus Kelas"><i class="fas fa-trash-alt"></i></button>
                                 </td>
@@ -94,10 +92,9 @@
                                 <td>2.</td>
                                 <td>Idat Awal</td>
                                 <td>15-20</td>
-                                <td>22 oktober 2025</td>
+                                <td>dewasa</td>
                                 <td>SITI</td>
                                 <td class="action-icons">
-                                    <button class="icon-btn add-member-btn"><i class="fas fa-plus"></i></button>
                                     <button class="icon-btn view-details-btn"><i class="fas fa-eye"></i></button>
                                     <button class="icon-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
                                 </td>
@@ -106,10 +103,9 @@
                                 <td>3.</td>
                                 <td>Idat Awal</td>
                                 <td>15-20</td>
-                                <td>22 oktober 2025</td>
+                                <td>dewasa</td>
                                 <td>SITI</td>
                                 <td class="action-icons">
-                                    <button class="icon-btn add-member-btn"><i class="fas fa-plus"></i></button>
                                     <button class="icon-btn view-details-btn"><i class="fas fa-eye"></i></button>
                                     <button class="icon-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
                                 </td>
@@ -125,57 +121,6 @@
             </div>
             </main>
     </div>
-    <div id="modal-tambah-kelas" class="modal-overlay">
-    <div class="modal-content">
-        <div class="form-card-small">
-            
-            <h2 class="form-header-small">Tambah Kelas</h2>
-            <span class="close-btn" id="close-tambah-kelas-popup">&times;</span>
-            
-            <form action="submit_tambah_kelas.php" method="POST" class="form-grid-2-col-small">
-                
-                <div class="form-group full-width-small">
-                    <label for="kelas_tingkatan_modal">Kelas/Tingkatan</label>
-                    <input type="text" id="kelas_tingkatan_modal" name="kelas_tingkatan" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="pengajar_modal">Pengajar</label>
-                    <select id="pengajar_modal" name="pengajar" class="styled-select-small" required>
-                        <option value="">Pilih Pengajar</option>
-                        <option value="Siti">Siti</option>
-                        <option value="Budi">Budi</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="kapasitas_modal">Kapasitas</label>
-                    <input type="number" id="kapasitas_modal" name="kapasitas" required>
-                </div>
-                
-                <div class="form-group full-width-small">
-                    <label for="kategori_modal">Kategori</label>
-                    <input type="text" id="kategori_modal" name="kategori">
-                </div>
-
-                <div class="form-group">
-                    <label for="waktu_awal_modal">Waktu Awal Priode</label>
-                    <input type="date" id="waktu_awal_modal" name="waktu_awal">
-                </div>
-                <div class="form-group">
-                    <label for="waktu_selesai_modal">Waktu Selesai Priode</label>
-                    <input type="date" id="waktu_selesai_modal" name="waktu_selesai">
-                </div>
-
-                <div class="form-actions-small full-width-small">
-                    <button type="button" id="btn-batal-kelas" class="modal-action-btn-small cancel-btn-small">Batalkan</button>
-                    <button type="submit" class="modal-action-btn-small save-btn-small">Simpan</button>
-                </div>
-
-            </form>
-        </div>
-        <div id="notification-toast" class="toast-notification"></div>
-    </div>
-</div>
 <div id="notification-toast" class="toast-notification"></div>
 <div id="popup-profile-setting" class="modal-overlay">
     <div class="profile-setting-content">
@@ -203,6 +148,55 @@
             <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
             <button type="submit" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">Simpan</button>
         </div>
+    </div>
+</div>
+<div id="tambah-kelas-modal" class="modal-overlay">
+    <div class="tambah-kelas-content">
+        <button class="close-btn" id="btn-close-tambah-kelas-x">&times;</button>
+        <h2 class="modal-title-tambah-kelas">Tambah Kelas</h2>
+
+        <form id="form-tambah-kelas">
+            <div class="input-group-full">
+                <label for="input-kelas-tingkatan">Kelas/tingkatan</label>
+                <input type="text" id="input-kelas-tingkatan" placeholder="Contoh: Usman II (Dewasa)" required>
+            </div>
+            
+            <div class="form-row-tambah">
+                <div class="input-group-tambah">
+                    <label for="select-pengajar-kelas">Pengajar</label>
+                    <select id="select-pengajar-kelas" required>
+                        <option value="">Pilih Pengajar</option>
+                        <option value="zahra">Zahra</option>
+                        <option value="budi">Budi</option>
+                    </select>
+                </div>
+                <div class="input-group-tambah">
+                    <label for="input-kapasitas">Kapasitas</label>
+                    <input type="number" id="input-kapasitas" placeholder="Contoh: 15" required>
+                </div>
+            </div>
+
+            <div class="input-group-full">
+                <label for="input-kategori">Kategori</label>
+                <input type="text" id="input-kategori" placeholder="Contoh: Tahsin Dewasa" required>
+            </div>
+            
+            <div class="form-row-tambah">
+                <div class="input-group-tambah">
+                    <label for="input-waktu-mulai">Waktu Awal Periode</label>
+                    <input type="date" id="input-waktu-mulai" required>
+                </div>
+                <div class="input-group-tambah">
+                    <label for="input-waktu-selesai">Waktu Selesai Periode</label>
+                    <input type="date" id="input-waktu-selesai" required>
+                </div>
+            </div>
+
+            <div class="modal-footer-tambah-kelas">
+                <button type="button" class="action-btn-form cancel-btn-kelas" id="btn-cancel-kelas">Batalkan</button>
+                <button type="submit" class="action-btn-form save-btn-kelas" id="btn-simpan-kelas">Simpan</button>
+            </div>
+        </form>
     </div>
 </div>
 <script type="module" src="../js/admin_jadwal.js"></script>

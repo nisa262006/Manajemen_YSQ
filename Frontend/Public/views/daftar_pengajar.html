@@ -54,11 +54,9 @@
                     <button class="action-btn-form add-teacher-btn">
                         <i class="fas fa-plus"></i> Tambah Pengajar
                     </button>
-                </div>
             </section>
             <section class="teacher-table-section">
                 <div class="pendaftar-table"> 
-                    <h2 class="teacher-table-title">Pengajar</h2>
                     <table class="teacher-list-table">
                         <thead>
                             <tr>
@@ -71,31 +69,8 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1.</td>
-                                <td>249078561</td>
-                                <td>David</td>
-                                <td>Quran</td>
-                                <td>Pengajar@gmail.ac.id</td>
-                                <td><span class="status-badge status-aktif">Aktif</span></td>
-                                <td class="action-icons">
-                                    <button class="icon-btn edit-btn"><i class="fas fa-pen"></i></button>
-                                    <button class="icon-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2.</td>
-                                <td>249078561</td>
-                                <td>David</td>
-                                <td>Quran</td>
-                                <td>Pengajar@gmail.ac.id</td>
-                                <td><span class="status-badge status-aktif">Aktif</span></td>
-                                <td class="action-icons">
-                                    <button class="icon-btn edit-btn"><i class="fas fa-pen"></i></button>
-                                    <button class="icon-btn delete-btn"><i class="fas fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
+                        <tbody id="pengajar-table-body">
+                            <!-- Diisi otomatis via JS -->
                         </tbody>
                     </table>
                 </div>
@@ -135,59 +110,6 @@
         </div>
     </div>
 </div>
-<!-- POPUP EDIT PENGAJAR -->
-<div id="popup-edit-pengajar" class="modal-overlay" style="display:none;">
-    <div class="popup-content pengajar-edit-box">
-        <input type="hidden" id="edit-id-pengajar">
-
-        <button class="close-btn" id="close-edit-pengajar">&times;</button>
-        <h2>Edit Data Pengajar</h2>
-
-        <div class="edit-form-group">
-            <label>Nama Lengkap</label>
-            <input type="text" id="edit-nama-pengajar">
-        </div>
-
-        <div class="edit-form-group">
-            <label>Tempat Lahir</label>
-            <input type="text" id="edit-tempat-lahir">
-        </div>
-
-        <div class="edit-form-group">
-            <label>Tanggal Lahir</label>
-            <input type="date" id="edit-tanggal-lahir">
-        </div>
-
-        <div class="edit-form-group">
-            <label>Alamat</label>
-            <input type="text" id="edit-alamat">
-        </div>
-
-        <div class="edit-form-group">
-            <label>Mata Pelajaran / Kelas</label>
-            <input type="text" id="edit-mapel">
-        </div>
-
-        <div class="edit-form-group">
-            <label>Email</label>
-            <input type="email" id="edit-email-pengajar">
-        </div>
-
-        <div class="edit-form-group">
-            <label>No. Telepon</label>
-            <input type="text" id="edit-no-kontak">
-        </div>
-
-        <div class="edit-form-group">
-            <label>Password Baru (opsional)</label>
-            <input type="password" id="edit-password-baru" placeholder="Biarkan kosong jika tidak diganti">
-        </div>
-
-        <button class="save-btn" id="btn-simpan-edit-pengajar">
-            Simpan Perubahan
-        </button>
-    </div>
-</div>
-    <script type="module" src="../js/admin_data.js"></script>
+<script type="module" src="../js/admin_data.js"></script>
 </body>
 </html>

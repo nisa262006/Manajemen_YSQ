@@ -48,35 +48,38 @@
                     
                     <div class="absensi-filters-group">
                         
-                        <div class="filter-group-item absensi-select">
-                            <label for="tanggal_absensi">Tanggal</label>
-                            <select id="tanggal_absensi" name="tanggal_absensi" class="styled-select-absensi">
-                                <option value="bulan_ini">Bulan Ini</option>
-                                <option value="bulan_lalu">Bulan Lalu</option>
-                            </select>
-                        </div>
+                        <div class="date-filter responsive-filter">
+                            <!-- Grup 1: Start Date -->
+                            <div class="date-filter-group">
+                                <label for="start-date">Start Date:</label>
+                                <input type="date" id="start-date">
+                            </div>
                         
-                        <div class="filter-group-item absensi-select">
-                            <label for="pilih_pengajar">Pilih Pengajar:</label>
-                            <select id="pilih_pengajar" name="pilih_pengajar" class="styled-select-absensi">
-                                <option value="usmanii">Usmanii</option>
-                                <option value="siti">Siti</option>
-                            </select>
+                            <!-- Grup 2: End Date -->
+                            <div class="date-filter-group">
+                                <label for="end-date">End Date:</label>
+                                <input type="date" id="end-date">
+                            </div>
+                                                
+                            <!-- Grup 3: Pilih Pengajar -->
+                            <div class="filter-group-item absensi-select">
+                                <label for="pilih_pengajar">Pilih Pengajar:</label>
+                                <select id="pilih_pengajar" name="pilih_pengajar" class="styled-select-absensi">
+                                </select>
+                            </div>
                         </div>
 
-                        <button class="action-btn-form export-report-btn">
+                        </div> <button class="action-btn-form export-report-btn">
                             <i class="fas fa-file-export"></i> Ekspor Laporan
                         </button>
                     </div>
-
-                </div>
             </section>
             <section class="absensi-table-section">
                 <div class="pendaftar-table"> 
                     <table class="absensi-summary-table">
                         <thead>
                             <tr>
-                                <th>Minggu</th>
+                                <th>Tanggal</th>
                                 <th>Hadir</th>
                                 <th>Izin</th>
                                 <th>Sakit</th>
@@ -146,6 +149,6 @@
         </div>
     </div>
 </div>
-    <script type="module" src="../js/admin.js"></script>
+<script type="module" src="../js/admin.js"></script>
 </body>
 </html>

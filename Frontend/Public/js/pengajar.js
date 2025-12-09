@@ -267,7 +267,7 @@ function renderDashboardJadwal(jadwal) {
         <td>${j.hari ?? "-"}</td>
         <td>${j.jam_mulai ?? "-"} - ${j.jam_selesai ?? "-"}</td>
         <td>${j.nama_kelas ?? "-"}</td>
-        <td>${j.lokasi ?? "-"}</td>
+        <td>${j.kategori ?? "-"}</td>
         <td>${j.pertemuan_ke ?? "-"}</td>
       </tr>
     `;
@@ -294,7 +294,7 @@ function renderPageJadwal(jadwal) {
         <td>${j.hari ?? "-"}</td>
         <td>${j.jam_mulai ?? "-"} - ${j.jam_selesai ?? "-"}</td>
         <td>${j.nama_kelas ?? "-"}</td>
-        <td>${j.lokasi ?? "-"}</td>
+        <td>${j.kategori ?? "-"}</td>
         <td>${j.nama_pengajar ?? "-"}</td>
         <td><button class="btn-detail" data-detail-index="${i}">Detail</button></td>
       </tr>
