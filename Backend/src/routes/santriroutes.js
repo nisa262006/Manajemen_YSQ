@@ -11,19 +11,25 @@ const {
 
 const { verifyToken, onlyAdmin } = require("../middleware/auth");
 
-// GET all santri
+
+// =========================
+// URUTAN HARUS BENAR
+// =========================
+
+// Export Excel → TARUH DI ATAS
+router.get("/export/excel", verifyToken, onlyAdmin, exportSantriExcel);
+
+// Semua santri
 router.get("/", verifyToken, onlyAdmin, getAllSantri);
 
-// GET santri by ID
+// Detail santri
 router.get("/:id_santri", verifyToken, onlyAdmin, getSantriById);
 
-// UPDATE santri
+// Update
 router.put("/:id_santri", verifyToken, onlyAdmin, updateSantri);
 
-// DELETE santri
+// Delete
 router.delete("/:id_santri", verifyToken, onlyAdmin, deleteSantri);
 
-// Export Excel
-router.get("/export/excel", verifyToken, onlyAdmin, exportSantriExcel);
 
 module.exports = router;

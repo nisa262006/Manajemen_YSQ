@@ -97,14 +97,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### 2. GET ALL SANTRI (Pagination + Filter + Search)
 ### =======================================
 GET http://localhost:5000/santri?page=2&limit=10&q=&kategori=&status=
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTMzODU0MiwiZXhwIjoxNzY1NDI0OTQyfQ.za0qJPZqL-oGK9T3gca0_YI2ZXmpShRR0cnEoYKfoos
+Content-Type: application/json
 
 
 ### =======================================
 ### 3. GET SANTRI BY ID
 ### =======================================
 GET http://localhost:5000/santri/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTMzODU0MiwiZXhwIjoxNzY1NDI0OTQyfQ.za0qJPZqL-oGK9T3gca0_YI2ZXmpShRR0cnEoYKfoos
 
 
 ### =======================================
@@ -112,7 +113,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### =======================================
 PUT http://localhost:5000/santri/7
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTEwMDM5NywiZXhwIjoxNzY1MTg2Nzk3fQ.LZSnvn2lEvbgXLjtHxfgaqfH1AsGkz3KpdJMWDp0J5w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
 
 {
   "nis": "YSQ-2025-0007",
@@ -164,7 +165,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 
 ### LIHAT SEMUA PENGAJAR
 GET http://localhost:5000/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
+Content-Type: application/json
 
 ### LIHAT PENGAJAR SESUAI ID
 GET http://localhost:5000/pengajar/1

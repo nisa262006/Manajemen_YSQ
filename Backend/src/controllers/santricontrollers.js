@@ -1,9 +1,6 @@
 const db = require("../config/db");
 const ExcelJS = require("exceljs");
 
-/* =========================================
-   1. Ambil Semua Santri (Pagination + Search + Filter)
-========================================= */
 exports.getAllSantri = async (req, res) => {
   try {
     let { page, limit, q, kategori, status } = req.query;
@@ -36,27 +33,34 @@ exports.getAllSantri = async (req, res) => {
 
     const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
 
+    /* ========================================================
+       🔥 FIX UTAMA !!!
+       Tambahkan sk.id_kelas + k.nama_kelas agar FRONTEND bisa
+       menentukan status SANTRI / MENUNGGU dengan benar
+    ==========================================================*/
     const santriQuery = await db.query(
       `
       SELECT 
-  s.id_santri,
-  s.nis,
-  s.nama,
-  s.kategori,
-  s.no_wa,
-  s.email,
-  s.tempat_lahir,
-  s.tanggal_lahir,
-  s.alamat,       -- ⭐ TAMBAHKAN INI
-  s.status,
-  u.username,
-  COALESCE(k.nama_kelas, '-') AS nama_kelas
+        s.id_santri,
+        s.nis,
+        s.nama,
+        s.kategori,
+        s.no_wa,
+        s.email,
+        s.tempat_lahir,
+        s.tanggal_lahir,
+        s.alamat,
+        s.status,
+        u.username,
+        u.email AS user_email,
 
+        sk.id_kelas,                     -- ⭐ WAJIB
+        COALESCE(k.nama_kelas, '-') AS nama_kelas  -- ⭐ WAJIB
 
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
       LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
-      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas   -- JOIN KELAS FIX
+      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
       ${whereSQL}
       ORDER BY s.id_santri ASC
       LIMIT $${i} OFFSET $${i + 1}
@@ -183,26 +187,30 @@ exports.updateSantri = async (req, res) => {
     const id_users = oldData.id_users;
 
     /* ==========================
-       UPDATE EMAIL USER (jika berubah)
-    ========================== */
-    if (email && email.toLowerCase().trim() !== oldData.user_email.toLowerCase().trim()) {
+   UPDATE EMAIL USER (jika berubah)
+========================== */
+const oldEmail = (oldData.user_email || "").toLowerCase().trim();
+const newEmail = (email || "").toLowerCase().trim();
 
-      // cek email unik
-      const cekEmail = await db.query(
-        `SELECT email FROM users WHERE email = $1 AND id_users != $2`,
-        [email, id_users]
-      );
+if (newEmail && newEmail !== oldEmail) {
 
-      if (cekEmail.rowCount > 0) {
-        return res.status(400).json({ message: "Email sudah digunakan user lain" });
-      }
+  // cek email unik
+  const cekEmail = await db.query(
+    `SELECT email FROM users WHERE email = $1 AND id_users != $2`,
+    [email, id_users]
+  );
 
-      // update email user
-      await db.query(
-        `UPDATE users SET email=$1 WHERE id_users=$2`,
-        [email, id_users]
-      );
-    }
+  if (cekEmail.rowCount > 0) {
+    return res.status(400).json({ message: "Email sudah digunakan user lain" });
+  }
+
+  // update email user
+  await db.query(
+    `UPDATE users SET email=$1 WHERE id_users=$2`,
+    [email, id_users]
+  );
+}
+
 
     /* ==========================
        UPDATE DATA SANTRI

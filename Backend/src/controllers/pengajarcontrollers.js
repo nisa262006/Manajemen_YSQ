@@ -188,7 +188,7 @@ exports.getPengajarById = async (req, res) => {
 };
 
 /* =========================================
-   4. Update Pengajar (FIX NIP ERROR)
+   4. Update Pengajar (FINAL TANPA ERROR NIP)
 ========================================= */
 exports.updatePengajar = async (req, res) => {
   try {
@@ -207,7 +207,7 @@ exports.updatePengajar = async (req, res) => {
       confirmPassword
     } = req.body;
 
-    // 1. Ambil data lama
+    // Ambil data lama
     const check = await db.query(`
       SELECT p.*, u.email AS user_email, u.username 
       FROM pengajar p
@@ -224,9 +224,9 @@ exports.updatePengajar = async (req, res) => {
 
     let changes = {};
 
-    /* ===============================
-       UPDATE PASSWORD (jika diisi)
-    =============================== */
+    // ===============================
+    // Update Password (opsional)
+    // ===============================
     if (password || confirmPassword) {
       if (password !== confirmPassword) {
         return res.status(400).json({ message: "Password tidak sama" });
@@ -242,9 +242,9 @@ exports.updatePengajar = async (req, res) => {
       changes.password = "updated";
     }
 
-    /* ===============================
-       Kolom pengajar yang boleh diupdate
-    =============================== */
+    // ===============================
+    // Data pengajar yang boleh diupdate
+    // ===============================
     const updatePengajar = {
       nama,
       no_kontak,
@@ -256,7 +256,7 @@ exports.updatePengajar = async (req, res) => {
       status
     };
 
-    // track perubahan
+    // Track perubahan
     for (let key in updatePengajar) {
       if (
         updatePengajar[key] !== undefined &&
@@ -266,9 +266,9 @@ exports.updatePengajar = async (req, res) => {
       }
     }
 
-    /* ===============================
-       EKSEKUSI UPDATE → tanpa nip!
-    =============================== */
+    // ===============================
+    // EKSEKUSI UPDATE
+    // ===============================
     await db.query(
       `UPDATE pengajar SET 
         nama=$1,
@@ -279,7 +279,7 @@ exports.updatePengajar = async (req, res) => {
         mapel=$6,
         email=$7,
         status=$8
-       WHERE id_pengajar=$9`,
+      WHERE id_pengajar=$9`,
       [
         nama,
         no_kontak,
@@ -291,12 +291,12 @@ exports.updatePengajar = async (req, res) => {
         status,
         id_pengajar
       ]
-    );    
+    );
 
-    res.json({
+    return res.json({
       message: "Pengajar berhasil diperbarui",
       id_pengajar,
-      nip: oldData.nip, // nip tetap sama, tidak diedit
+      nip: oldData.nip,   // ⬅ nip hanya dibaca, tidak membuat variabel baru!
       updated_fields: changes
     });
 
@@ -305,6 +305,7 @@ exports.updatePengajar = async (req, res) => {
     return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
+
 
 /* =========================================
    5. Delete Pengajar
