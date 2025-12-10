@@ -126,6 +126,95 @@ function applyFilters() {
 }
 
 /* ============================================================
+   EKSPOR ABSENSI PENGAJAR KE EXCEL
+============================================================ */
+function exportAbsensiPengajarExcel() {
+
+    if (!allAbsensi.length) {
+        alert("Tidak ada data absensi untuk diekspor!");
+        return;
+    }
+
+    // --- FILTER DATA SESUAI PILIHAN USER ---
+    let filtered = [...allAbsensi];
+    const pengajarID = pilihPengajar.value ? Number(pilihPengajar.value) : null;
+
+    const start = startDate.value ? new Date(startDate.value + "T00:00:00") : null;
+    const end = endDate.value ? new Date(endDate.value + "T23:59:59") : null;
+
+    if (pengajarID) {
+        filtered = filtered.filter(a => Number(a.id_pengajar) === pengajarID);
+    }
+    if (start) {
+        filtered = filtered.filter(a => new Date(a.tanggal) >= start);
+    }
+    if (end) {
+        filtered = filtered.filter(a => new Date(a.tanggal) <= end);
+    }
+
+    if (!filtered.length) {
+        alert("Tidak ada data sesuai filter!");
+        return;
+    }
+
+    // --- RINGKASAN ---
+    const totalHadir = filtered.filter(a => a.status_absensi === "Hadir").length;
+    const totalIzin = filtered.filter(a => a.status_absensi === "Izin").length;
+    const totalTidakHadir = filtered.filter(a => a.status_absensi === "Sakit" || a.status_absensi === "Tidak Hadir").length;
+
+    // --- DATA UTAMA ---
+    const exportData = filtered.map((a, i) => ({
+        No: i + 1,
+        Tanggal: new Date(a.tanggal).toLocaleDateString("id-ID"),
+        Pengajar: a.nama_pengajar,
+        Email: a.email_pengajar ?? "-",
+        Status: a.status_absensi,
+        Catatan: a.catatan ?? "-",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet([]);
+
+    // --- TULIS RINGKASAN DI EXCEL ---
+    XLSX.utils.sheet_add_aoa(ws, [
+        ["RINGKASAN ABSENSI PENGAJAR"],
+        [""],
+        ["Hadir", totalHadir],
+        ["Izin", totalIzin],
+        ["Tidak Hadir", totalTidakHadir],
+        [""],
+        ["DATA ABSENSI"]
+    ], { origin: "A1" });
+
+    // --- TULIS DATA TABEL ABSENSI MULAI BARIS 8 ---
+    XLSX.utils.sheet_add_json(ws, exportData, {
+        origin: "A8",
+        skipHeader: false
+    });
+
+    // --- ATUR LEBAR KOLOM ---
+    ws["!cols"] = [
+        { wch: 5 },   // No
+        { wch: 15 },  // Tanggal
+        { wch: 20 },  // Pengajar
+        { wch: 25 },  // Email
+        { wch: 12 },  // Status
+        { wch: 35 },  // Catatan
+    ];
+
+    // --- BUAT FILE EXCEL ---
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Absensi Pengajar");
+
+    const bulan = new Date().toLocaleString("id-ID", { month: "long" });
+    const tahun = new Date().getFullYear();
+
+    XLSX.writeFile(wb, `Riwayat_Absensi_Pengajar_${bulan}_${tahun}.xlsx`);
+}
+
+document.getElementById("btn-export-absensi")
+    .addEventListener("click", exportAbsensiPengajarExcel);
+
+/* ============================================================
    7. EVENT LISTENER
 ============================================================ */
 startDate.addEventListener("change", applyFilters);
