@@ -1,6 +1,9 @@
 const db = require("../config/db");
 const ExcelJS = require("exceljs");
 
+/* ============================================================
+   1. GET SEMUA SANTRI (Dengan Filter + Pagination)
+============================================================ */
 exports.getAllSantri = async (req, res) => {
   try {
     let { page, limit, q, kategori, status } = req.query;
@@ -33,11 +36,6 @@ exports.getAllSantri = async (req, res) => {
 
     const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
 
-    /* ========================================================
-       🔥 FIX UTAMA !!!
-       Tambahkan sk.id_kelas + k.nama_kelas agar FRONTEND bisa
-       menentukan status SANTRI / MENUNGGU dengan benar
-    ==========================================================*/
     const santriQuery = await db.query(
       `
       SELECT 
@@ -49,13 +47,15 @@ exports.getAllSantri = async (req, res) => {
         s.email,
         s.tempat_lahir,
         s.tanggal_lahir,
-        s.alamat,
         s.status,
+        s.alamat,
+        s.tanggal_terdaftar,
+
         u.username,
         u.email AS user_email,
 
-        sk.id_kelas,                     -- ⭐ WAJIB
-        COALESCE(k.nama_kelas, '-') AS nama_kelas  -- ⭐ WAJIB
+        sk.id_kelas,
+        COALESCE(k.nama_kelas, '-') AS nama_kelas
 
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
@@ -91,9 +91,9 @@ exports.getAllSantri = async (req, res) => {
   }
 };
 
-/* =========================================
-   2. Detail Santri by ID
-========================================= */
+/* ============================================================
+   2. DETAIL SANTRI
+============================================================ */
 exports.getSantriById = async (req, res) => {
   try {
     const { id_santri } = req.params;
@@ -110,25 +110,23 @@ exports.getSantriById = async (req, res) => {
           s.tempat_lahir,
           s.tanggal_lahir,
           s.status,
-          COALESCE(s.alamat, '') AS alamat,
-    
+          s.alamat,
+          s.tanggal_terdaftar,
+
           u.username,
           u.email AS user_email,
-    
+
           sk.id_kelas,
           k.nama_kelas
-    
+
       FROM santri s
       LEFT JOIN users u ON s.id_users = u.id_users
       LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
       LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
-    
       WHERE s.id_santri = $1
       `,
       [id_santri]
     );
-    
-    
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Santri tidak ditemukan" });
@@ -145,88 +143,16 @@ exports.getSantriById = async (req, res) => {
   }
 };
 
-/* =========================================
-   3. Update Santri
-========================================= */
+
+
+/* ============================================================
+   3. UPDATE SANTRI
+============================================================ */
 exports.updateSantri = async (req, res) => {
   try {
     const { id_santri } = req.params;
 
     const {
-      // tambahan (READ ONLY, tetap boleh ada di body)
-      nis,
-      username,
-      user_email,
-
-      // data yang boleh diupdate
-      nama,
-      kategori,
-      no_wa,
-      email,
-      tempat_lahir,
-      tanggal_lahir,
-      status,
-      alamat
-    } = req.body;
-
-    /* ==========================
-       CEK DATA SANTRI
-    ========================== */
-    const check = await db.query(`
-      SELECT s.*, u.email AS user_email, u.username, u.id_users, s.alamat
-      FROM santri s
-      LEFT JOIN users u ON s.id_users = u.id_users
-      WHERE s.id_santri = $1
-    `, [id_santri]);
-
-    if (check.rowCount === 0) {
-      return res.status(404).json({ message: "Santri tidak ditemukan" });
-    }
-
-    const oldData = check.rows[0];
-    const id_users = oldData.id_users;
-
-    /* ==========================
-   UPDATE EMAIL USER (jika berubah)
-========================== */
-const oldEmail = (oldData.user_email || "").toLowerCase().trim();
-const newEmail = (email || "").toLowerCase().trim();
-
-if (newEmail && newEmail !== oldEmail) {
-
-  // cek email unik
-  const cekEmail = await db.query(
-    `SELECT email FROM users WHERE email = $1 AND id_users != $2`,
-    [email, id_users]
-  );
-
-  if (cekEmail.rowCount > 0) {
-    return res.status(400).json({ message: "Email sudah digunakan user lain" });
-  }
-
-  // update email user
-  await db.query(
-    `UPDATE users SET email=$1 WHERE id_users=$2`,
-    [email, id_users]
-  );
-}
-
-
-    /* ==========================
-       UPDATE DATA SANTRI
-    ========================== */
-    await db.query(`
-      UPDATE santri SET
-        nama = $1,
-        kategori = $2,
-        no_wa = $3,
-        email = $4,
-        tempat_lahir = $5,
-        tanggal_lahir = $6,
-        status = $7,
-        alamat = $8         -- ⭐ TAMBAHKAN INI
-      WHERE id_santri = $9
-    `, [
       nama,
       kategori,
       no_wa,
@@ -235,38 +161,88 @@ if (newEmail && newEmail !== oldEmail) {
       tanggal_lahir,
       status,
       alamat,
-      id_santri
-    ]);
-    
+      user_email
+    } = req.body;
 
-    /* ==========================
-       BENTUKKAN DATA OUTPUT
-    ========================== */
-    const cleanDate = tanggal_lahir
-      ? tanggal_lahir.split("T")[0]
-      : oldData.tanggal_lahir
-        ? oldData.tanggal_lahir.toISOString().split("T")[0]
-        : null;
+    // Cek keberadaan santri
+    const check = await db.query(
+      `
+      SELECT s.*, u.id_users, u.email AS user_email
+      FROM santri s
+      LEFT JOIN users u ON s.id_users = u.id_users
+      WHERE s.id_santri = $1
+      `,
+      [id_santri]
+    );
 
-    const after = {
-      nis: oldData.nis,                   // tidak berubah
-      nama,
-      kategori,
-      no_wa,
-      email,
-      tempat_lahir,
-      tanggal_lahir: cleanDate,
-      alamat,           // format aman YYYY-MM-DD
-      username: oldData.username,         // dari tabel users
-      user_email: email                   // email terbaru
-    };
+    if (check.rowCount === 0) {
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
 
-    /* ==========================
-       RESPONSE AKHIR
-    ========================== */
+    const oldData = check.rows[0];
+    const id_users = oldData.id_users;
+
+    /* ==== UPDATE EMAIL USER JIKA BERUBAH ==== */
+    const oldEmail = (oldData.user_email || "").toLowerCase().trim();
+    const newEmail = (user_email || email || "").toLowerCase().trim();
+
+    if (newEmail && newEmail !== oldEmail) {
+
+      const cekEmail = await db.query(
+        `SELECT email FROM users WHERE email=$1 AND id_users != $2`,
+        [newEmail, id_users]
+      );
+
+      if (cekEmail.rowCount > 0) {
+        return res.status(400).json({ message: "Email sudah digunakan user lain" });
+      }
+
+      await db.query(
+        `UPDATE users SET email=$1 WHERE id_users=$2`,
+        [newEmail, id_users]
+      );
+    }
+
+    /* ==== UPDATE SANTRI ==== */
+    await db.query(
+      `
+      UPDATE santri SET
+        nama=$1,
+        kategori=$2,
+        no_wa=$3,
+        email=$4,
+        tempat_lahir=$5,
+        tanggal_lahir=$6,
+        status=$7,
+        alamat=$8
+      WHERE id_santri=$9
+      `,
+      [
+        nama,
+        kategori,
+        no_wa,
+        email,
+        tempat_lahir,
+        tanggal_lahir,
+        status,
+        alamat,
+        id_santri
+      ]
+    );
+
     res.json({
       message: "Santri berhasil diperbarui",
-      data: after
+      data: {
+        id_santri,
+        nama,
+        kategori,
+        no_wa,
+        email: newEmail,
+        tempat_lahir,
+        tanggal_lahir,
+        alamat,
+        status
+      }
     });
 
   } catch (err) {
@@ -276,9 +252,10 @@ if (newEmail && newEmail !== oldEmail) {
 };
 
 
-/* =========================================
-   4. Delete Santri
-========================================= */
+
+/* ============================================================
+   4. DELETE SANTRI + USERNYA
+============================================================ */
 exports.deleteSantri = async (req, res) => {
   try {
     const { id_santri } = req.params;
@@ -297,10 +274,7 @@ exports.deleteSantri = async (req, res) => {
     await db.query(`DELETE FROM santri WHERE id_santri=$1`, [id_santri]);
     await db.query(`DELETE FROM users WHERE id_users=$1`, [id_users]);
 
-    res.json({
-      message: "Santri berhasil dihapus",
-      id_santri
-    });
+    res.json({ message: "Santri berhasil dihapus", id_santri });
 
   } catch (err) {
     console.error("DELETE SANTRI ERROR:", err);
@@ -310,14 +284,17 @@ exports.deleteSantri = async (req, res) => {
 
 
 
-/* =========================================
-   5. Export Santri ke Excel
-========================================= */
+/* ============================================================
+   5. EXPORT EXCEL (Dengan tanggal terdaftar)
+============================================================ */
 exports.exportSantriExcel = async (req, res) => {
   try {
     const santri = await db.query(`
-      SELECT s.id_santri, s.nis, s.nama, s.kategori,
-             s.no_wa, s.email, s.tempat_lahir, s.tanggal_lahir, s.status
+      SELECT 
+        s.id_santri, s.nis, s.nama, s.kategori,
+        s.no_wa, s.email, s.tempat_lahir,
+        s.tanggal_lahir, s.alamat, s.tanggal_terdaftar,
+        s.status
       FROM santri s
       ORDER BY s.id_santri ASC
     `);
@@ -325,13 +302,12 @@ exports.exportSantriExcel = async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Data Santri");
 
-    // Header
     sheet.addRow([
       "ID", "NIS", "Nama", "Kategori", "No WA",
-      "Email", "Tempat Lahir", "Tanggal Lahir","alamat", "Status"
+      "Email", "Tempat Lahir", "Tanggal Lahir",
+      "Alamat", "Tanggal Terdaftar", "Status"
     ]);
 
-    // Data
     santri.rows.forEach(s => {
       sheet.addRow([
         s.id_santri,
@@ -343,11 +319,11 @@ exports.exportSantriExcel = async (req, res) => {
         s.tempat_lahir,
         s.tanggal_lahir,
         s.alamat,
+        s.tanggal_terdaftar,
         s.status
       ]);
     });
 
-    // Style header
     sheet.getRow(1).eachCell(cell => {
       cell.font = { bold: true };
       cell.alignment = { horizontal: "center" };

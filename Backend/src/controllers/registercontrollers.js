@@ -158,8 +158,8 @@ exports.terimaPendaftar = async (req, res) => {
     ============================= */
     await db.query(
       `INSERT INTO santri 
-       (id_users, nis, nama, kategori, no_wa, email, tempat_lahir, tanggal_lahir, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'aktif')`,
+       (id_users, nis, nama, kategori, no_wa, email, tempat_lahir, tanggal_lahir, tanggal_terdaftar, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8, NOW(), 'aktif')`,
       [
         id_users,
         nis,
@@ -171,6 +171,7 @@ exports.terimaPendaftar = async (req, res) => {
         p.tanggal_lahir,
       ]
     );
+    
 
     /* ============================
        7. Update status pendaftar

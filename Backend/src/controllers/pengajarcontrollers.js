@@ -83,8 +83,8 @@ exports.tambahPengajar = async (req, res) => {
     // =============================
     await db.query(
       `INSERT INTO pengajar 
-       (id_users, nip, nama, no_kontak, alamat, tempat_lahir, tanggal_lahir, mapel, email, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'aktif')`,
+        (id_users, nip, nama, no_kontak, alamat, tempat_lahir, tanggal_lahir, mapel, email, status, tanggal_terdaftar)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'aktif', NOW())`,
       [
         id_users,
         nip,
@@ -96,7 +96,7 @@ exports.tambahPengajar = async (req, res) => {
         mapel || null,
         email || null
       ]
-    );    
+    );
 
     return res.json({
       message: "Pengajar berhasil ditambahkan",
@@ -161,16 +161,14 @@ exports.getPengajarById = async (req, res) => {
         p.*,
         u.username,
         u.email AS user_email,
-
-        -- RELASI KELAS
+    
         k.id_kelas,
         k.nama_kelas
-
       FROM pengajar p
       LEFT JOIN users u ON p.id_users = u.id_users
       LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
       WHERE p.id_pengajar = $1
-    `, [id_pengajar]);
+    `, [id_pengajar]);    
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Pengajar tidak ditemukan" });

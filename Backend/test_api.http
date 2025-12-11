@@ -97,7 +97,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### 2. GET ALL SANTRI (Pagination + Filter + Search)
 ### =======================================
 GET http://localhost:5000/santri?page=2&limit=10&q=&kategori=&status=
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTMzODU0MiwiZXhwIjoxNzY1NDI0OTQyfQ.za0qJPZqL-oGK9T3gca0_YI2ZXmpShRR0cnEoYKfoos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
 Content-Type: application/json
 
 
@@ -105,7 +105,7 @@ Content-Type: application/json
 ### 3. GET SANTRI BY ID
 ### =======================================
 GET http://localhost:5000/santri/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTMzODU0MiwiZXhwIjoxNzY1NDI0OTQyfQ.za0qJPZqL-oGK9T3gca0_YI2ZXmpShRR0cnEoYKfoos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
 
 
 ### =======================================
