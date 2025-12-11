@@ -165,12 +165,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 
 ### LIHAT SEMUA PENGAJAR
 GET http://localhost:5000/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
 Content-Type: application/json
 
 ### LIHAT PENGAJAR SESUAI ID
-GET http://localhost:5000/pengajar/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
+GET http://localhost:5000/pengajar/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
 
 ### EDIT DATA PENGAJAR
 PUT http://localhost:5000/pengajar/10
@@ -192,6 +192,22 @@ Content-Type: application/json
 ### HAPUS PENGAJAR
 DELETE http://localhost:5000/pengajar/3
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+
+
+### GET ADMIN PROFILE
+GET http://localhost:5000/admin/profile/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
+
+### UPDATE ADMIN PROFILE
+PUT http://localhost:5000/admin/profile/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
+Content-Type: application/json
+
+{
+  "username": "Admin",
+  "email": "admin1@gmail.com",
+  "no_wa": "081234567890"
+}
 
 ##################################################
 ### 1. TAMBAH KELAS (ADMIN) BENER

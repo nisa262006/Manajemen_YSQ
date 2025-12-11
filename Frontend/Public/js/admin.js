@@ -1,62 +1,119 @@
-// ============================
-// admin.js CLEAN VERSION
-// ============================
+// ====================================================================
+// ADMIN.JS – FINAL CLEAN VERSION
+// ====================================================================
+
 import { apiGet, apiPost, apiPut } from "./apiService.js";
 
-// Mini helper
+
+// ====================================================================
+// HELPER
+// ====================================================================
 const $ = (id) => document.getElementById(id);
 const q = (s) => document.querySelector(s);
 
-// ===============================================================
-//                  🔔 GLOBAL NOTIFICATION TOAST 🔔
-// ===============================================================
-window.showNotification = function(message, type = "success") {
-    const toast = document.getElementById("notification-toast");
-    if (!toast) {
-        console.error("Element #notification-toast tidak ditemukan!");
-        return;
-    }
+function esc(x) {
+    if (!x) return "";
+    return String(x).replace(/[&<>"]/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;"
+    }[c]));
+}
+
+
+// ====================================================================
+// TOAST & NOTIFICATION
+// ====================================================================
+window.showNotification = function (message, type = "success") {
+    const toast = $("notification-toast");
+    if (!toast) return;
 
     toast.innerText = message;
-
-    // Warna berdasarkan tipe
-    if (type === "error") {
-        toast.style.background = "#e74c3c";
-    } else if (type === "warning") {
-        toast.style.background = "#f1c40f";
-    } else {
-        toast.style.background = "#2ecc71"; // success
-    }
+    toast.style.background =
+        type === "error"
+            ? "#e74c3c"
+            : type === "warning"
+                ? "#f1c40f"
+                : "#2ecc71";
 
     toast.classList.add("show");
-
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
+    setTimeout(() => toast.classList.remove("show"), 2500);
 };
 
-// ============================
-// SAFE TOAST (no duplicate)
-// ============================
 function toast(msg, type = "success") {
     let t = $("notification-toast");
     if (!t) return;
 
     t.innerText = msg;
     t.className = `toast-notification show ${type}`;
-
-    setTimeout(() => {
-        t.classList.remove("show");
-    }, 2500);
+    setTimeout(() => t.classList.remove("show"), 2500);
 }
 
-// ============================
-// Escape HTML
-// ============================
-function esc(x) {
-    if (!x) return "";
-    return String(x).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ====================================================================
+// LOAD ADMIN PROFILE (GLOBAL) — FIXED
+// ====================================================================
+async function loadAdminProfile() {
+    try {
+        const res = await apiGet("/admin/profile/1");
+        const p = res?.data ?? {};
+
+        // Form
+        $("profile-name-input").value = p.nama || "";
+        $("profile-email-input").value = p.email || "";
+        $("profile-phone-input").value = p.no_wa || "";
+
+        // Header & card
+        $("dashboard-admin-name").innerText = p.nama || "Admin";
+        $("mini-card-name").innerText = p.nama || "-";
+        $("mini-card-email").innerText = p.email || "-";
+
+        // Avatar
+        document
+            .querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
+            .forEach((el) => {
+                el.innerText = (p.nama || "A").charAt(0).toUpperCase();
+            });
+
+    } catch (err) {
+        console.error("Gagal load profil:", err);
+    }
 }
+
+
+// ====================================================================
+// UPDATE ADMIN PROFILE — FIXED (TIDAK ADA DUPLIKASI LAGI)
+// ====================================================================
+document.addEventListener("click", async (e) => {
+
+    if (e.target.id === "btn-simpan-profil") {
+
+        const body = {
+            nama: $("profile-name-input").value.trim(),
+            email: $("profile-email-input").value.trim(),
+            no_wa: $("profile-phone-input").value.trim(),
+        };
+
+        try {
+            await apiPut("/admin/profile/1", body);
+            toast("Profil berhasil diperbarui", "success");
+            loadAdminProfile();
+
+            $("popup-profile-setting").style.display = "none";
+
+        } catch (err) {
+            console.error("Gagal update profil:", err);
+            toast("Gagal memperbarui profil", "error");
+        }
+    }
+
+    if (e.target.id === "btn-cancel-profil" ||
+        e.target.id === "btn-close-profil-x") {
+        $("popup-profile-setting").style.display = "none";
+    }
+});
+
 
 // ============================
 // LOAD DASHBOARD DATA
@@ -209,22 +266,47 @@ document.addEventListener("click", (e) => {
 });
 
 // ============================
-// PROFILE SAVE (LOCAL ONLY)
+// PROFILE SAVE (REAL BACKEND CONNECTED)
 // ============================
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
+    // SIMPAN PROFIL KE BACKEND
     if (e.target.id === "btn-simpan-profil") {
-        $("dashboard-admin-name").innerText = $("profile-name-input").value;
-        $("mini-card-name").innerText = $("profile-name-input").value;
-        $("mini-card-email").innerText = $("profile-email-input").value;
+        let body = {
+            nama: $("profile-name-input").value.trim(),
+            email: $("profile-email-input").value.trim(),
+            no_wa: $("profile-phone-input").value.trim()
+        };
 
-        $("popup-profile-setting").style.display = "none";
-        toast("Profil diperbarui", "success");
+        try {
+            let res = await apiPut("/profile", body);
+
+            toast("Profil berhasil diperbarui", "success");
+
+            // Update tampilan langsung
+            $("dashboard-admin-name").innerText = body.nama;
+            $("mini-card-name").innerText = body.nama;
+            $("mini-card-email").innerText = body.email;
+
+            // Update avatar
+            document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
+                .forEach(el => {
+                    el.innerText = body.nama.charAt(0).toUpperCase();
+                });
+
+            $("popup-profile-setting").style.display = "none";
+
+        } catch (err) {
+            console.error("Update Profile Error:", err);
+            toast("Gagal memperbarui profil", "error");
+        }
     }
 
+    // TUTUP POPUP
     if (e.target.id === "btn-cancel-profil" || e.target.id === "btn-close-profil-x") {
         $("popup-profile-setting").style.display = "none";
     }
 });
+
 
 // ============================
 // INIT
@@ -232,8 +314,10 @@ document.addEventListener("click", (e) => {
 document.addEventListener("DOMContentLoaded", () => {
     if (document.body.classList.contains("page-dashboard")) {
         loadDashboard();
+        loadAdminProfile();
     }
 });
+
 
 // ===============================================================
 //               🔥 TAMBAH KELAS — VERSI FINAL YSQ 🔥

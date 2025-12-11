@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
       return res.status(403).json({ message: "Invalid token payload" });
     }
 
-    if (decoded.status_user && decoded.status_user.toLowerCase() !== "aktif") {
+    if (decoded.status_users && decoded.status_users.toLowerCase() !== "aktif") {
       return res.status(403).json({ message: "Akun tidak aktif / diblokir" });
     }
 

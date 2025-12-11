@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const adminCtrl = require("../controllers/adminController");
-const auth = require("../middlewares/auth");
 
-// Dashboard Admin
-router.get("/dashboard", auth, adminCtrl.dashboard);
+const {
+  getAdminProfile,
+  updateAdminProfile,
+} = require("../controllers/admincontrollers");
 
-// Data detail
-router.get("/santri", auth, adminCtrl.getSantri);
-router.get("/pengajar", auth, adminCtrl.getPengajar);
-router.get("/kelas", auth, adminCtrl.getKelas);
+const { verifyToken, onlyAdmin } = require("../middleware/auth");
+
+// PAKAI verifyToken (fungsi auth kamu), bukan "auth"
+router.get("/profile/:id_admin", verifyToken, onlyAdmin, getAdminProfile);
+router.put("/profile/:id_admin", verifyToken, onlyAdmin, updateAdminProfile);
 
 module.exports = router;

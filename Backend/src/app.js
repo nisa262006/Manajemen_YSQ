@@ -29,6 +29,7 @@ const santriDashboardRoutes = require("./routes/santridashboardroutes");
 const meRouter = require("./routes/meroutes");
 const pengajarRouter = require("./routes/pengajarroutes");
 const santriRouter = require("./routes/santriroutes");
+const adminRouter = require("./routes/adminroutes");
 
 app.use("/auth", authRoutes);
 app.use("/pendaftar", registerRoutes);
@@ -39,6 +40,7 @@ app.use("/santri/dashboard", santriDashboardRoutes);
 app.use("/me", meRouter);
 app.use("/pengajar", pengajarRouter);
 app.use("/santri", santriRouter);
+app.use("/admin", adminRouter);
 
 // ======================= STATIC FILE (PINDAHKAN KE BAWAH) =======
 app.use(express.static(path.join(__dirname, "../../Frontend/Public")));
