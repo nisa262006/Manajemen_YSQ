@@ -2,12 +2,36 @@ import { apiGet, apiPut } from "./apiService.js";
 
 const $ = (id) => document.getElementById(id);
 
-// ===============
-// Load Profile
-// ===============
+/* ============================================================
+    AUTO CREATE DEV TOAST (agar tidak error di semua halaman)
+============================================================ */
+function getOrCreateDevToast() {
+    let el = document.getElementById("dev-toast");
+
+    if (!el) {
+        el = document.createElement("div");
+        el.id = "dev-toast";
+        document.body.appendChild(el);
+    }
+    return el;
+}
+
+function showDevToast(msg) {
+    const el = getOrCreateDevToast();
+    el.innerText = msg;
+
+    el.classList.add("show");
+
+    setTimeout(() => {
+        el.classList.remove("show");
+    }, 2200);
+}
+
+/* ============================================================
+                        LOAD PROFILE ADMIN
+============================================================ */
 async function loadProfile() {
     try {
-        // Ambil user login
         const me = await apiGet("/me");
 
         if (!me.success || !me.profile) return;
@@ -15,14 +39,10 @@ async function loadProfile() {
         const idAdmin = me.profile.id_admin;
         window._currentAdminId = idAdmin;
 
-        // Ambil data admin
         const profile = await apiGet(`/admin/profile/${idAdmin}`);
-
-        if (!profile.data) return;
-
         const p = profile.data;
+        if (!p) return;
 
-        // Isi popup
         if ($("profile-name-input")) $("profile-name-input").value = p.nama || "";
         if ($("profile-email-input")) $("profile-email-input").value = p.email || "";
         if ($("profile-phone-input")) $("profile-phone-input").value = p.no_wa || "";
@@ -32,32 +52,34 @@ async function loadProfile() {
     }
 }
 
-
-// ===============
-// OPEN / CLOSE POPUP
-// ===============
-
-// Open ketika tombol settings ditekan
+/* ============================================================
+                OPEN / CLOSE POPUP PROFILE
+============================================================ */
 document.addEventListener("click", (e) => {
-    if (e.target.closest(".setting")) {
+    const btn = e.target.closest(".setting");
+    if (!btn) return;
+
+    if ($("popup-profile-setting")) {
         $("popup-profile-setting").style.display = "flex";
         loadProfile();
     }
 });
 
-// Close popup
+// Tombol cancel & close
 ["btn-close-profil-x", "btn-cancel-profil"].forEach((id) => {
-    if ($(id)) {
-        $(id).onclick = () => {
-            $("popup-profile-setting").style.display = "none";
+    const el = $(id);
+    if (el) {
+        el.onclick = () => {
+            if ($("popup-profile-setting")) {
+                $("popup-profile-setting").style.display = "none";
+            }
         };
     }
 });
 
-
-// ===============
-// SIMPAN PERUBAHAN
-// ===============
+/* ============================================================
+                 SIMPAN PERUBAHAN PROFIL
+============================================================ */
 if ($("btn-simpan-profil")) {
     $("btn-simpan-profil").onclick = async () => {
         try {
@@ -71,21 +93,30 @@ if ($("btn-simpan-profil")) {
 
             await apiPut(`/admin/profile/${idAdmin}`, payload);
 
-            alert("Profil berhasil diperbarui");
-
+            showDevToast("Profil berhasil diperbarui.");
             $("popup-profile-setting").style.display = "none";
 
         } catch (err) {
             console.error(err);
-            alert("Gagal memperbarui profil");
+            showDevToast("Gagal memperbarui profil.");
         }
     };
 }
 
+/* ============================================================
+            NOTIFIKASI UNTUK HALAMAN DALAM PENGEMBANGAN
+============================================================ */
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-dev='true']");
+    if (!btn) return;
 
-// ===============
-// INIT
-// ===============
+    e.preventDefault();
+    showDevToast("Halaman ini sedang dalam proses pengembangan.");
+});
+
+/* ============================================================
+                            INIT
+============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-    loadProfile(); // auto-load saat halaman dibuka
+    loadProfile();
 });
