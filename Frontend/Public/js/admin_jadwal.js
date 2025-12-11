@@ -2,6 +2,17 @@ import { apiGet, apiPost, apiPut, apiDelete } from "./apiService.js";
 
 const $ = (id) => document.getElementById(id);
 
+
+// Buka popup profile 
+if ($("menu-profile")) {
+    $("menu-profile").onclick = () => {
+        const popup = $("popup-profile-setting");
+        if (popup) {
+            popup.style.display = "flex";
+            loadAdminProfile();
+        }
+    };
+}
 /* ============================================================
    TOAST
 ============================================================ */

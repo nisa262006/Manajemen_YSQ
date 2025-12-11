@@ -642,6 +642,75 @@ if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
     loadDetailPengajar();
 }
 
+// ====================================================================
+// admin.js — global
+// ====================================================================
+window._adminProfile = null; // simpan profile global
+
+export async function loadAdminProfile() {
+    try {
+        // Ambil data admin
+        const me = await apiGet("/me");
+        if (!me?.profile) return;
+
+        const idAdmin = me.profile.id_admin;
+
+        // Ambil detail profile
+        const res = await apiGet(`/admin/profile/${idAdmin}`);
+        const p = res.data;
+
+        window._adminProfile = p; // simpan global
+
+        // Header & mini card (jika ada)
+        if ($("dashboard-admin-name")) $("dashboard-admin-name").innerText = p.nama || "Admin";
+        if ($("mini-card-name")) $("mini-card-name").innerText = p.nama || "-";
+        if ($("mini-card-email")) $("mini-card-email").innerText = p.email || "-";
+
+        // Avatar
+        document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
+            .forEach(el => { el.innerText = (p.nama || "A").charAt(0).toUpperCase(); });
+
+        // Popup inputs (cek apakah ada)
+        if ($("profile-name-input")) $("profile-name-input").value = p.nama || "";
+        if ($("profile-email-input")) $("profile-email-input").value = p.email || "";
+        if ($("profile-phone-input")) $("profile-phone-input").value = p.no_wa || "";
+
+        // simpan idAdmin untuk update
+        if ($("btn-simpan-profil")) $("btn-simpan-profil").dataset.idAdmin = idAdmin;
+
+    } catch (err) {
+        console.error("Gagal load profil:", err);
+        toast("Gagal memuat profil admin", "error");
+    }
+}
+
+// Tombol simpan popup (jika ada)
+if ($("btn-simpan-profil")) {
+    $("btn-simpan-profil").onclick = async () => {
+        const idAdmin = $("btn-simpan-profil").dataset.idAdmin;
+        const payload = {
+            nama: $("profile-name-input")?.value || "",
+            email: $("profile-email-input")?.value || "",
+            no_wa: $("profile-phone-input")?.value || ""
+        };
+        try {
+            const res = await apiPut(`/admin/profile/${idAdmin}`, payload);
+            toast(res.message || "Profil berhasil diperbarui", "success");
+            $("popup-profile-setting").style.display = "none";
+            loadAdminProfile(); // refresh data global
+        } catch (err) {
+            console.error(err);
+            toast("Gagal memperbarui profil", "error");
+        }
+    };
+}
+
+// Tombol close / cancel popup
+if ($("btn-close-profil-x")) $("btn-close-profil-x").onclick = () => $("popup-profile-setting").style.display = "none";
+if ($("btn-cancel-profil")) $("btn-cancel-profil").onclick = () => $("popup-profile-setting").style.display = "none";
+
+// Load awal
+document.addEventListener("DOMContentLoaded", () => loadAdminProfile());
 
 // ===================================================
 // BAGIAN 1: DEFINISI FUNGSI GLOBAL (TOAST)

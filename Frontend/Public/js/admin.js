@@ -1,13 +1,5 @@
-// ====================================================================
-// ADMIN.JS – FINAL CLEAN VERSION
-// ====================================================================
-
 import { apiGet, apiPost, apiPut } from "./apiService.js";
 
-
-// ====================================================================
-// HELPER
-// ====================================================================
 const $ = (id) => document.getElementById(id);
 const q = (s) => document.querySelector(s);
 
@@ -21,10 +13,6 @@ function esc(x) {
     }[c]));
 }
 
-
-// ====================================================================
-// TOAST & NOTIFICATION
-// ====================================================================
 window.showNotification = function (message, type = "success") {
     const toast = $("notification-toast");
     if (!toast) return;
@@ -49,71 +37,6 @@ function toast(msg, type = "success") {
     t.className = `toast-notification show ${type}`;
     setTimeout(() => t.classList.remove("show"), 2500);
 }
-
-
-// ====================================================================
-// LOAD ADMIN PROFILE (GLOBAL) — FIXED
-// ====================================================================
-async function loadAdminProfile() {
-    try {
-        const res = await apiGet("/admin/profile/1");
-        const p = res?.data ?? {};
-
-        // Form
-        $("profile-name-input").value = p.nama || "";
-        $("profile-email-input").value = p.email || "";
-        $("profile-phone-input").value = p.no_wa || "";
-
-        // Header & card
-        $("dashboard-admin-name").innerText = p.nama || "Admin";
-        $("mini-card-name").innerText = p.nama || "-";
-        $("mini-card-email").innerText = p.email || "-";
-
-        // Avatar
-        document
-            .querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
-            .forEach((el) => {
-                el.innerText = (p.nama || "A").charAt(0).toUpperCase();
-            });
-
-    } catch (err) {
-        console.error("Gagal load profil:", err);
-    }
-}
-
-
-// ====================================================================
-// UPDATE ADMIN PROFILE — FIXED (TIDAK ADA DUPLIKASI LAGI)
-// ====================================================================
-document.addEventListener("click", async (e) => {
-
-    if (e.target.id === "btn-simpan-profil") {
-
-        const body = {
-            nama: $("profile-name-input").value.trim(),
-            email: $("profile-email-input").value.trim(),
-            no_wa: $("profile-phone-input").value.trim(),
-        };
-
-        try {
-            await apiPut("/admin/profile/1", body);
-            toast("Profil berhasil diperbarui", "success");
-            loadAdminProfile();
-
-            $("popup-profile-setting").style.display = "none";
-
-        } catch (err) {
-            console.error("Gagal update profil:", err);
-            toast("Gagal memperbarui profil", "error");
-        }
-    }
-
-    if (e.target.id === "btn-cancel-profil" ||
-        e.target.id === "btn-close-profil-x") {
-        $("popup-profile-setting").style.display = "none";
-    }
-});
-
 
 // ============================
 // LOAD DASHBOARD DATA
@@ -314,7 +237,6 @@ document.addEventListener("click", async (e) => {
 document.addEventListener("DOMContentLoaded", () => {
     if (document.body.classList.contains("page-dashboard")) {
         loadDashboard();
-        loadAdminProfile();
     }
 });
 
