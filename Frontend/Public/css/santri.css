@@ -544,3 +544,28 @@ body {
     max-width: 200px;
     border-radius: 8px;
 }
+
+/* --- NOTIFIKASI HALAMAN BELUM JADI --- */
+#dev-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    color: #0d3b2e; /* hijau tua */
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.35s ease;
+    z-index: 99999;
+    pointer-events: none;
+}
+
+#dev-toast.show {
+    opacity: 1;
+    transform: translateX(-40%) translateY(5px);
+}
+
