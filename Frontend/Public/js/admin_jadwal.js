@@ -2,65 +2,77 @@ import { apiGet, apiPost, apiPut, apiDelete } from "./apiService.js";
 
 const $ = (id) => document.getElementById(id);
 
-// Toast
+/* ============================================================
+   TOAST
+============================================================ */
 function toast(msg, type = "success") {
-    let t = $("notification-toast");
+    const t = $("notification-toast");
+    if (!t) return;
     t.innerText = msg;
     t.className = `toast-notification show ${type}`;
     setTimeout(() => t.classList.remove("show"), 2200);
 }
 
-// Format jam
+/* ============================================================
+   FORMAT JAM
+============================================================ */
 const formatJam = (mulai, selesai) =>
-    `${(mulai || "").slice(0,5)} - ${(selesai || "").slice(0,5)}`;
+    `${(mulai || "").slice(0, 5)} - ${(selesai || "").slice(0, 5)}`;
 
-
-// ================================
-// LOAD KELAS
-// ================================
+/* ============================================================
+   ========== BAGIAN 1 — SISTEM JADWAL ==========
+============================================================ */
 async function loadKelasDropdowns() {
+    if (!$("pilih_kelas") && !$("kelas-tingkatan")) return;
+
     try {
         const res = await apiGet("/kelas");
-        const kelasList = Array.isArray(res) ? res : res.data ?? [];
+        const list = Array.isArray(res) ? res : res.data ?? [];
 
-        window._kelasList = kelasList;
+        window._kelasList = list;
 
-        $("pilih_kelas").innerHTML = `<option value="">Semua Kelas</option>`;
-        $("kelas-tingkatan").innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+        if ($("pilih_kelas")) {
+            $("pilih_kelas").innerHTML = `<option value="">Semua Kelas</option>`;
+        }
+        if ($("kelas-tingkatan")) {
+            $("kelas-tingkatan").innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+        }
 
-        kelasList.forEach(k => {
-            $("pilih_kelas").innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
-            $("kelas-tingkatan").innerHTML += `<option value="${k.id_kelas}" data-kategori="${k.kategori}">
-                ${k.nama_kelas}
-            </option>`;
+        list.forEach(k => {
+            if ($("pilih_kelas"))
+                $("pilih_kelas").innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
+
+            if ($("kelas-tingkatan"))
+                $("kelas-tingkatan").innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
         });
 
-    } catch (err) {
-        console.error(err);
-        toast("Gagal load kelas", "error");
+    } catch (e) {
+        console.error(e);
+        toast("Gagal memuat kelas", "error");
     }
 }
 
-
-// ================================
-// LOAD PENGAJAR
-// ================================
 async function loadPengajarDropdowns() {
+    if (!$("pengajar-tambah") && !$("pengajar")) return;
+
     try {
         const res = await apiGet("/pengajar");
-        const pengajarList = Array.isArray(res) ? res : res.data ?? [];
+        const list = Array.isArray(res) ? res : res.data ?? [];
 
-        window._pengajarList = pengajarList;
+        window._pengajarList = list;
 
-        // TAMBAH JADWAL
-        $("pengajar-tambah").innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
+        if ($("pengajar-tambah"))
+            $("pengajar-tambah").innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
 
-        // EDIT JADWAL
-        $("pengajar").innerHTML = ``;
+        if ($("pengajar"))
+            $("pengajar").innerHTML = ``;
 
-        pengajarList.forEach(p => {
-            $("pengajar-tambah").innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
-            $("pengajar").innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+        list.forEach(p => {
+            if ($("pengajar-tambah"))
+                $("pengajar-tambah").innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+
+            if ($("pengajar"))
+                $("pengajar").innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
         });
 
     } catch (err) {
@@ -69,45 +81,38 @@ async function loadPengajarDropdowns() {
     }
 }
 
-
-// ================================
-// LOAD JADWAL
-// ================================
 async function loadJadwal() {
+    if (!$("jadwalBody")) return;
+
     try {
         const res = await apiGet("/jadwal");
         let list = Array.isArray(res) ? res : res.data ?? [];
 
-        // FIX: gunakan nama_pengajar dari backend
         list = list.map(j => ({
             ...j,
-            nama_kelas: j.nama_kelas,
             pengajar_nama: j.nama_pengajar || "-",
-            kategori: j.kategori
         }));
 
         window._jadwalList = list;
         renderJadwal();
 
-    } catch (err) {
-        console.error(err);
-        toast("Gagal load jadwal", "error");
+    } catch (e) {
+        console.error(e);
+        toast("Gagal memuat jadwal", "error");
     }
 }
 
-
-// ================================
-// RENDER TABLE
-// ================================
 function renderJadwal() {
     const tb = $("jadwalBody");
-    const fk = $("pilih_kelas").value;
-    const fk2 = $("kategori").value;
+    if (!tb) return;
+
+    const fkelas = $("pilih_kelas")?.value;
+    const fkat = $("kategori")?.value;
 
     let list = [...window._jadwalList];
 
-    if (fk) list = list.filter(j => j.id_kelas == fk);
-    if (fk2) list = list.filter(j => j.kategori == fk2);
+    if (fkelas) list = list.filter(j => j.id_kelas == fkelas);
+    if (fkat) list = list.filter(j => j.kategori == fkat);
 
     tb.innerHTML = "";
 
@@ -139,73 +144,69 @@ function renderJadwal() {
     });
 }
 
+/* ============================================================
+   TAMBAH JADWAL
+============================================================ */
+if ($("btn-add-jadwal")) {
+    $("btn-add-jadwal").onclick = () =>
+        $("tambah-jadwal-modal").style.display = "flex";
+}
 
-// ================================
-// TAMBAH JADWAL
-// ================================
-$("btn-add-jadwal").onclick = () => {
-    $("tambah-jadwal-modal").style.display = "flex";
-};
+if ($("btn-close-tambah-x"))
+    $("btn-close-tambah-x").onclick = () => $("tambah-jadwal-modal").style.display = "none";
 
-$("btn-close-tambah-x").onclick =
-$("btn-tambah-cancel").onclick = () =>
-    $("tambah-jadwal-modal").style.display = "none";
+if ($("btn-tambah-cancel"))
+    $("btn-tambah-cancel").onclick = () => $("tambah-jadwal-modal").style.display = "none";
 
+if ($("form-tambah-jadwal")) {
+    $("form-tambah-jadwal").addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-$("form-tambah-jadwal").addEventListener("submit", async (e) => {
-    e.preventDefault();
+        const payload = {
+            id_kelas: $("kelas-tingkatan").value,
+            id_pengajar: $("pengajar-tambah").value,
+            hari: $("hari-tambah").value,
+            jam_mulai: $("waktu-mulai").value + ":00",
+            jam_selesai: $("waktu-selesai").value + ":00",
+            kategori: $("kategori-jadwal").value
+        };
 
-    const payload = {
-        id_kelas: $("kelas-tingkatan").value,
-        id_pengajar: $("pengajar-tambah").value,
-        hari: $("hari-tambah").value,
-        jam_mulai: $("waktu-mulai").value + ":00",
-        jam_selesai: $("waktu-selesai").value + ":00",
-        kategori: $("kategori-jadwal").value
-    };
+        try {
+            await apiPost("/jadwal", payload);
+            toast("Jadwal berhasil ditambahkan!");
+            $("tambah-jadwal-modal").style.display = "none";
+            loadJadwal();
 
-    try {
-        await apiPost("/jadwal", payload);
-        toast("Jadwal berhasil ditambahkan!");
-        $("tambah-jadwal-modal").style.display = "none";
-        loadJadwal();
+        } catch (err) {
+            console.error(err);
+            toast("Gagal menambah jadwal", "error");
+        }
+    });
+}
 
-    } catch (err) {
-        console.error(err);
-        toast("Gagal menambah jadwal", "error");
-    }
-});
-
-
-// ================================
-// OPEN EDIT POPUP (GET DATA)
-// ================================
+/* ============================================================
+   EDIT JADWAL
+============================================================ */
 document.addEventListener("click", async (e) => {
-    if (!e.target.closest(".edit-btn")) return;
+    const btn = e.target.closest(".edit-btn");
+    if (!btn) return;
 
-    const idJadwal = e.target.closest(".edit-btn").dataset.id;
+    const id = btn.dataset.id;
 
     try {
-        // --- Ambil data jadwal ---
-        const jd = await apiGet(`/jadwal/${idJadwal}`);
+        const jd = await apiGet(`/jadwal/${id}`);
+        const kelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
 
-        // Simpan ID jadwal
-        $("edit-id-jadwal").value = idJadwal;
-
-        // Set tampilan nama kelas
+        $("edit-id-jadwal").value = id;
         $("kelas-nama-edit").innerText = jd.nama_kelas;
 
-        // Set form jadwal
         $("pengajar").value = jd.id_pengajar;
         $("kategori-edit").value = jd.kategori;
         $("edit-hari").value = jd.hari;
-        $("edit-mulai").value = jd.jam_mulai.slice(0,5);
-        $("edit-selesai").value = jd.jam_selesai.slice(0,5);
+        $("edit-mulai").value = jd.jam_mulai.slice(0, 5);
+        $("edit-selesai").value = jd.jam_selesai.slice(0, 5);
 
-        // --- Ambil data kelas ---
-        const kelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
-
-        $("jumlah-siswa-maks").value = kelas.kelas.kapasitas || 0;
+        $("jumlah-siswa-maks").value = kelas.kelas.kapasitas;
         $("edit-id-kelas").value = kelas.kelas.id_kelas;
 
         $("edit-jadwal-modal").style.display = "flex";
@@ -216,58 +217,49 @@ document.addEventListener("click", async (e) => {
     }
 });
 
+if ($("btn-edit-simpan")) {
+    $("btn-edit-simpan").onclick = async () => {
+        const idJadwal = $("edit-id-jadwal").value;
+        const idKelas = $("edit-id-kelas").value;
 
-// ================================
-// SUBMIT EDIT JADWAL
-// ================================
-$("btn-edit-simpan").onclick = async () => {
-    const idJadwal = $("edit-id-jadwal").value;
-    const idKelas = $("edit-id-kelas").value;
+        const kelasPayload = {
+            kapasitas: $("jumlah-siswa-maks").value,
+            kategori: $("kategori-edit").value,
+            id_pengajar: $("pengajar").value
+        };
 
-    // --- Payload untuk kelas ---
-    const kelasPayload = {
-        kapasitas: $("jumlah-siswa-maks").value,
-        kategori: $("kategori-edit").value,
-        id_pengajar: $("pengajar").value
+        const jadwalPayload = {
+            id_pengajar: $("pengajar").value,
+            kategori: $("kategori-edit").value,
+            hari: $("edit-hari").value,
+            jam_mulai: $("edit-mulai").value + ":00",
+            jam_selesai: $("edit-selesai").value + ":00"
+        };
+
+        try {
+            await apiPut(`/kelas/edit/${idKelas}`, kelasPayload);
+            await apiPut(`/jadwal/${idJadwal}`, jadwalPayload);
+
+            toast("Perubahan berhasil disimpan!");
+            $("edit-jadwal-modal").style.display = "none";
+            loadJadwal();
+
+        } catch (err) {
+            console.error(err);
+            toast("Gagal menyimpan perubahan", "error");
+        }
     };
+}
 
-    // --- Payload untuk jadwal ---
-    const jadwalPayload = {
-        id_pengajar: $("pengajar").value,
-        kategori: $("kategori-edit").value,
-        hari: $("edit-hari").value,
-        jam_mulai: $("edit-mulai").value + ":00",
-        jam_selesai: $("edit-selesai").value + ":00"
-    };
+/* ============================================================
+   HAPUS JADWAL
+============================================================ */
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".delete-btn");
+    if (!btn) return;
 
-    try {
-        // UPDATE KELAS
-        await apiPut(`/kelas/edit/${idKelas}`, kelasPayload);
+    const id = btn.dataset.id;
 
-        // UPDATE JADWAL
-        await apiPut(`/jadwal/${idJadwal}`, jadwalPayload);
-
-        toast("Kelas & Jadwal berhasil diperbarui!");
-
-        $("edit-jadwal-modal").style.display = "none";
-        loadJadwal();
-
-    } catch (err) {
-        console.error(err);
-        toast("Gagal memperbarui kelas atau jadwal", "error");
-    }
-};
-
-// ================================
-// HAPUS JADWAL
-// ================================
-document.addEventListener("click", (e) => {
-    if (!e.target.closest(".delete-btn")) return;
-    const id = e.target.closest(".delete-btn").dataset.id;
-    deleteJadwal(id);
-});
-
-async function deleteJadwal(id) {
     if (!confirm("Hapus jadwal ini?")) return;
 
     try {
@@ -278,19 +270,213 @@ async function deleteJadwal(id) {
         console.error(err);
         toast("Gagal menghapus jadwal", "error");
     }
+});
+
+/* ============================================================
+   ========== BAGIAN 2 — SISTEM KELAS ==========
+============================================================ */
+async function loadKelasTable() {
+    if (!document.querySelector(".class-list-table tbody")) return;
+
+    try {
+        const res = await apiGet("/kelas");
+        const list = Array.isArray(res) ? res : res.data ?? [];
+
+        window._kelasRaw = list;
+        renderKelas(list);
+
+    } catch (e) {
+        console.error(e);
+        toast("Gagal memuat kelas", "error");
+    }
+}
+
+function renderKelas(data) {
+    const body = document.querySelector(".class-list-table tbody");
+    if (!body) return;
+
+    body.innerHTML = "";
+
+    if (!data.length) {
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center;">Tidak ada data kelas</td></tr>`;
+        return;
+    }
+
+    data.forEach((k, i) => {
+        body.innerHTML += `
+            <tr>
+                <td>${i + 1}</td>
+                <td>${k.nama_kelas}</td>
+                <td>${k.kapasitas}</td>
+                <td>${k.kategori}</td>
+                <td>${k.nama_pengajar || "-"}</td>
+                <td class="action-icons">
+                    <button class="icon-btn view-details-btn" data-id="${k.id_kelas}">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="icon-btn delete-kelas-btn" data-id="${k.id_kelas}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".delete-kelas-btn");
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+
+    if (!confirm("Yakin ingin menghapus kelas ini?")) return;
+
+    try {
+        await apiDelete(`/kelas/hapus/${id}`);
+        toast("Kelas berhasil dihapus!");
+        loadKelasTable();
+    } catch (err) {
+        console.error(err);
+        toast("Gagal menghapus kelas", "error");
+    }
+});
+
+/* ============================================================
+   TAMBAH KELAS (SESUAI BACKEND)
+============================================================ */
+
+if ($("form-tambah-kelas")) {
+
+    $("btn-open-tambah-kelas").onclick = () => {
+        $("tambah-kelas-modal").style.display = "flex";
+        loadPengajarUntukTambahKelas(); // load list pengajar dari backend
+    };
+
+    $("btn-close-tambah-kelas-x").onclick =
+    $("btn-cancel-kelas").onclick = () => {
+        $("tambah-kelas-modal").style.display = "none";
+        $("form-tambah-kelas").reset();
+    };
+
+    // ============================
+    // LOAD PENGAJAR UNTUK DROPDOWN
+    // ============================
+    async function loadPengajarUntukTambahKelas() {
+        try {
+            const res = await apiGet("/pengajar");
+            const list = Array.isArray(res) ? res : res.data ?? [];
+
+            const dropdown = $("select-pengajar-kelas");
+            dropdown.innerHTML = `<option value="">Pilih Pengajar</option>`;
+
+            list.forEach(p => {
+                dropdown.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+            });
+
+        } catch (err) {
+            console.error(err);
+            toast("Gagal memuat daftar pengajar", "error");
+        }
+    }
+
+    // ============================
+    // SUBMIT FORM TAMBAH KELAS
+    // ============================
+    $("form-tambah-kelas").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            nama_kelas: $("input-kelas-tingkatan").value,
+            kapasitas: Number($("input-kapasitas").value),
+            kategori: $("input-kategori").value,
+            id_pengajar: Number($("select-pengajar-kelas").value),
+            waktu_mulai: $("input-waktu-mulai").value,
+            waktu_selesai: $("input-waktu-selesai").value
+        };
+
+        console.log("PAYLOAD KIRIM KELAS:", payload);
+
+        try {
+            await apiPost("/kelas", payload);
+
+            toast("Kelas berhasil ditambahkan!");
+
+            $("tambah-kelas-modal").style.display = "none";
+            $("form-tambah-kelas").reset();
+
+            loadKelasTable(); // refresh tabel kelas
+
+        } catch (err) {
+            console.error(err);
+            toast("Gagal menambah kelas", "error");
+        }
+    });
+
 }
 
 
-// ================================
-// INIT
-// ================================
+/* ============================================================
+   FILTER KELAS OTOMATIS DARI BACKEND
+============================================================ */
+async function populateFilterKelas() {
+    const select = $("kelas_tingkatan");
+    if (!select) return; // halaman jadwal tidak punya ini
+
+    try {
+        const res = await apiGet("/kelas");
+        const list = Array.isArray(res) ? res : res.data ?? [];
+
+        // Reset + tambahkan "Semua"
+        select.innerHTML = `<option value="semua">Semua</option>`;
+
+        // Tambahkan kelas berdasarkan nama_kelas
+        const uniqueNames = [...new Set(list.map(k => k.nama_kelas))];
+
+        uniqueNames.forEach(nama => {
+            select.innerHTML += `<option value="${nama.toLowerCase()}">${nama}</option>`;
+        });
+
+    } catch (err) {
+        console.error(err);
+        toast("Gagal memuat filter kelas", "error");
+    }
+}
+
+// Event filter
+if ($("kelas_tingkatan")) {
+    $("kelas_tingkatan").addEventListener("change", () => {
+        const val = $("kelas_tingkatan").value;
+
+        if (val === "semua") {
+            renderKelas(window._kelasRaw);
+            return;
+        }
+
+        const filtered = window._kelasRaw.filter(k =>
+            k.nama_kelas.toLowerCase() === val
+        );
+
+        renderKelas(filtered);
+    });
+}
+
+// Panggil saat load halaman
+document.addEventListener("DOMContentLoaded", async () => {
+    await populateFilterKelas();
+});
+
+
+/* ============================================================
+   INIT — BERFUNGSI UNTUK KEDUA HALAMAN
+============================================================ */
 document.addEventListener("DOMContentLoaded", async () => {
     await loadKelasDropdowns();
     await loadPengajarDropdowns();
     await loadJadwal();
+    await loadKelasTable();
 
-    $("pilih_kelas").onchange = renderJadwal;
-    $("kategori").onchange = renderJadwal;
+    if ($("pilih_kelas")) $("pilih_kelas").onchange = renderJadwal;
+    if ($("kategori")) $("kategori").onchange = renderJadwal;
 });
 
 
@@ -941,28 +1127,6 @@ if (formTambahKelas) {
         showToast("Kelas baru berhasil ditambahkan!", "success");
     });
 }
-
-// 🏷️ TAG: H. LOGIKA LINK DETAIL PENGAJAR DARI TABEL
-if (pengajarTableBody) {
-    pengajarTableBody.addEventListener('click', (e) => {
-        const editLink = e.target.closest('.edit-pengajar-link'); 
-        
-        if (editLink) {
-            e.preventDefault(); 
-            
-            const pengajarId = editLink.getAttribute('data-pengajar-id');
-            const targetPage = editLink.getAttribute('href'); 
-            
-            if (pengajarId && targetPage) {
-                // Buat URL baru dengan Query Parameter
-                const newUrl = `${targetPage}?id=${pengajarId}`;
-                window.location.href = newUrl;
-            }
-        }
-    });
-}
-
-
 
 
     // Tutup modal jika klik di luar

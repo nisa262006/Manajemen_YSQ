@@ -990,14 +990,14 @@ body {
 .class-list-table .action-icons {
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 8px;
 }
 
 .icon-btn {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     padding: 5px;
     transition: color 0.2s;
 }

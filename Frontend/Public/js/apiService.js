@@ -1,92 +1,94 @@
 const BASE_URL = "http://localhost:5000";
 
-// Ambil token dari localStorage
+// Ambil token
 export function getToken() {
     return localStorage.getItem("token");
 }
 
-// Membuat header dinamis
+// Header otomatis
 function buildHeaders() {
     const token = getToken();
     const headers = { "Content-Type": "application/json" };
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     return headers;
 }
 
-// =============== GET ===============
+/* ===========================
+   GET
+=========================== */
 export async function apiGet(endpoint) {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
+    const res = await fetch(BASE_URL + endpoint, {
+        method: "GET",
         headers: buildHeaders()
     });
 
+    const data = await res.json().catch(() => null);
+
     if (!res.ok) {
-        console.error(`GET ${endpoint} gagal`);
-        throw await res.json();
+        console.error(`GET ${endpoint} gagal:`, data);
+        throw data;
     }
 
-    return res.json();
+    return data;
 }
 
-// =============== POST ===============
-export async function apiPost(url, data) {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(BASE_URL + url, {
+/* ===========================
+   POST
+=========================== */
+export async function apiPost(endpoint, body) {
+    const res = await fetch(BASE_URL + endpoint, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
+        headers: buildHeaders(),
+        body: JSON.stringify(body)
     });
 
-    let json;
-    try {
-        json = await res.json();
-    } catch (e) {
-        throw new Error("Response bukan JSON");
-    }
+    const data = await res.json().catch(() => null);
 
-    // FIX UTAMA: jangan anggap error kalau status 200/201
     if (!res.ok) {
-        console.error("API Error:", json);
-        throw json;
+        console.error(`POST ${endpoint} gagal:`, data);
+        throw data;
     }
 
-    return json;
+    return data;
 }
 
-// =============== PUT ===============
+/* ===========================
+   PUT
+=========================== */
 export async function apiPut(endpoint, body) {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
+    const res = await fetch(BASE_URL + endpoint, {
         method: "PUT",
         headers: buildHeaders(),
         body: JSON.stringify(body)
     });
 
+    const data = await res.json().catch(() => null);
+
     if (!res.ok) {
-        console.error(`PUT ${endpoint} gagal`);
-        throw await res.json();
+        console.error(`PUT ${endpoint} gagal:`, data);
+        throw data;
     }
 
-    return res.json();
+    return data;
 }
 
-// =============== DELETE ===============
+/* ===========================
+   DELETE
+=========================== */
 export async function apiDelete(endpoint) {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
+    const res = await fetch(BASE_URL + endpoint, {
         method: "DELETE",
         headers: buildHeaders()
     });
 
+    const data = await res.json().catch(() => null);
+
     if (!res.ok) {
-        console.error(`DELETE ${endpoint} gagal`);
-        throw await res.json();
+        console.error(`DELETE ${endpoint} gagal:`, data);
+        throw data;
     }
 
-    return res.json();
+    return data;
 }

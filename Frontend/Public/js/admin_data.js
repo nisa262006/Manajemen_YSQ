@@ -177,7 +177,8 @@ if (window.location.pathname.includes("daftar_santri.html")) {
             Kelas: s.nama_kelas ?? "-",
             Email: s.email ?? "-",
             Kategori: s.kategori,
-            Status: s.status
+            Status: s.status,
+            tanggal_terdaftar:s.tanggal_terdaftar
         }));
 
         const ws = XLSX.utils.json_to_sheet(exportData);
@@ -189,7 +190,8 @@ if (window.location.pathname.includes("daftar_santri.html")) {
             { wch: 20 },
             { wch: 25 },
             { wch: 12 },
-            { wch: 12 }
+            { wch: 12 },
+            { wch: 20 },
         ];
 
         const wb = XLSX.utils.book_new();
@@ -235,7 +237,7 @@ if (window.location.pathname.toLowerCase().includes("detail_santri.html")) {
         tanggal_lahir: document.getElementById("tanggal-lahir"),
         tempat_lahir: document.getElementById("tempat-lahir"),
         telepon: document.getElementById("no-telepon"),
-        kelas: document.getElementById("kelas-santri"),
+        kelas: document.getElementById("kategori-santri"),
         username: document.getElementById("username"),
         email: document.getElementById("email"),
         status: document.getElementById("status-akun"),
@@ -485,6 +487,9 @@ if (window.location.pathname.includes("tambah_pengajar.html")) {
 ============================================================ */
 if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
 
+    /* ================================
+       Ambil ID dari URL
+    ================================= */
     const params = new URLSearchParams(window.location.search);
     const pengajarId = params.get("id");
 
@@ -493,6 +498,9 @@ if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
         window.location.href = "daftar_pengajar.html";
     }
 
+    /* ================================
+       Element Form
+    ================================= */
     const formEl = {
         nip: document.getElementById("pengajar-nip"),
         nama: document.getElementById("pengajar-nama"),
@@ -509,6 +517,9 @@ if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
     const btnEdit = document.getElementById("btn-edit-pengajar");
     const btnSave = document.getElementById("btn-simpan-pengajar-footer");
 
+    /* ================================
+       Enable/Disable Form
+    ================================= */
     function setDisabled(state) {
         document
             .querySelectorAll("#pengajar-detail-form input, #pengajar-detail-form select")
@@ -517,10 +528,35 @@ if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
         btnSave.style.display = state ? "none" : "inline-block";
     }
 
-    // Awal form disabled
+    // Default: form tidak bisa diedit
     setDisabled(true);
 
-    // ======================= LOAD DETAIL ========================
+
+    /* ================================
+       LOAD DROPDOWN KELAS (BACKEND)
+    ================================= */
+    async function loadKelasDropdown() {
+        try {
+            const res = await apiGet("/kelas");
+            const kelasList = Array.isArray(res) ? res : res.data;
+
+            formEl.kelas.innerHTML = `<option value="">Tidak Mengajar</option>`;
+
+            kelasList.forEach(k => {
+                formEl.kelas.innerHTML += `
+                    <option value="${k.id_kelas}">${k.nama_kelas}</option>
+                `;
+            });
+
+        } catch (err) {
+            console.error("❌ Error saat load kelas:", err);
+        }
+    }
+
+
+    /* ================================
+       LOAD DETAIL PENGAJAR
+    ================================= */
     async function loadDetailPengajar() {
         try {
             const res = await apiGet(`/pengajar/${pengajarId}`);
@@ -535,10 +571,13 @@ if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
                 ? p.tanggal_lahir.split("T")[0]
                 : "";
 
-            formEl.kelas.innerHTML = `<option value="${p.mapel}">${p.mapel}</option>`;
+            // SET KELAS setelah dropdown selesai load
+            setTimeout(() => {
+                if (p.id_kelas) formEl.kelas.value = p.id_kelas;
+            }, 200);
 
             formEl.username.value = p.username ?? "";
-            formEl.email.value = p.email ?? p.user_email ?? "";
+            formEl.email.value = p.user_email ?? p.email ?? "";
             formEl.status.value = p.status ?? "aktif";
 
             formEl.tanggal_terdaftar.value = p.tanggal_terdaftar
@@ -550,53 +589,56 @@ if (window.location.pathname.toLowerCase().includes("detail_pengajar.html")) {
         }
     }
 
+
+    /* ================================
+       EDIT → Buka Form
+    ================================= */
     btnEdit.addEventListener("click", () => setDisabled(false));
 
-    // ======================= SAVE UPDATE ========================
-async function savePengajar(e) {
-    e.preventDefault(); // HENTIKAN SUBMIT DEFAULT
 
-    const payload = {
-        nama: formEl.nama.value,
-        alamat: formEl.alamat.value,
-        tanggal_lahir: formEl.tanggal_lahir.value,
-        no_kontak: formEl.no_telepon.value,
-        mapel: formEl.kelas.value,
-        email: formEl.email.value,
-        status: formEl.status.value
-    };
+    /* ================================
+       SIMPAN UPDATE
+    ================================= */
+    async function savePengajar(e) {
+        e.preventDefault();
 
-    console.log("Payload update:", payload); // DEBUG
+        const payload = {
+            nama: formEl.nama.value,
+            alamat: formEl.alamat.value,
+            tanggal_lahir: formEl.tanggal_lahir.value,
+            no_kontak: formEl.no_telepon.value,
+            mapel: formEl.kelas.value,
+            email: formEl.email.value,
+            status: formEl.status.value
+        };
 
-    try {
-        const res = await apiPut(`/pengajar/${pengajarId}`, payload);
+        try {
+            await apiPut(`/pengajar/${pengajarId}`, payload);
 
-        console.log("Update response:", res); // DEBUG
+            if (typeof toast === "function") {
+                toast("Data pengajar berhasil diperbarui", "success");
+            }
 
-        // Tampilkan notifikasi bila ada
-        if (typeof toast === "function") {
-            toast("Data pengajar berhasil diperbarui", "success");
-        }
+            setTimeout(() => {
+                window.location.assign("daftar_pengajar.html");
+            }, 300);
 
-        // Pastikan redirect berjalan
-        setTimeout(() => {
-            console.log("Redirecting...");
-            window.location.assign("daftar_pengajar.html");
-        }, 300);
+        } catch (err) {
+            console.error("❌ Error update pengajar:", err);
 
-    } catch (err) {
-        console.error("❌ Error update pengajar:", err);
-
-        if (typeof toast === "function") {
-            toast("Gagal menyimpan perubahan", "cancel");
+            if (typeof toast === "function") {
+                toast("Gagal menyimpan perubahan", "cancel");
+            }
         }
     }
-}
 
-// pastikan event listener terdaftar
-btnSave.addEventListener("click", savePengajar);
+    btnSave.addEventListener("click", savePengajar);
 
 
+    /* ================================
+       INIT
+    ================================= */
+    loadKelasDropdown();
     loadDetailPengajar();
 }
 
