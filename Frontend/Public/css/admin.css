@@ -965,15 +965,30 @@ body {
 }
 
 /* Menetapkan lebar minimum untuk kolom Aksi agar semua ikon muat */
-.class-list-table th:last-child, 
+class-list-table th:last-child{
+    width: 120px; 
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    /* [PERBAIKAN WARNA] PERKUAT BACKGROUND YANG HILANG DI SINI */
+    background-color: var(--color-dark-green); 
+    color: var(--color-text-light);
+    padding: 12px 10px; 
+}
+
 .class-list-table td:last-child {
     width: 120px; /* Atur lebar minimum, misalnya 120px */
-    text-align: center;
+    text-align: center; 
+    align-items: center;
+    padding: 12px 10px;
 }
 
 .class-list-table thead tr {
     background-color: var(--color-dark-green); /* Hijau Tua */
     color: var(--color-text-light);
+    vertical-align: middle;
 }
 
 .class-list-table th, .class-list-table td {
@@ -990,7 +1005,8 @@ body {
 .class-list-table .action-icons {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    align-items: center;
 }
 
 .icon-btn {
@@ -3611,5 +3627,100 @@ body {
 #dev-toast.show {
     opacity: 1;
     transform: translateX(-40%) translateY(5px);
+}
+
+/* --- CSS untuk Modal (Popup) --- */
+
+.modal {
+    display: none; /* Sembunyikan modal secara default */
+    position: fixed; /* Tetap di posisinya, menutupi viewport */
+    z-index: 1000; /* Posisikan di atas semua elemen lain */
+    left: 0;
+    top: 0;
+    width: 100%; /* Lebar penuh */
+    height: 100%; /* Tinggi penuh */
+    overflow: auto; /* Aktifkan scroll jika konten terlalu besar */
+    background-color: rgba(0,0,0,0.6); /* Background gelap transparan */
+    backdrop-filter: blur(2px); /* Efek blur ringan pada background (opsional, tergantung browser support) */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    /* Atur margin agar modal muncul di tengah-tengah layar */
+    margin: 5% auto; 
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    width: 90%; /* Lebar responsif */
+    max-width: 550px; /* Batasan lebar agar tidak terlalu besar */
+    position: relative;
+    animation-name: animatetop;
+    animation-duration: 0.3s;
+}
+
+/* Animasi untuk memunculkan modal (agar terlihat lebih smooth) */
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+.close-btn {
+    color: #888;
+    float: right;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    margin: -10px -10px 0 0; /* Posisikan di sudut kanan atas */
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+}
+
+#modal-title {
+    color: #1e4620; /* Warna hijau sesuai tema Anda */
+    border-bottom: 2px solid #f39c12; /* Garis bawah oranye */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Gaya untuk tabel di dalam modal (menyesuaikan gaya tabel utama) */
+#santri-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#santri-table th, #santri-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+#santri-table th {
+    background-color: #f4f4f4; /* Header abu-abu muda */
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* KONTROL LEBAR KOLOM (Opsional, tergantung tampilan yang diinginkan) */
+#santri-table thead tr th:nth-child(1), /* Kolom No */
+#santri-table tbody tr td:nth-child(1) {
+    width: 5%; /* Kecilkan kolom No */
+    text-align: center;
+}
+
+#santri-table thead tr th:nth-child(3), /* Kolom Usia */
+#santri-table tbody tr td:nth-child(3) {
+    width: 30%; /* Tetapkan lebar Usia */
+    text-align: center;
+}
+
+#santri-table thead tr th:nth-child(4), /* Kolom Status */
+#santri-table tbody tr td:nth-child(4) {
+    width: 5%; /* Tetapkan lebar Status */
+    text-align: center;
 }
 

@@ -27,9 +27,9 @@
 
             <div class="sidebar-footer">
                 <div class="footer-buttons-wrapper"> 
-                    <a href="#" class="footer-btn setting">
+                    <button type="button" class="footer-btn setting" id="btn-open-profil">
                         <i class="fas fa-cog"></i> Setting Profil
-                    </a>
+                        </button>
                     <a href="login.html" class="footer-btn logout">
                         <i class="fas fa-sign-out-alt"></i> Keluar
                     </a>
@@ -159,6 +159,27 @@
                 <button type="submit" class="action-btn-form save-btn-kelas" id="btn-simpan-kelas">Simpan</button>
             </div>
         </form>
+    </div>
+</div>
+<div id="santri-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" title="Tutup">&times;</span>
+        <h3 id="modal-title">Daftar Santri Kelas: [Nama Kelas]</h3>
+        
+        <div id="santri-list-container" class="table-responsive">
+            <table id="santri-table" class="table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Santri</th>
+                        <th>Usia</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <script type="module" src="../js/admin_jadwal.js"></script>
