@@ -68,66 +68,93 @@ http://127.0.0.1:5500/frontend/index.html
 ```
 SAHABAT-QURAN-WEB/
 ├── Backend/
-│   ├── package.json
+│   ├── node_modules/
 │   ├── src/
-│   │    ├── app/
-│   │    ├── config/
-│   │    │     ├── db.js
-│   │    │     ├── hash.js
-│   │    │     └── testconnetions.js
-│   │    ├── controllers/
-│   │    │     ├── absensicontrollers.js
-│   │    │     ├── authcontrollers.js
-│   │    │     ├── jadwalcontrollers.js
-│   │    │     ├── kelascontrollers.js
-│   │    │     ├── registercontrollers.js
-│   │    │     ├── santricontrollers.js
-│   │    │     └── mecontrollers.js
-│   │    ├── middleware/
-│   │    │     ├── auth.js
-│   │    │     └── role.js
-│   │    ├── routes/
-│   │    │     ├── absensiroutes.js
-│   │    │     ├── authroutes.js
-│   │    │     ├── jadwalroutes.js
-│   │    │     ├── kelasroutes.js
-│   │    │     ├── registerroutes.js
-│   │    │     ├── santriroutes.js
-│   │    │     └── meroutes.js
-│   │    └── app.js
+│   │   ├── config/
+│   │   │   ├── db.js
+│   │   │   ├── hash.js
+│   │   │   └── testconnection.js
+│   │   ├── controllers/
+│   │   │   ├── absensicontrollers.js
+│   │   │   ├── admincontrollers.js
+│   │   │   ├── authcontrollers.js
+│   │   │   ├── jadwalcontrollers.js
+│   │   │   ├── kelascontrollers.js
+│   │   │   ├── mecontrollers.js
+│   │   │   ├── pengajarcontrollers.js
+│   │   │   ├── registercontrollers.js
+│   │   │   ├── santricontrollers.js
+│   │   │   └── santridashboardcontrollers.js
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   └── role.js
+│   │   ├── routes/
+│   │   │   ├── absensiroutes.js
+│   │   │   ├── adminroutes.js
+│   │   │   ├── authroutes.js
+│   │   │   ├── jadwalroutes.js
+│   │   │   ├── kelasroutes.js
+│   │   │   ├── meroutes.js
+│   │   │   ├── pengajarroutes.js
+│   │   │   ├── registerroutes.js
+│   │   │   ├── santridashboardroutes.js
+│   │   │   └── santriroutes.js
+│   │   ├── utils/
+│   │   └── app.js
 │   ├── .env
-│   ├── package.json
 │   ├── package-lock.json
-│   └── test_api.http
-│
+│   ├── package.json
+│   ├── test_api.http
+│   └── test-nodemailer.js
 ├── Frontend/
 │   ├── Public/
 │   │   ├── css/
 │   │   │   ├── admin.css
+│   │   │   ├── pengajar.css
+│   │   │   ├── santri.css
 │   │   │   └── style.css
 │   │   ├── images/
-│   │   │   ├── img.png
-│   │   │   ├── kelas.png
+│   │   │   ├── image.jpg
+│   │   │   ├── kelas.jpg
 │   │   │   └── LogoYSQ.png
-│   │   └── js/
-│   │       ├── login.js
-│   │       ├── register.js
-│   │       └── script.js
-│   ├── views/
-│   │    ├── berhasil.html
-│   │    ├── daftar.html
-│   │    ├── dashboardadmin.html
-│   │    ├── dashboardpengajar.html
-│   │    ├── dashboardsantri.html
-│   │    ├── index.html
-│   │    ├── jadwaladmin.html
-│   │    ├── kelasadmin.html
-│   │    ├── login.html
-│   │    └── registrasi.html
-│   └── test/
+│   │   ├── js/
+│   │   │   ├── absensisantri.js
+│   │   │   ├── admin_data.js
+│   │   │   ├── admin_jadwal.js
+│   │   │   ├── admin_laporan.js
+│   │   │   ├── admin.js
+│   │   │   ├── apiService.js
+│   │   │   ├── login.js
+│   │   │   ├── pengajar.js
+│   │   │   ├── profileSetting.js
+│   │   │   ├── register.js
+│   │   │   └── santri.js
+│   │   └── views/
+│   │       ├── absensisiswa.html
+│   │       ├── Admin.html
+│   │       ├── berhasil.html
+│   │       ├── daftar_jadwal.html
+│   │       ├── daftar_kelas.html
+│   │       ├── daftar_pengajar.html
+│   │       ├── daftar_registrasi.html
+│   │       ├── daftar_santri.html
+│   │       ├── daftar.html
+│   │       ├── dashboardpengajar.html
+│   │       ├── dashboardsantri.html
+│   │       ├── detail_pengajar.html
+│   │       ├── detail_santri.html
+│   │       ├── index.html
+│   │       ├── login.html
+│   │       ├── reset_password.html
+│   │       ├── riwayat_absensi.html
+│   │       ├── tambah_kelas.html
+│   │       ├── tambah_pengajar.html
+│   │       └── tambah_siswa.html
+│   └── package.json
 ├── .gitignore
 ├── package-lock.json
-└── README.md/
+├── README.md
+└── tests/
 ```
 
 ### Struktur Tim
