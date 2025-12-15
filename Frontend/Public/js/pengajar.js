@@ -55,6 +55,25 @@ function setTodayToDateInputs() {
 }
 
 /* ======================================================
+   TOAST NOTIFICATION (GLOBAL)
+====================================================== */
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toastNotification");
+  if (!toast) {
+    console.warn("toastNotification tidak ditemukan");
+    return;
+  }
+
+  toast.textContent = message;
+  toast.className = `toast show ${type}`;
+
+  setTimeout(() => {
+    toast.className = "toast";
+  }, 3000);
+}
+
+
+/* ======================================================
    LOAD DATA PENGAJAR (GET /pengajar/me)
    Untuk menampilkan nama di pojok kanan atas
 ====================================================== */
@@ -480,7 +499,7 @@ async function saveAbsensiSantri() {
         console.warn("Gagal simpan absensi untuk santri:", id_santri, e);
       }
     }
-    alert("Absensi Santri berhasil disimpan.");
+    showToast("✅ Absensi santri berhasil disimpan", "success");
   } catch (err) {
     console.error("Error saat menyimpan absensi:", err);
     alert("Terjadi kesalahan saat menyimpan. Cek console.");
@@ -490,7 +509,7 @@ async function saveAbsensiSantri() {
 }
 
 /* ======================================================
-   POST absensi pengajar (FINAL – SESUAI HTML KAMU)
+   SIMPAN ABSENSI PENGAJAR (FINAL FIXED VERSION)
 ====================================================== */
 async function simpanAbsensiPengajar() {
   console.log("👉 simpanAbsensiPengajar() dipanggil");
@@ -499,74 +518,50 @@ async function simpanAbsensiPengajar() {
   const kelasId = document.getElementById("kelasSelect")?.value;
   const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
 
-  if (!status) return alert("Pilih status kehadiran.");
-  if (!kelasId) return alert("Pilih kelas.");
-  if (!tanggal) return alert("Pilih tanggal.");
-
-  // --- Ambil ID Pengajar dari /me ---
-  const me = await fetchJSON(`${BASE_URL}/me`, {
-    headers: { Authorization: `Bearer ${getToken()}` }
-  });
-
-  const id_pengajar = me?.profile?.id_pengajar;
-  if (!id_pengajar) {
-    console.error("❌ id_pengajar tidak ditemukan di /me", me);
-    return alert("ID Pengajar tidak ditemukan. Silakan login ulang.");
+  if (!status || !kelasId || !tanggal) {
+    showToast("⚠️ Lengkapi kelas, tanggal, dan status", "warning");
+    return;
   }
 
-  // --- Ambil jadwal pengajar ---
-  const semuaJadwal = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
-    headers: { Authorization: `Bearer ${getToken()}` }
-  });
+  try {
+    // ================= GET JADWAL UTAMA =================
+    const jadwal = window._jadwalUtama;
+    if (!jadwal || !jadwal.id_jadwal) {
+      showToast("⚠️ Jadwal tidak ditemukan", "warning");
+      return;
+    }
 
-  if (!semuaJadwal || semuaJadwal.length === 0)
-    return alert("Tidak ada jadwal untuk pengajar ini.");
+    // ================= POST ABSENSI =================
+    await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({
+        id_jadwal: jadwal.id_jadwal,
+        tanggal,
+        status_absensi: status,
+        catatan: "Absensi pengajar"
+      })
+    });
 
-  // --- Cocokkan hari berdasarkan tanggal ---
-  const hariTanggal = new Date(tanggal)
-    .toLocaleDateString("id-ID", { weekday: "long" })
-    .toLowerCase();
+    showToast("✅ Absensi pengajar berhasil disimpan", "success");
 
-  const jadwalHariIni = semuaJadwal.find(
-    j => j.hari?.toLowerCase() === hariTanggal
-  );
+  } catch (err) {
+    console.error("❌ Error simpan absensi pengajar:", err);
 
-  if (!jadwalHariIni) {
-    console.warn("❌ Jadwal tidak ditemukan untuk hari:", hariTanggal);
-    return alert(`Tidak ada jadwal pada hari ${hariTanggal}`);
+    // 🔥 INI YANG KAMU BUTUHKAN
+    if (
+      err.status === 400 &&
+      err.body?.message?.toLowerCase().includes("sudah")
+    ) {
+      showToast("⚠️ Anda sudah absen pada tanggal ini", "warning");
+    } else {
+      showToast("❌ Gagal menyimpan absensi pengajar", "error");
+    }
   }
-
-  const id_jadwal = jadwalHariIni.id_jadwal;
-
-  console.log("📌 DATA DIKIRIM:", {
-    id_pengajar,
-    id_jadwal,
-    tanggal,
-    status
-  });
-
-  // --- Kirim ke backend ---
-  await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`
-    },
-    body: JSON.stringify({
-      id_pengajar,
-      id_jadwal,
-      tanggal,
-      status_absensi: status,
-      catatan: "Absensi pengajar"
-    })
-  });
-
-  document.getElementById("absenPengajarInfo").textContent =
-    `${status} (${tanggal})`;
-
-  alert("Absensi Pengajar berhasil disimpan.");
 }
-
 
 /* ======================================================
    Riwayat absensi (GET /absensi/santri/kelas/me)
@@ -607,6 +602,68 @@ function renderRiwayatAbsensi(list) {
     `;
   });
 }
+
+/* ======================================================
+   DASHBOARD STATS (KELAS HARI INI & KEHADIRAN)
+====================================================== */
+
+async function loadDashboardStatsPengajar() {
+  const token = getToken();
+  if (!token) return;
+
+  const kelasHariIniEl = document.querySelector(".kelas-hari-ini");
+  const persentaseEl = document.querySelector(".persentase-kehadiran");
+
+  /* ================= KELAS HARI INI ================= */
+  try {
+    const jadwal = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const list = Array.isArray(jadwal) ? jadwal : (jadwal ? [jadwal] : []);
+
+    const hariIni = new Date()
+      .toLocaleDateString("id-ID", { weekday: "long" })
+      .toLowerCase();
+
+    const jumlahHariIni = list.filter(
+      j => j.hari?.toLowerCase() === hariIni
+    ).length;
+
+    if (kelasHariIniEl) kelasHariIniEl.textContent = jumlahHariIni;
+
+  } catch (err) {
+    console.error("❌ Gagal hitung kelas hari ini:", err);
+    if (kelasHariIniEl) kelasHariIniEl.textContent = "0";
+  }
+
+  /* ================= PERSENTASE KEHADIRAN ================= */
+  try {
+    const absensi = await fetchJSON(`${BASE_URL}/absensi/santri/kelas/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const list = Array.isArray(absensi) ? absensi : (absensi ? [absensi] : []);
+
+    if (list.length === 0) {
+      if (persentaseEl) persentaseEl.textContent = "0%";
+      return;
+    }
+
+    const hadirCount = list.filter(
+      a => a.status_absensi?.toLowerCase() === "hadir"
+    ).length;
+
+    const persen = Math.round((hadirCount / list.length) * 100);
+
+    if (persentaseEl) persentaseEl.textContent = `${persen}%`;
+
+  } catch (err) {
+    console.error("❌ Gagal hitung persentase kehadiran:", err);
+    if (persentaseEl) persentaseEl.textContent = "0%";
+  }
+}
+
 
 /* ======================================================
    loadPageJadwalFor(kelasId) - we use jadwal/pengajar/me (no kelas param supported)
@@ -700,7 +757,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // save absensi button
   const btnSave = document.getElementById("btnSimpanAbsensi");
-  if (btnSave) btnSave.addEventListener("click", saveAbsensiSantri);
+  btnSave.addEventListener("click", () => {
+    document.getElementById("konfirmasiModal").style.display = "flex";
+  });
+  
+// ===== MODAL KONFIRMASI SIMPAN ABSENSI SANTRI =====
+const modal = document.getElementById("konfirmasiModal");
+const btnBatal = document.getElementById("batalSimpanButton");
+const btnLanjut = document.getElementById("lanjutkanSimpanButton");
+const btnClose = document.getElementById("closeKonfirmasi");
+
+// tombol batal
+btnBatal?.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+// tombol X
+btnClose?.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+// tombol YA SIMPAN
+btnLanjut?.addEventListener("click", async () => {
+  modal.style.display = "none";
+  await saveAbsensiSantri(); // ⬅️ INI YANG SEBELUMNYA TIDAK PERNAH TERPANGGIL
+});
 
   // view riwayat
   const viewRiway = document.getElementById("btnViewRiwayat");
@@ -713,15 +794,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnBack = document.getElementById("btnKembali");
   if (btnBack) btnBack.addEventListener("click", () => showSectionById("absensi-content"));
 
-    // === SIMPAN ABSENSI PENGAJAR ===
-    const btnSimpanPengajar = document.getElementById("simpanAbsenPengajar");
-    if (btnSimpanPengajar) {
-      btnSimpanPengajar.addEventListener("click", () => {
-        console.log("👉 Tombol SIMPAN ABSEN PENGAJAR diklik");
-        simpanAbsensiPengajar();
-      });
-    }
-  
+   // === SIMPAN ABSENSI PENGAJAR ===
+  const btnSimpanPengajar = document.getElementById("simpanAbsenPengajar");
+  if (btnSimpanPengajar) {
+    btnSimpanPengajar.addEventListener("click", () => {
+      console.log("👉 Tombol SIMPAN ABSEN PENGAJAR diklik");
+      simpanAbsensiPengajar();
+    });
+}
+
+    
 });
 
 
@@ -744,6 +826,7 @@ function showSectionById(id) {
     await populateClassSelects();
     await loadPengajarData();
     await loadPengajarName();
+    loadDashboardStatsPengajar();
     // default to dashboard (unless hash asks otherwise)
     const hash = location.hash.replace("#", "");
     if (hash === "jadwal") {

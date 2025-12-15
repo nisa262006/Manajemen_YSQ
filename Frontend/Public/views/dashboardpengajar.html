@@ -55,6 +55,8 @@
       <!-- DASHBOARD SECTION -->
       <section class="content-section active" id="dashboard-content">
         <div class="dashboard-grid">
+      
+          <!-- KARTU ATAS -->
           <div class="info-card-container">
             <div class="info-card tahsin-info">
               <h2>Informasi Kelas</h2>
@@ -73,25 +75,23 @@
                 </div>
               </div>
             </div>
-
+      
             <div class="info-card class-count">
               <i class='bx bx-calendar-check'></i>
-              <span class="value">2</span>
+              <span class="value kelas-hari-ini">-</span>
               <p class="label">Kelas Hari Ini</p>
             </div>
-
+      
             <div class="info-card attendance-rate">
               <i class='bx bxs-group'></i>
-              <span class="value">95%</span>
+              <span class="value persentase-kehadiran">-</span>
               <p class="label">Persentase Kehadiran</p>
             </div>
           </div>
-
+      
+          <!-- TABEL HARUS DI BAWAH -->
           <div class="schedule-section">
             <h2>Jadwal Kelas Hari Ini</h2>
-
-            <!-- NOTE: AKSI DIHILANGKAN DISINI (Dashboard) — tetap ada di halaman Jadwal -->
-            <!-- HEADER: removed "Aksi" column for dashboard (MODIFIED) -->
             <table class="data-table" id="dashboardTable">
               <thead>
                 <tr>
@@ -103,24 +103,10 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- rows without Aksi (Detail button removed) -->
-                <tr>
-                  <td>Senin</td>
-                  <td>08.00 - 10.00</td>
-                  <td>Usmanil</td>
-                  <td>1</td>
-                  <td>1</td>
-                </tr>
-
-                <tr>
-                  <td>Senin</td>
-                  <td>10.00 - 12.00</td>
-                  <td>Tahfidz</td>
-                  <td>2</td>
-                  <td>2</td>
-                </tr>
+                <!-- DIISI DARI BACKEND -->
               </tbody>
             </table>
+
             <!-- ADDED: small caption to explain why no aksi here -->
             <!-- ADDED --> 
             <p class="muted-note" style="margin-top:8px; color:#6b6b6b; font-size:13px;">
@@ -349,7 +335,7 @@
 
   
   <!-- JS -->
-  <script type="module" src="../js/profileSetting.js"></script>
   <script src="../js/pengajar.js"></script>
+  <script type="module" src="../js/profileSetting.js"></script>
 </body>
 </html>

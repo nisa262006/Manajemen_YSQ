@@ -710,3 +710,40 @@ body {
     transform: translateX(-40%) translateY(5px);
 }
 
+/* ================= TOAST NOTIFICATION ================= */
+#toastNotification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+  }
+  
+  .toast {
+    min-width: 260px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .toast.success {
+    background: #2e7d32;
+  }
+  
+  .toast.warning {
+    background: #ed6c02;
+  }
+  
+  .toast.error {
+    background: #d32f2f;
+  }
+  
