@@ -295,18 +295,29 @@ exports.getAllAbsensiPengajar = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
-        ap.*, 
+        ap.id_absensi_pengajar,
+        ap.id_pengajar,
+        ap.id_jadwal,
+        ap.tanggal,
+        ap.status_absensi,
+        ap.catatan,
         p.nama AS nama_pengajar,
-        u.email AS email_pengajar
+        k.nama_kelas
       FROM absensi_pengajar ap
-      JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
-      JOIN users u ON p.id_users = u.id_users
+      LEFT JOIN jadwal j ON ap.id_jadwal = j.id_jadwal
+      LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+      LEFT JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
       ORDER BY ap.tanggal DESC
     `);
 
-    res.json(result.rows);
+    res.json({
+      success: true,
+      data: result.rows
+    });
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Error getAllAbsensiPengajar:", err);
+    res.status(500).json({ message: "Gagal mengambil data absensi pengajar" });
   }
 };
 

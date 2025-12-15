@@ -1,4 +1,25 @@
 import { apiGet, apiPut, apiDelete } from "./apiService.js";
+const $ = (id) => document.getElementById(id);
+
+
+function renderCurrentDate() {
+    const dateEl = document.getElementById("current-date");
+    if (!dateEl) return;
+
+    const now = new Date();
+
+    const hari = now.toLocaleDateString("id-ID", { weekday: "long" });
+    const tanggal = now.getDate();
+    const bulan = now.toLocaleDateString("id-ID", { month: "long" });
+    const tahun = now.getFullYear();
+
+    dateEl.textContent = `${hari}, ${tanggal} ${bulan} ${tahun}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderCurrentDate();
+});
+
 
 // ============================
 // DAFTAR SANTRI

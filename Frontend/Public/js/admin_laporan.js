@@ -12,6 +12,21 @@ const endDate = document.getElementById("end-date");
 
 let allAbsensi = [];
 
+
+function renderCurrentDate() {
+    const dateEl = document.getElementById("current-date");
+    if (!dateEl) return;
+
+    const now = new Date();
+
+    const hari = now.toLocaleDateString("id-ID", { weekday: "long" });
+    const tanggal = now.getDate();
+    const bulan = now.toLocaleDateString("id-ID", { month: "long" });
+    const tahun = now.getFullYear();
+
+    dateEl.textContent = `${hari}, ${tanggal} ${bulan} ${tahun}`;
+}
+
 /* ============================================================
    1. LOAD PENGAJAR DROPDOWN
 ============================================================ */
@@ -226,7 +241,7 @@ pilihPengajar.addEventListener("change", applyFilters);
 ============================================================ */
 loadDropdownPengajar();
 loadAbsensiPengajar();
-
+renderCurrentDate();
 
 
 // ===================================================
@@ -906,28 +921,6 @@ if (formTambahKelas) {
         showToast("Kelas baru berhasil ditambahkan!", "success");
     });
 }
-
-// 🏷️ TAG: H. LOGIKA LINK DETAIL PENGAJAR DARI TABEL
-if (pengajarTableBody) {
-    pengajarTableBody.addEventListener('click', (e) => {
-        const editLink = e.target.closest('.edit-pengajar-link'); 
-        
-        if (editLink) {
-            e.preventDefault(); 
-            
-            const pengajarId = editLink.getAttribute('data-pengajar-id');
-            const targetPage = editLink.getAttribute('href'); 
-            
-            if (pengajarId && targetPage) {
-                // Buat URL baru dengan Query Parameter
-                const newUrl = `${targetPage}?id=${pengajarId}`;
-                window.location.href = newUrl;
-            }
-        }
-    });
-}
-
-
 
 
     // Tutup modal jika klik di luar
