@@ -61,22 +61,41 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================
 async function loadDashboard() {
     try {
-        // -------- PROFILE ADMIN --------
-        let me = await apiGet("/me");
-        let profile = me?.profile ?? me ?? {};
+        const me = await apiGet("/me");
+        const idAdmin = me?.profile?.id_admin || me?.id_admin;
 
+        if (!idAdmin) {
+            console.error("ID Admin tidak ditemukan");
+            return;
+        }
+
+        // 2️⃣ Ambil DATA LENGKAP admin
+        const resProfile = await apiGet(`/admin/profile/${idAdmin}`);
+        const profile = resProfile?.data;
+
+        if (!profile) {
+            console.error("Profile admin kosong");
+            return;
+        }
+
+        // 3️⃣ DASHBOARD HEADER
         $("dashboard-admin-name").innerText = profile.nama || "Admin";
+
+        // 4️⃣ MINI PROFILE (🔥 FIX UTAMA 🔥)
         $("mini-card-name").innerText = profile.nama || "-";
         $("mini-card-email").innerText = profile.email || "-";
+        $("mini-card-phone").innerText = profile.no_wa || "-";
 
+        // 5️⃣ POPUP SETTING
         if ($("profile-name-input")) $("profile-name-input").value = profile.nama || "";
         if ($("profile-email-input")) $("profile-email-input").value = profile.email || "";
         if ($("profile-phone-input")) $("profile-phone-input").value = profile.no_wa || "";
 
-        document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large").forEach((el) => {
-            el.innerText = (profile.nama || "A").charAt(0).toUpperCase();
+        // 6️⃣ AVATAR
+        document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large").forEach(el => {
+            el.innerText = (profile.nama || "A")[0].toUpperCase();
         });
-
+        
         // -------- PENDAFTAR --------
         let daftar = await apiGet("/pendaftar");
         let data = Array.isArray(daftar) ? daftar : daftar.data ?? [];
@@ -206,47 +225,6 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// ============================
-// PROFILE SAVE (REAL BACKEND CONNECTED)
-// ============================
-document.addEventListener("click", async (e) => {
-    // SIMPAN PROFIL KE BACKEND
-    if (e.target.id === "btn-simpan-profil") {
-        let body = {
-            nama: $("profile-name-input").value.trim(),
-            email: $("profile-email-input").value.trim(),
-            no_wa: $("profile-phone-input").value.trim()
-        };
-
-        try {
-            let res = await apiPut("/profile", body);
-
-            toast("Profil berhasil diperbarui", "success");
-
-            // Update tampilan langsung
-            $("dashboard-admin-name").innerText = body.nama;
-            $("mini-card-name").innerText = body.nama;
-            $("mini-card-email").innerText = body.email;
-
-            // Update avatar
-            document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
-                .forEach(el => {
-                    el.innerText = body.nama.charAt(0).toUpperCase();
-                });
-
-            $("popup-profile-setting").style.display = "none";
-
-        } catch (err) {
-            console.error("Update Profile Error:", err);
-            toast("Gagal memperbarui profil", "error");
-        }
-    }
-
-    // TUTUP POPUP
-    if (e.target.id === "btn-cancel-profil" || e.target.id === "btn-close-profil-x") {
-        $("popup-profile-setting").style.display = "none";
-    }
-});
 
 
 // ============================

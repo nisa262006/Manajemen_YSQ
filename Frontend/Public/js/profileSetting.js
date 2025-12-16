@@ -93,9 +93,6 @@ if ($("btn-simpan-profil")) {
 
             await apiPut(`/admin/profile/${idAdmin}`, payload);
 
-            showDevToast("Profil berhasil diperbarui.");
-            $("popup-profile-setting").style.display = "none";
-
         } catch (err) {
             console.error(err);
             showDevToast("Gagal memperbarui profil.");

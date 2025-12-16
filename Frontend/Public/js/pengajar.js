@@ -1,6 +1,23 @@
 
 const BASE_URL = "http://localhost:5000";
 
+/* ======================================================
+   REDIRECT KE DASHBOARD SAAT REFRESH
+   (Absensi TIDAK BOLEH di-refresh)
+====================================================== */
+(function redirectIfRefreshOnAbsensi() {
+  const isAbsensi = window.location.hash === "#absensi";
+
+  // performance.navigation deprecated, tapi masih dipakai browser
+  const isReload =
+    performance.getEntriesByType("navigation")[0]?.type === "reload";
+
+  if (isAbsensi && isReload) {
+    console.warn("🔁 Refresh terdeteksi di halaman absensi → kembali ke dashboard");
+    window.location.replace("dashboardpengajar.html");
+  }
+})();
+
 /* ---------- Helper: fetch wrapper with json/error handling ---------- */
 async function fetchJSON(url, opts = {}) {
   const res = await fetch(url, opts);
@@ -132,47 +149,73 @@ async function populateClassSelects() {
     });
 
     if (!resp.ok) {
-      console.warn("/kelas/pengajar/me returned", resp.status);
-      // ensure selects show placeholder
-      document.querySelectorAll("select.custom-select").forEach(sel => {
-        if (sel) sel.innerHTML = `<option value="">Tidak ada kelas</option>`;
-      });
+      console.warn("Gagal ambil kelas:", resp.status);
       return;
     }
 
     const raw = await resp.json();
-    logDebug("kelasData (raw)", raw);
 
-    // normalize to array (backend may return object)
+    // ===============================
+    // NORMALISASI RESPONSE
+    // ===============================
     let kelasList = [];
     if (Array.isArray(raw)) kelasList = raw;
-    else if (raw && raw.id_kelas) kelasList = [raw];
-    else if (raw && raw.data && Array.isArray(raw.data)) kelasList = raw.data;
-    else if (raw && raw.data && raw.data.id_kelas) kelasList = [raw.data];
+    else if (Array.isArray(raw?.data)) kelasList = raw.data;
+    else if (raw?.id_kelas) kelasList = [raw];
+    else if (raw?.data?.id_kelas) kelasList = [raw.data];
 
+    console.log("KELAS LIST:", kelasList);
+
+    // ⛔ STOP kalau memang kosong
+    if (!kelasList.length) {
+      console.warn("Tidak ada kelas");
+      return;
+    }
+
+    // ===============================
+    // SIMPAN STATE
+    // ===============================
     window._kelasList = kelasList;
-    window._selectedKelasId = kelasList[0]?.id_kelas ?? kelasList[0]?.id ?? null;
 
-    // fill selects used in jadwal & absensi & riwayat
-    const selects = document.querySelectorAll("#jadwal-content select.custom-select, #absensi-content select.custom-select, #riwayatKelasSelect");
+    // ambil pilihan sebelumnya
+    const prevSelected =
+      window._selectedKelasId ||
+      document.getElementById("riwayatKelasSelect")?.value;
+
+    // ===============================
+    // AMBIL SEMUA SELECT TERKAIT
+    // ===============================
+    const selects = document.querySelectorAll(
+      "select.custom-select, #riwayatKelasSelect"
+    );
+
     selects.forEach(sel => {
       if (!sel) return;
+
       sel.innerHTML = "";
-      if (kelasList.length === 0) {
-        sel.innerHTML = `<option value="">Tidak ada kelas</option>`;
-        return;
-      }
+
       kelasList.forEach(k => {
-        const id = k.id_kelas ?? k.id ?? "";
-        const nama = k.nama_kelas ?? k.nama ?? `Kelas ${id}`;
         const opt = document.createElement("option");
-        opt.value = id;
-        opt.textContent = nama;
+        opt.value = k.id_kelas;
+        opt.textContent = k.nama_kelas;
         sel.appendChild(opt);
       });
-      // set selected to first
-      sel.value = window._selectedKelasId ?? sel.options[0]?.value;
+
+      // restore pilihan jika masih ada
+      const exist = kelasList.find(k => k.id_kelas == prevSelected);
+      sel.value = exist ? prevSelected : kelasList[0].id_kelas;
     });
+
+    window._selectedKelasId =
+      document.getElementById("riwayatKelasSelect")?.value ??
+      kelasList[0].id_kelas;
+
+    // ===============================
+    // AUTO UPDATE DATA TERKAIT
+    // ===============================
+    if (typeof loadRiwayatAbsensi === "function") {
+      loadRiwayatAbsensi();
+    }
 
   } catch (err) {
     console.error("populateClassSelects error:", err);
@@ -346,31 +389,36 @@ function renderPageJadwal(jadwal) {
 }
 
 /* ======================================================
-   LOAD absensi santri for a kelasId & tanggal (render absensiBody)
+   LOAD absensi santri for a kelasId & tanggal
 ====================================================== */
 async function loadAbsensiSantriFor(kelasId, tanggal) {
   const tbody = document.getElementById("absensiBody");
   if (!tbody) return;
 
+  // 🔒 Jika state hilang (refresh), balik dashboard
   if (!kelasId) {
-    tbody.innerHTML = `<tr><td colspan="4">Pilih kelas terlebih dahulu.</td></tr>`;
+    console.warn("kelasId kosong → redirect dashboard");
+    window.location.replace("dashboardpengajar.html");
     return;
   }
 
   const detail = await loadKelasDetailForPengajar(kelasId);
+
   if (!detail || !Array.isArray(detail.santri) || detail.santri.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4">Belum ada santri di kelas ini.</td></tr>`;
     window._jadwalUtama = null;
+
     const title = document.querySelector(".absensi-info-bar h3");
     const time = document.querySelector(".absensi-info-bar span");
-    if (title) title.textContent = "Absen Hari ";
+    if (title) title.textContent = "Absen Hari";
     if (time) time.textContent = "";
     return;
   }
 
   tbody.innerHTML = "";
+
   detail.santri.forEach((s, idx) => {
-    const idSantri = s.id_santri ?? s.id ?? "";
+    const idSantri = s.id_santri ?? s.id;
     tbody.innerHTML += `
       <tr>
         <td>${idx + 1}</td>
@@ -391,17 +439,19 @@ async function loadAbsensiSantriFor(kelasId, tanggal) {
     `;
   });
 
-  window._jadwalUtama = (detail.jadwal && detail.jadwal.length) ? detail.jadwal[0] : null;
+  window._jadwalUtama =
+    detail.jadwal && detail.jadwal.length ? detail.jadwal[0] : null;
+
   const headerTitle = document.querySelector(".absensi-info-bar h3");
   const headerTime = document.querySelector(".absensi-info-bar span");
+
   if (window._jadwalUtama) {
-    if (headerTitle) headerTitle.textContent = `Absen Hari ${window._jadwalUtama.hari ?? ""}`;
-    if (headerTime) headerTime.textContent = `${window._jadwalUtama.jam_mulai ?? ""} - ${window._jadwalUtama.jam_selesai ?? ""}`;
-  } else {
-    if (headerTitle) headerTitle.textContent = `Absen Hari `;
-    if (headerTime) headerTime.textContent = "";
+    headerTitle.textContent = `Absen Hari ${window._jadwalUtama.hari ?? ""}`;
+    headerTime.textContent =
+      `${window._jadwalUtama.jam_mulai ?? ""} - ${window._jadwalUtama.jam_selesai ?? ""}`;
   }
 }
+
 
 /* ======================================================
    Save absensi santri (POST /absensi/santri) - per santri
@@ -460,78 +510,94 @@ async function postAbsensiPengajar(id_jadwal) {
 }
 
 async function saveAbsensiSantri() {
-  const token = getToken();
-  if (!token) return alert("Token tidak ditemukan. Silakan login ulang.");
-
   const jadwal = window._jadwalUtama;
-  if (!jadwal) return alert("Jadwal tidak ditemukan. Pilih kelas yang memiliki jadwal terlebih dahulu.");
 
-  const tanggal = (document.querySelector("#absensi-content input[type='date']")?.value) || new Date().toISOString().split("T")[0];
+  const tanggal =
+    document.querySelector("#absensi-content input[type='date']")?.value ||
+    new Date().toISOString().split("T")[0];
+
+  // ⛔ TIDAK ADA JADWAL
+  if (!jadwal || !jadwal.id_jadwal) {
+    showToast(
+      "⚠️ Absensi tidak tersimpan karena tidak ada jadwal",
+      "warning"
+    );
+    return;
+  }
+
   const rows = document.querySelectorAll("#absensiBody tr");
-  if (!rows || rows.length === 0) return alert("Tidak ada santri untuk disimpan.");
+  if (!rows.length) return;
 
   const btn = document.getElementById("btnSimpanAbsensi");
-  if (btn) { btn.disabled = true; btn.textContent = "Menyimpan..."; }
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Menyimpan...";
+  }
 
   try {
-    for (let row of rows) {
+    for (const row of rows) {
       const select = row.querySelector(".status-select");
       const input = row.querySelector(".input-catatan");
       if (!select) continue;
-      const id_santri = select.dataset.santriId;
-      const payload = {
-        id_santri: Number(id_santri),
-        id_jadwal: jadwal.id_jadwal ?? jadwal.id,
-        tanggal,
-        status_absensi: select.value,
-        catatan: input?.value || ""
-      };
-      try {
-        await fetchJSON(`${BASE_URL}/absensi/santri`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getToken()}`
-          },
-          body: JSON.stringify(payload)
-        });
-      } catch (e) {
-        console.warn("Gagal simpan absensi untuk santri:", id_santri, e);
-      }
+
+      await fetchJSON(`${BASE_URL}/absensi/santri`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({
+          id_santri: Number(select.dataset.santriId),
+          id_jadwal: Number(jadwal.id_jadwal),
+          tanggal,
+          status_absensi: select.value,
+          catatan: input?.value || ""
+        })
+      });
     }
+
+    // ✅ HANYA MUNCUL JIKA SEMUA BERHASIL
     showToast("✅ Absensi santri berhasil disimpan", "success");
+
   } catch (err) {
-    console.error("Error saat menyimpan absensi:", err);
-    alert("Terjadi kesalahan saat menyimpan. Cek console.");
+    console.error(err);
+
+    // 🎯 NOTIFIKASI SESUAI BACKEND
+    showToast(
+      err.body?.message || "❌ Absensi tidak tersimpan",
+      "warning"
+    );
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "Simpan Absensi"; }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Simpan Absensi";
+    }
   }
 }
+
 
 /* ======================================================
    SIMPAN ABSENSI PENGAJAR (FINAL FIXED VERSION)
 ====================================================== */
 async function simpanAbsensiPengajar() {
-  console.log("👉 simpanAbsensiPengajar() dipanggil");
+  const statusEl = document.getElementById("statusAbsensiPengajar");
+  const tanggalEl = document.getElementById("tanggalAbsensiPengajar");
 
-  const status = document.getElementById("statusAbsensiPengajar")?.value;
-  const kelasId = document.getElementById("kelasSelect")?.value;
-  const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
+  if (!statusEl || !tanggalEl) {
+    showToast("❌ Form absensi belum siap", "error");
+    return;
+  }
 
-  if (!status || !kelasId || !tanggal) {
-    showToast("⚠️ Lengkapi kelas, tanggal, dan status", "warning");
+  const status = statusEl.value;
+  const tanggal = tanggalEl.value;
+  const jadwal = window._jadwalUtama;
+
+  if (!jadwal || !jadwal.id_jadwal) {
+    showToast("⚠️ Jadwal tidak tersedia", "warning");
     return;
   }
 
   try {
-    // ================= GET JADWAL UTAMA =================
-    const jadwal = window._jadwalUtama;
-    if (!jadwal || !jadwal.id_jadwal) {
-      showToast("⚠️ Jadwal tidak ditemukan", "warning");
-      return;
-    }
-
-    // ================= POST ABSENSI =================
     await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
       method: "POST",
       headers: {
@@ -546,54 +612,86 @@ async function simpanAbsensiPengajar() {
       })
     });
 
-    showToast("✅ Absensi pengajar berhasil disimpan", "success");
+    showToast("✅ Absensi berhasil", "success");
 
   } catch (err) {
-    console.error("❌ Error simpan absensi pengajar:", err);
+    console.error(err);
 
-    // 🔥 INI YANG KAMU BUTUHKAN
-    if (
-      err.status === 400 &&
-      err.body?.message?.toLowerCase().includes("sudah")
-    ) {
-      showToast("⚠️ Anda sudah absen pada tanggal ini", "warning");
-    } else {
-      showToast("❌ Gagal menyimpan absensi pengajar", "error");
-    }
+    showToast(
+      err.body?.message || "❌ Gagal menyimpan absensi",
+      "error"
+    );
   }
 }
+
 
 /* ======================================================
    Riwayat absensi (GET /absensi/santri/kelas/me)
 ====================================================== */
+let riwayatAbsen = [];
+let riwayatAbsenMaster = [];
+
 async function loadRiwayatAbsensi() {
   try {
-    const data = await fetchJSON(`${BASE_URL}/absensi/santri/kelas/me`, {
+    const res = await fetchJSON(`${BASE_URL}/absensi/santri/kelas/me`, {
       headers: { Authorization: `Bearer ${getToken()}` }
     });
-    const list = Array.isArray(data) ? data : (data ? [data] : []);
-    renderRiwayatAbsensi(list);
+
+    const list = Array.isArray(res)
+      ? res
+      : Array.isArray(res?.data)
+        ? res.data
+        : [];
+
+    riwayatAbsenMaster = list;
+    riwayatAbsen = list;
+
+    renderRiwayatAbsensi(riwayatAbsen);
+
   } catch (err) {
     console.error("loadRiwayatAbsensi error:", err);
-    const tbody = document.getElementById("riwayatBody");
-    if (tbody) tbody.innerHTML = `<tr><td colspan="5">Gagal memuat riwayat. Cek console.</td></tr>`;
+    document.getElementById("riwayatBody").innerHTML =
+      `<tr><td colspan="6">Gagal memuat data</td></tr>`;
   }
 }
+
 
 function renderRiwayatAbsensi(list) {
   const tbody = document.getElementById("riwayatBody");
   if (!tbody) return;
+
   tbody.innerHTML = "";
+
   if (!Array.isArray(list) || list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5">Belum ada riwayat absensi.</td></tr>`;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center">
+          Belum ada riwayat absensi.
+        </td>
+      </tr>
+    `;
     return;
   }
+
   list.forEach((item, idx) => {
-    const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString("id-ID") : "-";
-    const jam = item.jam_mulai ? `${item.jam_mulai} - ${item.jam_selesai ?? "-"}` : "-";
+    const nama =
+      item.nama_santri ||
+      item.santri_nama ||
+      item.nama ||
+      "-";
+
+    const tanggal = item.tanggal
+      ? formatTanggalLocal(item.tanggal)
+      : "-";
+
+    const jam = item.jam_mulai
+      ? `${item.jam_mulai} - ${item.jam_selesai ?? "-"}`
+      : "-";
+
     tbody.innerHTML += `
       <tr>
         <td>${idx + 1}</td>
+        <td>${nama}</td>
         <td>${item.hari ?? "-"}, ${tanggal}</td>
         <td>${jam}</td>
         <td>${item.status_absensi ?? "-"}</td>
@@ -603,6 +701,92 @@ function renderRiwayatAbsensi(list) {
   });
 }
 
+document.getElementById("riwayatTanggal")?.addEventListener("change", (e) => {
+  const selectedDate = e.target.value; // YYYY-MM-DD
+
+  // 🔁 JIKA TANGGAL DIHAPUS → KEMBALIKAN DATA
+  if (!selectedDate) {
+    riwayatAbsen = [...riwayatAbsenMaster];
+    renderRiwayatAbsensi(riwayatAbsen);
+    return;
+  }
+
+  riwayatAbsen = riwayatAbsenMaster.filter(item => {
+    if (!item.tanggal) return false;
+    return item.tanggal.split("T")[0] === selectedDate;
+  });
+
+  renderRiwayatAbsensi(riwayatAbsen);
+});
+
+function formatTanggalLocal(tgl) {
+  if (!tgl) return "-";
+  const [y, m, d] = tgl.split("T")[0].split("-");
+  return `${d}/${m}/${y}`;
+}
+
+// ==========================================
+// EXPORT RIWAYAT ABSEN SANTRI KE EXCEL
+// ==========================================
+document.getElementById("eksporLaporan")?.addEventListener("click", () => {
+  if (!riwayatAbsen.length) {
+    alert("Data absensi kosong");
+    return;
+  }
+
+  // ===============================
+  // AMBIL NAMA KELAS (AMAN)
+  // ===============================
+  const kelasSelect = document.getElementById("riwayatKelasSelect");
+
+  let namaKelas =
+    kelasSelect?.selectedOptions?.[0]?.text ||
+    riwayatAbsen[0]?.nama_kelas ||
+    "Semua Kelas";
+
+  // ===============================
+  // FORMAT DATA EXCEL
+  // ===============================
+  const data = riwayatAbsen.map((r, i) => ({
+    No: i + 1,
+    Nama: r.nama_santri || r.nama || "-",
+    "Hari / Tanggal": `${r.hari ?? "-"}, ${formatTanggalLocal(r.tanggal)}`,
+    Jam: `${r.jam_mulai ?? "-"} - ${r.jam_selesai ?? "-"}`,
+    Kehadiran: r.status_absensi ?? "-",
+    Catatan: r.catatan ?? "-"
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+
+  // Lebar kolom rapi
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 25 },
+    { wch: 28 },
+    { wch: 18 },
+    { wch: 15 },
+    { wch: 35 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Riwayat Absensi");
+
+  // ===============================
+  // FORMAT NAMA FILE (AMAN)
+  // ===============================
+  const tanggal = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+  const safeKelas = namaKelas
+    .replace(/[^\w\s-]/g, "")   // hapus karakter aneh
+    .replace(/\s+/g, "_");      // spasi → _
+
+  const fileName = `Riwayat_Absensi_${safeKelas}_${tanggal}.xlsx`;
+
+  XLSX.writeFile(wb, fileName);
+});
+
+    
+    
 /* ======================================================
    DASHBOARD STATS (KELAS HARI INI & KEHADIRAN)
 ====================================================== */

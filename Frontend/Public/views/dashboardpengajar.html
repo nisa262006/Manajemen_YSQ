@@ -215,31 +215,7 @@
           
               <tbody id="absensiBody">
                 <tr>
-                  <td>1</td>
-                  <td>Siti Maryam</td>
-                  <td>
-                    <select class="status-select">
-                      <option>Hadir</option>
-                      <option>Izin</option>
-                      <option>Sakit</option>
-                      <option>Alpha</option>
-                    </select>
-                  </td>
-                  <td><input type="text" value="Kamis Izin" class="input-catatan"></td>
-                </tr>
-          
-                <tr>
-                  <td>2</td>
-                  <td>Aisyah</td>
-                  <td>
-                    <select class="status-select">
-                      <option>Hadir</option>
-                      <option>Izin</option>
-                      <option>Sakit</option>
-                      <option>Alpha</option>
-                    </select>
-                  </td>
-                  <td><input type="text" value="-" class="input-catatan"></td>
+                
                 </tr>
               </tbody>
             </table>
@@ -269,9 +245,18 @@
         </div>
 
         <table class="data-table">
-          <thead><tr><th>No</th><th>Hari/Tanggal</th><th>Jam</th><th>Kehadiran</th><th>Catatan</th></tr></thead>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Hari / Tanggal</th>
+              <th>Jam</th>
+              <th>Kehadiran</th>
+              <th>Catatan</th>
+            </tr>
+          </thead>
           <tbody id="riwayatBody"></tbody>
-        </table>
+        </table>        
 
         <div style="margin-top:18px; display:flex; justify-content:space-between;">
           <button id="btnKembali" class="btn-kembali">Kembali</button>
@@ -335,6 +320,7 @@
 
   
   <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="../js/pengajar.js"></script>
   <script type="module" src="../js/profileSetting.js"></script>
 </body>

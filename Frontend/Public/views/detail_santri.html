@@ -132,6 +132,37 @@
             </form>
     </div>
     
+    <div id="popup-profile-setting" class="modal-overlay">
+        <div class="profile-setting-content">
+            <button class="close-btn" id="btn-close-profil-x">
+                &times;
+            </button>
+            <div class="profile-avatar-large">R</div>
+            
+            <div class="profile-field-group">
+                <div>
+                    <label>Nama</label> :
+                    <input type="text" id="profile-name-input" class="profile-input" placeholder="" />
+                </div>
+                <div>
+                    <label>Email</label> :
+                    <input type="email" id="profile-email-input" class="profile-input" placeholder="" />
+                </div>
+                <div>
+                    <label>No. Telepon</label> :
+                    <input type="tel" id="profile-phone-input" class="profile-input" placeholder="" />
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+                <button type="button" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">
+                    Simpan
+                </button>
+                
+            </div>
+        </div>
+    </div>
     <div class="main-footer-actions">
         <a href="daftar_santri.html" class="action-btn-form back-btn">
             <i class="fas fa-arrow-left"></i> Kembali
@@ -140,5 +171,6 @@
             Simpan
         </button>
     </div>
+    <script type="module" src="../js/profileSetting.js"></script>
     <script type="module" src="../js/admin_data.js"></script>
 </main>
