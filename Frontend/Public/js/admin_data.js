@@ -295,7 +295,7 @@ if (window.location.pathname.toLowerCase().includes("detail_santri.html")) {
             formEl.kelas.value = s.kategori ?? "";
             formEl.username.value = s.username ?? "";
             formEl.email.value = s.user_email ?? s.email ?? "";
-            formEl.status.value = s.status ?? "aktif";
+            formEl.status.value = s.status || "nonaktif";
             formEl.tanggal_daftar.value = s.tanggal_terdaftar ? s.tanggal_terdaftar.split("T")[0] : "";
 
         } catch (err) {
@@ -320,21 +320,18 @@ if (window.location.pathname.toLowerCase().includes("detail_santri.html")) {
             user_email: formEl.email.value,
             tempat_lahir: formEl.tempat_lahir.value,
             tanggal_lahir: formEl.tanggal_lahir.value,
-            username: formEl.username.value
+            username: formEl.username.value,
+            status: formEl.status.value
         };
-
+    
         try {
             await apiPut(`/santri/${santriId}`, payload);
-
-            // Langsung pindah halaman tanpa notif
             window.location.href = "daftar_santri.html";
-
         } catch (err) {
             console.error("Gagal update santri:", err);
         }
     }
-
-    btnSaveBottom.addEventListener("click", saveSantri);
+    
 
     loadDetailSantri();
 }

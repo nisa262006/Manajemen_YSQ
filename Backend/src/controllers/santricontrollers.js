@@ -204,6 +204,8 @@ exports.updateSantri = async (req, res) => {
     }
 
     /* ==== UPDATE SANTRI ==== */
+    const finalStatus = status ?? oldData.status;
+
     await db.query(
       `
       UPDATE santri SET
@@ -224,11 +226,12 @@ exports.updateSantri = async (req, res) => {
         email,
         tempat_lahir,
         tanggal_lahir,
-        status,
+        finalStatus,
         alamat,
         id_santri
       ]
     );
+    
 
     res.json({
       message: "Santri berhasil diperbarui",

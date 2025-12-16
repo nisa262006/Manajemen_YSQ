@@ -38,6 +38,24 @@ function toast(msg, type = "success") {
     setTimeout(() => t.classList.remove("show"), 2500);
 }
 
+function renderCurrentDate() {
+    const dateEl = document.getElementById("current-date");
+    if (!dateEl) return;
+
+    const now = new Date();
+
+    const hari = now.toLocaleDateString("id-ID", { weekday: "long" });
+    const tanggal = now.getDate();
+    const bulan = now.toLocaleDateString("id-ID", { month: "long" });
+    const tahun = now.getFullYear();
+
+    dateEl.textContent = `${hari}, ${tanggal} ${bulan} ${tahun}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderCurrentDate();
+});
+
 // ============================
 // LOAD DASHBOARD DATA
 // ============================
