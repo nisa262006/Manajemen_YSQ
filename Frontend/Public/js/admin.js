@@ -246,21 +246,21 @@ if (document.body.classList.contains("page-tambah-kelas")) {
     //                       🔥 LOAD KELAS YSQ 🔥
     // ===============================================================
     const selectKelas = document.getElementById("id_kelas");
-    
+
     async function loadKelasYSQ() {
         try {
             const res = await apiGet("/kelas");
             const list = Array.isArray(res) ? res : [];
-    
-            renderDropdownKelas(list);
+
             window._allKelasYSQ = list;
-    
+            renderDropdownKelas(list);
+
         } catch (err) {
             console.error("Gagal load kelas:", err);
             selectKelas.innerHTML = `<option value="">Gagal memuat kelas</option>`;
         }
     }
-    
+
     function renderDropdownKelas(list) {
         selectKelas.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
         list.forEach(k => {
@@ -271,60 +271,64 @@ if (document.body.classList.contains("page-tambah-kelas")) {
             `;
         });
     }
-    
+
     loadKelasYSQ();
-    
-    
+
+
     // ===============================================================
-    //                       🔥 LOAD SANTRI YSQ 🔥
+    //                       🔥 LOAD SANTRI 🔥
     // ===============================================================
     const filterSelect = document.getElementById("kelas");
     const tableBody = document.querySelector(".data-table tbody");
     const selectAll = document.querySelector(".select-all-checkbox");
-    
+
     async function loadSantriKelas() {
         try {
             const res = await apiGet("/santri?page=1&limit=9999");
-            const list = res?.data ?? [];
-    
-            window._allSantri = list;
-            renderSantri("semua");
-    
+
+            // 🔥 RESET TOTAL (ANTI DATA NEMPEL)
+            window._allSantri = res?.data ?? [];
+
+            renderSantri(filterSelect.value || "semua");
+
         } catch (err) {
             console.error("Load Santri Error:", err);
         }
     }
-    
-    
+
+    loadSantriKelas();
+
+
     // ===============================================================
     //                🔥 RENDER SANTRI + FILTER 🔥
     // ===============================================================
     function renderSantri(filter) {
         tableBody.innerHTML = "";
-    
-        let list = window._allSantri || [];
-    
-        // ❗ FILTER STATUS AKTIF SAJA UNTUK TAMBAH KELAS
-        list = list.filter(s => s.status === "aktif");
-    
+
+        let list = window._allSantri
+            .filter(s => s.status === "aktif"); // 🔥 hanya aktif
+
         if (filter === "santri") list = list.filter(s => s.id_kelas != null);
         if (filter === "menunggu") list = list.filter(s => s.id_kelas == null);
-    
+
         if (list.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center">Tidak ada data.</td></tr>`;
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center">
+                        Tidak ada data.
+                    </td>
+                </tr>`;
             return;
         }
-    
+
         list.forEach(s => {
             const umur = s.tanggal_lahir
                 ? (new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear())
                 : "-";
-    
+
             tableBody.innerHTML += `
                 <tr data-id="${s.id_santri}">
-                    <td>
-                        <input type="checkbox" class="row-check">
-                    </td>
+                    <td><input type="checkbox" class="row-check"></td>
                     <td>${new Date().toLocaleDateString("id-ID")}</td>
                     <td>${s.nis}</td>
                     <td>${s.nama}</td>
@@ -332,88 +336,107 @@ if (document.body.classList.contains("page-tambah-kelas")) {
                     <td>
                         <span class="status-badge status-aktif">Aktif</span>
                     </td>
-                   <td>
-                    <span class="status-badge ${s.status === "aktif" ? "status-aktif" : "status-nonaktif"}">
-                        ${s.status}
-                    </span>
+                    <td>
+                        <span class="status-badge ${
+                            s.id_kelas ? "status-santri" : "status-menunggu"
+                        }">
+                            ${s.id_kelas ? "Santri" : "Menunggu"}
+                        </span>
                     </td>
                 </tr>
             `;
         });
-    }    
-    
-    // Event filter
+    }
+
     filterSelect.addEventListener("change", () => {
         renderSantri(filterSelect.value);
     });
-    
-    // Pilih semua checkbox
-    selectAll.addEventListener("change", function () {
-        const all = document.querySelectorAll(".row-check");
-        all.forEach(cb => cb.checked = selectAll.checked);
+
+    selectAll.addEventListener("change", () => {
+        document.querySelectorAll(".row-check")
+            .forEach(cb => cb.checked = selectAll.checked);
     });
-    
-    loadSantriKelas();
-    
-    
+
+
     // ===============================================================
-    //               🔥 VALIDASI KAPASITAS KELAS 🔥
+    //               🔥 VALIDASI KAPASITAS 🔥
     // ===============================================================
     function isKelasPenuh(idKelas, jumlahTambahan) {
         const kelas = window._allKelasYSQ.find(k => k.id_kelas == idKelas);
         if (!kelas) return false;
-    
-        const santriDiKelas = window._allSantri.filter(
+
+        const terisi = window._allSantri.filter(
             s => s.id_kelas == idKelas && s.status === "aktif"
         ).length;
-    
-        return (santriDiKelas + jumlahTambahan) > kelas.kapasitas;
-    }    
-    
+
+        return (terisi + jumlahTambahan) > kelas.kapasitas;
+    }
+
+
     // ===============================================================
-    //           🔥 SIMPAN SANTRI KE DALAM KELAS PILIHAN 🔥
+    //           🔥 SIMPAN / PINDAH SANTRI KE KELAS 🔥
     // ===============================================================
-    document.getElementById("btn-simpan-kelas-selection").addEventListener("click", async () => {
+    document.getElementById("btn-simpan-kelas-selection")
+        .addEventListener("click", async () => {
+
         try {
             const idKelas = selectKelas.value;
-    
+
             if (!idKelas) {
                 showNotification("Pilih kelas terlebih dahulu!", "error");
                 return;
             }
-    
+
             const checked = [...document.querySelectorAll(".row-check:checked")];
             if (checked.length === 0) {
                 showNotification("Pilih minimal satu santri!", "error");
                 return;
             }
-    
-            // VALIDASI KAPASITAS
+
             if (isKelasPenuh(idKelas, checked.length)) {
-                showNotification("Kelas penuh! Tidak bisa menambahkan santri.", "error");
+                showNotification("Kelas penuh!", "error");
                 return;
             }
-    
-            // Kirim satu per satu
+
+            // 🔥 PINDAH KELAS (BUKAN TAMBAH)
             for (let cb of checked) {
-                const idSantri = cb.closest("tr").getAttribute("data-id");
-    
-                await apiPost(`/kelas/${idKelas}/santri`, {
-                    id_santri: Number(idSantri)
-                });
-            }
-    
-            showNotification("Santri berhasil ditambahkan ke kelas!", "success");
-    
-            loadSantriKelas();   // Refresh tabel
-    
+                const idSantri = Number(cb.closest("tr").dataset.id);
+              
+                const santri = window._allSantri.find(
+                  s => s.id_santri === idSantri
+                );
+              
+                // 🔥 JIKA SUDAH ADA KELAS → PINDAH
+                if (santri?.id_kelas) {
+                  await apiPut(`/kelas/pindah/${idSantri}`, {
+                    id_kelas_baru: Number(idKelas)
+                  });
+                } 
+                // 🔥 JIKA BELUM → TAMBAH
+                else {
+                  await apiPost(`/kelas/${idKelas}/santri`, {
+                    id_santri: idSantri
+                  });
+                }
+              }
+              
+            showNotification("Santri berhasil dipindahkan ke kelas", "success");
+
+            // 🔥 WAJIB reload ulang
+            await loadSantriKelas();
+            await loadKelasYSQ();
+
         } catch (err) {
             console.error(err);
-            showNotification("Gagal menyimpan data.", "error");
+            showNotification(
+                err.response?.data?.message || "Gagal memproses data",
+                "error"
+            );
         }
     });
-    
-    } // END IF PAGE
+
+} // END PAGE
+
     
 
 // ====================================================================

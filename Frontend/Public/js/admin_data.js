@@ -235,7 +235,20 @@ if (window.location.pathname.includes("daftar_santri.html")) {
     // INIT
     // ==========================================
     loadKelas();
-    loadSantri();
+
+    if (sessionStorage.getItem("reloadSantri")) {
+        sessionStorage.removeItem("reloadSantri");
+
+        // 🔥 RESET FILTER BIAR GA KOSONG
+        kategoriSelect.value = "";
+        kelasSelect.value = "";
+        searchInput.value = "";
+
+        loadSantri();
+    } else {
+        loadSantri();
+}
+
 }
 
 /* ============================================================
@@ -330,10 +343,13 @@ if (window.location.pathname.toLowerCase().includes("detail_santri.html")) {
         console.log("PAYLOAD UPDATE SANTRI:", payload);
       
         try {
-          await apiPut(`/santri/${santriId}`, payload);
-      
-          alert("✅ Data santri berhasil diperbarui");
-          window.location.href = "daftar_santri.html";
+            await apiPut(`/santri/${santriId}`, payload);
+
+            // 🔥 TANDAI PERLU RELOAD
+            sessionStorage.setItem("reloadSantri", "true");
+            
+            alert("✅ Data santri berhasil diperbarui");
+            window.location.href = "daftar_santri.html";            
       
         } catch (err) {
           console.error("Gagal update santri:", err);
