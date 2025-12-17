@@ -1,248 +1,363 @@
 import { apiGet } from "./apiService.js";
 
-const tableBody = document.getElementById("table-riwayat-body");
-
-const sumHadir = document.getElementById("sum_hadir");
-const sumIzin = document.getElementById("sum_izin");
-const sumSakit = document.getElementById("sum_sakit");
-
-const pilihPengajar = document.getElementById("pilih_pengajar");
-const startDate = document.getElementById("start-date");
-const endDate = document.getElementById("end-date");
-
-let allAbsensi = [];
-
-
-function renderCurrentDate() {
-    const dateEl = document.getElementById("current-date");
-    if (!dateEl) return;
-
-    const now = new Date();
-
-    const hari = now.toLocaleDateString("id-ID", { weekday: "long" });
-    const tanggal = now.getDate();
-    const bulan = now.toLocaleDateString("id-ID", { month: "long" });
-    const tahun = now.getFullYear();
-
-    dateEl.textContent = `${hari}, ${tanggal} ${bulan} ${tahun}`;
+/* =====================================
+   HELPER
+===================================== */
+function qs(id) {
+  return document.getElementById(id);
 }
 
-/* ============================================================
-   1. LOAD PENGAJAR DROPDOWN
-============================================================ */
-async function loadDropdownPengajar() {
-    try {
-        const res = await apiGet("/pengajar");
-        const list = res?.data ?? [];
-
-        pilihPengajar.innerHTML = `<option value="">Semua Pengajar</option>`;
-        list.forEach(p => {
-            pilihPengajar.innerHTML += `
-                <option value="${p.id_pengajar}">
-                    ${p.nama}
-                </option>
-            `;
-        });
-
-    } catch (err) {
-        console.error("Load Pengajar Error:", err);
+// ==============================
+// SWITCH TAB (REDIRECT HALAMAN)
+// ==============================
+window.switchTab = function (target) {
+    if (target === "pengajar") {
+      window.location.href = "riwayat_absensi.html";
     }
-}
+    if (target === "santri") {
+      window.location.href = "riwayat_absensi_santri.html";
+    }
+  };
+  
+/* =====================================
+   DETEKSI HALAMAN
+===================================== */
+const isPengajarPage = !!qs("select-data");
+const isSantriPage   = !!qs("pilih_kelas");
 
-/* ============================================================
-   2. SET DEFAULT FILTER (1 BULAN TERAKHIR)
-============================================================ */
-function setDefaultDateFilter() {
+/* =========================================================
+   ================= ABSENSI PENGAJAR ======================
+========================================================= */
+if (isPengajarPage) {
+  const tableBody = qs("table-body");
+  const sumHadir = qs("sum-hadir");
+  const sumIzin = qs("sum-izin");
+  const sumSakit = qs("sum-dynamic");
+  const sumAlfa = qs("sum-alfa");
+
+  const pilihPengajar = qs("select-data");
+  const startDate = document.querySelectorAll('input[type="date"]')[0];
+  const endDate = document.querySelectorAll('input[type="date"]')[1];
+  const btnExport = qs("btn-export-absensi");
+
+  let allAbsensi = [];
+  let filteredAbsensi = [];
+
+  function setDefaultDatePengajar() {
+    if (startDate.value || endDate.value) return;
     const today = new Date();
     const past = new Date();
     past.setMonth(today.getMonth() - 1);
-
     startDate.value = past.toISOString().split("T")[0];
     endDate.value = today.toISOString().split("T")[0];
-}
+  }
 
-/* ============================================================
-   3. LOAD DATA ABSENSI
-============================================================ */
-async function loadAbsensiPengajar() {
-    try {
-        const res = await apiGet("/absensi/pengajar/all");
-        allAbsensi = Array.isArray(res) ? res : res.data ?? [];
-
-        setDefaultDateFilter();
-        applyFilters();
-
-    } catch (err) {
-        console.error("Load Absensi Error:", err);
-    }
-}
-
-/* ============================================================
-   4. TABEL ABSENSI
-============================================================ */
-function renderTable(list) {
-    tableBody.innerHTML = "";
-
-    if (!list.length) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="4" style="text-align:center;">Tidak ada data</td>
-            </tr>
-        `;
-        return;
-    }
-
-    list.forEach(item => {
-        tableBody.innerHTML += `
-            <tr>
-                <td>${new Date(item.tanggal).toLocaleDateString("id-ID")}</td>
-                <td>${item.nama_kelas ?? "-"}</td>
-                <td>${item.status_absensi}</td>
-                <td>${item.catatan || ""}</td>
-            </tr>
-        `;
+  async function loadDropdownPengajar() {
+    const res = await apiGet("/pengajar");
+    const list = Array.isArray(res) ? res : res.data ?? [];
+    pilihPengajar.innerHTML = `<option value="">Semua Pengajar</option>`;
+    list.forEach(p => {
+      pilihPengajar.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
     });
-}
+  }
 
-/* ============================================================
-   5. RINGKASAN
-============================================================ */
-function renderSummary(list) {
+  async function loadAbsensiPengajar() {
+    const res = await apiGet("/absensi/pengajar/all");
+    allAbsensi = Array.isArray(res) ? res : res.data ?? [];
+    setDefaultDatePengajar();
+    applyFilterPengajar();
+  }
+
+  function applyFilterPengajar() {
+    let data = [...allAbsensi];
+    const pid = pilihPengajar.value ? Number(pilihPengajar.value) : null;
+    const start = startDate.value ? new Date(startDate.value) : null;
+    const end = endDate.value ? new Date(endDate.value + "T23:59:59") : null;
+
+    if (pid) data = data.filter(a => Number(a.id_pengajar) === pid);
+    if (start) data = data.filter(a => new Date(a.tanggal) >= start);
+    if (end) data = data.filter(a => new Date(a.tanggal) <= end);
+
+    filteredAbsensi = data;
+    renderTablePengajar(data);
+    renderSummaryPengajar(data);
+  }
+
+  function renderTablePengajar(list) {
+    tableBody.innerHTML = "";
+    if (!list.length) {
+      tableBody.innerHTML = `<tr><td colspan="4" align="center">Tidak ada data</td></tr>`;
+      return;
+    }
+    list.forEach(a => {
+      tableBody.innerHTML += `
+        <tr>
+          <td>${new Date(a.tanggal).toLocaleDateString("id-ID")}</td>
+          <td>${a.nama_kelas ?? "-"}</td>
+          <td>${a.status_absensi}</td>
+          <td>${a.catatan ?? "-"}</td>
+        </tr>`;
+    });
+  }
+
+  function renderSummaryPengajar(list) {
     sumHadir.textContent = list.filter(a => a.status_absensi === "Hadir").length;
     sumIzin.textContent = list.filter(a => a.status_absensi === "Izin").length;
     sumSakit.textContent = list.filter(a => a.status_absensi === "Sakit").length;
-}
+    sumAlfa.textContent = list.filter(a => a.status_absensi === "Tidak Hadir").length;
+  }
 
-/* ============================================================
-   6. FILTER
-============================================================ */
-function applyFilters() {
-    let filtered = [...allAbsensi];
+  function exportPengajarExcel() {
+    if (!filteredAbsensi.length) return alert("Data kosong");
 
-    const pengajarID = pilihPengajar.value ? Number(pilihPengajar.value) : null;
-
-    const start = startDate.value ? new Date(startDate.value + "T00:00:00") : null;
-    const end = endDate.value ? new Date(endDate.value + "T23:59:59") : null;
-
-    if (pengajarID) {
-        filtered = filtered.filter(a => Number(a.id_pengajar) === pengajarID);
-    }
-
-    if (start) {
-        filtered = filtered.filter(a => new Date(a.tanggal) >= start);
-    }
-
-    if (end) {
-        filtered = filtered.filter(a => new Date(a.tanggal) <= end);
-    }
-
-    renderTable(filtered);
-    renderSummary(filtered);
-}
-
-/* ============================================================
-   EKSPOR ABSENSI PENGAJAR KE EXCEL
-============================================================ */
-function exportAbsensiPengajarExcel() {
-
-    if (!allAbsensi.length) {
-        alert("Tidak ada data absensi untuk diekspor!");
-        return;
-    }
-
-    // --- FILTER DATA SESUAI PILIHAN USER ---
-    let filtered = [...allAbsensi];
-    const pengajarID = pilihPengajar.value ? Number(pilihPengajar.value) : null;
-
-    const start = startDate.value ? new Date(startDate.value + "T00:00:00") : null;
-    const end = endDate.value ? new Date(endDate.value + "T23:59:59") : null;
-
-    if (pengajarID) {
-        filtered = filtered.filter(a => Number(a.id_pengajar) === pengajarID);
-    }
-    if (start) {
-        filtered = filtered.filter(a => new Date(a.tanggal) >= start);
-    }
-    if (end) {
-        filtered = filtered.filter(a => new Date(a.tanggal) <= end);
-    }
-
-    if (!filtered.length) {
-        alert("Tidak ada data sesuai filter!");
-        return;
-    }
-
-    // --- RINGKASAN ---
-    const totalHadir = filtered.filter(a => a.status_absensi === "Hadir").length;
-    const totalIzin = filtered.filter(a => a.status_absensi === "Izin").length;
-    const totalTidakHadir = filtered.filter(a => a.status_absensi === "Sakit" || a.status_absensi === "Tidak Hadir").length;
-
-    // --- DATA UTAMA ---
-    const exportData = filtered.map((a, i) => ({
-        No: i + 1,
-        Tanggal: new Date(a.tanggal).toLocaleDateString("id-ID"),
-        Pengajar: a.nama_pengajar,
-        Email: a.email_pengajar ?? "-",
-        Status: a.status_absensi,
-        Catatan: a.catatan ?? "-",
-    }));
-
-    const ws = XLSX.utils.json_to_sheet([]);
-
-    // --- TULIS RINGKASAN DI EXCEL ---
-    XLSX.utils.sheet_add_aoa(ws, [
-        ["RINGKASAN ABSENSI PENGAJAR"],
-        [""],
-        ["Hadir", totalHadir],
-        ["Izin", totalIzin],
-        ["Tidak Hadir", totalTidakHadir],
-        [""],
-        ["DATA ABSENSI"]
-    ], { origin: "A1" });
-
-    // --- TULIS DATA TABEL ABSENSI MULAI BARIS 8 ---
-    XLSX.utils.sheet_add_json(ws, exportData, {
-        origin: "A8",
-        skipHeader: false
+    let hadir = 0, izin = 0, sakit = 0, alfa = 0;
+    filteredAbsensi.forEach(a => {
+      if (a.status_absensi === "Hadir") hadir++;
+      else if (a.status_absensi === "Izin") izin++;
+      else if (a.status_absensi === "Sakit") sakit++;
+      else alfa++;
     });
 
-    // --- ATUR LEBAR KOLOM ---
-    ws["!cols"] = [
-        { wch: 5 },   // No
-        { wch: 15 },  // Tanggal
-        { wch: 20 },  // Pengajar
-        { wch: 25 },  // Email
-        { wch: 12 },  // Status
-        { wch: 35 },  // Catatan
-    ];
+    const rows = filteredAbsensi.map((a, i) => ({
+      No: i + 1,
+      Tanggal: new Date(a.tanggal).toLocaleDateString("id-ID"),
+      Kelas: a.nama_kelas ?? "-",
+      Status: a.status_absensi,
+      Catatan: a.catatan ?? "-"
+    }));
 
-    // --- BUAT FILE EXCEL ---
+    const sheet = XLSX.utils.aoa_to_sheet([
+      ["LAPORAN ABSENSI PENGAJAR"],
+      [],
+      ["Hadir", hadir],
+      ["Izin", izin],
+      ["Sakit", sakit],
+      ["Tidak Hadir", alfa],
+      [],
+      Object.keys(rows[0]),
+      ...rows.map(r => Object.values(r))
+    ]);
+
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Absensi Pengajar");
+    XLSX.utils.book_append_sheet(wb, sheet, "Absensi");
+    XLSX.writeFile(wb, `Absensi_Pengajar_${startDate.value}_${endDate.value}.xlsx`);
+  }
 
-    const bulan = new Date().toLocaleString("id-ID", { month: "long" });
-    const tahun = new Date().getFullYear();
+  startDate.addEventListener("change", applyFilterPengajar);
+  endDate.addEventListener("change", applyFilterPengajar);
+  pilihPengajar.addEventListener("change", applyFilterPengajar);
+  btnExport.addEventListener("click", exportPengajarExcel);
 
-    XLSX.writeFile(wb, `Riwayat_Absensi_Pengajar_${bulan}_${tahun}.xlsx`);
+  loadDropdownPengajar();
+  loadAbsensiPengajar();
 }
 
-document.getElementById("btn-export-absensi")
-    .addEventListener("click", exportAbsensiPengajarExcel);
+/* =========================================================
+   ================= ABSENSI SANTRI ========================
+========================================================= */
+if (isSantriPage) {
+    let allSantri = [];
 
-/* ============================================================
-   7. EVENT LISTENER
-============================================================ */
-startDate.addEventListener("change", applyFilters);
-endDate.addEventListener("change", applyFilters);
-pilihPengajar.addEventListener("change", applyFilters);
-
-/* ============================================================
-   8. INIT PAGE
-============================================================ */
-loadDropdownPengajar();
-loadAbsensiPengajar();
-renderCurrentDate();
-
+    const startDate = document.querySelectorAll('input[type="date"]')[0];
+    const endDate   = document.querySelectorAll('input[type="date"]')[1];
+  
+    const pilihKelas  = qs("pilih_kelas");
+    const pilihSantri = qs("pilih_santri");
+  
+    const tableBody = qs("table-body");
+  
+    const sumHadir   = qs("sum-hadir");
+    const sumIzin    = qs("sum-izin");
+    const sumDynamic = qs("sum-dynamic"); // Mustami’ah
+    const sumAlfa    = qs("sum-alfa");
+  
+    const btnExport = qs("btn-export-absensi-siswa");
+  
+    let allAbsensi = [];
+    let filteredAbsensi = [];
+  
+    /* ===== DEFAULT DATE ===== */
+    function setDefaultDate() {
+      if (startDate.value || endDate.value) return;
+  
+      const today = new Date();
+      const past = new Date();
+      past.setMonth(today.getMonth() - 1);
+  
+      startDate.value = past.toISOString().split("T")[0];
+      endDate.value   = today.toISOString().split("T")[0];
+    }
+  
+    /* ===== LOAD DATA ===== */
+    async function loadAbsensiSantri() {
+      const res = await apiGet("/absensi/santri/all");
+      allAbsensi = Array.isArray(res) ? res : res.data ?? [];
+      setDefaultDate();
+      applyFilter();
+    }
+    btnExport.addEventListener("click", exportSantriExcel);
+  
+    async function loadDropdownKelas() {
+      const res = await apiGet("/kelas");
+      const list = res?.data ?? res ?? [];
+      pilihKelas.innerHTML = `<option value="">Semua Kelas</option>`;
+      list.forEach(k => {
+        pilihKelas.innerHTML += `<option value="${k.nama_kelas}">${k.nama_kelas}</option>`;
+      });
+    }
+  
+    async function loadDropdownSantri() {
+        const res = await apiGet("/santri?limit=9999");
+        allSantri = res?.data ?? res ?? [];
+        renderSantriDropdown(); // tampilkan awal
+      }
+      
+      
+      function renderSantriDropdown() {
+        const kelasDipilih = pilihKelas.value;
+      
+        // Filter santri aktif
+        let santriAktif = allSantri.filter(s => s.status === "aktif");
+      
+        // Jika kelas dipilih → filter berdasarkan kelas
+        if (kelasDipilih) {
+          santriAktif = santriAktif.filter(
+            s => s.nama_kelas === kelasDipilih
+          );
+        }
+      
+        pilihSantri.innerHTML = `<option value="">Semua Santri</option>`;
+      
+        santriAktif.forEach(s => {
+          pilihSantri.innerHTML += `
+            <option value="${s.nama}">${s.nama}</option>
+          `;
+        });
+      }      
+         
+      
+      pilihKelas.addEventListener("change", () => {
+        renderSantriDropdown(); // update dropdown santri
+        applyFilter();          // update tabel
+      });
+  
+    /* ===== FILTER ===== */
+    function applyFilter() {
+      let data = [...allAbsensi];
+  
+      if (pilihKelas.value) {
+        data = data.filter(a => a.nama_kelas === pilihKelas.value);
+      }
+  
+      if (pilihSantri.value) {
+        data = data.filter(a => a.nama_santri === pilihSantri.value);
+      }
+  
+      if (startDate.value) {
+        data = data.filter(a => new Date(a.tanggal) >= new Date(startDate.value));
+      }
+  
+      if (endDate.value) {
+        data = data.filter(a => new Date(a.tanggal) <= new Date(endDate.value + "T23:59:59"));
+      }
+  
+      filteredAbsensi = data;
+      renderTable(data);
+      renderSummary(data);
+    }
+  
+    /* ===== RENDER TABLE ===== */
+    function renderTable(list) {
+      tableBody.innerHTML = "";
+  
+      if (!list.length) {
+        tableBody.innerHTML = `<tr><td colspan="5" align="center">Tidak ada data</td></tr>`;
+        return;
+      }
+  
+      list.forEach(a => {
+        tableBody.innerHTML += `
+          <tr>
+            <td>${new Date(a.tanggal).toLocaleDateString("id-ID")}</td>
+            <td>${a.nama_santri}</td>
+            <td>${a.nama_kelas}</td>
+            <td>${a.status_absensi}</td>
+            <td>${a.catatan ?? "-"}</td>
+          </tr>
+        `;
+      });
+    }
+  
+    /* ===== SUMMARY ===== */
+    function renderSummary(list) {
+      sumHadir.textContent   = list.filter(a => a.status_absensi === "Hadir").length;
+      sumIzin.textContent    = list.filter(a => a.status_absensi === "Izin").length;
+      sumDynamic.textContent = list.filter(a => a.status_absensi === "Mustamiah").length;
+      sumAlfa.textContent    = list.filter(a => a.status_absensi === "Alfa").length;
+    }
+  
+    /* ===== EXPORT ===== */
+    function exportSantriExcel() {
+        if (!filteredAbsensi.length) {
+          alert("Data kosong");
+          return;
+        }
+      
+        let hadir = 0, izin = 0, mustamiah = 0, alfa = 0;
+      
+        filteredAbsensi.forEach(a => {
+          if (a.status_absensi === "Hadir") hadir++;
+          else if (a.status_absensi === "Izin") izin++;
+          else if (a.status_absensi === "Mustamiah") mustamiah++;
+          else alfa++;
+        });
+      
+        const rows = filteredAbsensi.map((a, i) => ({
+          No: i + 1,
+          Tanggal: new Date(a.tanggal).toLocaleDateString("id-ID"),
+          "Nama Santri": a.nama_santri,
+          Kelas: a.nama_kelas ?? "-",
+          Status: a.status_absensi,
+          Catatan: a.catatan ?? "-"
+        }));
+      
+        const sheet = XLSX.utils.aoa_to_sheet([
+          ["LAPORAN ABSENSI SANTRI"],
+          [],
+          ["Hadir", hadir],
+          ["Izin", izin],
+          ["Mustamiah", mustamiah],
+          ["Alfa", alfa],
+          [],
+          Object.keys(rows[0]),
+          ...rows.map(r => Object.values(r))
+        ]);
+      
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, sheet, "Absensi Santri");
+      
+        const start = startDate.value || "awal";
+        const end   = endDate.value || "akhir";
+      
+        XLSX.writeFile(
+          wb,
+          `Absensi_Santri_${start}_${end}.xlsx`
+        );
+      }
+      
+  
+    /* ===== EVENT ===== */
+    startDate.addEventListener("change", applyFilter);
+    endDate.addEventListener("change", applyFilter);
+    pilihKelas.addEventListener("change", applyFilter);
+    pilihSantri.addEventListener("change", applyFilter);
+    btnExport.addEventListener("click", exportSantriExcel);
+    
+    loadDropdownKelas();
+    loadDropdownSantri();
+    loadAbsensiSantri();
+}    
+  
 
 // ===================================================
 // BAGIAN 1: DEFINISI FUNGSI GLOBAL (TOAST)
@@ -268,6 +383,74 @@ function showToast(message, type) {
     }, 3000); 
 }
 
+/* ===================================================
+        TAB ABSENSI (PENGAJAR / SANTRI)
+=================================================== */
+function switchTab(type) {
+    const btnPengajar = document.getElementById("btn-pengajar");
+    const btnSantri   = document.getElementById("btn-santri");
+    
+    // Elemen Label dan Select
+    const labelPilih   = document.getElementById("label-pilih");
+    const selectData   = document.getElementById("select-data");
+    
+    // Elemen Summary
+    const labelDynamic = document.getElementById("label-dynamic");
+    const labelAlfa    = document.getElementById("label-alfa");
+    
+    // Elemen Tabel
+    const tableHeader  = document.querySelector(".table-wrapper thead tr");
+
+    if (type === "pengajar") {
+        btnPengajar.classList.add("active");
+        btnSantri.classList.remove("active");
+
+        // Perubahan Teks Label & Dropdown
+        if (labelPilih) labelPilih.innerText = "Pilih Pengajar :";
+        if (selectData) {
+            selectData.innerHTML = '<option value="">Semua Pengajar</option>';
+        }
+
+        // Perubahan Summary
+        if (labelDynamic) labelDynamic.innerText = "Sakit";
+        if (labelAlfa) labelAlfa.innerText = "Tidak Hadir";
+
+        // Update Kolom Tabel
+        if (tableHeader) {
+            tableHeader.innerHTML = `
+                <th>Tanggal</th>
+                <th>Kelas</th>
+                <th>Status</th>
+                <th>Catatan</th>
+            `;
+        }
+
+    } else {
+        btnSantri.classList.add("active");
+        btnPengajar.classList.remove("active");
+
+        // PERUBAHAN UTAMA: Nama Santri
+        if (labelPilih) labelPilih.innerText = "Nama Santri :";
+        if (selectData) {
+            selectData.innerHTML = '<option value="">Semua Santri</option>';
+        }
+
+        // Perubahan Summary
+        if (labelDynamic) labelDynamic.innerText = "Mustamiah";
+        if (labelAlfa) labelAlfa.innerText = "Alfa";
+
+        // Update Kolom Tabel (Tambah kolom Nama Santri)
+        if (tableHeader) {
+            tableHeader.innerHTML = `
+                <th>Tanggal</th>
+                <th>Nama Santri</th>
+                <th>Kelas</th>
+                <th>Status</th>
+                <th>Catatan</th>
+            `;
+        }
+    }
+}
 
 // ===================================================
 // BAGIAN 2: LOGIKA UTAMA (POPUP SETTING PROFIL, FILTER, DLL)

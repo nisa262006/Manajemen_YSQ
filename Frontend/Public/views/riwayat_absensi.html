@@ -36,108 +36,106 @@
             </div>
         </aside>
         <main class="main-content">
-            <header class="dashboard-header class-header-style">
-                <h1 class="header-title">Riwayat Absensi Pengajar</h1>
-                <div class="admin-profile">
-                    <span id="current-date" class="admin-text"></span>
-                </div>
-            </header>
+            <!-- HEADER -->
+    <div class="riwayat-header">
+        <h1>Riwayat Absensi Pengajar</h1>
+        <div class="absensi-tabs">
+            <button id="btn-pengajar"
+                class="tab-btn active"
+                onclick="switchTab('pengajar')">
+                Absensi Pengajar
+            </button>
+
+            <button id="btn-santri"
+                class="tab-btn"
+                onclick="switchTab('santri')">
+                Absensi Santri
+            </button>
+        </div>
+    </div>
+
+    <div class="red-divider"></div>
+    <!-- SUMMARY ABSENSI -->
+<div class="attendance-summary">
+    <div class="summary-card card-hadir">
+        <div class="summary-value" id="sum-hadir">0</div>
+        <div class="summary-label">Hadir</div>
+    </div>
+
+    <div class="summary-card card-izin">
+        <div class="summary-value" id="sum-izin">0</div>
+        <div class="summary-label">Izin</div>
+    </div>
+
+    <div class="summary-card card-dynamic">
+        <div class="summary-value" id="sum-dynamic">0</div>
+        <div class="summary-label" id="label-dynamic">Sakit</div>
+    </div>
+
+    <div class="summary-card card-alfa">
+        <div class="summary-value" id="sum-alfa">0</div>
+        <div class="summary-label">Tidak Hadir</div>
+    </div>
+</div>
+
+
+    <!-- FILTER -->
+   <div class="attendance-filter-horizontal">
+
+    <div class="filter-item">
+        <span>Start Date :</span>
+        <input type="date">
+    </div>
+
+    <div class="filter-item">
+        <span>End Date :</span>
+        <input type="date">
+    </div>
+
+
+    <div class="filter-item">
+    <span id="label-pilih">Pilih Pengajar :</span>
+    
+    <select id="select-data">
+        <option value="">Semua Pengajar</option>
+    </select>
+</div>
+
+    <button class="export-report-btn" id="btn-export-absensi">
+    <i class="fas fa-file-export"></i> <span>Ekspor Laporan</span>
+    </button>
+</div>
+    <!-- TABLE -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Kelas</th>
+                    <th>Status</th>
+                    <th>Catatan</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
             
-            <!-- ============================
-                RINGKASAN ABSENSI PENGAJAR
-            =============================== -->
-            <section class="absensi-summary-section">
-                <div class="absensi-summary-wrapper">
-
-                    <div class="absensi-summary-card">
-                        <div class="summary-value" id="sum_hadir">0</div>
-                        <div class="summary-label">Hadir</div>
-                    </div>
-
-                    <div class="absensi-summary-card">
-                        <div class="summary-value" id="sum_izin">0</div>
-                        <div class="summary-label">Izin</div>
-                    </div>
-
-                    <div class="absensi-summary-card">
-                        <div class="summary-value" id="sum_sakit">0</div>
-                        <div class="summary-label">tidak hadir</div>
-                    </div>
-
-                </div>
-            </section>
-            
-            <!-- ============================
-                FILTER + EKSPORT LAPORAN
-            =============================== -->
-            <section class="absensi-controls-section">
-                <div class="absensi-controls-card">
-
-                    <div class="absensi-filters-group">
-
-                        <div class="absensi-filters-group">
-
-                            <div class="filter-box">
-                                <label for="start-date">Start Date:</label>
-                                <input type="date" id="start-date">
-                            </div>
-                        
-                            <div class="filter-box">
-                                <label for="end-date">End Date:</label>
-                                <input type="date" id="end-date">
-                            </div>
-                        
-                            <div class="filter-box">
-                                <label for="pilih_pengajar">Pilih Pengajar:</label>
-                                <select id="pilih_pengajar">
-                                    <option value="">Semua Pengajar</option>
-                                </select>
-                            </div>
-                        
-                        </div>
-                        
-                        <button class="action-btn-form export-report-btn" id="btn-export-absensi">
-                            <i class="fas fa-file-export"></i> Ekspor Laporan
-                        </button>                        
-                </div>
-            </section>
-
-            <!-- ============================
-                TABEL RIWAYAT ABSENSI
-            =============================== -->
-            <section class="absensi-table-section">
-                <div class="pendaftar-table"> 
-                    <table class="absensi-summary-table">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Kelas</th>
-                                <th>Status</th>
-                                <th>Catatan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-riwayat-body">
-                            <!-- Diisi oleh JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
+            </tbody>
+        </table>
+    </div>
             <div class="absensi-footer-actions">
                 <a href="Admin.html" class="action-btn-form back-btn-absensi">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </div>
-            </main>
+        </main>
+
     </div>
-    </div>
-    <div id="notification-toast" class="toast-notification"></div>
+        <div id="notification-toast" class="toast-notification"></div>
 <div id="popup-profile-setting" class="modal-overlay">
     <div class="profile-setting-content">
         <button class="close-btn" id="btn-close-profil-x">
             &times;
         </button>
-        <div class="profile-avatar-large">R</div>
+        <div class="profile-avatar-large">A</div>
         
         <div class="profile-field-group">
             <div>
@@ -162,7 +160,7 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script type="module" src="../js/admin_laporan.js"></script>
 <script type="module" src="../js/profileSetting.js"></script>
 </body>

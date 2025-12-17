@@ -1745,58 +1745,42 @@ class-list-table th:last-child{
 /* --- STYLE KHUSUS RIWAYAT ABSENSI --- */
 /* ========================================================== */
 
-/* Kontainer Utama Filter & Export */
-.absensi-controls-section {
-    margin-bottom: 25px;
+/* SUMMARY CARD (HADIR, IZIN, SAKIT, TIDAK HADIR) */
+/* Layout Utama Summary */
+.attendance-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Kunci 4 Kolom Sejajar */
+    gap: 20px;
+    margin: 24px 0;
 }
 
-/* ======================================================= */
-/* FILTER BAR - RAPIH, KOMPAK, SEJAJAR */
-/* ======================================================= */
-
-.absensi-controls-card {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: var(--color-form-bg);
-    padding: 15px 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    flex-wrap: wrap;
-    gap: 15px;
-    position: relative;  /* penting untuk tombol di kanan */
+.summary-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-/* Grup semua filter kiri */
-.absensi-filters-group {
-    display: flex;
-    gap: 15px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-}
+/* Warna-Warna Indikator */
+.card-hadir { border-bottom: 5px solid #28a745; }
+.card-hadir .summary-value { color: #28a745; }
 
-/* Satu kotak filter */
-.filter-box {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 170px;     /* <= Perkecil ukuran kolom */
-}
+/* 2. IZIN - KUNING */
+.card-izin { border-bottom: 5px solid #ffc107; }
+.card-izin .summary-value { color: #ffc107; }
 
-/* Label */
-.filter-box label {
-    font-size: 0.85rem;
-    font-weight: 600;
-}
+/* 3. SAKIT / MUSTAMIAH - BIRU/TEAL */
+.card-dynamic { border-bottom: 5px solid #17a2b8; }
+.card-dynamic .summary-value { color: #17a2b8; }
 
-/* Input & Select */
-.filter-box input,
-.filter-box select {
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    border-radius: 6px;
-    background: white;
+/* 4. TIDAK HADIR - MERAH */
+.card-alfa { border-bottom: 5px solid #dc3545; }
+.card-alfa .summary-value { color: #dc3545; }
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 700;
 }
 
 /* Tombol Ekspor Laporan */
@@ -1890,97 +1874,154 @@ class-list-table th:last-child{
 }
 
 
-/* ============================================== */
-/* STYLE INPUT DASAR */
-/* ============================================== */
-.date-filter input[type="date"],
-.absensi-select select {
-    width: 100%;
-    padding: 0.6rem;
-    border: 1px solid #D1D5DB;
-    border-radius: var(--border-radius);
-    font-size: 0.9rem;
-    color: var(--color-text-dark);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: white; /* Pastikan background putih */
-    cursor: pointer;
-}
-
-.date-filter input[type="date"]:focus,
-.absensi-select select:focus {
-    outline: none;
-    border-color: var(--color-dark-green);
-    box-shadow: 0 0 0 2px rgba(46, 94, 74, 0.2);
-}
-
-.date-filter label,
-.filter-group-item label {
-    display: block;
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500;
-    color: var(--color-text-dark);
-    margin-bottom: 0.4rem;
-}
-
-/* ============================================== */
-/* LAYOUT FILTER TANGGAL (date-filter) */
-/* ============================================== */
-
-.date-filter {
-    /* Menggunakan Flexbox untuk menempatkan semua elemen label/input dalam satu baris */
+/* HEADER */
+.riwayat-header {
     display: flex;
-    gap: 1.5rem; /* Jarak antar grup filter */
-    align-items: flex-start;
-    padding: 1rem 0;
-    width: 100%; /* Memastikan ia mengambil lebar penuh */
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* PENTING: Mendefinisikan lebar Label dan Input agar terbagi rata (masing-masing 25%) */
-.date-filter > label,
-.date-filter > input[type="date"] {
-    flex-basis: 25%; /* Membagi ruang menjadi 4 bagian yang sama */
-    flex-grow: 1;
+.riwayat-header h1 {
+    color: #1f4f3f;
+    font-size: 28px;
+    font-weight: 700;
 }
 
-/* Memastikan input tanggal berada berdampingan di dalam div filter tanggal */
-/* Menghapus definisi grid yang menyebabkan layout 2x2 yang salah */
-.date-filter.responsive-filter {
-    display: flex; /* Memastikan ini tetap flex jika kelas ini digunakan */
-    gap: 1.5rem;
+/* TAB BUTTON */
+.absensi-tabs {
+    background: #f3f5ec;
+    padding: 6px;
+    border-radius: 14px;
+    display: flex;
+    gap: 6px;
+
 }
 
-/* Menangani pasangan Label dan Input di dalam grid */
-.date-filter.responsive-filter > * {
-    grid-column: span 1;
+.tab-btn {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    background: transparent;
+    font-weight: 600;
+    color: #1f4f3f;
 }
 
-/* ============================================== */
-/* LAYOUT FILTER SELECT (filter-group-item) */
-/* ============================================== */
+.tab-btn.active {
+    background: #1f4f3f;
+    color: #fff;
 
-.filter-group-item {
-    padding: 1rem 0;
-    /* Fleksibel di dalam container yang lebih besar */
-    flex-grow: 1;
-    min-width: 150px;
 }
 
-/* Responsivitas untuk tampilan Ponsel/Tablet */
-@media (max-width: 768px) {
-    .date-filter {
-        /* Tetap flex (melebar) tetapi memungkinkan elemen membungkus jika terlalu sempit */
-        flex-wrap: wrap; 
-        gap: 1rem;
-    }
-    /* Pada ponsel, berikan lebih banyak ruang agar label dan input terlihat */
-    .date-filter > label,
-    .date-filter > input[type="date"] {
-        flex-basis: 40%; 
-    }
-    .date-filter.responsive-filter {
-        /* Juga menggunakan flex-wrap */
-        flex-wrap: wrap; 
-    }
+/* GARIS MERAH */
+.red-divider {
+    height: 3px;
+    background: #8b0000;
+    margin: 16px 0 24px;
+}
+
+/* FILTER ABSENSI - SATU BARIS LURUS */
+.attendance-filter-horizontal {
+    background: #f5f7ec;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: var(--shadow-light);
+
+    display: flex;
+    align-items: center;    /* Membuat label, input, dan tombol sejajar tengah secara vertikal */
+    gap: 20px;              /* Jarak antar elemen */
+
+    flex-wrap: nowrap;      /* Mencegah elemen turun ke baris baru */
+    position: relative;
+    width: 100%;
+}
+
+/* ITEM FILTER */
+.attendance-filter-horizontal .filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+/* LABEL */
+.attendance-filter-horizontal .filter-item span {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* INPUT & SELECT */
+.attendance-filter-horizontal input,
+.attendance-filter-horizontal select {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    background: #fff;
+}
+
+/* TABLE */
+/* Container Tabel agar memiliki bayangan halus */
+.table-wrapper {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Shadow lembut */
+    overflow: hidden; /* Memastikan isi tabel tidak keluar dari sudut bulat */
+    margin-top: 20px;
+}
+
+.table-wrapper table {
+    width: 100%;
+    border-collapse: separate; 
+    border-spacing: 0;
+}
+
+/* Header Tabel */
+.table-wrapper thead tr {
+    background-color: #1f3f34; /* Warna hijau tua sesuai gambar */
+    color: white;
+}
+
+.table-wrapper th {
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase; /* Membuat teks jadi kapital semua */
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+/* KUNCI: Border Radius hanya di ujung Header */
+.table-wrapper th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.table-wrapper th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* Isi Tabel (Body) */
+.table-wrapper tbody tr {
+    transition: background-color 0.2s;
+}
+
+/* Efek Hover: Baris berubah warna saat kursor lewat */
+.table-wrapper tbody tr:hover {
+    background-color: #f9fbf9;
+}
+
+.table-wrapper td {
+    padding: 14px;
+    font-size: 15px;
+    color: #444;
+    border-bottom: 1px solid #f0f0f0; /* Garis pemisah tipis horizontal */
+    text-align: center; /* Menyejajarkan teks ke tengah sesuai referensi */
+}
+
+/* Hilangkan garis bawah pada baris terakhir agar tidak merusak radius */
+.table-wrapper tbody tr:last-child td {
+    border-bottom: none;
 }
 
 /* --- TOMBOL KEMBALI DI BAWAH --- */

@@ -363,14 +363,11 @@ exports.getAllAbsensiPengajar = async (req, res) => {
       ORDER BY ap.tanggal DESC
     `);
 
-    res.json({
-      success: true,
-      data: result.rows
-    });
+    // ✅ KIRIM ARRAY LANGSUNG
+    res.json(result.rows);
 
   } catch (err) {
     console.error("Error getAllAbsensiPengajar:", err);
     res.status(500).json({ message: "Gagal mengambil data absensi pengajar" });
   }
 };
-

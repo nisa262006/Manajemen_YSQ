@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riwayat Absensi Santri - Sahabat Quran</title>
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body>
+<div class="container">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="../images/LogoYSQ.png" class="logo-img" />
+    </div>
+    <nav class="menu">
+      <a href="Admin.html" class="menu-item"><i class="fas fa-home"></i> Dashboard</a>
+      <a href="daftar_jadwal.html" class="menu-item"><i class="fas fa-calendar"></i> Daftar Jadwal</a>
+      <a href="daftar_kelas.html" class="menu-item"><i class="fas fa-book"></i> Daftar Kelas</a>
+      <a href="daftar_santri.html" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+      <a href="daftar_pengajar.html" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+      <a href="riwayat_absensi.html" class="menu-item active"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+      <a href="#" class="menu-item" data-dev="true"><i class="fas fa-scroll"></i> Rapor</a>
+      <a href="#" class="menu-item" data-dev="true"><i class="fas fa-file-alt"></i> Laporan</a>
+  </nav>
+  <div class="sidebar-footer">
+      <div class="footer-buttons-wrapper"> 
+          <button type="button" class="footer-btn setting" id="btn-open-profil">
+              <i class="fas fa-cog"></i> Setting Profil
+              </button>
+          <a href="login.html" class="footer-btn logout">
+              <i class="fas fa-sign-out-alt"></i> Keluar
+          </a>
+      </div>
+  </div>
+</aside>
+<main class="main-content">
+<!-- HEADER -->
+<div class="riwayat-header">
+  <h1>Riwayat Absensi Santri</h1>
+  <div class="absensi-tabs">
+    <button class="tab-btn" onclick="location.href='riwayat_absensi.html'">Absensi Pengajar</button>
+    <button class="tab-btn active">Absensi Santri</button>
+  </div>
+</div>
+<div class="red-divider"></div>
+
+<!-- SUMMARY -->
+<div class="attendance-summary">
+  <div class="summary-card card-hadir"><div id="sum-hadir">0</div><span>Hadir</span></div>
+  <div class="summary-card card-izin"><div id="sum-izin">0</div><span>Izin</span></div>
+  <div class="summary-card card-dynamic"><div id="sum-dynamic">0</div><span>Mustami’ah</span></div>
+  <div class="summary-card card-alfa"><div id="sum-alfa">0</div><span>Alfa</span></div>
+</div>
+
+<!-- FILTER -->
+<div class="attendance-filter-horizontal">
+    <div class="filter-item">
+        <span>Start Date :</span>
+        <input type="date">
+    </div>
+    <div class="filter-item">
+        <span>End Date :</span>
+        <input type="date">
+    </div>
+  <div class="filter-item">
+    <span>Pilih Kelas :</span>
+    <select id="pilih_kelas"><option value="">Semua Kelas</option></select>
+  </div>
+  <div class="filter-item">
+    <span>Pilih Santri :</span>
+    <select id="pilih_santri"><option value="">Semua Santri</option></select>
+  </div>
+  <button class="export-report-btn" id="btn-export-absensi-siswa">
+    <i class="fas fa-file-export"></i> Ekspor Laporan
+  </button>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Nama Santri</th>
+        <th>Kelas</th>
+        <th>Status</th>
+        <th>Catatan</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<div class="absensi-footer-actions">
+  <a href="Admin.html" class="action-btn-form back-btn-absensi">
+    <i class="fas fa-arrow-left"></i> Kembali
+  </a>
+</div>
+  </main>
+</div>
+<div id="notification-toast" class="toast-notification"></div>
+<div id="popup-profile-setting" class="modal-overlay">
+    <div class="profile-setting-content">
+        <button class="close-btn" id="btn-close-profil-x">
+            &times;
+        </button>
+        <div class="profile-avatar-large">A</div>
+        
+        <div class="profile-field-group">
+            <div>
+                <label>Nama</label> :
+                <input type="text" id="profile-name-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>Email</label> :
+                <input type="email" id="profile-email-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>No. Telepon</label> :
+                <input type="tel" id="profile-phone-input" class="profile-input" placeholder="" />
+            </div>
+        </div>
+        
+        <div class="profile-actions">
+            <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+            <button type="button" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">
+                Simpan
+            </button>            
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script type="module" src="../js/admin_laporan.js"></script>
+<script type="module" src="../js/profileSetting.js"></script>
+</body>
+</html>
