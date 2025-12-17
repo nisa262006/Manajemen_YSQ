@@ -208,7 +208,7 @@ exports.forgotPassword = async (req, res) => {
     const resetLink = `${process.env.BASE_URL}/views/reset_password.html?token=${token}`;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_SENDER,
+      from: '"YSQ Bogor" <noreply@ysqbogor.com>',
       to: email,
       subject: "Reset Password - YSQ Bogor",
       html: `
