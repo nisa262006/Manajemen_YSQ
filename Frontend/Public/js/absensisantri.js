@@ -4,35 +4,38 @@ document.addEventListener("DOMContentLoaded", initAbsensi);
 let RAW_DATA = []; // menyimpan data asli dari server
 
 function initAbsensi() {
-  // elemen UI
-  const startDateEl = document.getElementById("start-date");
-  const endDateEl = document.getElementById("end-date");
-  const exportBtn = document.getElementById("export-excel");
-
-  // set default tanggal (mis. 30 hari terakhir)
-  const now = new Date();
-  const prior = new Date();
-  prior.setMonth(now.getMonth() - 6);   // ⟵ 6 bulan kebelakang
-  if (startDateEl && !startDateEl.value) startDateEl.value = formatISODate(prior);
-  if (endDateEl && !endDateEl.value) endDateEl.value = formatISODate(now);
-
-  // event listeners
-  if (startDateEl) startDateEl.addEventListener("change", renderFiltered);
-  if (endDateEl) endDateEl.addEventListener("change", renderFiltered);
-  if (exportBtn) exportBtn.addEventListener("click", exportFilteredToCSV);
-
-  // load data
-  loadAbsensiSantri();
-}
-
+  // ===== Ambil elemen =====
+    const startDateEl = document.getElementById("start-date");
+    const endDateEl = document.getElementById("end-date");
+    const exportBtn = document.getElementById("export-excel");
+  
+    const today = new Date();
+    const sixMonthsAgo = new Date(today);
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+  
+    // ⛔ set attribute dulu (ANTI RESET)
+    startDateEl.setAttribute("max", formatISODate(today));
+    endDateEl.setAttribute("max", formatISODate(today));
+  
+    // ✅ set value SETELAH attribute
+    startDateEl.value = formatISODate(sixMonthsAgo);
+    endDateEl.value = formatISODate(today);
+  
+    startDateEl.addEventListener("input", onStartDateChange);
+    endDateEl.addEventListener("input", renderFiltered);
+    exportBtn?.addEventListener("click", exportFilteredToCSV);
+  
+    loadAbsensiSantri();
+  }
+  
 /**
  * Ambil data absensi dari backend, simpan di RAW_DATA lalu render.
  */
 async function loadAbsensiSantri() {
   const token = localStorage.getItem("token");
   if (!token) {
-    console.warn("Token tidak ditemukan — redirect ke login");
-    return (window.location.href = "../login.html");
+    window.location.href = "../login.html";
+    return;
   }
 
   try {
@@ -44,38 +47,54 @@ async function loadAbsensiSantri() {
     });
 
     if (!res.ok) {
-      const txt = await res.text();
-      console.error("Fetch absensi gagal:", res.status, txt);
-      throw new Error("Gagal mengambil data absensi");
+      const err = await res.text();
+      throw new Error(err);
     }
 
-    const data = await res.json();
-    console.log("Absensi (raw):", data);
-    RAW_DATA = Array.isArray(data) ? data : [];
+    const json = await res.json();
+    console.log("Absensi dari backend:", json);
 
-    renderFiltered(); // render sesuai tanggal default
+    RAW_DATA = Array.isArray(json.data) ? json.data : [];
+
+    renderFiltered();
+
   } catch (err) {
     console.error("ERROR loadAbsensiSantri:", err);
-    alert("Gagal memuat data absensi. Cek console untuk detail.");
+    alert("Gagal memuat data absensi");
   }
 }
+
 
 /**
  * Ambil data yang sudah difilter oleh tanggal (start-date / end-date) dan render UI
  */
 function renderFiltered() {
-  const startDate = parseDateFromInput("start-date");
-  const endDate = parseDateFromInput("end-date", true); // inclusive end
-  const filtered = RAW_DATA.filter(item => {
-    const t = parsePossibleDate(item.tanggal);
-    if (!t) return false;
-    if (startDate && t < startDate) return false;
-    if (endDate && t > endDate) return false;
-    return true;
-  });
+  const start = document.getElementById("start-date").value;
+  const end = document.getElementById("end-date").value;
+
+  const filtered = RAW_DATA.filter(item =>
+    item.tanggal >= start && item.tanggal <= end
+  );
 
   renderStats(filtered);
   renderTable(filtered);
+}
+
+function onStartDateChange() {
+  const startEl = document.getElementById("start-date");
+  const endEl = document.getElementById("end-date");
+
+  if (!startEl.value) return;
+
+  const start = new Date(startEl.value + "T00:00:00");
+  const end = new Date(start);
+  end.setMonth(end.getMonth() + 6);
+
+  const today = new Date();
+  if (end > today) endEl.value = formatISODate(today);
+  else endEl.value = formatISODate(end);
+
+  renderFiltered();
 }
 
 /**

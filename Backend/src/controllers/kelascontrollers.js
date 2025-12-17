@@ -53,6 +53,7 @@ exports.getDetailKelas = async (req, res) => {
     FROM santri_kelas sk
     JOIN santri s ON s.id_santri = sk.id_santri
     WHERE sk.id_kelas = $1
+     AND s.status = 'aktif'
   `, [id_kelas]);
 
   const jadwal = await db.query(
@@ -108,6 +109,18 @@ exports.tambahSantriKeKelas = async (req, res) => {
   );
 
   res.json({ message: "Santri berhasil ditambahkan ke kelas" });
+
+  const cekSantri = await db.query(
+    `SELECT status FROM santri WHERE id_santri = $1`,
+    [id_santri]
+  );
+  
+  if (cekSantri.rowCount === 0 || cekSantri.rows[0].status !== 'aktif') {
+    return res.status(400).json({
+      message: "Santri nonaktif tidak boleh dimasukkan ke kelas"
+    });
+  }
+  
 };
 
 // Pindah santri antar kelas
@@ -196,11 +209,12 @@ exports.getDetailKelasPengajar = async (req, res) => {
 
     // 2. Ambil santri dalam kelas
     const santri = await db.query(
-      `SELECT s.id_santri, s.nama, s.nis
-       FROM santri_kelas sk
-       JOIN santri s ON s.id_santri = sk.id_santri
-       WHERE sk.id_kelas = $1`,
-      [id_kelas]
+      `SELECT s.id_santri, s.nama, s.nis, s.status
+        FROM santri_kelas sk
+        JOIN santri s ON s.id_santri = sk.id_santri
+        WHERE sk.id_kelas = $1
+          AND s.status = 'aktif'
+        `,[id_kelas]
     );
 
     // 3. Ambil jadwal kelas
@@ -224,20 +238,70 @@ exports.getDetailKelasPengajar = async (req, res) => {
 };
 
 
-// ===================== SANTRI ===============================
-exports.kelasSantri = async (req, res) => {
-  const result = await db.query(
-    `SELECT k.*
-     FROM santri s
-     JOIN santri_kelas sk ON sk.id_santri = s.id_santri
-     JOIN kelas k ON k.id_kelas = sk.id_kelas
-     WHERE s.id_users = $1`,
-    [req.users.id_users]
-  );
+// ====================== DETAIL KELA SUNTUK SANTRI==============//
+exports.kelasSantriMe = async (req, res) => {
+  try {
+    const id_users = req.users.id_users;
 
-  if (result.rowCount === 0)
-    return res.status(404).json({ message: "Santri belum memiliki kelas" });
+    const santriRes = await db.query(`
+      SELECT 
+        s.id_santri,
+        s.nis,
+        s.nama,
+        s.kategori,
+        s.status,
+        k.id_kelas,
+        k.nama_kelas
+      FROM santri s
+      JOIN santri_kelas sk ON sk.id_santri = s.id_santri
+      JOIN kelas k ON k.id_kelas = sk.id_kelas
+      WHERE s.id_users = $1
+      LIMIT 1
+    `, [id_users]);
 
-  res.json(result.rows);
+    if (santriRes.rowCount === 0) {
+      return res.status(404).json({
+        message: "Santri belum terdaftar di kelas"
+      });
+    }
+
+    const santri = santriRes.rows[0];
+
+    const jadwalRes = await db.query(`
+      SELECT 
+        j.id_jadwal,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        u.username AS pengajar
+      FROM jadwal j
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      JOIN pengajar p ON k.id_pengajar = p.id_pengajar
+      JOIN users u ON p.id_users = u.id_users
+      WHERE k.id_kelas = $1
+      ORDER BY 
+        CASE 
+          WHEN j.hari='Senin' THEN 1
+          WHEN j.hari='Selasa' THEN 2
+          WHEN j.hari='Rabu' THEN 3
+          WHEN j.hari='Kamis' THEN 4
+          WHEN j.hari='Jumat' THEN 5
+          WHEN j.hari='Sabtu' THEN 6
+          WHEN j.hari='Minggu' THEN 7
+        END,
+        j.jam_mulai
+    `, [santri.id_kelas]);
+    
+
+    return res.json({
+      santri,
+      jadwal: jadwalRes.rows
+    });
+
+  } catch (err) {
+    console.error("KELAS SANTRI ERROR:", err);
+    return res.status(500).json({
+      message: "Gagal memuat data dashboard santri"
+    });
+  }
 };
-

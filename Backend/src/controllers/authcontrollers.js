@@ -7,57 +7,73 @@ const nodemailer = require("nodemailer");
 // ==================== LOGIN ====================
 exports.login = async (req, res) => {
   try {
-    const { identifier, password } = req.body; 
-    // identifier = username ATAU email
+    const { identifier, password } = req.body;
 
     console.log("REQUEST MASUK LOGIN:", identifier);
 
-    // Query user berdasarkan username ATAU email
-    const result = await db.query(
-      `SELECT * FROM "users" 
-       WHERE username = $1 OR email = $1`,
-      [identifier]
-    );
+    const result = await db.query(`
+      SELECT 
+        u.*,
+        s.status AS status_santri
+      FROM users u
+      LEFT JOIN santri s ON u.id_users = s.id_users
+      WHERE u.username = $1 OR u.email = $1
+      LIMIT 1
+    `, [identifier]);
 
     if (result.rowCount === 0) {
-      return res.status(400).json({ message: "Username/Email atau password salah" });
+      return res.status(400).json({
+        message: "Username/Email atau password salah"
+      });
     }
 
     const user = result.rows[0];
 
-    // Periksa password
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    // 🔒 BLOK USER NONAKTIF (APAPUN ROLE-NYA)
+if (user.status_user !== "aktif") {
+  return res.status(403).json({
+    message: "Akun Anda tidak aktif. Hubungi admin."
+  });
+}
+
+
+    // 🔑 BARU CEK PASSWORD
+    const validPassword = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
+
     if (!validPassword) {
-      return res.status(400).json({ message: "Username/Email atau password salah" });
+      return res.status(400).json({
+        message: "Username/Email atau password salah"
+      });
     }
 
-    // Buat token baru
+    // ✅ LOGIN BERHASIL
     const token = jwt.sign(
       {
         id_users: user.id_users,
-        username: user.email,        // middleware membutuhkan ini
-        role: user.role,
-        status_user: user.status_user
+        role: user.role
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-    
 
     return res.json({
       message: "Login berhasil",
       token,
       userId: user.id_users,
-      username: user.username,
-      role: user.role,
-      status: user.status_user
+      role: user.role
     });
 
   } catch (err) {
     console.error("LOGIN ERROR:", err);
-    return res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({
+      message: "Terjadi kesalahan server"
+    });
   }
 };
+
 
 
 // ==================== GET ME ====================

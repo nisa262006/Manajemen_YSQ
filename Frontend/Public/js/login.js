@@ -17,14 +17,17 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
       const data = await res.json();
 
       if (!res.ok) {
-          errorBox.innerText = data.message || "Login gagal";
-          return;
-      }
+        errorBox.innerText =
+          data?.message ||
+          `Login gagal (${res.status})`;
+        return;
+    }
+    
 
       // SIMPAN TOKEN + ROLE + ID USERS
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-      localStorage.setItem("id_users", data.id_users);
+      localStorage.setItem("id_users", data.userId);
 
       // REDIRECT SESUAI ROLE
       if (data.role === "admin") {

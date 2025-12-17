@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "identifier": "admin1",
-  "password": "123456"
+  "password": "admin1"
 }
 
 ### LOGIN PENGAJAR
@@ -22,8 +22,8 @@ POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "YSQ-2025-0015_neng",
-  "password": "123456"
+  "identifier": "ekan1@gmail.com",
+  "password": "ekan123"
 }
 
 
@@ -275,12 +275,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### memasukkan santri ke tabel santri_kelas (betul)
 ##################################################
 
-POST http://localhost:5000/kelas/6/santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+POST http://localhost:5000/kelas/16/santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTc1LCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjU5NDIwNTksImV4cCI6MTc2NjAyODQ1OX0.AWI8WyNguGvNHBPs2bLT78EtKTs-e-xgrDacbr5W4H4
 Content-Type: application/json
 
 {
-  "id_santri": 15
+  "id_santri": 36
 }
 
 
@@ -289,13 +289,13 @@ Content-Type: application/json
 ### menghapus dari kelas lama → tambah ke kelas baru
 ##################################################
 
-PUT http://localhost:5000/kelas/pindah/15
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
+PUT http://localhost:5000/kelas/pindah/36
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTc1LCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjU5NDIwNTksImV4cCI6MTc2NjAyODQ1OX0.AWI8WyNguGvNHBPs2bLT78EtKTs-e-xgrDacbr5W4H4
 Content-Type: application/json
 
 {
-  "id_kelas_lama": 6,
-  "id_kelas_baru": 8
+  "id_kelas_lama": 16,
+  "id_kelas_baru": 15
 }
 
 
@@ -312,7 +312,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 ##################################################
 
 GET http://localhost:5000/kelas/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDQwMDc0OSwiZXhwIjoxNzY0NDg3MTQ5fQ.7ZGaz11RZ3un0GKUaEllCR5TPVqxIzJxDC81ClIqkJg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTg1LCJyb2xlIjoic2FudHJpIiwiaWF0IjoxNzY1OTQ0MTEyLCJleHAiOjE3NjYwMzA1MTJ9.K9t_FOPh188G-Ec3-We_pEJX6LSdWWlWifnjeCJBAkQ
 
 
 
@@ -451,7 +451,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 ###############################################################
 
 GET http://localhost:5000/absensi/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDMxNzYxNSwiZXhwIjoxNzY0NDA0MDE1fQ.uclDGV-YPgT3WwlulkVcgc52wFsMKeQ0tOQ_ljYeF6g
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTg1LCJyb2xlIjoic2FudHJpIiwiaWF0IjoxNzY1OTQ0MTEyLCJleHAiOjE3NjYwMzA1MTJ9.K9t_FOPh188G-Ec3-We_pEJX6LSdWWlWifnjeCJBAkQ
 
 
 

@@ -143,12 +143,12 @@ exports.getSantriById = async (req, res) => {
   }
 };
 
-
-
 /* ============================================================
    3. UPDATE SANTRI
 ============================================================ */
 exports.updateSantri = async (req, res) => {
+  const client = await db.connect();
+
   try {
     const { id_santri } = req.params;
 
@@ -164,49 +164,62 @@ exports.updateSantri = async (req, res) => {
       user_email
     } = req.body;
 
-    // Cek keberadaan santri
-    const check = await db.query(
+    await client.query("BEGIN");
+
+    // 🔎 CEK SANTRI
+    const check = await client.query(
       `
-      SELECT s.*, u.id_users, u.email AS user_email
+      SELECT s.*, u.id_users, u.email AS user_email, u.status_user
       FROM santri s
-      LEFT JOIN users u ON s.id_users = u.id_users
+      JOIN users u ON s.id_users = u.id_users
       WHERE s.id_santri = $1
       `,
       [id_santri]
     );
 
     if (check.rowCount === 0) {
-      return res.status(404).json({ message: "Santri tidak ditemukan" });
+      throw new Error("Santri tidak ditemukan");
     }
 
-    const oldData = check.rows[0];
-    const id_users = oldData.id_users;
+    const old = check.rows[0];
+    const id_users = old.id_users;
 
-    /* ==== UPDATE EMAIL USER JIKA BERUBAH ==== */
-    const oldEmail = (oldData.user_email || "").toLowerCase().trim();
+    /* =========================
+       UPDATE EMAIL USER
+    ========================= */
+    const oldEmail = (old.user_email || "").toLowerCase().trim();
     const newEmail = (user_email || email || "").toLowerCase().trim();
 
     if (newEmail && newEmail !== oldEmail) {
-
-      const cekEmail = await db.query(
-        `SELECT email FROM users WHERE email=$1 AND id_users != $2`,
+      const cekEmail = await client.query(
+        `SELECT 1 FROM users WHERE email=$1 AND id_users != $2`,
         [newEmail, id_users]
       );
 
       if (cekEmail.rowCount > 0) {
-        return res.status(400).json({ message: "Email sudah digunakan user lain" });
+        throw new Error("Email sudah digunakan user lain");
       }
 
-      await db.query(
+      await client.query(
         `UPDATE users SET email=$1 WHERE id_users=$2`,
         [newEmail, id_users]
       );
     }
 
-    /* ==== UPDATE SANTRI ==== */
-    const finalStatus = status ?? oldData.status;
+    /* =========================
+       UPDATE STATUS USER ❗
+    ========================= */
+    const finalStatus = status ?? old.status;
 
-    await db.query(
+    await client.query(
+      `UPDATE users SET status_user=$1 WHERE id_users=$2`,
+      [finalStatus, id_users]
+    );
+
+    /* =========================
+       UPDATE DATA SANTRI
+    ========================= */
+    await client.query(
       `
       UPDATE santri SET
         nama=$1,
@@ -231,29 +244,28 @@ exports.updateSantri = async (req, res) => {
         id_santri
       ]
     );
-    
+
+    await client.query("COMMIT");
 
     res.json({
-      message: "Santri berhasil diperbarui",
+      success: true,
+      message: "Data santri berhasil diperbarui",
       data: {
         id_santri,
         nama,
         kategori,
-        no_wa,
-        email: newEmail,
-        tempat_lahir,
-        tanggal_lahir,
-        alamat,
-        status
+        status: finalStatus
       }
     });
 
   } catch (err) {
-    console.error("UPDATE SANTRI ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    await client.query("ROLLBACK");
+    console.error("UPDATE SANTRI ERROR:", err.message);
+    res.status(500).json({ message: err.message });
+  } finally {
+    client.release();
   }
 };
-
 
 
 /* ============================================================

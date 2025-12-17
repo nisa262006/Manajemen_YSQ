@@ -306,32 +306,41 @@ if (window.location.pathname.toLowerCase().includes("detail_santri.html")) {
 
     btnEdit.addEventListener("click", () => setDisabled(false));
 
+    btnSaveBottom.addEventListener("click", (e) => {
+    e.preventDefault();
+    saveSantri();
+    });
+
     // =============================
     // SIMPAN / UPDATE SANTRI
     // =============================
     async function saveSantri() {
-
         const payload = {
-            nis: formEl.nis.value,
-            nama: formEl.nama.value,
-            kategori: formEl.kelas.value,
-            no_wa: formEl.telepon.value,
-            email: formEl.email.value,
-            user_email: formEl.email.value,
-            tempat_lahir: formEl.tempat_lahir.value,
-            tanggal_lahir: formEl.tanggal_lahir.value,
-            username: formEl.username.value,
-            status: formEl.status.value
+          nama: formEl.nama.value.trim(),
+          kategori: formEl.kelas.value,
+          no_wa: formEl.telepon.value.trim(),
+          email: formEl.email.value.trim(),
+          user_email: formEl.email.value.trim(),
+          tempat_lahir: formEl.tempat_lahir.value.trim(),
+          tanggal_lahir: formEl.tanggal_lahir.value || null,
+          alamat: formEl.alamat.value.trim(),
+          status: formEl.status.value
         };
-    
+      
+        console.log("PAYLOAD UPDATE SANTRI:", payload);
+      
         try {
-            await apiPut(`/santri/${santriId}`, payload);
-            window.location.href = "daftar_santri.html";
+          await apiPut(`/santri/${santriId}`, payload);
+      
+          alert("✅ Data santri berhasil diperbarui");
+          window.location.href = "daftar_santri.html";
+      
         } catch (err) {
-            console.error("Gagal update santri:", err);
+          console.error("Gagal update santri:", err);
+          alert("❌ Gagal memperbarui data santri");
         }
-    }
-    
+      }      
+
 
     loadDetailSantri();
 }
