@@ -44,14 +44,18 @@ if (window.location.pathname.includes("daftar_santri.html")) {
     async function loadSantri() {
         try {
             let res = await apiGet("/santri?page=1&limit=5000");
-            allSantri = res?.data ?? [];
-
+    
+            console.log("RESPON SANTRI:", res);
+    
+            allSantri = res?.data ?? res ?? [];
+    
+            console.log("JUMLAH SANTRI:", allSantri.length);
+    
             renderSantri();
-
         } catch (err) {
             console.error("❌ Error load santri:", err);
         }
-    }
+    }    
 
     // ==========================================
     // LOAD DATA KELAS
