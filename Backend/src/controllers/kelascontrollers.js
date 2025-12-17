@@ -98,30 +98,71 @@ exports.deleteKelas = async (req, res) => {
 
 // Tambah santri ke kelas
 exports.tambahSantriKeKelas = async (req, res) => {
-  const { id_kelas } = req.params;
-  const { id_santri } = req.body;
+  const client = await db.connect();
 
-  await db.query(
-    `INSERT INTO santri_kelas (id_santri, id_kelas)
-     VALUES ($1, $2)
-     ON CONFLICT DO NOTHING`,
-    [id_santri, id_kelas]
-  );
+  try {
+    const { id_kelas } = req.params;
+    const { id_santri } = req.body;
 
-  res.json({ message: "Santri berhasil ditambahkan ke kelas" });
+    await client.query("BEGIN");
 
-  const cekSantri = await db.query(
-    `SELECT status FROM santri WHERE id_santri = $1`,
-    [id_santri]
-  );
-  
-  if (cekSantri.rowCount === 0 || cekSantri.rows[0].status !== 'aktif') {
-    return res.status(400).json({
-      message: "Santri nonaktif tidak boleh dimasukkan ke kelas"
-    });
+    // 1. Cek santri
+    const cekSantri = await client.query(
+      `SELECT status FROM santri WHERE id_santri = $1`,
+      [id_santri]
+    );
+
+    if (cekSantri.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    }
+
+    if (cekSantri.rows[0].status !== "aktif") {
+      await client.query("ROLLBACK");
+      return res.status(400).json({
+        message: "Santri nonaktif tidak boleh dimasukkan ke kelas"
+      });
+    }
+
+    // 2. Cek kapasitas kelas
+    const kapasitas = await client.query(
+      `SELECT kapasitas,
+        (SELECT COUNT(*) FROM santri_kelas WHERE id_kelas = $1) AS terisi
+       FROM kelas WHERE id_kelas = $1`,
+      [id_kelas]
+    );
+
+    if (kapasitas.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "Kelas tidak ditemukan" });
+    }
+
+    if (parseInt(kapasitas.rows[0].terisi) >= kapasitas.rows[0].kapasitas) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ message: "Kapasitas kelas penuh" });
+    }
+
+    // 3. Insert relasi
+    await client.query(
+      `INSERT INTO santri_kelas (id_santri, id_kelas)
+       VALUES ($1, $2)
+       ON CONFLICT DO NOTHING`,
+      [id_santri, id_kelas]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({ message: "Santri berhasil ditambahkan ke kelas" });
+
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("TAMBAH SANTRI KELAS ERROR:", err);
+    res.status(500).json({ message: "Gagal menambahkan santri ke kelas" });
+  } finally {
+    client.release();
   }
-  
 };
+
 
 // Pindah santri antar kelas
 exports.pindahSantriKelas = async (req, res) => {

@@ -91,7 +91,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 
 ### RESET PENDAFTAR (HAPUS SEMUA KECUALI YANG DITERIMA)
 DELETE http://localhost:5000/pendaftar/reset/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTc1LCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjU5NDIwNTksImV4cCI6MTc2NjAyODQ1OX0.AWI8WyNguGvNHBPs2bLT78EtKTs-e-xgrDacbr5W4H4
 
 ### =======================================
 ### 2. GET ALL SANTRI (Pagination + Filter + Search)

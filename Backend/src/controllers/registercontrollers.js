@@ -4,31 +4,58 @@ const db = require("../config/db");
    1. Daftar Pendaftar (Public)
 ================================ */
 exports.daftarPendaftar = async (req, res) => {
+  const client = await db.connect();
+
   try {
-    console.log("DATA MASUK:", req.body);
-
     const { nama, email, no_wa, tanggal_lahir, tempat_lahir } = req.body;
-
-    // Pastikan tanggal hanya "YYYY-MM-DD"
     const tanggalFix = tanggal_lahir ? tanggal_lahir.split("T")[0] : null;
 
-    const result = await db.query(
-      `INSERT INTO pendaftar (nama, email, no_wa, tanggal_lahir, tempat_lahir, status)
-       VALUES ($1, $2, $3, $4, $5, 'pending')
+    await client.query("BEGIN");
+
+    // CEK EMAIL
+    const cek = await client.query(
+      `SELECT id_pendaftar FROM pendaftar WHERE email = $1`,
+      [email]
+    );
+
+    if (cek.rowCount > 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({
+        message: "Email sudah pernah mendaftar"
+      });
+    }
+
+    const result = await client.query(
+      `INSERT INTO pendaftar 
+       (nama, email, no_wa, tanggal_lahir, tempat_lahir, status)
+       VALUES ($1,$2,$3,$4,$5,'pending')
        RETURNING *`,
       [nama, email, no_wa, tanggalFix, tempat_lahir]
     );
 
+    await client.query("COMMIT");
+
     res.json({
       message: "Pendaftaran berhasil",
-      data: result.rows[0],
+      data: result.rows[0]
     });
 
   } catch (err) {
+    await client.query("ROLLBACK");
     console.error("DAFTAR ERROR:", err);
+
+    if (err.code === "23505") {
+      return res.status(409).json({
+        message: "Email sudah pernah mendaftar"
+      });
+    }
+
     res.status(500).json({ message: "Gagal mendaftar" });
+  } finally {
+    client.release();
   }
 };
+
 
 
 /* ================================
@@ -70,136 +97,113 @@ exports.getPendaftarById = async (req, res) => {
 };
 
 
-/* ================================
-   3. Terima pendaftar (FINAL)
-================================ */
 exports.terimaPendaftar = async (req, res) => {
-  try {
-    const id = req.params.id_pendaftar;
+  const client = await db.connect();
 
-    const cek = await db.query(
-      `SELECT * FROM pendaftar WHERE id_pendaftar = $1`,
-      [id]
+  try {
+    const { id_pendaftar } = req.params;
+    await client.query("BEGIN");
+
+    /* 1. Ambil pendaftar */
+    const cek = await client.query(
+      `SELECT * FROM pendaftar WHERE id_pendaftar=$1`,
+      [id_pendaftar]
     );
 
-    if (cek.rows.length === 0) {
+    if (cek.rowCount === 0) {
+      await client.query("ROLLBACK");
       return res.status(404).json({ message: "Pendaftar tidak ditemukan" });
     }
 
     const p = cek.rows[0];
 
-    /* ============================
-       1. Tentukan kategori umur
-    ============================= */
-    const tahunLahir = new Date(p.tanggal_lahir).getFullYear();
-    const tahunSekarang = new Date().getFullYear();
-    const umur = tahunSekarang - tahunLahir;
-    const kategori = umur <= 12 ? "anak" : "dewasa";
-
-    /* Tambahkan kode kategori untuk NIS */
-    const kodeKategori = kategori === "anak" ? "ANK" : "DWS";
-
-    /* ============================
-       2. Buat password default
-    ============================= */
-    const cleanName = p.nama.trim().toLowerCase().replace(/\s+/g, "");
-    const rawPassword = `${cleanName}123`;
-
-    const bcrypt = require("bcrypt");
-    const password_hash = await bcrypt.hash(rawPassword, 10);
-
-    /* ============================
-       3. Generate NIS baru
-       Format: YSQ25ANK001
-    ============================= */
-    const tahun2 = String(tahunSekarang).slice(2);
-
-    const getMax = await db.query(`
-      SELECT MAX(id_santri) AS max FROM santri
-    `);
-
-    const next = (getMax.rows[0].max || 0) + 1;
-    const nomor = String(next).padStart(3, "0");
-
-    const nis = `YSQ${tahun2}${kodeKategori}${nomor}`;
-
-    /* ============================
-       4. Generate USERNAME
-    ============================= */
-    let username = `${nis}_${cleanName}`;
-
-    const cekUser = await db.query(
-      `SELECT id_users FROM users WHERE username=$1`,
-      [username]
-    );
-
-    if (cekUser.rowCount > 0) {
-      username = `${username}_${Date.now()}`;
+    if (p.status === "diterima") {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ message: "Pendaftar sudah diterima" });
     }
 
-    /* ============================
-       5. Insert ke USERS
-    ============================= */
-    const newUser = await db.query(
-      `INSERT INTO users (email, username, password_hash, role, status_user)
-       VALUES ($1, $2, $3, 'santri', 'aktif')
-       RETURNING id_users`,
-      [
-        p.email || null,
-        username,
-        password_hash
-      ]
+    /* 2. Cek email user */
+    const cekEmail = await client.query(
+      `SELECT id_users FROM users WHERE email=$1`,
+      [p.email]
     );
 
-    const id_users = newUser.rows[0].id_users;
+    if (cekEmail.rowCount > 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({ message: "Email sudah ada" });
+    }
 
-    /* ============================
-       6. Insert SANTRI
-    ============================= */
-    await db.query(
-      `INSERT INTO santri 
+    /* 3. Kategori umur */
+    const tahun = new Date().getFullYear();
+    const umur = tahun - new Date(p.tanggal_lahir).getFullYear();
+    const kategori = umur <= 12 ? "anak" : "dewasa";
+    const kodeKategori = kategori === "anak" ? "ANK" : "DWS";
+
+    /* 4. Password */
+    const bcrypt = require("bcrypt");
+    const cleanName = p.nama.toLowerCase().replace(/\s+/g, "");
+    const rawPassword = `${cleanName}123`;
+    const password_hash = await bcrypt.hash(rawPassword, 10);
+
+    /* 5. NIS */
+    const tahun2 = String(tahun).slice(2);
+    const max = await client.query(
+      `SELECT COALESCE(MAX(id_santri),0) AS max FROM santri`
+    );
+    const nis = `YSQ${tahun2}${kodeKategori}${String(max.rows[0].max + 1).padStart(3, "0")}`;
+
+    /* 6. USER */
+    const user = await client.query(
+      `INSERT INTO users (email, username, password_hash, role, status_user)
+       VALUES ($1,$2,$3,'santri','aktif')
+       RETURNING id_users`,
+      [p.email, `${nis}_${cleanName}`, password_hash]
+    );
+
+    const id_users = user.rows[0].id_users;
+
+    /* 7. SANTRI */
+    await client.query(
+      `INSERT INTO santri
        (id_users, nis, nama, kategori, no_wa, email, tempat_lahir, tanggal_lahir, tanggal_terdaftar, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8, NOW(), 'aktif')`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,NOW(),'aktif')`,
       [
         id_users,
         nis,
         p.nama,
         kategori,
         p.no_wa,
-        p.email || null,
+        p.email,
         p.tempat_lahir,
-        p.tanggal_lahir,
+        p.tanggal_lahir
       ]
     );
-    
 
-    /* ============================
-       7. Update status pendaftar
-    ============================= */
-    await db.query(
-      `UPDATE pendaftar SET status='diterima' WHERE id_pendaftar=$1`,
-      [id]
+    /* 8. UPDATE PENDAFTAR (PENTING) */
+    await client.query(
+      `UPDATE pendaftar
+       SET status='diterima', id_users=$1
+       WHERE id_pendaftar=$2`,
+      [id_users, id_pendaftar]
     );
 
-    /* ============================
-       8. Response lengkap
-    ============================= */
-    return res.json({
+    await client.query("COMMIT");
+
+    res.json({
       message: "Pendaftar berhasil diterima",
-      id_users,
       nis,
-      username,
-      kategori,
-      password_default: rawPassword,
-      password_hash: password_hash
+      username: `${nis}_${cleanName}`,
+      password_default: rawPassword
     });
 
   } catch (err) {
-    console.error("TERIMA ERROR:", err);
+    await client.query("ROLLBACK");
+    console.error(err);
     res.status(500).json({ message: "Terjadi kesalahan server" });
+  } finally {
+    client.release();
   }
 };
-
 
 
 /* ================================

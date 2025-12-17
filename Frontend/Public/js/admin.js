@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut } from "./apiService.js";
+import { apiGet, apiPost, apiPut, apiDelete } from "./apiService.js";
 
 const $ = (id) => document.getElementById(id);
 const q = (s) => document.querySelector(s);
@@ -95,7 +95,7 @@ async function loadDashboard() {
         document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large").forEach(el => {
             el.innerText = (profile.nama || "A")[0].toUpperCase();
         });
-        
+
         // -------- PENDAFTAR --------
         let daftar = await apiGet("/pendaftar");
         let data = Array.isArray(daftar) ? daftar : daftar.data ?? [];
@@ -304,6 +304,9 @@ if (document.body.classList.contains("page-tambah-kelas")) {
     
         let list = window._allSantri || [];
     
+        // ❗ FILTER STATUS AKTIF SAJA UNTUK TAMBAH KELAS
+        list = list.filter(s => s.status === "aktif");
+    
         if (filter === "santri") list = list.filter(s => s.id_kelas != null);
         if (filter === "menunggu") list = list.filter(s => s.id_kelas == null);
     
@@ -313,26 +316,31 @@ if (document.body.classList.contains("page-tambah-kelas")) {
         }
     
         list.forEach(s => {
-            const umur = s.tanggal_lahir ?
-                (new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear()) : "-";
+            const umur = s.tanggal_lahir
+                ? (new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear())
+                : "-";
     
             tableBody.innerHTML += `
                 <tr data-id="${s.id_santri}">
-                    <td><input type="checkbox" class="row-check"></td>
+                    <td>
+                        <input type="checkbox" class="row-check">
+                    </td>
                     <td>${new Date().toLocaleDateString("id-ID")}</td>
                     <td>${s.nis}</td>
                     <td>${s.nama}</td>
                     <td>${umur}</td>
-                    <td><span class="status-badge status-aktif">Aktif</span></td>
                     <td>
-                        <span class="status-badge ${s.id_kelas ? "status-santri" : "status-menunggu"}">
-                            ${s.id_kelas ? "Santri" : "Menunggu"}
-                        </span>
+                        <span class="status-badge status-aktif">Aktif</span>
+                    </td>
+                   <td>
+                    <span class="status-badge ${s.status === "aktif" ? "status-aktif" : "status-nonaktif"}">
+                        ${s.status}
+                    </span>
                     </td>
                 </tr>
             `;
         });
-    }
+    }    
     
     // Event filter
     filterSelect.addEventListener("change", () => {
@@ -355,11 +363,12 @@ if (document.body.classList.contains("page-tambah-kelas")) {
         const kelas = window._allKelasYSQ.find(k => k.id_kelas == idKelas);
         if (!kelas) return false;
     
-        const santriDiKelas = window._allSantri.filter(s => s.id_kelas == idKelas).length;
+        const santriDiKelas = window._allSantri.filter(
+            s => s.id_kelas == idKelas && s.status === "aktif"
+        ).length;
     
         return (santriDiKelas + jumlahTambahan) > kelas.kapasitas;
-    }
-    
+    }    
     
     // ===============================================================
     //           🔥 SIMPAN SANTRI KE DALAM KELAS PILIHAN 🔥
@@ -685,18 +694,24 @@ document.addEventListener("click", (e) => {
     // =============================
     // RESET PENDAFTARAN (konfirmasi)
     // =============================
-    document.querySelector(".reset-btn").addEventListener("click", async () => {
-        if (!confirm("Yakin ingin reset pendaftaran tahunan? Semua data akan hilang!")) return;
-
-        try {
-            await apiPut("/pendaftar/reset"); // kamu harus buat endpoint ini
-            toast("Pendaftaran berhasil direset", "success");
-            loadPendaftarRegistrasi();
-        } catch (err) {
-            console.error(err);
-            toast("Gagal reset pendaftaran", "cancel");
-        }
+    document.addEventListener("DOMContentLoaded", () => {
+        const resetBtn = document.querySelector(".reset-btn");
+        if (!resetBtn) return;
+    
+        resetBtn.addEventListener("click", async () => {
+            if (!confirm("Yakin ingin reset pendaftaran tahunan?")) return;
+    
+            try {
+                await apiDelete("/pendaftar/reset/all");
+                showNotification("Pendaftaran berhasil direset", "success");
+                loadPendaftarRegistrasi();
+            } catch (err) {
+                console.error(err);
+                showNotification("Gagal reset pendaftaran", "error");
+            }
+        });
     });
+    
 
 // ============================================================
 //              EXPORT EXCEL – PENDAFTAR REGISTRASI

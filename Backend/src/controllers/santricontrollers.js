@@ -272,31 +272,52 @@ exports.updateSantri = async (req, res) => {
    4. DELETE SANTRI + USERNYA
 ============================================================ */
 exports.deleteSantri = async (req, res) => {
+  const client = await db.connect();
+
   try {
     const { id_santri } = req.params;
+    await client.query("BEGIN");
 
-    const check = await db.query(
-      `SELECT * FROM santri WHERE id_santri = $1`,
+    const cek = await client.query(
+      `SELECT id_users FROM santri WHERE id_santri=$1`,
       [id_santri]
     );
 
-    if (check.rowCount === 0) {
+    if (cek.rowCount === 0) {
+      await client.query("ROLLBACK");
       return res.status(404).json({ message: "Santri tidak ditemukan" });
     }
 
-    const id_users = check.rows[0].id_users;
+    const id_users = cek.rows[0].id_users;
 
-    await db.query(`DELETE FROM santri WHERE id_santri=$1`, [id_santri]);
-    await db.query(`DELETE FROM users WHERE id_users=$1`, [id_users]);
+    /* HAPUS SANTRI */
+    await client.query(
+      `DELETE FROM santri WHERE id_santri=$1`,
+      [id_santri]
+    );
 
-    res.json({ message: "Santri berhasil dihapus", id_santri });
+    /* NONAKTIFKAN USER */
+    await client.query(
+      `UPDATE users SET status_user='nonaktif' WHERE id_users=$1`,
+      [id_users]
+    );
+
+    /* ❌ JANGAN SENTUH TABEL PENDAFTAR */
+
+    await client.query("COMMIT");
+
+    res.json({
+      message: "Santri dihapus, akun dinonaktifkan"
+    });
 
   } catch (err) {
-    console.error("DELETE SANTRI ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    await client.query("ROLLBACK");
+    console.error(err);
+    res.status(500).json({ message: "Gagal menghapus santri" });
+  } finally {
+    client.release();
   }
 };
-
 
 
 /* ============================================================
