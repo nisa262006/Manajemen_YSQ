@@ -284,6 +284,7 @@ exports.kelasSantriMe = async (req, res) => {
   try {
     const id_users = req.users.id_users;
 
+    // 1. Ambil data santri (BOLEH BELUM PUNYA KELAS)
     const santriRes = await db.query(`
       SELECT 
         s.id_santri,
@@ -294,20 +295,29 @@ exports.kelasSantriMe = async (req, res) => {
         k.id_kelas,
         k.nama_kelas
       FROM santri s
-      JOIN santri_kelas sk ON sk.id_santri = s.id_santri
-      JOIN kelas k ON k.id_kelas = sk.id_kelas
+      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
+      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
       WHERE s.id_users = $1
       LIMIT 1
     `, [id_users]);
 
     if (santriRes.rowCount === 0) {
       return res.status(404).json({
-        message: "Santri belum terdaftar di kelas"
+        message: "Data santri tidak ditemukan"
       });
     }
 
     const santri = santriRes.rows[0];
 
+    // 2. JIKA BELUM PUNYA KELAS → JADWAL KOSONG (BUKAN ERROR)
+    if (!santri.id_kelas) {
+      return res.json({
+        santri,
+        jadwal: []
+      });
+    }
+
+    // 3. Ambil jadwal kalau sudah punya kelas
     const jadwalRes = await db.query(`
       SELECT 
         j.id_jadwal,
@@ -332,7 +342,6 @@ exports.kelasSantriMe = async (req, res) => {
         END,
         j.jam_mulai
     `, [santri.id_kelas]);
-    
 
     return res.json({
       santri,
@@ -342,7 +351,7 @@ exports.kelasSantriMe = async (req, res) => {
   } catch (err) {
     console.error("KELAS SANTRI ERROR:", err);
     return res.status(500).json({
-      message: "Gagal memuat data dashboard santri"
+      message: "Gagal memuat dashboard santri"
     });
   }
 };

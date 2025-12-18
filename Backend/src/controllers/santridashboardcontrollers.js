@@ -5,17 +5,14 @@ exports.getDashboardSantri = async (req, res) => {
     const id_users = req.users.id_users;
 
     // 1. Ambil data santri
-    const santri = await db.query(`
+    const santriResult = await db.query(`
       SELECT 
         s.id_santri,
         s.nis,
         s.nama,
         s.kategori,
-        s.tempat_lahir,
-        s.tanggal_lahir,
-        s.no_wa,
         s.status,
-        k.id_kelas,
+        s.id_kelas,
         k.nama_kelas,
         k.level
       FROM santri s
@@ -23,13 +20,22 @@ exports.getDashboardSantri = async (req, res) => {
       WHERE s.id_users = $1
     `, [id_users]);
 
-    if (santri.rowCount === 0)
+    if (santriResult.rowCount === 0) {
       return res.status(404).json({ message: "Data santri tidak ditemukan" });
+    }
 
-    const infoSantri = santri.rows[0];
+    const santri = santriResult.rows[0];
 
-    // 2. Ambil jadwal kelas santri
-    const jadwal = await db.query(`
+    // 2. JIKA BELUM PUNYA KELAS → KIRIM JADWAL KOSONG
+    if (!santri.id_kelas) {
+      return res.json({
+        santri,
+        jadwal: []
+      });
+    }
+
+    // 3. Ambil jadwal jika sudah punya kelas
+    const jadwalResult = await db.query(`
       SELECT 
         j.id_jadwal,
         j.hari,
@@ -52,15 +58,15 @@ exports.getDashboardSantri = async (req, res) => {
           WHEN hari='Minggu' THEN 7
         END,
         jam_mulai ASC
-    `, [infoSantri.id_kelas]);
+    `, [santri.id_kelas]);
 
-    // 3. Response lengkap
     res.json({
-      santri: infoSantri,
-      jadwal: jadwal.rows
+      santri,
+      jadwal: jadwalResult.rows
     });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
