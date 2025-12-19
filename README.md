@@ -100,6 +100,7 @@ SAHABAT-QURAN-WEB/
 │   │   │   ├── santridashboardroutes.js
 │   │   │   └── santriroutes.js
 │   │   ├── utils/
+│   │   │   └── generettoken.js
 │   │   └── app.js
 │   ├── .env
 │   ├── package-lock.json
@@ -147,6 +148,7 @@ SAHABAT-QURAN-WEB/
 │   │       ├── login.html
 │   │       ├── reset_password.html
 │   │       ├── riwayat_absensi.html
+│   │       ├── riwayat_absensi_santri.html
 │   │       ├── tambah_kelas.html
 │   │       ├── tambah_pengajar.html
 │   │       └── tambah_siswa.html
