@@ -123,7 +123,7 @@ exports.deleteJadwal = async (req, res) => {
 // ➤ Ambil jadwal milik pengajar (GET /jadwal/pengajar/me)
 exports.jadwalPengajar = async (req, res) => {
   try {
-    const { id_users } = req.users;
+    const { id_users } = req.user;
 
     // Cari id_pengajar
     const pg = await db.query(
@@ -171,7 +171,7 @@ exports.jadwalPengajar = async (req, res) => {
 // ➤ Ambil jadwal santri sendiri
 exports.jadwalSantri = async (req, res) => {
   try {
-    const { id_users } = req.users;
+    const { id_users } = req.user;
 
     const result = await db.query(`
       SELECT 

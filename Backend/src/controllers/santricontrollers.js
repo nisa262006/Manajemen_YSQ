@@ -111,7 +111,7 @@ exports.getSantriById = async (req, res) => {
           s.tanggal_lahir,
           s.status,
           s.alamat,
-          s.tanggal_terdaftar,
+          s.tanggal_terdaftar,      -- tanggal terdaftar santri
 
           u.username,
           u.email AS user_email,
@@ -142,6 +142,7 @@ exports.getSantriById = async (req, res) => {
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
+
 
 /* ============================================================
    3. UPDATE SANTRI

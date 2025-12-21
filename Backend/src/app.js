@@ -1,56 +1,115 @@
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-
-console.log("JWT Secret Status:", process.env.JWT_SECRET ? "LOADED" : "FAILED TO LOAD");
-console.log("PORT Status:", process.env.PORT);
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+
 const app = express();
+const PORT = process.env.PORT || 8000;
 
+// ================= MIDDLEWARE =================
 app.use(cors());
+app.use(express.json());
 
-// Log request
+// ================= LOG REQUEST =================
 app.use((req, res, next) => {
-  console.log("REQUEST MASUK:", req.method, req.url);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
-// Middleware JSON
-app.use(express.json());
+// ================= STATIC FILES =================
+// path ke folder public
+const publicPath = path.join(__dirname, "../public");
+const viewsPath = path.join(publicPath, "views");
 
-// ======================= R O U T E S  ===========================
-const authRoutes = require("./routes/authroutes");
-const registerRoutes = require("./routes/registerroutes");
-const kelasRoutes = require("./routes/kelasroutes");
-const jadwalRouter = require("./routes/jadwalroutes");
-const absensiRouter = require("./routes/absensiroutes");
-const santriDashboardRoutes = require("./routes/santridashboardroutes");
-const meRouter = require("./routes/meroutes");
-const pengajarRouter = require("./routes/pengajarroutes");
-const santriRouter = require("./routes/santriroutes");
-const adminRouter = require("./routes/adminroutes");
+// serve css, js, images
+app.use(express.static(publicPath));
 
-app.use("/auth", authRoutes);
-app.use("/pendaftar", registerRoutes);
-app.use("/kelas", kelasRoutes);
-app.use("/jadwal", jadwalRouter);
-app.use("/absensi", absensiRouter);
-app.use("/santri/dashboard", santriDashboardRoutes);
-app.use("/me", meRouter);
-app.use("/pengajar", pengajarRouter);
-app.use("/santri", santriRouter);
-app.use("/admin", adminRouter);
+// helper biar gak nulis sendFile panjang-panjang
+const view = (file) => path.join(viewsPath, file);
 
-// ======================= STATIC FILE (PINDAHKAN KE BAWAH) =======
-app.use(express.static(path.join(__dirname, "../../Frontend/Public")));
+// ================= HALAMAN UMUM =================
+app.get("/", (_, res) => res.sendFile(view("index.html")));
+app.get("/login", (_, res) => res.sendFile(view("login.html")));
+app.get("/daftar", (_, res) => res.sendFile(view("daftar.html")));
+app.get("/reset-password", (_, res) => res.sendFile(view("reset_password.html")));
+app.get("/berhasil", (_, res) => res.sendFile(view("berhasil.html")));
 
-app.get("/", (req, res) => {
-  res.send("API Sahabat Quran berjalan");
+// ================= DASHBOARD =================
+app.get("/dashboard/admin", (_, res) => res.sendFile(view("Admin.html")));
+app.get("/dashboard/pengajar", (_, res) => res.sendFile(view("dashboardpengajar.html")));
+app.get("/dashboard/santri", (_, res) => res.sendFile(view("dashboardsantri.html")));
+
+app.get("/dashboard/riwayat-absensi", (_, res) =>
+  res.sendFile(view("riwayat_absensi.html"))
+);
+
+app.get("/dashboard/riwayat-absensi-santri", (_, res) =>
+  res.sendFile(view("riwayat_absensi_santri.html"))
+);
+
+app.get("/dashboard/daftar-kelas", (_, res) =>
+  res.sendFile(view("daftar_kelas.html"))
+);
+
+app.get("/dashboard/tambah-kelas", (_, res) =>
+  res.sendFile(view("tambah_kelas.html"))
+);
+
+app.get("/dashboard/daftar-pengajar", (_, res) =>
+  res.sendFile(view("daftar_pengajar.html"))
+);
+
+app.get("/dashboard/tambah-pengajar", (_, res) =>
+  res.sendFile(view("tambah_pengajar.html"))
+);
+
+app.get("/dashboard/daftar-santri", (_, res) =>
+  res.sendFile(view("daftar_santri.html"))
+);
+
+app.get("/dashboard/tambah-siswa", (_, res) =>
+  res.sendFile(view("tambah_siswa.html"))
+);
+
+app.get("/dashboard/daftar-jadwal", (_, res) =>
+  res.sendFile(view("daftar_jadwal.html"))
+);
+
+app.get("/dashboard/detail-pengajar", (_, res) =>
+  res.sendFile(view("detail_pengajar.html"))
+);
+
+app.get("/dashboard/detail-santri", (_, res) =>
+  res.sendFile(view("detail_santri.html"))
+);
+
+app.get("/dashboard/absensi-siswa", (_, res) =>
+  res.sendFile(view("absensisiswa.html"))
+);
+
+app.get("/dashboard/daftar-registrasi", (_, res) =>
+  res.sendFile(view("daftar_registrasi.html"))
+);
+
+// ================= API ROUTES =================
+app.use("/api/auth", require("./routes/authroutes"));
+app.use("/api/pendaftar", require("./routes/registerroutes"));
+app.use("/api/kelas", require("./routes/kelasroutes"));
+app.use("/api/jadwal", require("./routes/jadwalroutes"));
+app.use("/api/absensi", require("./routes/absensiroutes"));
+app.use("/api/santri", require("./routes/santriroutes"));
+app.use("/api/pengajar", require("./routes/pengajarroutes"));
+app.use("/api/admin", require("./routes/adminroutes"));
+app.use("/api/me", require("./routes/meroutes"));
+app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
+
+// ================= 404 =================
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
 });
 
-// ======================= START SERVER ===========================
-const PORT = process.env.PORT || 5000;
+// ================= START SERVER =================
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - YSQ</title>
+
+    <!-- ICON -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- CSS (HARUS ABSOLUT) -->
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="header">
+            <img src="/images/LogoYSQ.png" alt="Logo YSQ">
+            <p class="organization-name">YAYASAN SAHABAT QUR'AN</p>
+        </div>
+
+        <form class="login-form" id="loginForm">
+            <div class="input-group">
+                <input type="text" id="identifier" placeholder="Username atau Email" required>
+                <i class="bx bx-user icon"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Kata Sandi" required>
+                <i class="bx bx-hide toggle-password" id="togglePassword"></i>
+            </div>
+
+            <!-- PATH HARUS ABSOLUT -->
+            <a href="/reset-password" class="forgot-password">
+                Lupa Kata Sandi?
+            </a>
+
+            <button type="submit" class="login-button">Login</button>
+
+            <p id="error" style="color:#ffb3b3; margin-top:12px; font-size:14px;"></p>
+        </form>
+    </div>
+
+    <!-- JS HARUS ABSOLUT -->
+    <script src="/js/login.js"></script>
+</body>
+</html>

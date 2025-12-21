@@ -41,85 +41,42 @@ git clone https://github.com/username/Manajemen-ysq.git
 cd Manajemen-ysq
 ```
 ```
-2️⃣ Setup Backend (Jika Ada API)
-Install dependencies
-npm install
+2️⃣ Setup Environment & Dependencies
+- Masuk ke folder Backend/
+- Buat file .env secara manual (Isi DB_USER, DB_PASSWORD, dll)
+- Jalankan perintah: npm install
 ```
 ```
-Jalankan server backend
-npm run dev / node app.js
+3️⃣ Menjalankan Database (Docker)
+- Pastikan aplikasi Docker Desktop sudah aktif
+- Jalankan perintah: docker-compose up db -d
 ```
 ```
-Backend akan berjalan di:
-http://localhost:5000
-```
-```
-3️⃣ Setup Database (PostgreSQL via pgAdmin4)
-Jalankan PostgreSQL 
-```
-```
-4️⃣ Menjalankan Frontend
-Jika frontend menggunakan file statis:
-Cukup buka:
-http://127.0.0.1:5500/frontend/index.html
+4️⃣ Menjalankan Aplikasi
+   - Jalankan server: npm start (atau node src/app.js)
+   - Akses API di: http://localhost:8000
 ```
 
 ## Struktur Folder
 ```
 SAHABAT-QURAN-WEB/
-├── Backend/
-│   ├── node_modules/
-│   ├── src/
-│   │   ├── config/
-│   │   │   ├── db.js
-│   │   │   ├── hash.js
-│   │   │   └── testconnection.js
-│   │   ├── controllers/
-│   │   │   ├── absensicontrollers.js
-│   │   │   ├── admincontrollers.js
-│   │   │   ├── authcontrollers.js
-│   │   │   ├── jadwalcontrollers.js
-│   │   │   ├── kelascontrollers.js
-│   │   │   ├── mecontrollers.js
-│   │   │   ├── pengajarcontrollers.js
-│   │   │   ├── registercontrollers.js
-│   │   │   ├── santricontrollers.js
-│   │   │   └── santridashboardcontrollers.js
-│   │   ├── middleware/
-│   │   │   ├── auth.js
-│   │   │   └── role.js
-│   │   ├── routes/
-│   │   │   ├── absensiroutes.js
-│   │   │   ├── adminroutes.js
-│   │   │   ├── authroutes.js
-│   │   │   ├── jadwalroutes.js
-│   │   │   ├── kelasroutes.js
-│   │   │   ├── meroutes.js
-│   │   │   ├── pengajarroutes.js
-│   │   │   ├── registerroutes.js
-│   │   │   ├── santridashboardroutes.js
-│   │   │   └── santriroutes.js
-│   │   ├── utils/
-│   │   │   └── generettoken.js
-│   │   └── app.js
-│   ├── .env
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── test_api.http
-│   └── test-nodemailer.js
-├── Frontend/
-│   ├── Public/
-│   │   ├── css/
+├── Backend/                           
+│   ├── docker/                        
+│   │   ├── init.sql                   
+│   │   └── schema.sql                  
+│   ├── node_modules/                 
+│   ├── public/                        
+│   │   ├── css/                        
 │   │   │   ├── admin.css
 │   │   │   ├── pengajar.css
 │   │   │   ├── santri.css
 │   │   │   └── style.css
-│   │   ├── images/
-│   │   │   ├── image.jpg
+│   │   ├── images/                     
+│   │   │   ├── img.jpg
 │   │   │   ├── kelas.jpg
 │   │   │   └── LogoYSQ.png
-│   │   ├── js/
-│   │   │   ├── absensisantri.js
+│   │   ├── js/                        
+│   │   │   ├── absensisantri.js           
 │   │   │   ├── admin_data.js
 │   │   │   ├── admin_jadwal.js
 │   │   │   ├── admin_laporan.js
@@ -129,8 +86,9 @@ SAHABAT-QURAN-WEB/
 │   │   │   ├── pengajar.js
 │   │   │   ├── profileSetting.js
 │   │   │   ├── register.js
-│   │   │   └── santri.js
-│   │   └── views/
+│   │   │   ├── santri.js
+│   │   │   └── script.js
+│   │   └── views/                     
 │   │       ├── absensisiswa.html
 │   │       ├── Admin.html
 │   │       ├── berhasil.html
@@ -144,19 +102,59 @@ SAHABAT-QURAN-WEB/
 │   │       ├── dashboardsantri.html
 │   │       ├── detail_pengajar.html
 │   │       ├── detail_santri.html
-│   │       ├── index.html
+│   │       ├── index.html           
 │   │       ├── login.html
 │   │       ├── reset_password.html
+│   │       ├── riwayat_absensi_santri.html
 │   │       ├── riwayat_absensi.html
 │   │       ├── riwayat_absensi_santri.html
 │   │       ├── tambah_kelas.html
 │   │       ├── tambah_pengajar.html
 │   │       └── tambah_siswa.html
-│   └── package.json
-├── .gitignore
+│   ├── src/                          
+│   │   ├── config/                     
+│   │   │   ├── db.js                   
+│   │   │   ├── hash.js                 
+│   │   │   └── testconnection.js       
+│   │   ├── controllers/                
+│   │   │   ├── absensicontrollers.js
+│   │   │   ├── admincontrollers.js
+│   │   │   ├── authcontrollers.js
+│   │   │   ├── jadwalcontrollers.js
+│   │   │   ├── kelascontrollers.js
+│   │   │   ├── mecontrollers.js
+│   │   │   ├── pengajarcontrollers.js
+│   │   │   ├── registercontrollers.js
+│   │   │   ├── santricontrollers.js
+│   │   │   └── santridashboardcontrollers.js
+│   │   ├── middleware/                 
+│   │   │   ├── auth.js                 
+│   │   │   └── role.js                 
+│   │   ├── routes/                     
+│   │   │   ├── absensiroutes.js
+│   │   │   ├── adminroutes.js
+│   │   │   ├── authroutes.js
+│   │   │   ├── jadwalroutes.js
+│   │   │   ├── kelasroutes.js
+│   │   │   ├── meroutes.js
+│   │   │   ├── pengajarroutes.js
+│   │   │   ├── registerroutes.js
+│   │   │   ├── santridashboardroutes.js
+│   │   │   └── santriroutes.js
+│   │   ├── utils/
+│   │   │   └── generateToken.js
+│   │   └── app.js                      
+│   ├── .env                           
+│   ├── docker-compose.yml             
+│   ├── dockerfile              
+│   ├── package-lock.json      
+│   ├── package.json      
+│   ├── test_api.http      
+│   └── test-nodemailer.js              
+├── tests/                            
+├── .gitignore                          # Pengabaian node_modules & .env
 ├── package-lock.json
-├── README.md
-└── tests/
+└── README.md           
 ```
 
 ### Struktur Tim
@@ -167,4 +165,3 @@ SAHABAT-QURAN-WEB/
 
 ## 🙏 Penutup
 Repository ini dikelola sebagai bagian dari implementasi sistem manajemen modern untuk Yayasan Sahabat Qur’an Bogor. Proyek ini dibangun dengan tujuan meningkatkan efisiensi, akurasi, dan profesionalitas dalam pengelolaan operasional yayasan.
-

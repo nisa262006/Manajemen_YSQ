@@ -1,8 +1,5 @@
 const db = require("../config/db");
 
-/* ================================
-   1. Daftar Pendaftar (Public)
-================================ */
 exports.daftarPendaftar = async (req, res) => {
   const client = await db.connect();
 
@@ -10,15 +7,32 @@ exports.daftarPendaftar = async (req, res) => {
     const {
       nama,
       email,
-      alamat,          // ✅ AMBIL
+      alamat,
       no_wa,
       tanggal_lahir,
       tempat_lahir
     } = req.body;
 
+    if (!nama || !email || !alamat || !no_wa || !tanggal_lahir || !tempat_lahir) {
+      return res.status(400).json({ message: "Semua field wajib diisi" });
+    }
+
+    // Pastikan tanggal_lahir ada sebelum di-split untuk menghindari error undefined
     const tanggalFix = tanggal_lahir ? tanggal_lahir.split("T")[0] : null;
 
     await client.query("BEGIN");
+
+    // ✅ FIX: Nama variabel disamakan menjadi 'cekEmail'
+    const cekEmail = await client.query(
+      `SELECT id_pendaftar FROM pendaftar WHERE email = $1`, [email]
+    );
+
+    if (cekEmail.rows.length > 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({
+        message: "Email sudah terdaftar"
+      });
+    }
 
     const result = await client.query(
       `
@@ -32,19 +46,20 @@ exports.daftarPendaftar = async (req, res) => {
 
     await client.query("COMMIT");
 
-    res.json({
+    res.status(201).json({
       success: true,
+      message: "Pendaftaran berhasil",
       data: result.rows[0]
     });
 
   } catch (err) {
-    await client.query("ROLLBACK");
-    res.status(500).json({ message: "Gagal mendaftar" });
+    if (client) await client.query("ROLLBACK");
+    console.error("DAFTAR ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
-
 
 /* ================================
    2. Get semua pendaftar (Admin)

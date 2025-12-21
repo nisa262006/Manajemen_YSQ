@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Kelas - Sahabat Quran</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/LogoYSQ.png" alt="Sahabat Quran" class="logo-img">
+            </div>
+            
+            <nav class="menu">
+                <a href="/dashboard/Admin" class="menu-item"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/dashboard/daftar-jadwal" class="menu-item"><i class="fas fa-calendar-alt"></i> Daftar Jadwal</a>
+                <a href="/dashboard/daftar-kelas" class="menu-item active"><i class="fas fa-book"></i> Daftar Kelas</a>
+                <a href="/dashboard/daftar-santri" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+                <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+                <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+                <a href="#" class="menu-item" data-dev="true"><i class="fas fa-scroll"></i> Rapor</a>
+                <a href="#" class="menu-item" data-dev="true"><i class="fas fa-file-alt"></i> Laporan</a>                
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="footer-buttons-wrapper"> 
+                    <button type="button" class="footer-btn setting" id="btn-open-profil">
+                        <i class="fas fa-cog"></i> Setting Profil
+                        </button>
+                    <a href="/login" class="footer-btn logout">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </a>
+                </div>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="dashboard-header class-header-style">
+                <h1 class="header-title">Daftar Kelas</h1>
+                <div class="admin-profile">
+                    <span class="header-date" id="current-date-display">Rabu, 19 November 2025</span>
+                </div>
+            </header>
+            
+            <section class="class-controls-section">
+                <div class="class-controls-card">
+                    
+                    <div class="filter-group">
+                        <label for="kelas_tingkatan">Kelas/Tingkatan</label>
+                        <select id="kelas_tingkatan" name="kelas_tingkatan" class="styled-select-filter">
+                            <option value="semua">Semua</option>
+                        </select>                        
+                    </div>
+                    <button type="button" id="btn-open-tambah-kelas" class="action-btn-form add-class-btn">
+                    <i class="fas fa-plus"></i> Tambah Kelas
+                    </button>
+                </div>
+            </section>
+            
+            <section class="class-table-section">
+                <div class="pendaftar-table"> 
+                    <table class="class-list-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Kelas</th>
+                                <th>Kapasitas</th>
+                                <th>Kategori</th>
+                                <th>Pengajar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <div class="table-footer-actions">
+                <a href="/dashboard/Admin" class="action-btn-form back-btn">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
+            </main>
+    </div>
+<div id="notification-toast" class="toast-notification"></div>
+<div id="popup-profile-setting" class="modal-overlay">
+    <div class="profile-setting-content">
+        <button class="close-btn" id="btn-close-profil-x">
+            &times;
+        </button>
+        <div class="profile-avatar-large">R</div>
+        
+        <div class="profile-field-group">
+            <div>
+                <label>Nama</label> :
+                <input type="text" id="profile-name-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>Email</label> :
+                <input type="email" id="profile-email-input" class="profile-input" placeholder="" />
+            </div>
+            <div>
+                <label>No. Telepon</label> :
+                <input type="tel" id="profile-phone-input" class="profile-input" placeholder="" />
+            </div>
+        </div>
+        
+        <div class="profile-actions">
+            <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+            <button type="button" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">
+                Simpan
+            </button>
+            
+        </div>
+    </div>
+</div>
+<div id="tambah-kelas-modal" class="modal-overlay">
+    <div class="tambah-kelas-content">
+        <button class="close-btn" id="btn-close-tambah-kelas-x">&times;</button>
+        <h2 class="modal-title-tambah-kelas">Tambah Kelas</h2>
+
+        <form id="form-tambah-kelas">
+            <div class="input-group-full">
+                <label for="input-kelas-tingkatan">Kelas/tingkatan</label>
+                <input type="text" id="input-kelas-tingkatan" placeholder="Contoh: Tahsin" required>
+            </div>
+            
+            <div class="form-row-tambah">
+                <div class="input-group-tambah">
+                    <label for="select-pengajar-kelas">Pengajar</label>
+                    <select id="select-pengajar-kelas" required>
+                        <option value="">Pilih Pengajar</option>
+                    </select>
+                </div>
+                <div class="input-group-tambah">
+                    <label for="input-kapasitas">Kapasitas</label>
+                    <input type="number" id="input-kapasitas" placeholder="Contoh: 15" required>
+                </div>
+            </div>
+
+            <div class="input-group-full">
+                <label for="input-kategori">Kategori</label>
+                <input type="text" id="input-kategori" placeholder="Contoh: Tahsin Dewasa" required>
+            </div>
+            
+            <div class="form-row-tambah">
+                <div class="input-group-tambah">
+                    <label for="input-waktu-mulai">Waktu Awal Periode</label>
+                    <input type="date" id="input-waktu-mulai" required>
+                </div>
+                <div class="input-group-tambah">
+                    <label for="input-waktu-selesai">Waktu Selesai Periode</label>
+                    <input type="date" id="input-waktu-selesai" required>
+                </div>
+            </div>
+
+            <div class="modal-footer-tambah-kelas">
+                <button type="button" class="action-btn-form cancel-btn-kelas" id="btn-cancel-kelas">Batalkan</button>
+                <button type="submit" class="action-btn-form save-btn-kelas" id="btn-simpan-kelas">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="santri-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" title="Tutup">&times;</span>
+        <h3 id="modal-title">Daftar Santri Kelas: [Nama Kelas]</h3>
+        
+        <div id="santri-list-container" class="table-responsive">
+            <table id="santri-table" class="table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Santri</th>
+                        <th>Usia</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="module" src="/js/admin_jadwal.js"></script>
+<script type="module" src="/js/profileSetting.js"></script>
+</body>
+</html>

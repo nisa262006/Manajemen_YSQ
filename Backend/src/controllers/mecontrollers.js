@@ -2,7 +2,7 @@ const pool = require("../config/db");
 
 exports.getMyProfile = async (req, res) => {
   try {
-    const { id_users, role } = req.users;
+    const { id_users, role } = req.user;
 
     let query = "";
     let params = [id_users];

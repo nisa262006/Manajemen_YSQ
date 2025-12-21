@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASBOARD siswa</title>
+    <link rel="stylesheet" href="/css/santri.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+
+<header class="header">
+    <div class="logo-section">
+        <img src="/images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
+        <h2>YAYASAN SAHABAT QUR'AN</h2>
+    </div>
+
+    <div class="user-info">
+        <span id="role-user">Santri</span>
+        <i class='bx bx-user'></i>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="dashboard-card">
+
+        <h1>DASBOARD SISWA</h1>
+
+        <!-- SUB NAV RESPONSIF -->
+        <div class="sub-nav scroll-x">
+            <button class="active">Dashboard</button>
+            <a href="absensisiswa.html">Riwayat Absen</a>
+            <button data-dev="true">Raport</button>
+            <button data-dev="true">Student Bill</button>
+        </div>
+        
+
+        <!-- INFORMASI TAHSHIN CARD -->
+        <div class="info-tahsin responsive-card">
+            <img src="/images/kelas.jpg" alt="Ruang Kelas" class="info-tahsin-image">
+
+            <div class="info-tahsin-body">
+
+                <div class="info-left">
+                    <p><strong>Informasi Kelas</strong></p>
+                    <p>Nama: <span id="namaSantri">-</span></p>
+                    <p>Kategori: <span id="kategori-santri">-</span></p>
+                    <p>Kelas: <span id="kelas-santri">-</span></p>
+                    <p>Jadwal: <span id="jadwal-santri">-</span></p>
+                </div>
+
+                <div class="info-tahsin-id">
+                    <p class="info-tahsin-level" id="nisSantri">-</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB STUDENT INFO / EVENT -->
+        <div class="student-event-section">
+            <div class="student-event-tabs scroll-x">
+                <button class="active">Student Info</button>
+                <button>Event</button>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>NO</th>
+                            <th>Subjek</th>
+                            <th>Hari</th>
+                            <th>Jam</th>
+                            <th>Guru</th>
+                            <th>Materi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jadwal-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="module" src="/js/santri.js"></script>
+</body>
+</html>

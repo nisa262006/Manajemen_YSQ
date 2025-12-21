@@ -91,3 +91,27 @@ exports.updateAdminProfile = async (req, res) => {
     }
   };
   
+  exports.getDashboardStats = async (req, res) => {
+    try {
+        // Menghitung data aktif sesuai kategori di Admin.html
+        const santriDewasa = await db.query("SELECT COUNT(*) FROM santri WHERE kategori = 'dewasa' AND status = 'aktif'");
+        const santriAnak = await db.query("SELECT COUNT(*) FROM santri WHERE kategori = 'anak' AND status = 'aktif'");
+        const totalPengajar = await db.query("SELECT COUNT(*) FROM pengajar WHERE status = 'aktif'");
+        const totalKelas = await db.query("SELECT COUNT(*) FROM kelas");
+        const totalPendaftar = await db.query("SELECT COUNT(*) FROM pendaftar WHERE status = 'pending'");
+
+        res.json({
+            success: true,
+            data: {
+                santri_dewasa: parseInt(santriDewasa.rows[0].count),
+                santri_anak: parseInt(santriAnak.rows[0].count),
+                pengajar: parseInt(totalPengajar.rows[0].count),
+                kelas: parseInt(totalKelas.rows[0].count),
+                pendaftar: parseInt(totalPendaftar.rows[0].count)
+            }
+        });
+    } catch (err) {
+        console.error("GET STATS ERROR:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+};

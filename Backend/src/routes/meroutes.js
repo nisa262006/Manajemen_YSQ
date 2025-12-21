@@ -5,7 +5,8 @@ const pool = require("../config/db");
 
 router.get("/", auth.verifyToken, async (req, res) => {
   try {
-    const { id_users, role } = req.users;
+    // 🔥 FIX UTAMA DI SINI
+    const { id_users, role } = req.user;
 
     // ================= USER BASE =================
     const baseUser = await pool.query(
@@ -44,7 +45,6 @@ router.get("/", auth.verifyToken, async (req, res) => {
         return res.status(404).json({ message: "Data santri tidak ditemukan" });
       }
 
-      // 🔒 BLOKIR SANTRI NONAKTIF
       if (q.rows[0].status !== "aktif") {
         return res.status(403).json({
           message: "Akun santri tidak aktif"
@@ -57,9 +57,20 @@ router.get("/", auth.verifyToken, async (req, res) => {
     // ================= PENGAJAR =================
     else if (role === "pengajar") {
       const q = await pool.query(
-        `SELECT id_pengajar, nama, no_kontak, alamat, status
-         FROM pengajar
-         WHERE id_users = $1`,
+        `SELECT 
+          p.id_pengajar,
+          p.nip,
+          p.nama,
+          p.no_kontak,
+          p.alamat,
+          p.mapel,
+          p.status,
+          p.tanggal_terdaftar,
+          u.email,
+          u.username
+        FROM pengajar p
+        JOIN users u ON u.id_users = p.id_users
+        WHERE p.id_users = $1`,
         [id_users]
       );
       roleData = q.rows[0] ?? {};

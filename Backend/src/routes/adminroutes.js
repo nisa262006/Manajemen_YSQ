@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getAdminProfile,
-  updateAdminProfile,
-} = require("../controllers/admincontrollers");
-
+// Perubahan: Impor seluruh controller sebagai satu objek
+const adminController = require("../controllers/admincontrollers");
 const { verifyToken, onlyAdmin } = require("../middleware/auth");
 
-// PAKAI verifyToken (fungsi auth kamu), bukan "auth"
-router.get("/profile/:id_admin", verifyToken, onlyAdmin, getAdminProfile);
-router.put("/profile/:id_admin", verifyToken, onlyAdmin, updateAdminProfile);
+// Route untuk statistik di Admin.html
+router.get("/stats", verifyToken, onlyAdmin, adminController.getDashboardStats);
+
+// Route profil admin
+router.get("/profile/:id_admin", verifyToken, onlyAdmin, adminController.getAdminProfile);
+router.put("/profile/:id_admin", verifyToken, onlyAdmin, adminController.updateAdminProfile);
 
 module.exports = router;

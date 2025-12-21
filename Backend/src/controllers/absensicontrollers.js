@@ -23,7 +23,7 @@ function getHariFromTanggal(tanggal) {
 exports.catatAbsensiSantri = async (req, res) => {
   try {
     const { id_santri, id_jadwal, tanggal, status_absensi, catatan } = req.body;
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     if (!tanggal)
       return res.status(400).json({ message: "Tanggal wajib diisi" });
@@ -134,7 +134,7 @@ exports.updateAbsensiSantri = async (req, res) => {
   try {
     const { id_absensi } = req.params;
     const { status_absensi } = req.body;
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar)
@@ -168,7 +168,7 @@ exports.updateAbsensiSantri = async (req, res) => {
 ====================================================================== */
 exports.getAbsensiKelasPengajar = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar) {
@@ -211,7 +211,7 @@ exports.getAbsensiKelasPengajar = async (req, res) => {
 ====================================================================== */
 exports.getAbsensiSantri = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     const result = await db.query(`
       SELECT 
@@ -254,7 +254,7 @@ function getHariFromTanggal(tanggal) {
 
 exports.catatAbsensiPengajar = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
     const { id_jadwal, tanggal, status_absensi, catatan } = req.body;
 
     const id_pengajar = await getIdPengajar(id_users);
@@ -315,7 +315,7 @@ exports.catatAbsensiPengajar = async (req, res) => {
 ============================================================================ */
 exports.getAbsensiPengajar = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar)

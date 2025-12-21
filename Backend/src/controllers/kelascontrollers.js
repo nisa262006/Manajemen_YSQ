@@ -219,7 +219,7 @@ exports.kelasPengajar = async (req, res) => {
      FROM kelas k
      JOIN pengajar p ON p.id_pengajar = k.id_pengajar
      WHERE p.id_users = $1`,
-    [req.users.id_users]
+     [req.user.id_users]
   );
 
   res.json(result.rows);
@@ -230,7 +230,8 @@ exports.kelasPengajar = async (req, res) => {
 
 exports.getDetailKelasPengajar = async (req, res) => {
   const { id_kelas } = req.params;
-  const id_users = req.users.id_users; // dari token
+  const id_users = req.user.id_users;
+
 
   try {
     // 1. Pastikan kelas ini memang diajar oleh pengajar yang login
@@ -282,7 +283,7 @@ exports.getDetailKelasPengajar = async (req, res) => {
 // ====================== DETAIL KELA SUNTUK SANTRI==============//
 exports.kelasSantriMe = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     // 1. Ambil data santri (BOLEH BELUM PUNYA KELAS)
     const santriRes = await db.query(`
