@@ -1,296 +1,244 @@
-// santri_absensi.js
-document.addEventListener("DOMContentLoaded", initAbsensi);
+/* =========================================================
+   CONFIG
+========================================================= */
+const API_BASE = "http://localhost:8000/api";
+const token = localStorage.getItem("token");
 
-let RAW_DATA = []; // menyimpan data asli dari server
-
-function initAbsensi() {
-  // ===== Ambil elemen =====
-    const startDateEl = document.getElementById("start-date");
-    const endDateEl = document.getElementById("end-date");
-    const exportBtn = document.getElementById("export-excel");
-  
-    const today = new Date();
-    const sixMonthsAgo = new Date(today);
-    sixMonthsAgo.setMonth(today.getMonth() - 6);
-  
-    // ⛔ set attribute dulu (ANTI RESET)
-    startDateEl.setAttribute("max", formatISODate(today));
-    endDateEl.setAttribute("max", formatISODate(today));
-  
-    // ✅ set value SETELAH attribute
-    startDateEl.value = formatISODate(sixMonthsAgo);
-    endDateEl.value = formatISODate(today);
-  
-    startDateEl.addEventListener("input", onStartDateChange);
-    endDateEl.addEventListener("input", renderFiltered);
-    exportBtn?.addEventListener("click", exportFilteredToCSV);
-  
-    loadAbsensiSantri();
-  }
-  
-/**
- * Ambil data absensi dari backend, simpan di RAW_DATA lalu render.
- */
-async function loadAbsensiSantri() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "../login.html";
-    return;
-  }
-
-  try {
-    const res = await fetch("http://localhost:5000/absensi/santri/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
-    }
-
-    const json = await res.json();
-    console.log("Absensi dari backend:", json);
-
-    RAW_DATA = Array.isArray(json.data) ? json.data : [];
-
-    renderFiltered();
-
-  } catch (err) {
-    console.error("ERROR loadAbsensiSantri:", err);
-    alert("Gagal memuat data absensi");
-  }
+if (!token) {
+  alert("Session habis, silakan login ulang");
+  location.href = "/login";
 }
 
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+let RAW_DATA = [];
 
-/**
- * Ambil data yang sudah difilter oleh tanggal (start-date / end-date) dan render UI
- */
-function renderFiltered() {
-  const start = document.getElementById("start-date").value;
-  const end = document.getElementById("end-date").value;
+/* =========================================================
+   ELEMENTS
+========================================================= */
+const tbody = document.getElementById("absensi-body");
+const startDateInput = document.getElementById("start-date");
+const endDateInput = document.getElementById("end-date");
+const exportBtn = document.getElementById("export-excel");
 
-  const filtered = RAW_DATA.filter(item =>
-    item.tanggal >= start && item.tanggal <= end
-  );
+const totalEl = document.querySelector(".summary-card-value.total");
+const hadirEl = document.querySelector(".summary-card-value.hadir");
+const izinEl = document.querySelector(".summary-card-value.izin");
+const sakitEl = document.querySelector(".summary-card-value.sakit");
+const alfaEl = document.querySelector(".summary-card-value.alfa");
+const mustamilahEl = document.querySelector(".summary-card-value.mustamilah");
 
-  renderStats(filtered);
-  renderTable(filtered);
+/* =========================================================
+   DATE UTIL (ANTI TIMEZONE BUG)
+========================================================= */
+function formatDateInput(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-function onStartDateChange() {
-  const startEl = document.getElementById("start-date");
-  const endEl = document.getElementById("end-date");
-
-  if (!startEl.value) return;
-
-  const start = new Date(startEl.value + "T00:00:00");
-  const end = new Date(start);
-  end.setMonth(end.getMonth() + 6);
-
-  const today = new Date();
-  if (end > today) endEl.value = formatISODate(today);
-  else endEl.value = formatISODate(end);
-
-  renderFiltered();
-}
-
-/**
- * Render statistik (total, hadir, izin, sakit, alfa, mustamilah)
- */
-function renderStats(list) {
-  const total = list.length;
-  const hadir = list.filter(i => normalizeStatus(i) === "hadir").length;
-  const izin = list.filter(i => normalizeStatus(i) === "izin").length;
-  const sakit = list.filter(i => normalizeStatus(i) === "sakit").length;
-  const alfa = list.filter(i => ["alpha", "alfa"].includes(normalizeStatus(i))).length;
-  const mustamilah = list.filter(i => normalizeStatus(i) === "mustamilah").length;
-
-  // update DOM — gunakan kelas sesuai HTML
-  setText(".summary-card-value.total", total);
-  setText(".summary-card-value.hadir", hadir);
-  setText(".summary-card-value.izin", izin);
-  setText(".summary-card-value.sakit", sakit);
-  setText(".summary-card-value.alfa", alfa);
-  setText(".summary-card-value.mustamilah", mustamilah);
-}
-
-/**
- * Render tabel absensi
- */
-function renderTable(list) {
-  const tbody = document.getElementById("absensi-body") || document.querySelector(".attendance-table tbody");
-  if (!tbody) {
-    console.warn("elemen tbody absensi tidak ditemukan (id='absensi-body' atau .attendance-table tbody)");
-    return;
-  }
-  tbody.innerHTML = "";
-
-  list.forEach(item => {
-    const tanggal = formatTanggalForDisplay(item.tanggal);
-    const kelas = item.kelas ?? item.nama_kelas ?? item.kelas ?? "-";
-    const jamMulai = item.jam_mulai ?? item.jam_mulai_absensi ?? "-";
-    const jamSelesai = item.jam_selesai ?? item.jam_selesai_absensi ?? "-";
-    const catatan = item.catatan ?? item.keterangan ?? "-";
-    const statusRaw = normalizeStatusReadable(item);
-    const statusClass = makeStatusClass(statusRaw);
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${tanggal}</td>
-      <td>${escapeHtml(kelas)}</td>
-      <td>${escapeHtml(jamMulai)} - ${escapeHtml(jamSelesai)}</td>
-      <td>${escapeHtml(catatan)}</td>
-      <td><span class="${statusClass}">${escapeHtml(statusRaw)}</span></td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  if (list.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:18px;color:#666">Tidak ada data absensi pada rentang tanggal ini.</td></tr>`;
-  }
-}
-
-/* -------------------------
-   HELPERS / UTILITIES
-   ------------------------- */
-
-function setText(selector, value) {
-  const el = document.querySelector(selector);
-  if (el) el.textContent = value;
-}
-
-function parseDateFromInput(id, endOfDay = false) {
-  const el = document.getElementById(id);
-  if (!el || !el.value) return null;
-  const d = new Date(el.value + (endOfDay ? "T23:59:59" : "T00:00:00"));
+function parsePossibleDate(value) {
+  if (!value) return null;
+  const d = new Date(value + "T12:00:00"); // aman timezone
   return isNaN(d) ? null : d;
 }
 
-function parsePossibleDate(raw) {
-  if (!raw) return null;
-  // if already Date
-  if (raw instanceof Date) return raw;
-  // try ISO or yyyy-mm-dd
-  const d = new Date(raw);
-  if (!isNaN(d)) return d;
-  // try split dd/mm/yyyy or dd-mm-yyyy
-  const m1 = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/.exec(raw);
-  if (m1) {
-    return new Date(`${m1[3]}-${m1[2]}-${m1[1]}T00:00:00`);
-  }
-  return null;
+function parseDateFromInput(id, end = false) {
+  const v = document.getElementById(id)?.value;
+  if (!v) return null;
+  const d = new Date(v + "T12:00:00");
+  if (end) d.setHours(23, 59, 59, 999);
+  return d;
 }
 
-function formatTanggalForDisplay(raw) {
-  const d = parsePossibleDate(raw);
-  if (!d) return raw ?? "-";
-  return d.toLocaleDateString("id-ID");
+function formatTanggalForDisplay(tanggal) {
+  const d = parsePossibleDate(tanggal);
+  if (!d) return "-";
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
 }
 
-function formatISODate(d) {
-  if (!(d instanceof Date)) return "";
-  return d.toISOString().slice(0,10);
+/* =========================================================
+   DEFAULT DATE (1 BULAN)
+========================================================= */
+function setDefaultDate(start, end) {
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+
+  const oneMonthAgo = new Date(today);
+  oneMonthAgo.setMonth(today.getMonth() - 1);
+
+  start.value = formatDateInput(oneMonthAgo);
+  end.value = formatDateInput(today);
 }
 
-/**
- * Cari value status dari beberapa kemungkinan nama field
- * dan normalisasi ke lowercase singkat: hadir / izin / sakit / alpha / mustamilah / other
- */
-function normalizeStatus(item) {
-  const raw = (item.status_absensi ?? item.status ?? item.kehadiran ?? item.keterangan ?? item.ket ?? item.status_kehadiran ?? "").toString().trim().toLowerCase();
-  if (!raw) return "unknown";
-  if (raw.includes("hadir")) return "hadir";
-  if (raw.includes("izin")) return "izin";
-  if (raw.includes("sakit")) return "sakit";
-  if (raw.includes("alpha") || raw.includes("alfa")) return "alpha";
-  if (raw.includes("mustamilah")) return "mustamilah";
-  return raw; // fallback: kembalikan string apapun (lowercase)
-}
-
-/**
- * Sama seperti normalizeStatus tetapi kembalikan versi readble (cap words)
- */
+/* =========================================================
+   STATUS NORMALIZER
+========================================================= */
 function normalizeStatusReadable(item) {
-  const norm = normalizeStatus(item);
-  if (norm === "unknown") return "-";
-  // cap first letter
-  return norm.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  if (!item.status_absensi) return "-";
+  return item.status_absensi
+    .toLowerCase()
+    .replace(/^\w/, c => c.toUpperCase());
 }
 
-/**
- * CSS class generator untuk badge status
- */
-function makeStatusClass(statusReadable) {
-  if (!statusReadable || statusReadable === "-") return "status-unknown";
-  return "status-" + statusReadable.toLowerCase().replace(/\s+/g, "-");
-}
-
-/**
- * Escape HTML (prevent injection)
- */
-function escapeHtml(str) {
-  if (str === null || str === undefined) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-/* =========================
-   EXPORT CSV (Excel)
-   - export data currently terfilter
-   ========================= */
-/* ============================================================
-   EXPORT EXCEL — RAPIH SESUAI TABEL
-============================================================ */
-function exportFilteredToCSV() {
-    const startDate = parseDateFromInput("start-date");
-    const endDate = parseDateFromInput("end-date", true);
-  
-    const filtered = RAW_DATA.filter(item => {
-      const d = parsePossibleDate(item.tanggal);
-      if (!d) return false;
-      if (startDate && d < startDate) return false;
-      if (endDate && d > endDate) return false;
-      return true;
+/* =========================================================
+   LOAD DATA
+========================================================= */
+async function loadAbsensiSantri() {
+  try {
+    const res = await fetch(`${API_BASE}/absensi/santri/me`, {
+      headers: { Authorization: `Bearer ${token}` }
     });
-  
-    if (!filtered.length) {
-      return alert("Tidak ada data untuk diekspor pada rentang tanggal ini.");
-    }
-  
-    // Susunan kolom sesuai tampilan tabel
-    const excelData = filtered.map((item, i) => ({
-      No: i + 1,
-      Tanggal: formatTanggalForDisplay(item.tanggal),
-      Kelas: item.kelas ?? item.nama_kelas ?? "-",
-      "Jam Mulai": item.jam_mulai ?? item.jam_mulai_absensi ?? "-",
-      "Jam Selesai": item.jam_selesai ?? item.jam_selesai_absensi ?? "-",
-      Catatan: item.catatan ?? item.keterangan ?? "-",
-      Status: normalizeStatusReadable(item)
-    }));
-  
-    const ws = XLSX.utils.json_to_sheet(excelData);
-  
-    // Set lebar kolom agar rapi
-    ws["!cols"] = [
-      { wch: 5 },   // No
-      { wch: 14 },  // Tanggal
-      { wch: 20 },  // Kelas
-      { wch: 12 },  // Jam Mulai
-      { wch: 12 },  // Jam Selesai
-      { wch: 25 },  // Catatan
-      { wch: 12 }   // Status
-    ];
-  
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Absensi");
-  
-    XLSX.writeFile(wb, `Absensi_Santri_${formatISODate(new Date())}.xlsx`);
+
+    if (!res.ok) throw new Error("Gagal mengambil data absensi");
+
+    const json = await res.json();
+    RAW_DATA = Array.isArray(json.data) ? json.data : [];
+
+    applyFilterAndRender();
+
+  } catch (err) {
+    console.error(err);
+    tbody.innerHTML =
+      `<tr><td colspan="5" style="text-align:center">Gagal memuat data</td></tr>`;
   }
-  
+}
+
+/* =========================================================
+   FILTER + RENDER
+========================================================= */
+function applyFilterAndRender() {
+  const start = parseDateFromInput("start-date");
+  const end = parseDateFromInput("end-date", true);
+
+  const filtered = RAW_DATA.filter(item => {
+    const d = parsePossibleDate(item.tanggal);
+    if (!d) return false;
+    if (start && d < start) return false;
+    if (end && d > end) return false;
+    return true;
+  });
+
+  renderTable(filtered);
+  renderSummary(filtered);
+}
+
+/* =========================================================
+   TABLE RENDER
+========================================================= */
+function renderTable(data) {
+  tbody.innerHTML = "";
+
+  if (!data.length) {
+    tbody.innerHTML =
+      `<tr><td colspan="5" style="text-align:center">Tidak ada data</td></tr>`;
+    return;
+  }
+
+  data.forEach(item => {
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td>${formatTanggalForDisplay(item.tanggal)}</td>
+        <td>${item.nama_kelas ?? "-"}</td>
+        <td>${item.jam_mulai ?? "-"} - ${item.jam_selesai ?? "-"}</td>
+        <td>${item.catatan ?? "-"}</td>
+        <td>${normalizeStatusReadable(item)}</td>
+      </tr>
+    `);
+  });
+}
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+function renderSummary(data) {
+  let hadir = 0, izin = 0, sakit = 0, alfa = 0, mustamilah = 0;
+
+  data.forEach(d => {
+    switch (d.status_absensi?.toLowerCase()) {
+      case "hadir": hadir++; break;
+      case "izin": izin++; break;
+      case "sakit": sakit++; break;
+      case "alfa": alfa++; break;
+      case "mustamilah": mustamilah++; break;
+    }
+  });
+
+  totalEl.textContent = data.length;
+  hadirEl.textContent = hadir;
+  izinEl.textContent = izin;
+  sakitEl.textContent = sakit;
+  alfaEl.textContent = alfa;
+  mustamilahEl.textContent = mustamilah;
+}
+
+/* =========================================================
+   EXPORT EXCEL — SESUAI TABEL
+========================================================= */
+function exportFilteredToCSV() {
+  const startDate = parseDateFromInput("start-date");
+  const endDate = parseDateFromInput("end-date", true);
+
+  const filtered = RAW_DATA.filter(item => {
+    const d = parsePossibleDate(item.tanggal);
+    if (!d) return false;
+    if (startDate && d < startDate) return false;
+    if (endDate && d > endDate) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    alert("Tidak ada data untuk diekspor");
+    return;
+  }
+
+  const excelData = filtered.map((item, i) => ({
+    No: i + 1,
+    Tanggal: formatTanggalForDisplay(item.tanggal),
+    Kelas: item.nama_kelas ?? "-",
+    "Jam Mulai": item.jam_mulai ?? "-",
+    "Jam Selesai": item.jam_selesai ?? "-",
+    Catatan: item.catatan ?? "-",
+    Status: normalizeStatusReadable(item)
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(excelData);
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 18 },
+    { wch: 22 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 30 },
+    { wch: 12 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Absensi");
+
+  XLSX.writeFile(
+    wb,
+    `Absensi_Santri_${formatDateInput(new Date())}.xlsx`
+  );
+}
+
+/* =========================================================
+   EVENTS
+========================================================= */
+startDateInput.addEventListener("change", applyFilterAndRender);
+endDateInput.addEventListener("change", applyFilterAndRender);
+exportBtn.addEventListener("click", exportFilteredToCSV);
+
+/* =========================================================
+   INIT
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  setDefaultDate(startDateInput, endDateInput);
+  loadAbsensiSantri();
+});

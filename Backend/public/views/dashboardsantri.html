@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DASBOARD siswa</title>
+    <title>DASHBOARD Siswa</title>
     <link rel="stylesheet" href="/css/santri.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -17,45 +17,38 @@
 
     <div class="user-info">
         <span id="role-user">Santri</span>
-        <i class='bx bx-user'></i>
+        <i class='bx bx-user-circle icon-user'></i> 
     </div>
 </header>
 
 <div class="main-container">
     <div class="dashboard-card">
+        <div class="main-header-row">
+            <h1>DASHBOARD SISWA</h1>
+            <div id="nisSantri">YSQSNTRI888</div>
+        </div>
 
-        <h1>DASBOARD SISWA</h1>
-
-        <!-- SUB NAV RESPONSIF -->
         <div class="sub-nav scroll-x">
             <button class="active">Dashboard</button>
-            <a href="absensisiswa.html">Riwayat Absen</a>
+            <a href="/dashboard/absensi-siswa">Riwayat Absen</a>
             <button data-dev="true">Raport</button>
             <button data-dev="true">Student Bill</button>
         </div>
         
-
-        <!-- INFORMASI TAHSHIN CARD -->
         <div class="info-tahsin responsive-card">
             <img src="/images/kelas.jpg" alt="Ruang Kelas" class="info-tahsin-image">
 
             <div class="info-tahsin-body">
-
                 <div class="info-left">
-                    <p><strong>Informasi Kelas</strong></p>
-                    <p>Nama: <span id="namaSantri">-</span></p>
-                    <p>Kategori: <span id="kategori-santri">-</span></p>
-                    <p>Kelas: <span id="kelas-santri">-</span></p>
-                    <p>Jadwal: <span id="jadwal-santri">-</span></p>
-                </div>
-
-                <div class="info-tahsin-id">
-                    <p class="info-tahsin-level" id="nisSantri">-</p>
+                    <p><strong>INFORMASI KELAS</strong></p>
+                    <p><span class="label">Nama</span>: <span id="namaSantri">-</span></p>
+                    <p><span class="label">Kategori</span>: <span id="kategori-santri">-</span></p>
+                    <p><span class="label">Kelas</span>: <span id="kelas-santri">-</span></p>
+                    <p><span class="label">Jadwal</span>: <span id="jadwal-santri">-</span></p>
                 </div>
             </div>
         </div>
 
-        <!-- TAB STUDENT INFO / EVENT -->
         <div class="student-event-section">
             <div class="student-event-tabs scroll-x">
                 <button class="active">Student Info</button>

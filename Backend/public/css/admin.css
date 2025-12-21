@@ -3764,19 +3764,3 @@ class-list-table th:last-child{
     width: 5%; /* Tetapkan lebar Status */
     text-align: center;
 }
-
-/* ================= MODAL OVERLAY ================= */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-
-    display: none;          /* ⬅️ KUNCI UTAMA */
-    pointer-events: none;  /* ⬅️ BIAR KLIK TEMBUS */
-    z-index: 999;
-}
-
-.modal-overlay.active {
-    display: flex;
-    pointer-events: auto;
-}
