@@ -53,6 +53,13 @@ CREATE TABLE santri (
   tanggal_terdaftar VARCHAR(255)
 );
 
+--11
+CREATE TABLE program (
+    id_program SERIAL PRIMARY KEY,
+    nama_program VARCHAR(100) NOT NULL,
+    deskripsi TEXT
+);
+
 -- 5. Kelas
 CREATE TABLE kelas (
   id_kelas SERIAL PRIMARY KEY,
@@ -109,13 +116,6 @@ CREATE TABLE password_reset_tokens (
   id_users INT REFERENCES users(id_users) ON DELETE CASCADE,
   token VARCHAR(255) UNIQUE,
   expired_at TIMESTAMP
-);
-
---11
-CREATE TABLE program (
-    id_program SERIAL PRIMARY KEY,
-    nama_program VARCHAR(100) NOT NULL,
-    deskripsi TEXT
 );
 
 --12
