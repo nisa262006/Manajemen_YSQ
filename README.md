@@ -26,7 +26,7 @@ Sistem manajemen berbasis web yang dirancang untuk meningkatkan efisiensi operas
 
 ### Backend:
 - Node.js / Express 
-- PostgreSQL 17
+- PostgreSQL 15
 - Docker Compose 
 
 ### Tools:
