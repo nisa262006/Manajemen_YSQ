@@ -1,117 +1,95 @@
 const db = require("../config/db");
 
 // =======================================
-// GET ADMIN PROFILE
+// GET DASHBOARD STATS (FIX: Tambahkan fungsi yang hilang)
 // =======================================
-exports.getAdminProfile = async (req, res) => {
+exports.getDashboardStats = async (req, res) => {
     try {
-      const id_admin = req.params.id_admin;
-  
-      const result = await db.query(
-        `SELECT 
-            a.id_admin,
-            a.nama,
-            a.email,
-            a.no_wa,
-            a.foto,
-            u.id_users,
-            u.role
-          FROM admin a
-          LEFT JOIN users u ON a.id_users = u.id_users
-          WHERE a.id_admin = $1`,
-        [id_admin]
-      );
-  
-      if (result.rowCount === 0) {
-        return res.status(404).json({ message: "Data admin tidak ditemukan" });
-      }
-  
-      res.json({
-        message: "Profil admin ditemukan",
-        data: result.rows[0]
-      });
-  
-    } catch (err) {
-      console.error("GET ADMIN PROFILE ERROR:", err);
-      res.status(500).json({ message: "Terjadi kesalahan server" });
-    }
-  };
-  
-// =======================================
-// UPDATE ADMIN PROFILE
-// =======================================
-exports.updateAdminProfile = async (req, res) => {
-    try {
-      const id_admin = req.params.id_admin;
-      const { nama, email, no_wa, foto } = req.body;
-  
-      // cek data admin
-      const oldData = await db.query(
-        `SELECT * FROM admin WHERE id_admin = $1`,
-        [id_admin]
-      );
-  
-      if (oldData.rowCount === 0) {
-        return res.status(404).json({ message: "Data admin tidak ditemukan" });
-      }
-  
-      const old = oldData.rows[0];
-  
-      // Update
-      await db.query(
-        `UPDATE admin SET
-            nama = $1,
-            email = $2,
-            no_wa = $3,
-            foto = $4
-          WHERE id_admin = $5`,
-        [
-          nama || old.nama,
-          email || old.email,
-          no_wa || old.no_wa,
-          foto || old.foto,
-          id_admin
-        ]
-      );
-  
-      res.json({
-        message: "Profil admin berhasil diperbarui",
-        data: {
-          id_admin,
-          nama: nama || old.nama,
-          email: email || old.email,
-          no_wa: no_wa || old.no_wa,
-          foto: foto || old.foto
-        }
-      });
-  
-    } catch (err) {
-      console.error("UPDATE ADMIN PROFILE ERROR:", err);
-      res.status(500).json({ message: "Terjadi kesalahan server" });
-    }
-  };
-  
-  exports.getDashboardStats = async (req, res) => {
-    try {
-        // Menghitung data aktif sesuai kategori di Admin.html
-        const santriDewasa = await db.query("SELECT COUNT(*) FROM santri WHERE kategori = 'dewasa' AND status = 'aktif'");
-        const santriAnak = await db.query("SELECT COUNT(*) FROM santri WHERE kategori = 'anak' AND status = 'aktif'");
-        const totalPengajar = await db.query("SELECT COUNT(*) FROM pengajar WHERE status = 'aktif'");
-        const totalKelas = await db.query("SELECT COUNT(*) FROM kelas");
-        const totalPendaftar = await db.query("SELECT COUNT(*) FROM pendaftar WHERE status = 'pending'");
+        const pendaftar = await db.query("SELECT COUNT(*) FROM pendaftar");
+        const santri = await db.query("SELECT COUNT(*) FROM santri");
+        const pengajar = await db.query("SELECT COUNT(*) FROM pengajar");
+        const kelas = await db.query("SELECT COUNT(*) FROM kelas");
 
         res.json({
             success: true,
             data: {
-                santri_dewasa: parseInt(santriDewasa.rows[0].count),
-                santri_anak: parseInt(santriAnak.rows[0].count),
-                pengajar: parseInt(totalPengajar.rows[0].count),
-                kelas: parseInt(totalKelas.rows[0].count),
-                pendaftar: parseInt(totalPendaftar.rows[0].count)
+                total_pendaftar: parseInt(pendaftar.rows[0].count),
+                total_santri: parseInt(santri.rows[0].count),
+                total_pengajar: parseInt(pengajar.rows[0].count),
+                total_kelas: parseInt(kelas.rows[0].count)
             }
         });
     } catch (err) {
-        console.error("GET STATS ERROR:", err);
-        res.status(500).json({ message: "Server error" });
+        console.error("STATS ERROR:", err);
+        res.status(500).json({ success: false, message: "Gagal mengambil statistik" });
+    }
+};
+
+// =======================================
+// GET ADMIN PROFILE
+// =======================================
+exports.getAdminProfile = async (req, res) => {
+    try {
+        const id_admin = req.params.id_admin;
+        const result = await db.query(
+            `SELECT a.id_admin, a.nama, a.email, a.no_wa, u.id_users, u.role
+             FROM admin a
+             LEFT JOIN users u ON a.id_users = u.id_users
+             WHERE a.id_admin = $1`,
+            [id_admin]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, message: "Data admin tidak ditemukan" });
+        }
+
+        res.json({ success: true, data: result.rows[0] });
+    } catch (err) {
+        console.error("GET PROFILE ERROR:", err);
+        res.status(500).json({ success: false, message: "Kesalahan server" });
+    }
+};
+
+// =======================================
+// UPDATE ADMIN PROFILE (FIX: Hindari Error id_users)
+// =======================================
+exports.updateAdminProfile = async (req, res) => {
+    const client = await db.connect();
+    try {
+        const id_admin = req.params.id_admin;
+        const { nama, email, no_wa } = req.body;
+
+        await client.query("BEGIN");
+
+        const oldData = await client.query(
+            "SELECT id_users, nama, email, no_wa FROM admin WHERE id_admin = $1",
+            [id_admin]
+        );
+
+        if (oldData.rowCount === 0) {
+            await client.query("ROLLBACK");
+            return res.status(404).json({ message: "Admin tidak ditemukan" });
+        }
+
+        const old = oldData.rows[0];
+
+        const adminUpdate = await client.query(
+            `UPDATE admin SET nama = $1, email = $2, no_wa = $3 WHERE id_admin = $4 RETURNING *`,
+            [nama || old.nama, email || old.email, no_wa || old.no_wa, id_admin]
+        );
+
+        await client.query(
+            "UPDATE users SET email = $1 WHERE id_users = $2",
+            [email || old.email, old.id_users]
+        );
+
+        await client.query("COMMIT");
+        res.json({ success: true, message: "Profil diperbarui", data: adminUpdate.rows[0] });
+    } catch (err) {
+        await client.query("ROLLBACK");
+        console.error("UPDATE ERROR:", err);
+        res.status(500).json({ success: false, message: "Gagal update profil" });
+    } finally {
+        client.release();
     }
 };

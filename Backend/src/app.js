@@ -104,11 +104,6 @@ app.use("/api/admin", require("./routes/adminroutes"));
 app.use("/api/me", require("./routes/meroutes"));
 app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
 
-// ================= 404 =================
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
 // ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);

@@ -1,245 +1,243 @@
-import { apiGet, apiPost, apiPut, apiDelete } from "./apiService.js";
+import { apiGet, apiPut, apiPost } from "./apiService.js";
 
+
+/* =========================
+   HELPER
+======================*/
 const $ = (id) => document.getElementById(id);
-const q = (s) => document.querySelector(s);
+const q = (selector) => document.querySelector(selector);
 
 function esc(x) {
-    if (!x) return "";
-    return String(x).replace(/[&<>"]/g, (c) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;"
-    }[c]));
+  if (!x) return "";
+  return String(x).replace(/[&<>"]/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;"
+  }[c]));
 }
 
-window.showNotification = function (message, type = "success") {
-    const toast = $("notification-toast");
-    if (!toast) return;
+/* =========================
+   TOAST
+========================= */
+window.showNotification = function (msg, type = "success") {
+  const toast = $("notification-toast");
+  if (!toast) return;
 
-    toast.innerText = message;
-    toast.style.background =
-        type === "error"
-            ? "#e74c3c"
-            : type === "warning"
-                ? "#f1c40f"
-                : "#2ecc71";
+  toast.innerText = msg;
+  toast.style.background =
+    type === "error" ? "#e74c3c" :
+    type === "warning" ? "#f1c40f" :
+    "#2ecc71";
 
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2500);
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
 };
 
-function toast(msg, type = "success") {
-    let t = $("notification-toast");
-    if (!t) return;
+/* =========================
+   STATE GLOBAL
+========================= */
+window._pendaftarList = [];
 
-    t.innerText = msg;
-    t.className = `toast-notification show ${type}`;
-    setTimeout(() => t.classList.remove("show"), 2500);
+/* =========================
+   RENDER TABEL PENDAFTAR
+========================= */
+function renderPendaftarTable() {
+  const tbody = $("table-pendaftar-body");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  if (window._pendaftarList.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center">
+          Belum ada pendaftar
+        </td>
+      </tr>`;
+    return;
+  }
+
+  window._pendaftarList.forEach((p, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${esc(p.nama)}</td>
+        <td>${esc(p.tempat_lahir)}</td>
+        <td>${p.tanggal_lahir
+          ? new Date(p.tanggal_lahir).toLocaleDateString("id-ID")
+          : "-"}</td>
+        <td>${esc(p.no_wa)}</td>
+        <td>
+          ${
+            p.status === "diterima"
+              ? `<span class="status-badge status-diterima">Diterima</span>`
+            : p.status === "ditolak"
+              ? `<span class="status-badge status-ditolak">Ditolak</span>`
+            : `<button class="btn-detail" data-id="${p.id_pendaftar}">
+                Lihat Detail
+              </button>`
+          }
+        </td>
+      </tr>`;
+  });
 }
 
-function renderCurrentDate() {
-    const dateEl = document.getElementById("current-date");
-    if (!dateEl) return;
-
-    const now = new Date();
-
-    const hari = now.toLocaleDateString("id-ID", { weekday: "long" });
-    const tanggal = now.getDate();
-    const bulan = now.toLocaleDateString("id-ID", { month: "long" });
-    const tahun = now.getFullYear();
-
-    dateEl.textContent = `${hari}, ${tanggal} ${bulan} ${tahun}`;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    renderCurrentDate();
-});
-
-// ============================
-// LOAD DASHBOARD DATA
-// ============================
+/* =========================
+   LOAD DASHBOARD
+========================= */
 async function loadDashboard() {
     try {
-        const me = await apiGet("/me");
-        const idAdmin = me?.profile?.id_admin || me?.id_admin;
-
-        if (!idAdmin) {
-            console.error("ID Admin tidak ditemukan");
-            return;
-        }
-
-        // 2️⃣ Ambil DATA LENGKAP admin
-        const resProfile = await apiGet(`/admin/profile/${idAdmin}`);
-        const profile = resProfile?.data;
-
-        if (!profile) {
-            console.error("Profile admin kosong");
-            return;
-        }
-
-        // 3️⃣ DASHBOARD HEADER
-        $("dashboard-admin-name").innerText = profile.nama || "Admin";
-
-        // 4️⃣ MINI PROFILE (🔥 FIX UTAMA 🔥)
-        $("mini-card-name").innerText = profile.nama || "-";
-        $("mini-card-email").innerText = profile.email || "-";
-        $("mini-card-phone").innerText = profile.no_wa || "-";
-
-        // 5️⃣ POPUP SETTING
-        if ($("profile-name-input")) $("profile-name-input").value = profile.nama || "";
-        if ($("profile-email-input")) $("profile-email-input").value = profile.email || "";
-        if ($("profile-phone-input")) $("profile-phone-input").value = profile.no_wa || "";
-
-        // 6️⃣ AVATAR
-        document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large").forEach(el => {
-            el.innerText = (profile.nama || "A")[0].toUpperCase();
-        });
-
-        // -------- PENDAFTAR --------
-        let daftar = await apiGet("/pendaftar");
-        let data = Array.isArray(daftar) ? daftar : daftar.data ?? [];
-        window._pendaftarList = data;
-
-        $("total_pendaftar").innerText = data.length;
-
-        let tbody = $("table-pendaftar-body");
-        tbody.innerHTML = "";
-
-        if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center">Belum ada pendaftar.</td></tr>`;
-        } else {
-            data.forEach((p, i) => {
-                tbody.innerHTML += `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${esc(p.nama)}</td>
-                    <td>${esc(p.tempat_lahir)}</td>
-                    <td>${p.tanggal_lahir ? new Date(p.tanggal_lahir).toLocaleDateString("id-ID") : "-"}</td>
-                    <td>${esc(p.no_wa)}</td>
-                    <td>
-                ${
-                    p.status === "ditolak"
-                        ? `<span class="status-badge status-ditolak">Ditolak</span>`
-                    : p.status === "diterima"
-                        ? `<span class="status-badge status-diterima">Diterima</span>`
-                    : `<button class="btn-detail" data-id="${p.id_pendaftar}">Lihat Detail</button>`
-                }
-            </td>
-
-                </tr>`;
-            });
-        }
-
-        // -------- KELAS / SANTRI --------
-        // =============== TOTAL KELAS ===============
-        let kelas = await apiGet("/kelas");
-        let kelasList = Array.isArray(kelas) ? kelas : kelas.data ?? [];
-        $("total_kelas").innerText = kelasList.length;
-
-        // =============== TOTAL SANTRI ===============
-        // Ambil SEMUA santri tanpa pagination
-        let santriRes = await apiGet("/santri?page=1&limit=9999");
-        let santriList = santriRes?.data ?? santriRes ?? [];
-
-        let dewasa = santriList.filter(s => (s.kategori || "").toLowerCase() === "dewasa").length;
-        let anak   = santriList.filter(s => (s.kategori || "").toLowerCase() === "anak").length;
-
-        $("total_santri_dewasa").innerText = dewasa;
-        $("total_santri_anak").innerText = anak;
-
-        // -------- PENGAJAR --------
-        let pengajar = await apiGet("/pengajar");
-        let pengajarList = Array.isArray(pengajar) ? pengajar : pengajar.data ?? [];
-        $("total_pengajar").innerText = pengajarList.length;
-
-        console.log("Dashboard Loaded.");
+      /* ======================
+         HELPER
+      ====================== */
+      const setById = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+      };
+  
+      const normalizeKategori = (k) =>
+        String(k || "")
+          .toLowerCase()
+          .replace(/\s+/g, "")
+          .replace("-", "");
+  
+      /* ======================
+         PENDAFTAR
+      ====================== */
+      const resPendaftar = await apiGet("/pendaftar");
+      const pendaftar = Array.isArray(resPendaftar)
+        ? resPendaftar
+        : resPendaftar?.data ?? [];
+  
+      window._pendaftarList = pendaftar;
+      setById("total_pendaftar", pendaftar.length);
+      renderPendaftarTable();
+  
+      /* ======================
+         SANTRI (FIX TOTAL)
+      ====================== */
+      const santriRes = await apiGet("/santri?page=1&limit=9999");
+      const santri = santriRes?.data ?? santriRes ?? [];
+  
+      let totalDewasa = 0;
+      let totalAnak = 0;
+  
+      santri.forEach((s) => {
+        const k = normalizeKategori(s.kategori);
+  
+        if (k === "dewasa") totalDewasa++;
+        if (k.includes("anak")) totalAnak++;
+      });
+  
+      setById("total_santri_dewasa", totalDewasa);
+      setById("total_santri_anak", totalAnak);
+  
+      /* ======================
+         PENGAJAR
+      ====================== */
+      const pengajarRes = await apiGet("/pengajar");
+      const pengajar = pengajarRes?.data ?? pengajarRes ?? [];
+      setById("total_pengajar", pengajar.length);
+  
+      /* ======================
+         KELAS
+      ====================== */
+      const kelasRes = await apiGet("/kelas");
+      const kelas = kelasRes?.data ?? kelasRes ?? [];
+      setById("total_kelas", kelas.length);
+  
     } catch (err) {
-        console.error("Dashboard Error:", err);
+      console.error("Dashboard error:", err);
+      showNotification("Gagal memuat dashboard", "error");
     }
+  }  
+
+/* =========================
+   DETAIL POPUP
+========================= */
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("btn-detail")) return;
+
+  const id = e.target.dataset.id;
+  const data = window._pendaftarList.find(p => p.id_pendaftar == id);
+  if (!data) return;
+
+  $("detail-name").textContent = data.nama || "-";
+  $("detail-tempat-lahir").textContent = data.tempat_lahir || "-";
+  $("detail-tanggal-lahir").textContent =
+    data.tanggal_lahir
+      ? new Date(data.tanggal_lahir).toLocaleDateString("id-ID")
+      : "-";
+  $("detail-whatsapp").textContent = data.no_wa || "-";
+  $("detail-email").textContent = data.email || "-";
+
+  const popup = $("popup-detail-pendaftar");
+  popup.dataset.id = id;
+  popup.style.display = "flex";
+});
+
+/* =========================
+   TERIMA / TOLAK (REALTIME)
+========================= */
+document.addEventListener("click", async (e) => {
+  const popup = $("popup-detail-pendaftar");
+  if (!popup || !popup.dataset.id) return;
+
+  const id = popup.dataset.id;
+
+  try {
+    if (e.target.classList.contains("btn-diterima")) {
+      await apiPut(`/pendaftar/terima/${id}`);
+      updateStatusLocal(id, "diterima");
+      showNotification("Pendaftar diterima");
+      popup.style.display = "none";
+    }
+
+    if (e.target.classList.contains("btn-ditolak")) {
+      await apiPut(`/pendaftar/tolak/${id}`);
+      updateStatusLocal(id, "ditolak");
+      showNotification("Pendaftar ditolak", "warning");
+      popup.style.display = "none";
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification("Aksi gagal", "error");
+  }
+});
+
+/* =========================
+   UPDATE STATE LOKAL
+========================= */
+function updateStatusLocal(id, status) {
+  const idx = window._pendaftarList.findIndex(p => p.id_pendaftar == id);
+  if (idx === -1) return;
+
+  window._pendaftarList[idx].status = status;
+  renderPendaftarTable();
 }
 
-// ============================
-// DETAIL POPUP (SAFE)
-// ============================
-document.addEventListener("click", async (e) => {
-    if (e.target.classList.contains("btn-detail")) {
-        let id = e.target.dataset.id;
-        let data = window._pendaftarList.find((x) => x.id_pendaftar == id);
-        if (!data) return alert("Data tidak ditemukan");
-
-        // Isi popup
-        $("detail-name").innerText = data.nama;
-        $("detail-tempat-lahir").innerText = data.tempat_lahir;
-        $("detail-tanggal-lahir").innerText = data.tanggal_lahir ? new Date(data.tanggal_lahir).toLocaleDateString("id-ID") : "-";
-        $("detail-whatsapp").innerText = data.no_wa;
-        $("detail-email").innerText = data.email;
-
-        let popup = $("popup-detail-pendaftar");
-        popup.dataset.id = id;
-        popup.style.display = "flex";
-    }
-});
-
-// ============================
-// TERIMA / TOLAK (FIX VERSION)
-// ============================
-document.addEventListener("click", async (e) => {
-    let popup = $("popup-detail-pendaftar");
-    let id = popup?.dataset?.id;
-
-    // === Tombol DITERIMA ===
-    if (e.target.classList.contains("btn-diterima")) {
-        try {
-            await apiPut(`/pendaftar/terima/${id}`);
-            showNotification("Pendaftar diterima!", "success");
-            popup.style.display = "none";
-            loadDashboard();
-        } catch (err) {
-            console.error(err);
-            showNotification("Gagal menerima pendaftar", "error");
-        }
-    }
-
-    // === Tombol DITOLAK ===
-    if (e.target.classList.contains("btn-ditolak")) {
-        try {
-            await apiPut(`/pendaftar/tolak/${id}`);
-            showNotification("Pendaftar ditolak!", "warning");
-            popup.style.display = "none";
-            loadDashboard();
-        } catch (err) {
-            console.error(err);
-            showNotification("Gagal menolak pendaftar", "error");
-        }
-    }
-});
-
-
-// ============================
-// CLOSE POPUP
-// ============================
+/* =========================
+   CLOSE POPUP
+========================= */
 document.addEventListener("click", (e) => {
-    if (e.target.id === "close-detail-popup") {
-        $("popup-detail-pendaftar").style.display = "none";
-    }
+  if (e.target.id === "close-detail-popup") {
+    $("popup-detail-pendaftar").style.display = "none";
+  }
 });
 
-
-
-// ============================
-// INIT
-// ============================
+/* =========================
+   INIT
+========================= */
 document.addEventListener("DOMContentLoaded", () => {
-    if (document.body.classList.contains("page-dashboard")) {
-        loadDashboard();
-    }
+  if (document.body.classList.contains("page-dashboard")) {
+    loadDashboard();
+  }
 });
-
 
 
 // ===============================================================
-// 🔥 TAMBAH KELAS — ADMIN (FINAL FIX TOTAL)
+// 🔥 TAMBAH KELAS — ADMIN (FIX TOTAL)
 // ===============================================================
 if (document.body.classList.contains("page-tambah-kelas")) {
 
@@ -247,175 +245,166 @@ if (document.body.classList.contains("page-tambah-kelas")) {
     const filterSelect = document.getElementById("kelas");
     const tableBody    = document.querySelector(".data-table tbody");
     const selectAll    = document.querySelector(".select-all-checkbox");
-
-    // ===============================================================
-    // 🔥 LOAD KELAS
-    // ===============================================================
+    const btnSimpan    = document.getElementById("btn-simpan-kelas-selection");
+  
+    /* ===============================================================
+       LOAD KELAS
+    =============================================================== */
     async function loadKelasYSQ() {
-        try {
-            const res = await apiGet("/kelas");   // ❗ TANPA /api
-            const list = Array.isArray(res) ? res : [];
-
-            window._allKelasYSQ = list;
-
-            selectKelas.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
-            list.forEach(k => {
-                selectKelas.innerHTML += `
-                    <option value="${k.id_kelas}">
-                        ${k.nama_kelas} (${k.kategori})
-                    </option>
-                `;
-            });
-
-        } catch (err) {
-            console.error("Load kelas gagal:", err);
-            toast("Gagal memuat kelas", "error");
-        }
+      try {
+        const res = await apiGet("/kelas");
+        const list = res?.data ?? res ?? [];
+  
+        window._allKelasYSQ = list;
+  
+        selectKelas.innerHTML =
+          `<option value="">-- Pilih Kelas --</option>`;
+  
+        list.forEach(k => {
+          selectKelas.innerHTML += `
+            <option value="${k.id_kelas}">
+              ${k.nama_kelas} (${k.kategori})
+            </option>`;
+        });
+  
+      } catch (err) {
+        console.error(err);
+        showNotification("Gagal memuat kelas", "error");
+      }
     }
-
-    // ===============================================================
-    // 🔥 LOAD SANTRI
-    // ===============================================================
+  
+    /* ===============================================================
+       LOAD SANTRI
+    =============================================================== */
     async function loadSantri() {
-        try {
-            const res = await apiGet("/santri?page=1&limit=9999"); // ❗ TANPA /api
-
-            let list = [];
-            if (Array.isArray(res)) list = res;
-            else if (Array.isArray(res?.data)) list = res.data;
-
-            window._allSantri = list;
-            renderSantri(filterSelect.value || "semua");
-
-        } catch (err) {
-            console.error("Load santri gagal:", err);
-            toast("Gagal memuat santri", "error");
-        }
+      try {
+        const res = await apiGet("/santri?page=1&limit=9999");
+        const list = res?.data ?? res ?? [];
+  
+        window._allSantri = list;
+        renderSantri(filterSelect.value || "semua");
+  
+      } catch (err) {
+        console.error(err);
+        showNotification("Gagal memuat santri", "error");
+      }
     }
-
-    // ===============================================================
-    // 🔥 RENDER SANTRI
-    // ===============================================================
+  
+    /* ===============================================================
+       RENDER SANTRI
+    =============================================================== */
     function renderSantri(filter) {
-        tableBody.innerHTML = "";
-
-        let list = (window._allSantri || []).filter(
-            s => s.status === "aktif"
-        );
-
-        if (filter === "menunggu") list = list.filter(s => !s.id_kelas);
-        if (filter === "santri")   list = list.filter(s => s.id_kelas);
-
-        if (!list.length) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align:center">
-                        Tidak ada santri
-                    </td>
-                </tr>`;
-            return;
-        }
-
-        list.forEach(s => {
-            const umur = s.tanggal_lahir
-                ? new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear()
-                : "-";
-
-            tableBody.innerHTML += `
-                <tr data-id="${s.id_santri}">
-                    <td><input type="checkbox" class="row-check"></td>
-                    <td>${s.nis}</td>
-                    <td>${s.nama}</td>
-                    <td>${umur}</td>
-                    <td>
-                        <span class="status-badge status-aktif">Aktif</span>
-                    </td>
-                    <td>
-                        <span class="status-badge ${
-                            s.id_kelas ? "status-santri" : "status-menunggu"
-                        }">
-                            ${s.id_kelas ? "Sudah Kelas" : "Menunggu"}
-                        </span>
-                    </td>
-                </tr>
-            `;
-        });
+      tableBody.innerHTML = "";
+  
+      let list = (window._allSantri || []).filter(s =>
+        String(s.status || "").toLowerCase() === "aktif"
+      );
+  
+      if (filter === "menunggu") list = list.filter(s => !s.id_kelas);
+      if (filter === "santri")   list = list.filter(s => s.id_kelas);
+  
+      if (!list.length) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align:center">
+              Tidak ada santri
+            </td>
+          </tr>`;
+        return;
+      }
+  
+      list.forEach(s => {
+        tableBody.innerHTML += `
+          <tr data-id="${s.id_santri}">
+            <td><input type="checkbox" class="row-check"></td>
+            <td>${s.nis}</td>
+            <td>${s.nama}</td>
+            <td>${s.tanggal_lahir
+              ? new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear()
+              : "-"}</td>
+            <td><span class="status-badge status-aktif">Aktif</span></td>
+            <td>
+              <span class="status-badge ${
+                s.id_kelas ? "status-santri" : "status-menunggu"
+              }">
+                ${s.id_kelas ? "Sudah Kelas" : "Menunggu"}
+              </span>
+            </td>
+          </tr>`;
+      });
     }
-
-    // ===============================================================
-    // 🔥 SIMPAN KE KELAS
-    // ===============================================================
-    document
-        .getElementById("btn-simpan-kelas-selection")
-        .addEventListener("click", async () => {
-
-            const idKelas = Number(selectKelas.value);
-            if (!idKelas) {
-                toast("Pilih kelas terlebih dahulu", "error");
-                return;
-            }
-
-            const checked = [...document.querySelectorAll(".row-check:checked")];
-            if (!checked.length) {
-                toast("Pilih minimal satu santri", "error");
-                return;
-            }
-
-            try {
-                for (const cb of checked) {
-                    const idSantri = Number(cb.closest("tr").dataset.id);
-                    const santri = window._allSantri.find(
-                        s => s.id_santri === idSantri
-                    );
-
-                    // 🔁 PINDAH KELAS
-                    if (santri?.id_kelas) {
-                        await apiPut(`/kelas/pindah/${idSantri}`, {
-                            id_kelas_baru: idKelas
-                        });
-                    }
-                    // ➕ TAMBAH KE KELAS
-                    else {
-                        await apiPost(`/kelas/${idKelas}/santri`, {
-                            id_santri: idSantri
-                        });
-                    }
-                }
-
-                toast("Santri berhasil dimasukkan ke kelas", "success");
-                await loadSantri();
-                await loadKelasYSQ();
-
-            } catch (err) {
-                console.error("Simpan kelas gagal:", err);
-                toast("Gagal menyimpan data kelas", "error");
-            }
-        });
-
-    // ===============================================================
-    // 🔥 EVENT
-    // ===============================================================
-    filterSelect.addEventListener("change", () =>
-        renderSantri(filterSelect.value)
-    );
-
-    selectAll.addEventListener("change", () => {
-        document
-            .querySelectorAll(".row-check")
-            .forEach(cb => cb.checked = selectAll.checked);
+  
+    /* ===============================================================
+       SIMPAN KE KELAS
+    =============================================================== */
+    btnSimpan.addEventListener("click", async () => {
+  
+      const idKelas = Number(selectKelas.value);
+      if (!idKelas) {
+        showNotification("Pilih kelas terlebih dahulu", "error");
+        return;
+      }
+  
+      const checked = [...document.querySelectorAll(".row-check:checked")];
+      if (!checked.length) {
+        showNotification("Pilih minimal satu santri", "error");
+        return;
+      }
+  
+      try {
+        for (const cb of checked) {
+          const tr = cb.closest("tr");
+          const idSantri = Number(tr.dataset.id);
+  
+          if (!idSantri) continue;
+  
+          const santri = window._allSantri.find(
+            s => s.id_santri === idSantri
+          );
+  
+          if (santri?.id_kelas) {
+            await apiPut(`/kelas/pindah/${idSantri}`, {
+              id_kelas_baru: idKelas
+            });
+          } else {
+            await apiPost(`/kelas/${idKelas}/santri`, {
+              id_santri: idSantri
+            });
+          }
+        }
+  
+        showNotification("Santri berhasil dimasukkan ke kelas", "success");
+        await loadSantri();
+        await loadKelasYSQ();
+  
+      } catch (err) {
+        console.error(err);
+        showNotification("Gagal menyimpan kelas", "error");
+      }
     });
-
-    // ===============================================================
-    // 🚀 INIT
-    // ===============================================================
+  
+    /* ===============================================================
+       EVENT
+    =============================================================== */
+    filterSelect.addEventListener("change", () =>
+      renderSantri(filterSelect.value)
+    );
+  
+    selectAll.addEventListener("change", () => {
+      document.querySelectorAll(".row-check")
+        .forEach(cb => cb.checked = selectAll.checked);
+    });
+  
+    /* ===============================================================
+       INIT
+    =============================================================== */
     loadKelasYSQ();
     loadSantri();
-}
-
+  }
+  
     
-
 /* ======================================================
-   TAMBAH SANTRI (ADMIN)
+    TAMBAH SANTRI (ADMIN)
 ====================================================== */
 function initTambahSiswa() {
     if (!document.body.classList.contains("page-tambah-siswa")) return;
@@ -427,354 +416,128 @@ function initTambahSiswa() {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const password = $("password").value;
-        const confirm = $("confirm_password").value;
+        const password = $("password").value.trim();
+        const confirm  = $("confirm_password").value.trim();
+
+        if (!password || !confirm) {
+            showNotification("Password wajib diisi", "error");
+            return;
+        }
+
         if (password !== confirm) {
-            toast("Password tidak sama", "error");
+            showNotification("Password tidak sama", "error");
+            return;
+        }
+
+        const jenjang = q('input[name="jenjang"]:checked')?.value;
+        if (!jenjang) {
+            showNotification("Pilih jenjang santri", "error");
             return;
         }
 
         const data = {
-            nama: $("nama_lengkap").value,
-            email: $("email").value,
-            alamat: $("alamat").value,
-            no_wa: $("no_telpon").value,
-            tempat_lahir: $("tempat_lahir").value,
-            tanggal_lahir: $("tanggal_lahir").value
+            nis: $("nisn").value.trim(),
+            nama: $("nama_lengkap").value.trim(),
+            email: $("email").value.trim(),
+            alamat: $("alamat").value.trim(),
+            no_wa: $("no_telpon").value.trim(),
+            tempat_lahir: $("tempat_lahir").value.trim(),
+            tanggal_lahir: $("tanggal_lahir").value,
+            kategori: jenjang.toLowerCase(),
+            password: password,
+            confirm_password: confirm
         };
 
         try {
             const res = await apiPost("/pendaftar/daftar", data);
-            await apiPut(`/pendaftar/terima/${res.data.id_pendaftar}`, {
+
+            const idPendaftar = res?.data?.id_pendaftar || res?.id_pendaftar;
+            if (!idPendaftar) throw new Error("ID pendaftar tidak ditemukan");
+
+            await apiPut(`/pendaftar/terima/${idPendaftar}`, {
                 sumber: "admin",
-                password
+                password,
+                confirm_password: confirm
             });
 
-            toast("Santri berhasil ditambahkan");
-            setTimeout(() => location.href = "/dashboard/Admin", 1000);
+            showNotification("Santri berhasil ditambahkan", "success");
+            setTimeout(() => location.href = "/dashboard/admin", 1200);
+
         } catch (err) {
             console.error(err);
-            toast("Gagal menambah santri", "error");
+            showNotification(err?.message || "Gagal menambah santri", "error");
         }
     });
 }
 
+
 /* ======================================================
-   TAMBAH PENGAJAR (ADMIN)
+    TAMBAH PENGAJAR (ADMIN)
 ====================================================== */
 function initTambahPengajar() {
     if (!document.body.classList.contains("page-tambah-pengajar")) return;
 
-    const form = $("form-tambah-pengajar");
+    const form = document.getElementById("form-tambah-pengajar");
     if (!form || form.dataset.bound) return;
     form.dataset.bound = "true";
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const password = $("password").value;
-        const confirm = $("confirm_password").value;
-        if (password !== confirm) {
-            toast("Password tidak sama", "error");
+        const password = document.getElementById("password").value.trim();
+        const confirmPassword = document
+            .getElementById("confirm_password")
+            .value.trim();
+
+        if (!password || !confirmPassword) {
+            showNotification("Password dan konfirmasi wajib diisi", "error");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showNotification("Password tidak sama", "error");
             return;
         }
 
         const data = {
-            nama: $("nama_lengkap").value,
-            email: $("email").value,
-            no_kontak: $("no_telpon").value,
-            alamat: $("alamat").value,
-            tempat_lahir: $("tempat_lahir").value,
-            tanggal_lahir: $("tanggal_lahir").value,
-            mapel: $("kelas").value,
-            password,
-            confirmPassword: confirm
+            nama: document.getElementById("nama_lengkap").value.trim(),
+            email: document.getElementById("email").value.trim(),
+
+            // ⬇⬇⬇ WAJIB SESUAI BACKEND
+            no_kontak: document.getElementById("no_telpon").value.trim(),
+
+            alamat: document.getElementById("alamat").value.trim(),
+            tempat_lahir: document.getElementById("tempat_lahir").value.trim(),
+            tanggal_lahir: document.getElementById("tanggal_lahir").value,
+            mapel: document.getElementById("kelas").value.trim(),
+
+            password: password,
+            confirmPassword: confirmPassword // ⬅️ KUNCI UTAMA
         };
 
         try {
             await apiPost("/pengajar/tambah", data);
-            toast("Pengajar berhasil ditambahkan");
-            setTimeout(() => location.href = "/dashboard/Admin", 1000);
+            showNotification("Pengajar berhasil ditambahkan", "success");
+            setTimeout(() => {
+                window.location.href = "/dashboard/admin";
+            }, 1200);
         } catch (err) {
             console.error(err);
-            toast("Gagal menambah pengajar", "error");
+            showNotification(
+                err?.message || "Gagal menambah pengajar",
+                "error"
+            );
         }
     });
 }
 
-/* ===================== INIT ===================== */
+/* =========================
+   INIT FORM ADMIN
+========================= */
 document.addEventListener("DOMContentLoaded", () => {
-    renderCurrentDate();
-
     initTambahSiswa();
     initTambahPengajar();
 });
-
-
-// ====================================================================
-// 🔥 DAFTAR REGISTRASI ADMIN — FINAL STABLE VERSION
-// ====================================================================
-if (document.body.classList.contains("page-daftar-registrasi")) {
-
-    console.log("✅ Page Daftar Registrasi Loaded");
-
-    const tbody = document.querySelector(".pendaftar-table-reg tbody");
-
-    // ================================================================
-    // HELPER
-    // ================================================================
-    const $ = (id) => document.getElementById(id);
-    const q = (sel) => document.querySelector(sel);
-
-    function esc(str) {
-        return String(str ?? "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    }
-
-    // ================================================================
-    // LOAD DATA PENDAFTAR
-    // ================================================================
-    async function loadPendaftarRegistrasi() {
-        try {
-            const res = await apiGet("/pendaftar");
-            const data = Array.isArray(res) ? res : res?.data ?? [];
-
-            window._pendaftarList = data;
-
-            renderTableRegistrasi(data);
-            updateRegistrasiStats();
-
-        } catch (err) {
-            console.error("❌ Load Registrasi Error:", err);
-        }
-    }
-
-    // ================================================================
-    // UPDATE STATISTIK
-    // ================================================================
-    function updateRegistrasiStats() {
-        const data = window._pendaftarList || [];
-
-        const total = data.length;
-        const pending = data.filter(p => p.status === "pending").length;
-        const diterima = data.filter(p => p.status === "diterima").length;
-
-        const totalKuota = 100;
-        const sisaKuota = totalKuota - diterima;
-
-        q(".reg-stats-cards .stat-card:nth-child(1) .stat-value").innerText = total;
-        q(".reg-stats-cards .stat-card:nth-child(2) .stat-value").innerText = pending;
-        q(".reg-stats-cards .stat-card:nth-child(3) .stat-value").innerText = diterima;
-        q(".reg-stats-cards .stat-card:nth-child(4) .stat-value").innerText = sisaKuota;
-    }
-
-    // ================================================================
-    // RENDER TABEL
-    // ================================================================
-    function renderTableRegistrasi(list) {
-        tbody.innerHTML = "";
-
-        if (!list.length) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align:center">
-                        Tidak ada pendaftar.
-                    </td>
-                </tr>`;
-            return;
-        }
-
-        list.forEach((p, i) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${esc(p.nama)}</td>
-                    <td>${esc(p.tempat_lahir)}</td>
-                    <td>${p.tanggal_lahir
-                        ? new Date(p.tanggal_lahir).toLocaleDateString("id-ID")
-                        : "-"}</td>
-                    <td>${esc(p.no_wa)}</td>
-                    <td>
-                        ${
-                            p.status === "diterima"
-                                ? `<span class="status-badge status-diterima">Diterima</span>`
-                            : p.status === "ditolak"
-                                ? `<span class="status-badge status-ditolak">Ditolak</span>`
-                            : `<button class="btn-detail" data-id="${p.id_pendaftar}">
-                                    Lihat Detail
-                               </button>`
-                        }
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    // ================================================================
-    // BUKA DETAIL POPUP
-    // ================================================================
-    document.addEventListener("click", (e) => {
-        if (!e.target.classList.contains("btn-detail")) return;
-
-        const id = e.target.dataset.id;
-        const data = window._pendaftarList.find(p => p.id_pendaftar == id);
-        if (!data) return;
-
-        $("detail-name").innerText = data.nama;
-        $("detail-tempat-lahir").innerText = data.tempat_lahir;
-        $("detail-tanggal-lahir").innerText = data.tanggal_lahir
-            ? new Date(data.tanggal_lahir).toLocaleDateString("id-ID")
-            : "-";
-        $("detail-whatsapp").innerText = data.no_wa;
-        $("detail-email").innerText = data.email;
-
-        const popup = $("popup-detail-pendaftar");
-        popup.dataset.id = id;
-        popup.style.display = "flex";
-    });
-
-    // ================================================================
-    // TERIMA / TOLAK (REALTIME, TANPA RELOAD)
-    // ================================================================
-    document.addEventListener("click", async (e) => {
-        const popup = $("popup-detail-pendaftar");
-        const id = popup.dataset.id;
-        if (!id) return;
-
-        try {
-            // === TERIMA ===
-            if (e.target.classList.contains("detail-diterima")) {
-                await apiPut(`/pendaftar/terima/${id}`);
-                updateStatusLokal(id, "diterima");
-                showNotification("Pendaftar diterima", "success");
-            }
-
-            // === TOLAK ===
-            if (e.target.classList.contains("detail-ditolak")) {
-                await apiPut(`/pendaftar/tolak/${id}`);
-                updateStatusLokal(id, "ditolak");
-                showNotification("Pendaftar ditolak", "warning");
-            }
-
-            popup.style.display = "none";
-
-        } catch (err) {
-            console.error(err);
-            showNotification("Aksi gagal", "error");
-        }
-    });
-
-    // ================================================================
-    // UPDATE STATE LOKAL
-    // ================================================================
-    function updateStatusLokal(id, statusBaru) {
-        const idx = window._pendaftarList.findIndex(
-            p => p.id_pendaftar == id
-        );
-        if (idx === -1) return;
-
-        window._pendaftarList[idx].status = statusBaru;
-
-        renderTableRegistrasi(window._pendaftarList);
-        updateRegistrasiStats();
-    }
-
-    // ================================================================
-    // CLOSE POPUP
-    // ================================================================
-    document.addEventListener("click", (e) => {
-        if (e.target.id === "close-detail-popup") {
-            $("popup-detail-pendaftar").style.display = "none";
-        }
-    });
-
-    // ================================================================
-    // SEARCH
-    // ================================================================
-    const searchInput = q(".search-box input");
-    if (searchInput) {
-        searchInput.addEventListener("keyup", () => {
-            const term = searchInput.value.toLowerCase();
-            const filtered = window._pendaftarList.filter(p =>
-                p.nama.toLowerCase().includes(term) ||
-                p.tempat_lahir.toLowerCase().includes(term) ||
-                p.no_wa.toLowerCase().includes(term)
-            );
-            renderTableRegistrasi(filtered);
-        });
-    }
-
-    // ================================================================
-    // RESET PENDAFTAR
-    // ================================================================
-    const resetBtn = document.querySelector(".reset-btn");
-    if (resetBtn) {
-        resetBtn.addEventListener("click", async () => {
-            if (!confirm("Yakin ingin reset pendaftaran?")) return;
-
-            try {
-                await apiDelete("/pendaftar/reset/all");
-                showNotification("Pendaftaran direset", "success");
-                loadPendaftarRegistrasi();
-            } catch (err) {
-                console.error(err);
-                showNotification("Gagal reset", "error");
-            }
-        });
-    }
-
-    // ============================================================
-//              EXPORT EXCEL – PENDAFTAR REGISTRASI
-// ============================================================
-function exportPendaftarToCSV() {
-
-    if (!window._pendaftarList || window._pendaftarList.length === 0) {
-        return alert("Tidak ada data pendaftar untuk diekspor.");
-    }
-
-    const excelData = window._pendaftarList.map((p, i) => ({
-        No: i + 1,
-        "Nama Lengkap": p.nama,
-        "Tempat Lahir": p.tempat_lahir,
-        "Tanggal Lahir": p.tanggal_lahir
-            ? new Date(p.tanggal_lahir).toLocaleDateString("id-ID")
-            : "-",
-        "Nomor WA": p.no_wa,
-        Status: p.status
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(excelData);
-
-    ws["!cols"] = [
-        { wch: 5 },
-        { wch: 25 },
-        { wch: 18 },
-        { wch: 16 },
-        { wch: 16 },
-        { wch: 12 }
-    ];
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Pendaftar");
-
-    const bulan = new Date().toLocaleString("id-ID", { month: "long" });
-    const tahun = new Date().getFullYear();
-    const fileName = `Pendaftar_${bulan}_${tahun}.xlsx`;
-
-    XLSX.writeFile(wb, fileName);
-}
-
-    // ================================================================
-    // LOAD AWAL
-    // ================================================================
-    const exportBtn = document.querySelector(".export-btn");
-if (exportBtn) {
-    exportBtn.addEventListener("click", () => exportPendaftarToCSV());
-}
-    loadPendaftarRegistrasi();
-}
 
 // ===================================================
 // BAGIAN 1: DEFINISI FUNGSI GLOBAL (TOAST)

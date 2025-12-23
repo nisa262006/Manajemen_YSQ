@@ -3,11 +3,10 @@ import { apiGet, apiPut } from "./apiService.js";
 const $ = (id) => document.getElementById(id);
 
 /* ============================================================
-    AUTO CREATE DEV TOAST (agar tidak error di semua halaman)
+   DEV TOAST (HANYA UNTUK HALAMAN DEV)
 ============================================================ */
 function getOrCreateDevToast() {
     let el = document.getElementById("dev-toast");
-
     if (!el) {
         el = document.createElement("div");
         el.id = "dev-toast";
@@ -19,71 +18,80 @@ function getOrCreateDevToast() {
 function showDevToast(msg) {
     const el = getOrCreateDevToast();
     el.innerText = msg;
-
     el.classList.add("show");
-
-    setTimeout(() => {
-        el.classList.remove("show");
-    }, 2200);
+    setTimeout(() => el.classList.remove("show"), 2200);
 }
 
 /* ============================================================
-                        LOAD PROFILE ADMIN
+   GLOBAL CACHE
+============================================================ */
+let CURRENT_PROFILE = null;
+let CURRENT_ADMIN_ID = null;
+
+/* ============================================================
+   LOAD PROFILE
 ============================================================ */
 async function loadProfile() {
     try {
         const me = await apiGet("/me");
+        if (!me?.profile?.id_admin) return;
 
-        if (!me.success || !me.profile) return;
+        CURRENT_ADMIN_ID = me.profile.id_admin;
 
-        const idAdmin = me.profile.id_admin;
-        window._currentAdminId = idAdmin;
-
-        const profile = await apiGet(`/admin/profile/${idAdmin}`);
-        const p = profile.data;
+        const res = await apiGet(`/admin/profile/${CURRENT_ADMIN_ID}`);
+        const p = res?.data ?? res;
         if (!p) return;
 
+        CURRENT_PROFILE = p;
+
+        // ===== POPUP SETTING =====
         if ($("profile-name-input")) $("profile-name-input").value = p.nama || "";
         if ($("profile-email-input")) $("profile-email-input").value = p.email || "";
         if ($("profile-phone-input")) $("profile-phone-input").value = p.no_wa || "";
 
+        // ===== MINI PROFILE =====
+        if ($("mini-card-name")) $("mini-card-name").innerText = p.nama || "-";
+        if ($("mini-card-email")) $("mini-card-email").innerText = p.email || "-";
+        if ($("mini-card-phone")) $("mini-card-phone").innerText = p.no_wa || "-";
+
+        document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
+            .forEach(el => el.innerText = (p.nama || "A")[0].toUpperCase());
+
     } catch (err) {
-        console.error("Gagal load profile:", err);
+        console.error("Load profile gagal:", err);
     }
 }
 
 /* ============================================================
-                OPEN / CLOSE POPUP PROFILE
+   OPEN / CLOSE POPUP SETTING
 ============================================================ */
 document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".setting");
-    if (!btn) return;
+    const btnSetting = e.target.closest(".setting");
+    if (!btnSetting) return;
 
-    if ($("popup-profile-setting")) {
-        $("popup-profile-setting").style.display = "flex";
-        loadProfile();
-    }
+    const popup = $("popup-profile-setting");
+    if (!popup) return;
+
+    popup.style.display = "flex";
+    loadProfile();
 });
 
-// Tombol cancel & close
 ["btn-close-profil-x", "btn-cancel-profil"].forEach((id) => {
     const el = $(id);
     if (el) {
         el.onclick = () => {
-            if ($("popup-profile-setting")) {
-                $("popup-profile-setting").style.display = "none";
-            }
+            $("popup-profile-setting").style.display = "none";
         };
     }
 });
 
 /* ============================================================
-                 SIMPAN PERUBAHAN PROFIL
+   SAVE PROFILE (TANPA NOTIF)
 ============================================================ */
 if ($("btn-simpan-profil")) {
     $("btn-simpan-profil").onclick = async () => {
         try {
-            const idAdmin = window._currentAdminId;
+            if (!CURRENT_ADMIN_ID) return;
 
             const payload = {
                 nama: $("profile-name-input").value,
@@ -91,36 +99,56 @@ if ($("btn-simpan-profil")) {
                 no_wa: $("profile-phone-input").value
             };
 
-            await apiPut(`/admin/profile/${idAdmin}`, payload);
+            await apiPut(`/admin/profile/${CURRENT_ADMIN_ID}`, payload);
+
+            // Update cache & UI
+            CURRENT_PROFILE = { ...CURRENT_PROFILE, ...payload };
+
+            if ($("mini-card-name")) $("mini-card-name").innerText = payload.nama;
+            if ($("mini-card-email")) $("mini-card-email").innerText = payload.email;
+            if ($("mini-card-phone")) $("mini-card-phone").innerText = payload.no_wa;
+
+            document.querySelectorAll(".profile-avatar-mini, .profile-avatar-large")
+                .forEach(el => el.innerText = payload.nama[0].toUpperCase());
+
+            $("popup-profile-setting").style.display = "none";
 
         } catch (err) {
-            console.error(err);
-            showDevToast("Gagal memperbarui profil.");
+            console.error("Update profile gagal:", err);
         }
     };
 }
 
-const me = await fetchJSON(`${BASE_URL}/me`, {
-    headers: { Authorization: `Bearer ${getToken()}` }
-  });
-  
-  if (me.role !== "admin") return; // ⬅️ STOP kalau bukan admin
-
-  
 /* ============================================================
-            NOTIFIKASI UNTUK HALAMAN DALAM PENGEMBANGAN
+   POPUP MINI PROFILE
+============================================================ */
+document.addEventListener("click", (e) => {
+    const icon = e.target.closest("#dashboard-admin-icon");
+    const popup = $("popup-profile-mini");
+
+    if (!popup) return;
+
+    if (icon) {
+        popup.classList.toggle("show");
+        return;
+    }
+
+    if (!popup.contains(e.target)) {
+        popup.classList.remove("show");
+    }
+});
+
+/* ============================================================
+   NOTIF HALAMAN BELUM TERSEDIA
 ============================================================ */
 document.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-dev='true']");
     if (!btn) return;
-
     e.preventDefault();
-    showDevToast("Halaman ini sedang dalam proses pengembangan.");
+    showDevToast("Halaman ini sedang dalam pengembangan");
 });
 
 /* ============================================================
-                            INIT
+   INIT
 ============================================================ */
-document.addEventListener("DOMContentLoaded", () => {
-    loadProfile();
-});
+document.addEventListener("DOMContentLoaded", loadProfile);

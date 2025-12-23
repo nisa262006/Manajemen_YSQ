@@ -87,7 +87,8 @@ CREATE TABLE jadwal (
     hari VARCHAR(20) NOT NULL,
     jam_mulai TIME NOT NULL,
     jam_selesai TIME NOT NULL,
-    lokasi VARCHAR(100)
+    lokasi VARCHAR(100),
+    kategori VARCHAR(50)
 );
 
 -- 8. Absensi & Token
@@ -121,6 +122,7 @@ CREATE TABLE password_reset_tokens (
 --12
 CREATE TABLE pendaftar (
   id_pendaftar SERIAL PRIMARY KEY,
+  id_users INTEGER,
   nama VARCHAR(255) NOT NULL,
   tempat_lahir VARCHAR(100),
   tanggal_lahir DATE,

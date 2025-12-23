@@ -12,10 +12,19 @@ async function getIdPengajar(id_users) {
 }
 
 function getHariFromTanggal(tanggal) {
-  return new Date(tanggal)
+  if (!tanggal) return null;
+
+  // tanggal harus YYYY-MM-DD
+  const [year, month, day] = tanggal.split("-").map(Number);
+
+  // Pakai Date lokal (tanpa UTC)
+  const localDate = new Date(year, month - 1, day);
+
+  return localDate
     .toLocaleDateString("id-ID", { weekday: "long" })
     .toLowerCase();
 }
+
 
 /* =========================================================
    CATAT ABSENSI SANTRI (PENGAJAR)
@@ -107,10 +116,15 @@ exports.getAllAbsensiSantri = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
-        a.*,
+        a.id_absensi,
+        TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+        a.status_absensi,
+        a.catatan,
         s.nama AS nama_santri,
         k.nama_kelas,
-        j.hari, j.jam_mulai, j.jam_selesai
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai
       FROM absensi a
       JOIN santri s ON a.id_santri = s.id_santri
       JOIN jadwal j ON a.id_jadwal = j.id_jadwal
@@ -121,6 +135,7 @@ exports.getAllAbsensiSantri = async (req, res) => {
 
     res.json(result.rows);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -351,7 +366,7 @@ exports.getAllAbsensiPengajar = async (req, res) => {
         ap.id_absensi_pengajar,
         ap.id_pengajar,
         ap.id_jadwal,
-        ap.tanggal,
+        TO_CHAR(ap.tanggal, 'YYYY-MM-DD') AS tanggal,
         ap.status_absensi,
         ap.catatan,
         p.nama AS nama_pengajar,
@@ -363,7 +378,6 @@ exports.getAllAbsensiPengajar = async (req, res) => {
       ORDER BY ap.tanggal DESC
     `);
 
-    // ✅ KIRIM ARRAY LANGSUNG
     res.json(result.rows);
 
   } catch (err) {
