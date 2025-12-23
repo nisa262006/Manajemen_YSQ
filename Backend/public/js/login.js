@@ -42,3 +42,46 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     errorBox.innerText = "Tidak dapat terhubung ke server";
   }
 });
+
+document.querySelector('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.querySelector('input[type="email"]').value;
+  const btnSubmit = document.querySelector('button');
+  
+  // Indikator loading
+  btnSubmit.disabled = true;
+  btnSubmit.innerText = "Mengirim...";
+
+  try {
+      // PASTIKAN URL PORT SESUAI (Ganti ke 8000 jika backend di 8000)
+      const response = await fetch('http://localhost:8000/api/auth/forgot-password', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: email })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+          // NOTIFIKASI BERHASIL
+          alert("✅ Berhasil! Link reset password telah dikirim ke email Anda. Silakan cek kotak masuk atau folder spam.");
+      } else {
+          // NOTIFIKASI EMAIL TIDAK TERDAFTAR (Status 404 dari controller)
+          if (response.status === 404) {
+              alert("❌ Maaf, email tersebut tidak terdaftar di sistem kami sebagai Santri, Pengajar, atau Admin.");
+          } else {
+              alert("⚠️ Gagal: " + result.message);
+          }
+      }
+  } catch (error) {
+      console.error("Error:", error);
+      // NOTIFIKASI SERVER MATI / CONNECTION REFUSED
+      alert("🚫 Tidak dapat terhubung ke server. Pastikan server backend Anda sudah dijalankan.");
+  } finally {
+      btnSubmit.disabled = false;
+      btnSubmit.innerText = "Kirim Link Reset";
+  }
+});

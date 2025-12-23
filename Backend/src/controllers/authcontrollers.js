@@ -150,7 +150,7 @@ exports.createUserAfterSantriAccepted = async (req, res) => {
   }
 };
 
-// ==================== FORGOT PASSWORD ====================
+// ==================== FORGOT PASSWORD (FIXED & IMPROVED) ====================
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -159,84 +159,79 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ message: "Email wajib diisi" });
     }
 
+    // 1. Cek email di database
     const userCheck = await db.query(
       `SELECT id_users FROM users WHERE email = $1`,
       [email]
     );
 
+    // Mengembalikan status 404 agar frontend bisa memberi notifikasi email tidak terdaftar
     if (userCheck.rowCount === 0) {
-      return res.status(404).json({ message: "Email tidak ditemukan" });
+      return res.status(404).json({ message: "Maaf, email tersebut tidak terdaftar di sistem kami." });
     }
 
     const user = userCheck.rows[0];
     const token = crypto.randomBytes(32).toString("hex");
-    const expired_at = new Date(Date.now() + 10 * 60 * 1000);
+    const expired_at = new Date(Date.now() + 10 * 60 * 1000); 
 
+    // 2. Transaksi penyimpanan token
+    await db.query(`DELETE FROM password_reset_tokens WHERE id_users = $1`, [user.id_users]);
     await db.query(
-      `DELETE FROM password_reset_tokens WHERE id_users = $1`,
-      [user.id_users]
-    );
-
-    await db.query(
-      `
-      INSERT INTO password_reset_tokens (id_users, token, expired_at)
-      VALUES ($1, $2, $3)
-      `,
+      `INSERT INTO password_reset_tokens (id_users, token, expired_at) VALUES ($1, $2, $3)`,
       [user.id_users, token, expired_at]
     );
 
+    // 3. Konfigurasi Transporter
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465, 
+      secure: true, 
       auth: {
         user: process.env.EMAIL_SENDER,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASSWORD 
       }
     });
 
-    const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
+    // Sesuaikan link dengan letak file frontend Anda
+    const resetLink = `${process.env.BASE_URL}/views/reset_password.html?token=${token}`;
 
+    // 4. Kirim Email
     await transporter.sendMail({
-      from: '"YSQ Bogor" <noreply@ysqbogor.com>',
+      from: `"Sahabat Quran Bogor" <${process.env.EMAIL_SENDER}>`,
       to: email,
-      subject: "Reset Password - YSQ Bogor",
+      subject: "Reset Password - Sahabat Quran Bogor",
       html: `
-        <p>Klik link berikut untuk reset password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>Link berlaku 10 menit.</p>
-      `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
+          <h2 style="color: #1b4332;">Permintaan Reset Password</h2>
+          <p>Kami menerima permintaan untuk mereset password akun Sahabat Quran Anda.</p>
+          <p>Klik tombol di bawah ini untuk mengatur ulang password:</p>
+          <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #1b4332; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+          <p>Link ini berlaku selama 10 menit. Jika Anda tidak merasa melakukan ini, abaikan email ini.</p>
+        </div>`
     });
 
-    res.json({ message: "Link reset password telah dikirim ke email Anda" });
+    return res.status(200).json({ message: "Link reset password telah dikirim ke email Anda. Cek kotak masuk atau spam." });
 
   } catch (err) {
     console.error("FORGOT PASSWORD ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({ message: "Gagal mengirim email. Pastikan server terhubung ke internet." });
   }
 };
 
-// ==================== RESET PASSWORD ====================
+// ==================== RESET PASSWORD (FIXED) ====================
 exports.resetPassword = async (req, res) => {
   const client = await db.connect();
-
   try {
     const { token, password, confirmPassword } = req.body;
 
-    if (!token)
-      return res.status(400).json({ message: "Token diperlukan" });
-    if (!password || !confirmPassword)
-      return res.status(400).json({ message: "Password wajib diisi" });
-    if (password !== confirmPassword)
-      return res.status(400).json({ message: "Password tidak sama" });
+    if (!token) return res.status(400).json({ message: "Token diperlukan" });
+    if (!password || password.length < 6) return res.status(400).json({ message: "Password minimal 6 karakter" });
+    if (password !== confirmPassword) return res.status(400).json({ message: "Konfirmasi password tidak cocok" });
 
     await client.query("BEGIN");
 
     const tokenCheck = await client.query(
-      `
-      SELECT id_users, expired_at
-      FROM password_reset_tokens
-      WHERE token = $1
-      FOR UPDATE
-      `,
+      `SELECT id_users, expired_at FROM password_reset_tokens WHERE token = $1 FOR UPDATE`,
       [token]
     );
 
@@ -247,7 +242,7 @@ exports.resetPassword = async (req, res) => {
 
     if (new Date() > new Date(tokenCheck.rows[0].expired_at)) {
       await client.query("ROLLBACK");
-      return res.status(400).json({ message: "Token expired" });
+      return res.status(400).json({ message: "Token telah kadaluarsa" });
     }
 
     const password_hash = await bcrypt.hash(password, 10);
@@ -257,19 +252,15 @@ exports.resetPassword = async (req, res) => {
       [password_hash, tokenCheck.rows[0].id_users]
     );
 
-    await client.query(
-      `DELETE FROM password_reset_tokens WHERE id_users = $1`,
-      [tokenCheck.rows[0].id_users]
-    );
+    await client.query(`DELETE FROM password_reset_tokens WHERE id_users = $1`, [tokenCheck.rows[0].id_users]);
 
     await client.query("COMMIT");
-
-    res.json({ message: "Password berhasil direset, silakan login kembali" });
+    return res.json({ message: "Password berhasil diperbarui. Silakan login kembali." });
 
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("RESET PASSWORD ERROR:", err);
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
   } finally {
     client.release();
   }
