@@ -20,8 +20,8 @@ Sistem manajemen berbasis web yang dirancang untuk meningkatkan efisiensi operas
 ## 🏗 Teknologi yang Digunakan
 
 ### Frontend:
-- HTML5
-- Tailwind CSS
+- Html
+- CSS
 - JavaScript
 
 ### Backend:
