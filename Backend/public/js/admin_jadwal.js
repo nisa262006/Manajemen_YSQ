@@ -75,32 +75,53 @@ async function loadKelasDropdowns() {
     }
 }
 
+/* ============================================================
+   FIXED: LOAD PENGAJAR DROPDOWNS (ANTI-DOBEL)
+============================================================ */
 async function loadPengajarDropdowns() {
+    // Pastikan elemen target ada di halaman (tambah atau edit)
     if (!$("pengajar-tambah") && !$("pengajar")) return;
 
     try {
         const res = await apiGet("/pengajar");
         const list = Array.isArray(res) ? res : res.data ?? [];
 
-        window._pengajarList = list;
-
-        if ($("pengajar-tambah"))
-            $("pengajar-tambah").innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
-
-        if ($("pengajar"))
-            $("pengajar").innerHTML = ``;
+        // --- LOGIKA FILTER UNIK BERDASARKAN ID_PENGAJAR ---
+        const uniquePengajar = [];
+        const seenIds = new Set();
 
         list.forEach(p => {
-            if ($("pengajar-tambah"))
-                $("pengajar-tambah").innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
-
-            if ($("pengajar"))
-                $("pengajar").innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+            if (p.id_pengajar && !seenIds.has(p.id_pengajar)) {
+                seenIds.add(p.id_pengajar);
+                uniquePengajar.push(p);
+            }
         });
 
+        // Simpan data unik ke variabel global agar sinkron dengan fungsi lain
+        window._pengajarList = uniquePengajar;
+
+        // 1. Reset & Isi Dropdown TAMBAH JADWAL
+        const selectTambah = $("pengajar-tambah");
+        if (selectTambah) {
+            selectTambah.innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
+            uniquePengajar.forEach(p => {
+                selectTambah.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+            });
+        }
+
+        // 2. Reset & Isi Dropdown EDIT JADWAL
+        const selectEdit = $("pengajar");
+        if (selectEdit) {
+            // Berikan opsi kosong default agar tidak langsung terpilih baris pertama
+            selectEdit.innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
+            uniquePengajar.forEach(p => {
+                selectEdit.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+            });
+        }
+
     } catch (err) {
-        console.error(err);
-        toast("Gagal load pengajar", "error");
+        console.error("Error loading unique teachers:", err);
+        toast("Gagal memuat daftar pengajar", "error");
     }
 }
 
@@ -208,7 +229,7 @@ if ($("form-tambah-jadwal")) {
 }
 
 /* ============================================================
-   EDIT JADWAL
+   EDIT JADWAL & DAFTAR SESI PEMBELAJARAN
 ============================================================ */
 document.addEventListener("click", async (e) => {
     const btn = e.target.closest(".edit-btn");
@@ -217,62 +238,99 @@ document.addEventListener("click", async (e) => {
     const id = btn.dataset.id;
 
     try {
+        // 1. Ambil Detail Jadwal yang dipilih
         const jd = await apiGet(`/jadwal/${id}`);
-        const kelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
+        const resKelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
 
+        // 2. Isi Data Utama ke Form Modal
         $("edit-id-jadwal").value = id;
+        $("edit-id-kelas").value = jd.id_kelas;
         $("kelas-nama-edit").innerText = jd.nama_kelas;
-
         $("pengajar").value = jd.id_pengajar;
         $("kategori-edit").value = jd.kategori;
         $("edit-hari").value = jd.hari;
         $("edit-mulai").value = jd.jam_mulai.slice(0, 5);
         $("edit-selesai").value = jd.jam_selesai.slice(0, 5);
+        $("jumlah-siswa-maks").value = resKelas.kelas.kapasitas;
 
-        $("jumlah-siswa-maks").value = kelas.kelas.kapasitas;
-        $("edit-id-kelas").value = kelas.kelas.id_kelas;
+        // 3. AMBIL DAFTAR SESI PENGAJAR TERSEBUT
+        if (jd.id_pengajar) {
+            // Kita simpan id_pengajar di dataset modal agar fungsi hapus bisa refresh tabel ini
+            $("edit-jadwal-modal").dataset.currentPengajarId = jd.id_pengajar;
+            await loadDaftarSesiPengajar(jd.id_pengajar);
+        }
 
         $("edit-jadwal-modal").style.display = "flex";
 
     } catch (err) {
         console.error(err);
-        toast("Gagal memuat data edit", "error");
+        toast("Gagal memuat data", "error");
     }
 });
 
-if ($("btn-edit-simpan")) {
-    $("btn-edit-simpan").onclick = async () => {
-        const idJadwal = $("edit-id-jadwal").value;
-        const idKelas = $("edit-id-kelas").value;
+// Fungsi Helper untuk merender tabel Daftar Sesi Pembelajaran dengan Tombol Hapus
+async function loadDaftarSesiPengajar(idPengajar) {
+    const sesiBody = $("sesi-table-body");
+    if (!sesiBody) return;
 
-        const kelasPayload = {
-            kapasitas: $("jumlah-siswa-maks").value,
-            kategori: $("kategori-edit").value,
-            id_pengajar: $("pengajar").value
-        };
+    try {
+        const listSesi = await apiGet(`/jadwal/pengajar-sesi/${idPengajar}`);
+        
+        sesiBody.innerHTML = listSesi.length 
+            ? listSesi.map((s, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${s.nama_kelas}</td>
+                    <td>${s.hari}</td>
+                    <td>${s.jam_mulai.slice(0, 5)} - ${s.jam_selesai.slice(0, 5)}</td>
+                    <td><span class="status-badge status-aktif">AKTIF</span></td>
+                    <td>
+                        <button class="icon-btn delete-sesi-modal-btn" data-id="${s.id_jadwal}" title="Hapus Sesi">
+                            <i class="fas fa-trash-alt" style="color: #e74c3c;"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join("")
+            : `<tr><td colspan="6" style="text-align:center;">Pengajar belum memiliki sesi lain.</td></tr>`;
 
-        const jadwalPayload = {
-            id_pengajar: $("pengajar").value,
-            kategori: $("kategori-edit").value,
-            hari: $("edit-hari").value,
-            jam_mulai: $("edit-mulai").value + ":00",
-            jam_selesai: $("edit-selesai").value + ":00"
-        };
-
-        try {
-            await apiPut(`/kelas/edit/${idKelas}`, kelasPayload);
-            await apiPut(`/jadwal/${idJadwal}`, jadwalPayload);
-
-            toast("Perubahan berhasil disimpan!");
-            $("edit-jadwal-modal").style.display = "none";
-            loadJadwal();
-
-        } catch (err) {
-            console.error(err);
-            toast("Gagal menyimpan perubahan", "error");
-        }
-    };
+    } catch (err) {
+        sesiBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat sesi.</td></tr>`;
+    }
 }
+
+/* ============================================================
+   LOGIKA HAPUS SESI DARI DALAM MODAL
+============================================================ */
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".delete-sesi-modal-btn");
+    if (!btn) return;
+
+    const idJadwal = btn.dataset.id;
+    const idPengajar = $("edit-jadwal-modal").dataset.currentPengajarId;
+
+    if (!confirm("Apakah Anda yakin ingin menghapus sesi jadwal ini?")) return;
+
+    try {
+        // Gunakan endpoint delete yang sudah ada di jadwalroutes.js
+        await apiDelete(`/jadwal/${idJadwal}`);
+        
+        toast("Sesi berhasil dihapus!");
+
+        // 1. Refresh tabel kecil di dalam modal
+        if (idPengajar) {
+            await loadDaftarSesiPengajar(idPengajar);
+        }
+
+        // 2. Refresh tabel utama di halaman belakang modal
+        if (typeof loadJadwal === "function") {
+            loadJadwal();
+        }
+
+    } catch (err) {
+        console.error(err);
+        toast("Gagal menghapus sesi", "error");
+    }
+});
 
 /* ============================================================
    HAPUS JADWAL
@@ -478,14 +536,27 @@ if ($("form-tambah-kelas")) {
         try {
             const res = await apiGet("/pengajar");
             const list = Array.isArray(res) ? res : res.data ?? [];
-
+    
             const dropdown = $("select-pengajar-kelas");
+            if (!dropdown) return;
+    
             dropdown.innerHTML = `<option value="">Pilih Pengajar</option>`;
-
+    
+            // --- LOGIKA ANTI-DOBEL ---
+            const uniquePengajar = [];
+            const seenIds = new Set();
+    
             list.forEach(p => {
+                if (!seenIds.has(p.id_pengajar)) {
+                    seenIds.add(p.id_pengajar);
+                    uniquePengajar.push(p);
+                }
+            });
+    
+            uniquePengajar.forEach(p => {
                 dropdown.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
             });
-
+    
         } catch (err) {
             console.error(err);
             toast("Gagal memuat daftar pengajar", "error");

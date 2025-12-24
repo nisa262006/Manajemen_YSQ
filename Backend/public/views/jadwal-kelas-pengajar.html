@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Kelas - Sahabat Quran</title>
+    <link rel="stylesheet" href="/css/pengajar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body class="allow-scroll"> 
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/LogoYSQ.png" alt="Logo Sahabat Quran">
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/dashboard/pengajar" class="nav-link nav-item" data-content-id="dashboard-content"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+                    <li class="active"><a href="/dashboard/pengajar/jadwal" class="nav-link nav-item active" data-content-id="jadwal-content"><i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span></a></li>
+                    <li><a href="/dashboard/pengajar/absensi" class="nav-link nav-item" data-content-id="absensi-content"><i class="fas fa-check-square"></i> <span>Absensi</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-book"></i> <span>Materi Ajar</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <ul>
+                    <li class="setting" id="btn-open-profil"><i class="fas fa-cog"></i> Pengaturan</li>
+                    <li class="logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1 id="main-title">Jadwal Kelas</h1>
+                <div class="user-info">
+                    <span class="user-name">Pengajar</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="jadwal-page-container">
+                <div class="card filter-card filter-container">
+                    <div class="filter-group">
+                        <label>Pilih Kelas:</label>
+                        <select name="pilih-kelas" class="custom-select" id="filter-kelas">
+                            <option value="">Semua Kelas</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tanggal:</label>
+                        <input type="date" class="custom-select" id="filter-tanggal">
+                    </div>
+                    <button class="btn-export" id="export-excel">
+                        <i class="fas fa-file-excel"></i> Ekspor Excel
+                    </button>
+                </div>
+
+                <div class="card table-full-card">
+                    <h3>Jadwal Lengkap</h3>
+                    <table class="table-lengkap data-table" id="jadwalTable">
+                        <thead>
+                            <tr>
+                                <th>HARI</th>
+                                <th>WAKTU</th>
+                                <th>KELAS</th>
+                                <th>KATEGORI</th>
+                                <th>PENGAJAR</th>
+                                <th>PRESENSI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table_jadwal">
+                            <tr><td colspan="6" style="text-align:center">Memuat jadwal...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="/js/pengajar.js"></script>
+    <script type="module" src="/js/profileSetting.js"></script>
+</body>
+</html>

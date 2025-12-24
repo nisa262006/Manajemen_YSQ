@@ -37,7 +37,7 @@ app.get("/berhasil", (_, res) => res.sendFile(view("berhasil.html")));
 
 // ================= DASHBOARD =================
 app.get("/dashboard/admin", (_, res) => res.sendFile(view("Admin.html")));
-app.get("/dashboard/pengajar", (_, res) => res.sendFile(view("dashboardpengajar.html")));
+app.get("/dashboard/pengajar", (_, res) => res.sendFile(view("dashboard-pengajar.html")));
 app.get("/dashboard/santri", (_, res) => res.sendFile(view("dashboardsantri.html")));
 
 app.get("/dashboard/riwayat-absensi", (_, res) =>
@@ -91,6 +91,18 @@ app.get("/dashboard/absensi-siswa", (_, res) =>
 app.get("/dashboard/daftar-registrasi", (_, res) =>
   res.sendFile(view("daftar_registrasi.html"))
 );
+
+app.get("/dashboard/pengajar/jadwal", (_, res) => {
+  res.sendFile(view("jadwal-kelas-pengajar.html"));
+});
+
+app.get("/dashboard/pengajar/absensi", (_, res) => {
+  res.sendFile(view("absensi-pengajar.html"));
+});
+
+app.get("/dashboard/pengajar/riwayat-absensi", (_, res) => {
+  res.sendFile(view("riwayat-absensi.html"));
+});
 
 // ================= API ROUTES =================
 app.use("/api/auth", require("./routes/authroutes"));

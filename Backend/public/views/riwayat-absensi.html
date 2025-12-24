@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Kehadiran - Sahabat Quran</title>
+    <link rel="stylesheet" href="/css/pengajar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="allow-scroll">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/LogoYSQ.png" alt="Logo">
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/dashboard/pengajar" class="nav-link nav-item"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+                    <li><a href="/dashboard/pengajar/jadwal" class="nav-link nav-item"><i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span></a></li>
+                    <li class="active"><a href="/dashboard/pengajar/absensi" class="nav-link nav-item active"><i class="fas fa-check-square"></i> <span>Absensi</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-book"></i> <span>Materi Ajar</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Riwayat Kehadiran</h1>
+                <div class="user-profile">
+                    <span class="user-name">Pengajar</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="riwayat-page-content">
+                <div class="card riwayat-main-card">
+                    
+                    <div class="filter-riwayat-row">
+                        <div class="filter-group">
+                            <label><i class="fas fa-book"></i> Pilih Kelas</label>
+                            <select id="riwayatKelasSelect" class="custom-select">
+                                <option value="">-- Semua Kelas --</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label><i class="fas fa-calendar-day"></i> Tanggal</label>
+                            <input type="date" id="riwayatTanggal" class="custom-select">
+                        </div>
+                        <button id="eksporLaporan" class="btn-export">
+                            <i class="fas fa-file-pdf"></i> Export Laporan
+                        </button>
+                    </div>
+
+                    <div class="stats-riwayat-row">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-hadir"><i class="fas fa-user-check"></i></div>
+                            <div class="stat-info">
+                                <p>Total Hadir</p>
+                                <h3 id="statTotalHadir">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-izin"><i class="fas fa-user-times"></i></div>
+                            <div class="stat-info">
+                                <p>Total Izin/Sakit</p>
+                                <h3 id="statTotalIzin">0</h3>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-materi"><i class="fas fa-book-open"></i></div>
+                            <div class="stat-info">
+                                <p>Materi Terakhir</p>
+                                <h3 id="statMateriTerakhir">-</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="table-riwayat data-table">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>NAMA</th>
+                                    <th>HARI / TANGGAL</th>
+                                    <th>JAM</th> <th>KEHADIRAN</th>
+                                    <th>CATATAN SANTRI</th>
+                                    <th>MATERI KELAS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="riwayatBody">
+                                <tr><td colspan="7" style="text-align:center">Memuat data riwayat...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="riwayat-footer">
+                        <a href="/dashboard/pengajar/absensi" class="btn-kembali-absen">
+                            <i class="fas fa-arrow-left"></i> Kembali ke Absensi
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="notification-toast" class="toast-notification"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="/js/absensi-pengajar.js"></script>
+    <script type="module" src="/js/profileSetting.js"></script>
+</body>
+</html>

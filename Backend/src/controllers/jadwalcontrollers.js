@@ -115,6 +115,40 @@ exports.deleteJadwal = async (req, res) => {
   }
 };
 
+// ➤ Ambil semua sesi jadwal berdasarkan ID Pengajar (Untuk tabel di Modal Edit)
+exports.getJadwalByPengajar = async (req, res) => {
+  try {
+    const { id_pengajar } = req.params;
+
+    const result = await db.query(`
+      SELECT 
+        j.id_jadwal,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        j.kategori,
+        k.nama_kelas
+      FROM jadwal j
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE j.id_pengajar = $1
+      ORDER BY 
+        CASE 
+          WHEN j.hari='Senin' THEN 1
+          WHEN j.hari='Selasa' THEN 2
+          WHEN j.hari='Rabu' THEN 3
+          WHEN j.hari='Kamis' THEN 4
+          WHEN j.hari='Jumat' THEN 5
+          WHEN j.hari='Sabtu' THEN 6
+          WHEN j.hari='Minggu' THEN 7
+        END, j.jam_mulai ASC
+    `, [id_pengajar]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("ERR getJadwalByPengajar:", err);
+    res.status(500).json({ message: "Gagal mengambil daftar sesi pengajar" });
+  }
+};
 
 // ======================================================
 // ===================== PENGAJAR =======================

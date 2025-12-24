@@ -148,21 +148,14 @@ function initDaftarSantri() {
 
 
 /* ======================================================
-   DAFTAR PENGAJAR
+   DAFTAR PENGAJAR (FIXED: Tidak Dobel Kelas)
 ====================================================== */
-
 function initDaftarPengajar() {
     const tbody = document.getElementById("pengajarTableBody");
     const searchInput = document.querySelector(".teacher-search-input input");
     const addBtn = document.querySelector(".add-teacher-btn");
 
     let DATA = [];
-
-    if (addBtn) {
-        addBtn.addEventListener("click", () => {
-            window.location.href = "/dashboard/tambah-pengajar";
-        });
-    }
 
     async function load() {
         const res = await apiGet("/pengajar");
@@ -172,7 +165,20 @@ function initDaftarPengajar() {
 
     function render() {
         const key = searchInput.value.toLowerCase();
-        const list = DATA.filter(p => p.nama?.toLowerCase().includes(key));
+        
+        // --- LOGIKA ANTI-DOBEL ---
+        // Kita gunakan Map untuk memastikan 1 ID Pengajar hanya muncul 1 kali
+        const uniqueData = [];
+        const map = new Map();
+        
+        for (const item of DATA) {
+            if (!map.has(item.id_pengajar)) {
+                map.set(item.id_pengajar, true);
+                uniqueData.push(item);
+            }
+        }
+
+        const list = uniqueData.filter(p => p.nama?.toLowerCase().includes(key));
 
         tbody.innerHTML = list.length
             ? list.map((p, i) => `
@@ -180,8 +186,7 @@ function initDaftarPengajar() {
                     <td>${i + 1}</td>
                     <td>${p.nip ?? "-"}</td>
                     <td>${p.nama}</td>
-                    <td>${p.nama_kelas ?? "-"}</td>
-                    <td>${p.user_email ?? p.email ?? "-"}</td>
+                    <td>${p.mapel ?? p.nama_kelas ?? "-"}</td> <td>${p.user_email ?? p.email ?? "-"}</td>
                     <td>
                         <span class="status-badge ${p.status === "aktif" ? "status-aktif" : "status-nonaktif"}">
                             ${p.status}
@@ -199,6 +204,8 @@ function initDaftarPengajar() {
             `).join("")
             : `<tr><td colspan="7">Tidak ada data</td></tr>`;
     }
+
+    // ... sisanya tetap sama ...
 
     document.addEventListener("click", async (e) => {
         const del = e.target.closest(".delete-btn");

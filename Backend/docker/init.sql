@@ -132,6 +132,13 @@ CREATE TABLE pendaftar (
   status VARCHAR(20) DEFAULT 'menunggu'
 );
 
+CREATE TABLE announcement (
+    id SERIAL PRIMARY KEY,
+    tanggal DATE NOT NULL,
+    isi TEXT NOT NULL,
+    id_pengajar INT -- Opsional: untuk membedakan catatan tiap guru
+);
+
 -- insert
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin1@ysq.com', '$2a$12$a8YvFLJ3dhQJaPCdHgeY7Og62137S9KOqbImtWBMipqCzaIf3VRM.', 'admin', 'aktif', 'admin1');

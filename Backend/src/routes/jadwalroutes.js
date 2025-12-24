@@ -8,7 +8,8 @@ const {
   updateJadwal,
   deleteJadwal,
   jadwalPengajar,
-  jadwalSantri
+  jadwalSantri,
+  getJadwalByPengajar
 } = require("../controllers/jadwalcontrollers");
 
 const {
@@ -22,6 +23,8 @@ const {
 // ===================== ADMIN =============================
 router.post("/", verifyToken, onlyAdmin, tambahJadwal);
 router.get("/", verifyToken, onlyAdmin, getAllJadwal);
+
+router.get("/pengajar-sesi/:id_pengajar", verifyToken, onlyAdmin, getJadwalByPengajar);
 
 // ===================== PENGAJAR =============================
 router.get("/pengajar/me", verifyToken, onlyPengajar, jadwalPengajar);

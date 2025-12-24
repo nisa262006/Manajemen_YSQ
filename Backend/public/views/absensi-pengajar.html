@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi - Sahabat Quran</title>
+    <link rel="stylesheet" href="/css/pengajar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="allow-scroll">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/LogoYSQ.png" alt="Logo">
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="/dashboard/pengajar" class="nav-link nav-item" data-content-id="dashboard-content"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+                    <li><a href="/dashboard/pengajar/jadwal" class="nav-link nav-item" data-content-id="jadwal-content"><i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span></a></li>
+                    <li class="active"><a href="/dashboard/pengajar/absensi" class="nav-link nav-item active" data-content-id="absensi-content"><i class="fas fa-check-square"></i> <span>Absensi</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-book"></i> <span>Materi Ajar</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
+                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <ul>
+                    <li class="setting" id="btn-open-profil"><i class="fas fa-cog"></i> Pengaturan</li>
+                    <li class="logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Absensi</h1>
+                <div class="user-profile">
+                    <span class="user-name">Pengajar</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="absensi-page-content">
+                <div class="card absensi-main-card">
+                    <div class="absensi-header-row">
+                        <h2>Absensi Santri</h2>
+                        <button class="btn-tambah-catatan" id="btnTambahCatatan">
+                            <i class="fas fa-edit"></i> Tambah Catatan Materi
+                        </button>
+                    </div>
+
+                    <div class="filter-absen-row">
+                        <div class="filter-group">
+                            <label>Pengajar:</label>
+                            <span class="static-value user-name">Pengajar</span>
+                        </div>
+                        <div class="filter-group">
+                            <label>Pilih Kelas:</label>
+                            <select id="kelasSelect" class="custom-select">
+                                <option value="">-- Pilih Kelas --</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tanggal:</label>
+                            <input id="tanggalAbsensiPengajar" type="date" class="custom-select">
+                        </div>
+                    </div>
+
+                    <div class="absen-pengajar-box">
+                        <div class="absen-pengajar-input">
+                            <label>Absen Pengajar Hari Ini:</label>
+                            <select id="statusAbsensiPengajar">
+                                <option value="">Pilih Kehadiran</option>
+                                <option value="Hadir">Hadir</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Tidak Hadir">Tidak Hadir</option>
+                            </select>
+                            <button class="btn-simpan-absen" id="simpanAbsenPengajar">Simpan</button>
+                            <span id="absenPengajarInfo" style="margin-left:12px;color:#275238;font-weight:600"></span>
+                        </div>
+                    </div>
+
+                    <div class="label-jam-absen">
+                        <span class="badge-hari">Absen Hari</span>
+                        <span class="jam-val" id="jamAbsenDisplay">08.00 - 08.30</span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="table-absensi-santri absensi-harian-table">
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>NAMA SANTRI</th>
+                                    <th>STATUS KEHADIRAN</th>
+                                    <th>CATATAN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absensiBody">
+                                <tr><td colspan="4" style="text-align:center">Pilih kelas untuk memuat data santri...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="absensi-footer">
+                        <button class="btn-simpan" id="btnSimpanAbsensi">
+                            <i class="fas fa-save"></i> Simpan Absensi Santri
+                        </button>
+                        <a href="/dashboard/pengajar/riwayat-absensi" class="btn-view-riwayat">
+                            <i class="fas fa-history"></i> Lihat Riwayat
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="catatanModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="document.getElementById('catatanModal').style.display='none'">&times;</span>
+            <h3>Tambah Catatan Materi</h3> 
+            <textarea id="classNoteInput" placeholder="Masukkan materi yang diajarkan hari ini..."></textarea>
+            <div class="modal-footer">
+                <button class="btn-batal" onclick="document.getElementById('catatanModal').style.display='none'">Batal</button>
+                <button class="btn-simpan" id="saveNoteButton">Simpan Catatan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-toast" class="toast-notification"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="/js/absensi-pengajar.js"></script>
+    <script type="module" src="/js/profileSetting.js"></script>
+</body>
+</html>

@@ -16,6 +16,7 @@ exports.tambahKelas = async (req, res) => {
 };
 
 // List kelas
+// List kelas (Hanya menampilkan kelas unik)
 exports.getAllKelas = async (req, res) => {
   const result = await db.query(`
     SELECT 
@@ -25,6 +26,7 @@ exports.getAllKelas = async (req, res) => {
       k.kategori,
       p.nama_program,
       pg.nama AS nama_pengajar,
+      pg.id_pengajar, -- Tambahkan ID Pengajar
       u.email AS email_pengajar
     FROM kelas k
     LEFT JOIN program p ON p.id_program = k.id_program

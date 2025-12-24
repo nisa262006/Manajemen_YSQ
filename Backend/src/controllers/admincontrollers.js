@@ -93,3 +93,38 @@ exports.updateAdminProfile = async (req, res) => {
         client.release();
     }
 };
+
+/////////////////////////////////////////////////////////////////////////////////
+// src/controllers/admincontrollers.js
+
+const getDashboardStats = async (req, res) => { /* kode kamu */ };
+const getAdminProfile = async (req, res) => { /* kode kamu */ };
+const updateAdminProfile = async (req, res) => { /* kode kamu */ };
+
+// --- TAMBAHKAN DUA FUNGSI INI ---
+const createAnnouncement = async (req, res) => {
+    try {
+        // Logika simpan pengumuman
+        res.status(201).json({ message: "Pengumuman berhasil dibuat" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getAllAnnouncements = async (req, res) => {
+    try {
+        // Logika ambil pengumuman
+        res.status(200).json({ data: [] });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// --- PASTIKAN SEMUA DI-EXPORT DI SINI ---
+module.exports = {
+    getDashboardStats,
+    getAdminProfile,
+    updateAdminProfile,
+    createAnnouncement, // Pastikan nama ini ada
+    getAllAnnouncements  // Pastikan nama ini ada
+};
