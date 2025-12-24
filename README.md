@@ -21,7 +21,7 @@ Sistem manajemen berbasis web yang dirancang untuk meningkatkan efisiensi operas
 
 ### Frontend:
 - HTML5
-- Tailwind CSS
+- CSS
 - JavaScript
 
 ### Backend:
