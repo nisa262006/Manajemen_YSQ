@@ -95,36 +95,46 @@ exports.updateAdminProfile = async (req, res) => {
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-// src/controllers/admincontrollers.js
-
-const getDashboardStats = async (req, res) => { /* kode kamu */ };
-const getAdminProfile = async (req, res) => { /* kode kamu */ };
-const updateAdminProfile = async (req, res) => { /* kode kamu */ };
-
-// --- TAMBAHKAN DUA FUNGSI INI ---
-const createAnnouncement = async (req, res) => {
+// =======================================
+// ANNOUNCEMENT / CATATAN KALENDER
+// =======================================
+exports.createAnnouncement = async (req, res) => {
     try {
-        // Logika simpan pengumuman
-        res.status(201).json({ message: "Pengumuman berhasil dibuat" });
+        const { tanggal, isi } = req.body;
+        const id_pengajar = req.user.id_pengajar || req.user.profile?.id_pengajar; 
+        if (!tanggal || !isi) return res.status(400).json({ message: "Tanggal dan isi wajib diisi" });
+
+        const query = `
+            INSERT INTO announcement (tanggal, isi, id_pengajar) 
+            VALUES ($1, $2, $3)
+            ON CONFLICT (tanggal, id_pengajar) 
+            DO UPDATE SET isi = EXCLUDED.isi
+            RETURNING *;
+        `;
+        const result = await db.query(query, [tanggal, isi, id_pengajar]);
+        res.status(201).json({ success: true, message: "Catatan disimpan", data: result.rows[0] });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("DB ERROR:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
-const getAllAnnouncements = async (req, res) => {
+exports.getAnnouncementByDate = async (req, res) => {
     try {
-        // Logika ambil pengumuman
-        res.status(200).json({ data: [] });
+        const { tanggal } = req.params;
+        const id_pengajar = req.user.id_pengajar || req.user.profile?.id_pengajar;
+        const result = await db.query("SELECT isi FROM announcement WHERE tanggal = $1 AND id_pengajar = $2", [tanggal, id_pengajar]);
+        res.json({ success: true, data: result.rows[0] || { isi: "" } });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Gagal ambil data" });
     }
 };
 
-// --- PASTIKAN SEMUA DI-EXPORT DI SINI ---
-module.exports = {
-    getDashboardStats,
-    getAdminProfile,
-    updateAdminProfile,
-    createAnnouncement, // Pastikan nama ini ada
-    getAllAnnouncements  // Pastikan nama ini ada
+exports.getAllAnnouncements = async (req, res) => {
+    try {
+        const result = await db.query("SELECT * FROM announcement ORDER BY tanggal DESC");
+        res.json({ success: true, data: result.rows });
+    } catch (error) {
+        res.status(500).json({ message: "Gagal load data" });
+    }
 };

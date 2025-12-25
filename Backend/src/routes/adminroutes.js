@@ -14,8 +14,8 @@ router.put("/profile/:id_admin", verifyToken, onlyAdmin, adminController.updateA
 
 
 // Tambahkan baris ini di adminroutes.js
+router.get("/announcement/date/:tanggal", verifyToken, adminController.getAnnouncementByDate);
 router.post("/announcement", verifyToken, adminController.createAnnouncement);
 router.get("/announcement", verifyToken, adminController.getAllAnnouncements);
-
 
 module.exports = router;

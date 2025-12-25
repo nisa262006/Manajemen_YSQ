@@ -20,6 +20,37 @@ function getToken() {
     return localStorage.getItem("token");
 }
 
+/* ================== RESPONSIF =================*/
+document.querySelector('.calendar-card')?.addEventListener('click', function () {
+    this.classList.toggle('expanded');
+});
+
+const menuBtn = document.getElementById("mobileMenuBtn");
+const sidebar = document.querySelector(".sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+
+if (menuBtn && sidebar && overlay) {
+    menuBtn.addEventListener("click", () => {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+    });
+
+    overlay.addEventListener("click", () => {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+    });
+}
+
+document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove("show");
+            overlay.classList.remove("show");
+        }
+    });
+});
+
+
 /* ======================================================
     PENGATURAN TANGGAL & FILTER GLOBAL
 ====================================================== */
@@ -35,12 +66,14 @@ function getTodayLocal() {
 }
 
 function setTodayDateInput() {
-    const today = getTodayLocal();
-    // Cari semua input tanggal yang mungkin ada di berbagai halaman
-    const ids = ["filter-tanggal", "tanggalAbsensiPengajar", "tanggalAbsen"];
+    const today = getTodayLocal(); // Menghasilkan format YYYY-MM-DD
+    const ids = ["filter-tanggal", "tanggalAbsensiPengajar", "tanggalAbsen", "riwayatTanggal"];
+    
     ids.forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.value = today;
+        if (el) {
+            el.value = today; // Langsung mengisi nilai input dengan tanggal hari ini
+        }
     });
 }
 
@@ -80,12 +113,12 @@ async function loadDashboardData() {
         
         if (kelasList.length > 0) {
             const k = kelasList[0];
-            document.querySelector(".nama_kelas").textContent = k.nama_kelas || "-";
+            document.querySelectorAll(".nama_kelas").forEach(el => el.textContent = k.nama_kelas || "-");
             
             const detail = await fetchJSON(`${BASE_URL}/kelas/pengajar/detail/${k.id_kelas}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            document.querySelector(".jumlah_santri").textContent = `${detail?.santri?.length || 0} Santri`;
+            document.querySelectorAll(".jumlah_santri").forEach(el => el.textContent = `${detail?.santri?.length || 0} Santri`);
         }
 
         const jadwalRes = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
@@ -93,17 +126,20 @@ async function loadDashboardData() {
         });
         const jadwalList = jadwalRes?.data || jadwalRes || [];
 
-        const hariIni = new Date().toLocaleDateString("id-ID", { weekday: "long" });
+        const dateInput = document.getElementById("filter-tanggal")?.value;
+        const targetDate = dateInput ? new Date(dateInput) : new Date();
+        const hariIni = targetDate.toLocaleDateString("id-ID", { weekday: "long" });
+
         const filteredJadwal = jadwalList.filter(j => 
             j.hari?.toLowerCase() === hariIni.toLowerCase()
         );
 
-        document.querySelector(".kelas-hari-ini").textContent = filteredJadwal.length;
-        document.querySelector(".jadwal_kelas").textContent = filteredJadwal.length > 0 ? filteredJadwal[0].hari : "Tidak ada jadwal hari ini";
+        if (document.querySelector(".kelas-hari-ini")) document.querySelector(".kelas-hari-ini").textContent = filteredJadwal.length;
+        if (document.querySelector(".jadwal_kelas")) document.querySelector(".jadwal_kelas").textContent = filteredJadwal.length > 0 ? filteredJadwal[0].hari : "Tidak ada jadwal";
         
         tbody.innerHTML = "";
         if (filteredJadwal.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Belum ada jadwal hari ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Belum ada jadwal untuk hari ${hariIni}.</td></tr>`;
         } else {
             filteredJadwal.forEach(j => {
                 tbody.innerHTML += `
@@ -123,11 +159,13 @@ async function loadDashboardData() {
 }
 
 /* ======================================================
-    LOAD JADWAL PAGE & FILTER LOGIC
+    LOAD JADWAL PAGE & FILTER LOGIC (FIXED)
 ====================================================== */
 async function loadFullJadwalPage() {
     const tbody = document.getElementById("table_jadwal");
     const classFilter = document.getElementById("filter-kelas");
+    const dateFilter = document.getElementById("filter-tanggal");
+    
     if (!tbody) return;
 
     try {
@@ -136,21 +174,27 @@ async function loadFullJadwalPage() {
         });
         allJadwalData = res?.data || res || [];
         
-        // Populate dropdown filter kelas secara dinamis
         if (classFilter) {
             const uniqueClasses = [...new Set(allJadwalData.map(j => j.nama_kelas))];
             classFilter.innerHTML = `<option value="">Semua Kelas</option>` + 
                 uniqueClasses.map(c => `<option value="${c}">${c}</option>`).join("");
             
-            classFilter.onchange = () => applyJadwalFilters(); // Event filter kelas
+            classFilter.onchange = () => applyJadwalFilters(); 
         }
 
-        const dateFilter = document.getElementById("filter-tanggal");
         if (dateFilter) {
-            dateFilter.onchange = () => applyJadwalFilters(); // Event filter tanggal
+            // Pastikan input tanggal terisi hari ini sebelum filter dijalankan
+            if (!dateFilter.value) dateFilter.value = getTodayLocal();
+            
+            dateFilter.onchange = () => {
+                applyJadwalFilters();
+                if (document.body.classList.contains("page-dashboard-pengajar")) loadDashboardData();
+            };
         }
 
-        renderJadwalTable(allJadwalData);
+        // PANGGIL FILTER DI SINI agar tabel langsung terisi berdasarkan tanggal hari ini
+        applyJadwalFilters();
+
     } catch (err) {
         console.error("Jadwal page error:", err);
     }
@@ -162,10 +206,12 @@ function applyJadwalFilters() {
     
     let filtered = allJadwalData;
 
+    // Filter Kelas
     if (classVal) {
         filtered = filtered.filter(j => j.nama_kelas === classVal);
     }
 
+    // Filter Tanggal (Hari)
     if (dateVal) {
         const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
         const dayName = days[new Date(dateVal).getDay()];
@@ -215,17 +261,30 @@ function renderJadwalTable(data) {
 }
 
 /* ======================================================
-    KALENDER & CATATAN INTERAKTIF
+    KALENDER & CATATAN INTERAKTIF (FIXED: TANGGAL MUNCUL)
 ====================================================== */
 let selectedDateStr = "";
 
-function initCalendar() {
+async function initCalendar() {
     const calDays = document.getElementById("calendar-days");
     if (!calDays) return;
 
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
+
+    let noteDates = [];
+    try {
+        const res = await fetchJSON(`${BASE_URL}/admin/announcement`, {
+            headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        noteDates = (res?.data || []).map(n => {
+            const d = new Date(n.tanggal);
+            return d.toISOString().split('T')[0];
+        });
+    } catch (err) {
+        console.error("Gagal load riwayat kalender:", err);
+    }
 
     const monthYear = document.getElementById("calendar-month-year");
     if (monthYear) monthYear.textContent = now.toLocaleDateString("id-ID", { month: 'long', year: 'numeric' });
@@ -242,24 +301,77 @@ function initCalendar() {
     for (let i = 1; i <= lastDay; i++) {
         const dayDiv = document.createElement("div");
         dayDiv.className = "calendar-day";
+        
+        const fullDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        
         if (i === now.getDate()) dayDiv.classList.add("today");
-        dayDiv.textContent = i;
+        
+        if (noteDates.includes(fullDateStr)) {
+            dayDiv.innerHTML = `${i}<span class="dot-indicator" style="width:5px; height:5px; background:#275238; border-radius:50%; position:absolute; bottom:5px; left:50%; transform:translateX(-50%);"></span>`;
+            dayDiv.style.position = "relative";
+        } else {
+            dayDiv.textContent = i;
+        }
+
         dayDiv.addEventListener("click", () => {
             openReminderModal(i, currentMonth, currentYear);
         });
         calDays.appendChild(dayDiv);
     }
+
+    const todayStr = getTodayLocal();
+    loadAnnouncementToArea(todayStr);
 }
 
-function openReminderModal(day, month, year) {
+async function loadAnnouncementToArea(dateStr) {
+    const area = document.querySelector(".announcement-card");
+    if (!area) return;
+
+    try {
+        const res = await fetchJSON(`${BASE_URL}/admin/announcement/date/${dateStr}`, {
+            headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        
+        const content = res?.data?.isi;
+        if (content) {
+            let infoEl = area.querySelector(".info-text-riwayat");
+            if (!infoEl) {
+                infoEl = document.createElement("p");
+                infoEl.className = "info-text-riwayat";
+                infoEl.style.fontSize = "12px";
+                infoEl.style.marginTop = "10px";
+                infoEl.style.textAlign = "center";
+                area.appendChild(infoEl);
+            }
+            infoEl.textContent = content;
+        }
+    } catch (err) {
+        console.error("Gagal load info riwayat area");
+    }
+}
+
+async function openReminderModal(day, month, year) {
     const modal = document.getElementById("reminderModal");
-    if (!modal) return;
-    selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const input = document.getElementById("reminderInput");
     const dateText = document.getElementById("selected-date-text");
+    if (!modal) return;
+
+    selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     if (dateText) {
         dateText.textContent = `Catatan: ${day} ${new Date(year, month).toLocaleDateString('id-ID', {month:'long'})}`;
     }
+    
+    input.value = "Memuat...";
     modal.style.display = "flex";
+
+    try {
+        const res = await fetchJSON(`${BASE_URL}/admin/announcement/date/${selectedDateStr}`, {
+            headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        input.value = res?.data?.isi || "";
+    } catch (err) {
+        input.value = "";
+    }
 }
 
 window.closeReminderModal = function() {
@@ -273,115 +385,87 @@ window.closeReminderModal = function() {
     STATISTIK KEHADIRAN PENGAJAR
 ====================================================== */
 async function loadTeacherAttendanceStats() {
-  try {
-      const token = getToken();
-      const rekap = await fetchJSON(`${BASE_URL}/absensi/pengajar/rekap`, {
-          headers: { Authorization: `Bearer ${token}` }
-      });
-      const elPersen = document.querySelector(".persentase-kehadiran");
-      if (elPersen) {
-          elPersen.textContent = rekap?.persentase || "0%";
-      }
-  } catch (e) {
-      if (document.querySelector(".persentase-kehadiran")) {
-          document.querySelector(".persentase-kehadiran").textContent = "0%";
-      }
-  }
+    try {
+        const token = getToken();
+        const rekap = await fetchJSON(`${BASE_URL}/absensi/pengajar/rekap`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const elPersen = document.querySelector(".persentase-kehadiran");
+        if (elPersen) elPersen.textContent = rekap?.persentase || "0%";
+    } catch (e) {
+        if (document.querySelector(".persentase-kehadiran")) {
+            document.querySelector(".persentase-kehadiran").textContent = "0%";
+        }
+    }
 }
 
 /* ======================================================
-    EKSPOR LAPORAN EXCEL (FORMAT XLSX)
+    EKSPOR LAPORAN EXCEL
 ====================================================== */
 function exportToExcel() {
-  if (!allJadwalData || !allJadwalData.length) return alert("Data kosong");
+    if (!allJadwalData || !allJadwalData.length) return alert("Data kosong");
+    const dateFilter = document.getElementById("filter-tanggal");
+    const selectedDate = dateFilter?.value || getTodayLocal();
 
-  const dateFilter = document.getElementById("filter-tanggal");
-  const selectedDate = dateFilter?.value || new Date().toISOString().split('T')[0];
+    const wsData = [
+        ["LAPORAN JADWAL KELAS PENGAJAR"],
+        ["Tanggal Cetak:", selectedDate],
+        [],
+        ["No", "Hari", "Waktu", "Nama Kelas", "Kategori", "Pengajar"]
+    ];
 
-  // Format Data sesuai permintaan Anda
-  const wsData = [
-      ["LAPORAN JADWAL KELAS PENGAJAR"],
-      ["Tanggal Cetak:", selectedDate],
-      [],
-      ["No", "Hari", "Waktu", "Nama Kelas", "Kategori", "Pengajar"]
-  ];
+    allJadwalData.forEach((j, i) => {
+        wsData.push([i + 1, j.hari || "-", `${j.jam_mulai} - ${j.jam_selesai}`, j.nama_kelas || "-", j.kategori || "-", j.nama_pengajar || "Anda"]);
+    });
 
-  allJadwalData.forEach((j, i) => {
-      wsData.push([
-          i + 1, 
-          j.hari || "-", 
-          `${j.jam_mulai} - ${j.jam_selesai}`, 
-          j.nama_kelas || "-", 
-          j.kategori || "-", 
-          j.nama_pengajar || "Anda"
-      ]);
-  });
-
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Laporan Jadwal");
-
-  // Unduh file dengan nama file menyertakan tanggal
-  XLSX.writeFile(wb, `Laporan_Jadwal_Pengajar_${selectedDate}.xlsx`);
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan Jadwal");
+    XLSX.writeFile(wb, `Laporan_Jadwal_Pengajar_${selectedDate}.xlsx`);
 }
-
 
 /* ======================================================
     INITIALIZATION
 ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  loadPengajarProfile();
-  setTodayDateInput(); // Set 24 Desember 2025
+    loadPengajarProfile();
+    setTodayDateInput(); 
 
-  // Inisialisasi Halaman Absensi
-  if (document.getElementById("absensiBody")) {
-      populateAbsensiFilters();
-      document.getElementById("kelasSelect")?.addEventListener("change", loadAbsensiData);
-      document.getElementById("tanggalAbsensiPengajar")?.addEventListener("change", loadAbsensiData);
-      document.getElementById("simpanAbsenPengajar")?.addEventListener("click", handleSimpanAbsenPengajar);
-      document.getElementById("btnSimpanAbsensi")?.addEventListener("click", handleSimpanAbsensiSantri);
-  }
-
-  // Inisialisasi Dashboard
-  if (document.body.classList.contains("page-dashboard-pengajar")) {
-      loadDashboardData();
-      initCalendar();
-  }
-
-  // Inisialisasi Jadwal Lengkap
-  if (document.getElementById("table_jadwal")) {
-      loadFullJadwalPage();
-  }
-});
-
-    // Event Ekspor Excel
-    const exportBtn = document.getElementById("export-excel");
-    if (exportBtn) {
-        exportBtn.onclick = exportToExcel; // Menghubungkan fungsi ekspor
+    if (document.body.classList.contains("page-dashboard-pengajar")) {
+        loadDashboardData();
+        initCalendar(); 
     }
 
-    // Event Simpan Reminder
-    const saveBtn = document.getElementById("saveReminderBtn");
-    if (saveBtn) {
-        saveBtn.onclick = async () => {
+    if (document.getElementById("table_jadwal") || document.getElementById("filter-tanggal")) {
+        loadFullJadwalPage();
+    }
+
+    const exportBtn = document.getElementById("export-excel");
+    if (exportBtn) exportBtn.onclick = exportToExcel;
+
+    const saveReminderBtn = document.getElementById("saveReminderBtn");
+    if (saveReminderBtn) {
+        saveReminderBtn.onclick = async () => {
             const text = document.getElementById("reminderInput").value;
-            if (!text) return alert("Catatan tidak boleh kosong");
+            if (!text.trim()) return alert("Catatan tidak boleh kosong");
             try {
                 await fetchJSON(`${BASE_URL}/admin/announcement`, {
                     method: "POST",
                     headers: { 
-                        "Content-Type": "application/json",
+                        "Content-Type": "application/json", 
                         Authorization: `Bearer ${getToken()}` 
                     },
                     body: JSON.stringify({ tanggal: selectedDateStr, isi: text })
                 });
                 alert("Catatan berhasil disimpan!");
                 closeReminderModal();
+                initCalendar(); 
             } catch (err) {
                 alert("Gagal menyimpan catatan.");
             }
         };
     }
+});
 
 /* ======================================================
     LOGOUT FUNCTION
@@ -392,5 +476,3 @@ window.handleLogout = function() {
         window.location.replace("/login");
     }
 };
-
-////////////////////////////////////////////////////////////////////////

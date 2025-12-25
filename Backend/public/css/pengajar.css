@@ -760,6 +760,183 @@ table {
         transform: scale(1); /* Kembali ke ukuran asli */
     }
 }
+/*============== MOBILE ATAU TAB =====================*/
+/* =========================================================
+   MOBILE MODE (TABLET & HP)
+   ========================================================= */
+   @media (max-width: 768px) {
+
+    body {
+        overflow: auto;
+    }
+
+    .container {
+        flex-direction: column;
+    }
+
+    /* =========================
+       HEADER / APP BAR
+       ========================= */
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        background: var(--bg-color);
+        padding: 10px 15px;
+        gap: 10px;
+    }
+
+    header h1 {
+        font-size: 18px;
+        flex: 1;
+        text-align: center;
+    }
+
+    .user-profile {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    /* Tombol Hamburger */
+    .mobile-menu-btn {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 22px;
+        color: var(--primary-green);
+        cursor: pointer;
+    }
+
+    /* =========================
+       SIDEBAR → DRAWER
+       ========================= */
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        width: 260px;
+        height: 100vh;
+        transition: 0.3s ease;
+        z-index: 1200;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+
+    /* Overlay saat sidebar terbuka */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 1100;
+    }
+    
+    .sidebar-overlay.show {
+        display: block;
+    }
+    
+
+    /* =========================
+       MAIN CONTENT
+       ========================= */
+    .main-content {
+        padding: 15px !important;
+        height: auto;
+    }
+
+    /* =========================
+       DASHBOARD LAYOUT
+       ========================= */
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .right-column {
+        margin-right: 0;
+    }
+
+    /* =========================
+       STATS ROW → STACK
+       ========================= */
+    .stats-row {
+        flex-direction: column;
+    }
+
+    .info-kelas {
+        width: 100%;
+    }
+
+    .mini-card {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px;
+    }
+
+    .mini-card i {
+        font-size: 22px;
+    }
+
+    /* =========================
+       TABLE → SCROLL HORIZONTAL
+       ========================= */
+    .table-wrapper {
+        overflow-x: auto;
+        max-height: unset;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+    /* ===============================
+   MOBILE CALENDAR COLLAPSIBLE
+   =============================== */
+@media (max-width: 768px) {
+
+    .calendar-card {
+        max-height: 70px; /* MODE KECIL */
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        cursor: pointer;
+    }
+
+    .calendar-card h3 {
+        font-size: 15px;
+        margin-bottom: 0;
+    }
+
+    .calendar-card.expanded {
+        max-height: 400px; /* MODE TERBUKA */
+    }
+
+    .calendar-days {
+        margin-top: 10px;
+    }
+}
+
+
+    /* =========================
+       MODAL RESPONSIVE
+       ========================= */
+    .modal-content {
+        width: 90% !important;
+        max-width: 360px;
+    }
+
+}
+
+/* =========================================================
+   DESKTOP ONLY (SEMBUNYIKAN HAMBURGER)
+   ========================================================= */
+@media (min-width: 769px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
 
 /* ==========================================================================
    BAGIAN HALAMAN JADWAL KELAS
@@ -1282,4 +1459,28 @@ table {
     text-decoration: none;
     font-weight: 600;
     margin-top: 25px;
+}
+
+/* Indikator tanggal yang memiliki catatan */
+.calendar-day.has-note {
+    position: relative;
+    background-color: #e8f5e9; /* Warna hijau sangat muda */
+    font-weight: 600;
+    color: #275238;
+}
+
+/* Titik kecil di bawah angka tanggal */
+.note-indicator {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #275238; /* Hijau tua sesuai tema */
+    border-radius: 50%;
+}
+
+.calendar-day.has-note:hover {
+    background-color: #c8e6c9;
 }
