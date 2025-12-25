@@ -1,5 +1,5 @@
 ### LOGIN TEST
-POST http://localhost:5000/auth/login
+POST http://localhost:8000/auth/login
 Content-Type: application/json
 
 {
@@ -8,22 +8,22 @@ Content-Type: application/json
 }
 
 ### LOGIN PENGAJAR
-POST http://localhost:5000/auth/login
+POST http://localhost:8000/api/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "maya@ysq.com",
-  "password": "123456"
+  "identifier": "pengajar1@ysq.com",
+  "password": "riska"
 }
 
 
 ### LOGIN SANTRI
-POST http://localhost:5000/auth/login
+POST http://localhost:8000/api/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "ekan1@gmail.com",
-  "password": "ekan123"
+  "identifier": "rahmafitriatunnisa.xtpgma@gmail.com",
+  "password": "rahma123"
 }
 
 
@@ -479,3 +479,136 @@ Content-Type: application/json
 GET http://localhost:5000/absensi/pengajar/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
 
+
+###############################################################
+### TUGAS DAN NILAI
+###############################################################
+### TAMBAH TUGAS PENGAJAR
+POST http://localhost:8000/api/tugas-media/tugas
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+Content-Type: application/json
+
+{
+  "id_kelas": 1,
+  "judul": "Hafalan Surat Al-Mulk",
+  "deskripsi": "Setor hafalan surat Al-Mulk ayat 1–10",
+  "due_date": "2025-12-30 23:59",
+  "allow_file": true,
+  "allow_text": true
+}
+
+
+### LIST TUGAS KELAS PENGAJAR
+GET http://localhost:8000/api/tugas-media/tugas/pengajar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+
+### UPDATE TUGAS PENGAJAR
+PUT http://localhost:8000/api/tugas-media/tugas/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+Content-Type: application/json
+
+{
+  "judul": "Hafalan Surat Al-Mulk (Revisi)",
+  "deskripsi": "Ayat 1–15",
+  "due_date": "2025-12-31 23:59"
+}
+
+
+### DELETE TUGAS PENGAJAR
+DELETE http://localhost:8000/api/tugas-media/tugas/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+
+### MONITORING TUGAS pengajar
+GET http://localhost:8000/api/tugas-media/tugas/1/monitoring
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+
+### TAMBAH MEDIA AJAR (LINK) PENGAJAR
+POST http://localhost:8000/api/tugas-media/media
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+Content-Type: application/json
+
+{
+  "id_kelas": 1,
+  "judul": "Video Tajwid Nun Mati",
+  "tipe": "LINK",
+  "link_url": "https://youtube.com/xxxxx"
+}
+
+## FILE
+POST http://localhost:8000/api/tugas-media/media
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+Content-Type: application/json
+
+{
+  "id_kelas": 1,
+  "judul": "Modul Tajwid PDF",
+  "tipe": "FILE",
+  "file_path": "/uploads/modul_tajwid.pdf"
+}
+
+
+### LIST MEDIA AJAR PENGAJAR
+GET http://localhost:8000/api/tugas-media/media/pengajar
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+
+## HAPUS MEDIA AJAR
+DELETE http://localhost:8000/api/tugas-media/media/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+
+## SANTRI LIHAT TUGAS
+GET http://localhost:8000/api/tugas-media/tugas/saya
+Authorization: Bearer {{token_santri}}
+
+## SANTRI NGUMPULIN TUGAS TEXT
+POST http://localhost:8000/api/tugas-media/tugas/kumpul
+Authorization: Bearer {{token_santri}}
+Content-Type: application/json
+
+{
+  "id_tugas": 2,
+  "jawaban_text": "Saya sudah menghafal ayat 1–10",
+  "file_path": null
+}
+
+## FILE
+POST http://localhost:8000/api/tugas-media/tugas/kumpul
+Authorization: Bearer {{token_santri}}
+Content-Type: application/json
+
+{
+  "id_tugas": 2,
+  "jawaban_text": null,
+  "file_path": "/uploads/setoran_ahmad.mp3"
+}
+
+## SANTRI LIHAT MEDIA AJAR
+GET http://localhost:8000/api/tugas-media/media/saya
+Authorization: Bearer {{token_santri}}
+
+###############################################################
+### NILAI DAN PROGRES
+###############################################################
+### INPUT PROGRES (PENGAJAR)
+POST http://localhost:8000/api/nilai-progres/progres
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+Content-Type: application/json
+
+{
+  "id_santri": 1,
+  "id_kelas": 2,
+  "minggu_ke": 1,
+  "catatan": "Makharijul huruf baik",
+  "nilai": 85
+}
+
+### LIHAT PROGRES SANTRI
+GET http://localhost:8000/api/nilai-progres/saya
+Authorization: Bearer {{token_santri}}
+
+### REKAP KELAS
+GET http://localhost:8000/api/nilai-progres/rekap/kelas/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+
+### LAPORAN ADMIN
+GET http://localhost:8000/api/nilai-progres/laporan
+Authorization: Bearer {{token_admin}}

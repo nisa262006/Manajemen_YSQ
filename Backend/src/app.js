@@ -115,6 +115,9 @@ app.use("/api/pengajar", require("./routes/pengajarroutes"));
 app.use("/api/admin", require("./routes/adminroutes"));
 app.use("/api/me", require("./routes/meroutes"));
 app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
+app.use("/api/tugas-media", require("./routes/tugasmediaajarroutes"));
+app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
+
 
 // ================= START SERVER =================
 app.listen(PORT, () => {
