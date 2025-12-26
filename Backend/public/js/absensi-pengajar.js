@@ -21,6 +21,36 @@ function getToken() {
     return localStorage.getItem("token");
 }
 
+/* ================== RESPONSIF =================*/
+document.querySelector('.calendar-card')?.addEventListener('click', function () {
+    this.classList.toggle('expanded');
+});
+
+const menuBtn = document.getElementById("mobileMenuBtn");
+const sidebar = document.querySelector(".sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+
+if (menuBtn && sidebar && overlay) {
+    menuBtn.addEventListener("click", () => {
+        sidebar.classList.add("show");
+        overlay.classList.add("show");
+    });
+
+    overlay.addEventListener("click", () => {
+        sidebar.classList.remove("show");
+        overlay.classList.remove("show");
+    });
+}
+
+document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove("show");
+            overlay.classList.remove("show");
+        }
+    });
+});
+
 /* ======================================================
     PENGATURAN TANGGAL & GLOBAL STATE
 ====================================================== */
