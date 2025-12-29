@@ -229,9 +229,9 @@ function renderJadwalTable(data) {
         ? `<tr><td colspan="6" style="text-align:center">Tidak ada jadwal yang sesuai.</td></tr>`
         : data.map((j, i) => `
             <tr class="main-row">
+                <td><strong>${j.nama_kelas ?? "-"}</strong></td>
                 <td>${j.hari ?? "-"}</td>
                 <td>${j.jam_mulai ?? "-"} - ${j.jam_selesai ?? "-"}</td>
-                <td><strong>${j.nama_kelas ?? "-"}</strong></td>
                 <td>${j.kategori ?? "-"}</td>
                 <td>${j.nama_pengajar ?? "Anda"}</td>
                 <td>
@@ -476,3 +476,4 @@ window.handleLogout = function() {
         window.location.replace("/login");
     }
 };
+

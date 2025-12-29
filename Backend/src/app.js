@@ -19,11 +19,13 @@ app.use((req, res, next) => {
 
 // ================= STATIC FILES =================
 // path ke folder public
+app.use(express.static(path.join(__dirname, "../public")));
 const publicPath = path.join(__dirname, "../public");
 const viewsPath = path.join(publicPath, "views");
 
 // serve css, js, images
 app.use(express.static(publicPath));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // helper biar gak nulis sendFile panjang-panjang
 const view = (file) => path.join(viewsPath, file);
@@ -104,6 +106,10 @@ app.get("/dashboard/pengajar/riwayat-absensi", (_, res) => {
   res.sendFile(view("riwayat-absensi.html"));
 });
 
+app.get("/dashboard/pengajar/materi-ajar", (_, res) => {
+  res.sendFile(view("materi-ajar.html"));
+});
+
 // ================= API ROUTES =================
 app.use("/api/auth", require("./routes/authroutes"));
 app.use("/api/pendaftar", require("./routes/registerroutes"));
@@ -115,7 +121,7 @@ app.use("/api/pengajar", require("./routes/pengajarroutes"));
 app.use("/api/admin", require("./routes/adminroutes"));
 app.use("/api/me", require("./routes/meroutes"));
 app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
-app.use("/api/tugas-media", require("./routes/tugasmediaajarroutes"));
+app.use("/api/tugas-media", require("./routes/tugasmateriajarroutes"));
 app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
 
 

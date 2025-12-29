@@ -159,7 +159,6 @@ exports.jadwalPengajar = async (req, res) => {
   try {
     const { id_users } = req.user;
 
-    // Cari id_pengajar
     const pg = await db.query(
       `SELECT id_pengajar FROM pengajar WHERE id_users = $1`,
       [id_users]
@@ -171,19 +170,17 @@ exports.jadwalPengajar = async (req, res) => {
 
     const id_pengajar = pg.rows[0].id_pengajar;
 
-    // Ambil jadwal pengajar
     const result = await db.query(`
       SELECT 
         j.id_jadwal,
+        j.id_kelas,            -- 🔥 INI KUNCINYA
         j.hari,
         j.jam_mulai,
         j.jam_selesai,
         j.kategori,
-        k.nama_kelas,
-        p.nama AS nama_pengajar
+        k.nama_kelas
       FROM jadwal j
-      LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
-      LEFT JOIN pengajar p ON j.id_pengajar = p.id_pengajar
+      JOIN kelas k ON j.id_kelas = k.id_kelas
       WHERE j.id_pengajar = $1
       ORDER BY j.hari, j.jam_mulai
     `, [id_pengajar]);
@@ -196,6 +193,44 @@ exports.jadwalPengajar = async (req, res) => {
   }
 };
 
+
+// ➤ Ambil kelas pengajar berdasarkan hari (UNTUK ABSENSI)
+exports.jadwalPengajarByHari = async (req, res) => {
+  try {
+    const { id_users } = req.user;
+    const { hari } = req.params;
+
+    const pg = await db.query(
+      `SELECT id_pengajar FROM pengajar WHERE id_users = $1`,
+      [id_users]
+    );
+    if (pg.rowCount === 0) {
+      return res.status(404).json({ message: "Pengajar tidak ditemukan" });
+    }
+
+    const id_pengajar = pg.rows[0].id_pengajar;
+
+    const result = await db.query(`
+      SELECT DISTINCT
+        k.id_kelas,
+        k.nama_kelas,
+        j.id_jadwal,
+        j.jam_mulai,
+        j.jam_selesai
+      FROM jadwal j
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE j.id_pengajar = $1
+        AND LOWER(j.hari) = LOWER($2)
+      ORDER BY j.jam_mulai ASC
+    `, [id_pengajar, hari]);
+
+    res.json({ success: true, data: result.rows });
+
+  } catch (err) {
+    console.error("ERR jadwalPengajarByHari:", err);
+    res.status(500).json({ message: "Gagal mengambil jadwal berdasarkan hari" });
+  }
+};
 
 
 // ======================================================
