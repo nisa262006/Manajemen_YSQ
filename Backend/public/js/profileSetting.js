@@ -152,3 +152,108 @@ document.addEventListener("click", (e) => {
    INIT
 ============================================================ */
 document.addEventListener("DOMContentLoaded", loadProfile);
+
+window.toggleMiniProfil = async () => {
+  const card = document.getElementById("miniProfilCard");
+  card.style.display = card.style.display === "block" ? "none" : "block";
+
+  const me = await apiGet("/api/me");
+
+  document.getElementById("mini-nama").innerText = me.nama;
+  document.getElementById("mini-email").innerText = me.email;
+  document.getElementById("mini-phone").innerText = me.no_hp;
+};
+
+window.handleSimpanProfil = async () => {
+  const body = {
+    nama: document.getElementById("input-nama").value,
+    email: document.getElementById("input-email").value,
+    no_hp: document.getElementById("input-wa").value,
+  };
+
+  await apiPut("/api/me", body);
+  alert("Profil berhasil diperbarui");
+};
+
+
+/* ======================================================
+    LOGIKA PROFIL (Header, Mini Profile & Pengaturan)
+====================================================== */
+
+// 1. Memuat Data Profil dari Server
+async function loadProfileData() {
+    try {
+        // Panggil API /me (Hapus '/api' jika apiService sudah menambahkannya otomatis)
+        const res = await apiGet("/me"); 
+        const p = res.profile || res; // Sesuai struktur response backend
+
+        // Update Nama di Header & Sidebar
+        document.querySelectorAll(".user-name").forEach(el => {
+            el.textContent = p.nama || "Pengajar";
+        });
+
+        // Update Popup Mini Profile
+        if (document.getElementById("mini-nama")) {
+            document.getElementById("mini-nama").textContent = p.nama || "-";
+            document.getElementById("mini-email").innerHTML = `<i class="fas fa-envelope"></i> ${p.email || "-"}`;
+            document.getElementById("mini-phone").innerHTML = `<i class="fab fa-whatsapp"></i> ${p.no_kontak || "-"}`;
+            document.getElementById("mini-avatar-initials").textContent = (p.nama || "P").charAt(0).toUpperCase();
+        }
+
+        // Update Form di Modal Pengaturan
+        if (document.getElementById("input-nama")) {
+            document.getElementById("input-nama").value = p.nama || "";
+            document.getElementById("input-email").value = p.email || "";
+            document.getElementById("input-wa").value = p.no_kontak || "";
+            document.getElementById("input-terdaftar").value = p.tanggal_terdaftar || "-";
+            document.getElementById("profile-initials").textContent = (p.nama || "P").charAt(0).toUpperCase();
+        }
+
+    } catch (err) {
+        console.error("Gagal memuat profil:", err);
+    }
+}
+
+// 2. Toggle Popup Mini Profile
+window.toggleMiniProfil = function() {
+    const card = document.getElementById("miniProfilCard");
+    if (card) {
+        const isVisible = card.style.display === "block";
+        card.style.display = isVisible ? "none" : "block";
+    }
+};
+
+// 3. Membuka Modal Pengaturan
+window.openProfil = function() {
+    const modal = document.getElementById("profilOverlay");
+    if (modal) {
+        modal.style.display = "flex";
+        loadProfileData(); // Refresh data saat modal dibuka
+    }
+};
+
+// 4. Menutup Modal Pengaturan
+window.closeModalProfil = function() {
+    const modal = document.getElementById("profilOverlay");
+    if (modal) modal.style.display = "none";
+};
+
+// 5. Simpan Perubahan Profil
+window.handleSimpanProfil = async function() {
+    const nama = document.getElementById("input-nama").value;
+    const no_kontak = document.getElementById("input-wa").value;
+
+    try {
+        // Ganti URL sesuai endpoint backend Anda
+        await apiPut("/update-profil-pengajar", { nama, no_kontak });
+        
+        alert("Profil berhasil diperbarui!");
+        closeModalProfil();
+        loadProfileData(); // Sync ulang data ke header dan popup
+    } catch (err) {
+        alert("Gagal menyimpan: " + (err.message || "Terjadi kesalahan"));
+    }
+};
+
+// Jalankan saat halaman pertama kali dimuat
+document.addEventListener("DOMContentLoaded", loadProfileData);

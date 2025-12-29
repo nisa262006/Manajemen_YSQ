@@ -87,8 +87,7 @@ CREATE TABLE jadwal (
     hari VARCHAR(20) NOT NULL,
     jam_mulai TIME NOT NULL,
     jam_selesai TIME NOT NULL,
-    lokasi VARCHAR(100),
-    kategori VARCHAR(50)
+    lokasi VARCHAR(100)
 );
 
 -- 8. Absensi & Token
@@ -101,7 +100,7 @@ CREATE TABLE absensi (
     catatan TEXT
 );
 
---19
+--9
 CREATE TABLE absensi_pengajar (
     id_absensi_pengajar SERIAL PRIMARY KEY,
     id_pengajar INT REFERENCES pengajar(id_pengajar),
@@ -122,7 +121,6 @@ CREATE TABLE password_reset_tokens (
 --12
 CREATE TABLE pendaftar (
   id_pendaftar SERIAL PRIMARY KEY,
-  id_users INTEGER,
   nama VARCHAR(255) NOT NULL,
   tempat_lahir VARCHAR(100),
   tanggal_lahir DATE,
@@ -132,11 +130,72 @@ CREATE TABLE pendaftar (
   status VARCHAR(20) DEFAULT 'menunggu'
 );
 
+--13 
 CREATE TABLE announcement (
     id SERIAL PRIMARY KEY,
     tanggal DATE NOT NULL,
     isi TEXT NOT NULL,
     id_pengajar INT -- Opsional: untuk membedakan catatan tiap guru
+);
+
+--14
+-- MATERI AJAR
+CREATE TABLE IF NOT EXISTS materi_ajar (
+    id_materi SERIAL PRIMARY KEY,
+    id_kelas INT NOT NULL REFERENCES kelas(id_kelas) ON DELETE CASCADE,
+    id_pengajar INT REFERENCES pengajar(id_pengajar),
+    judul VARCHAR(255) NOT NULL,
+    deskripsi TEXT,
+    tipe_file VARCHAR(20), -- Menghapus NOT NULL
+    file_path TEXT,        -- Menghapus 'DROP NOT NULL', defaultnya adalah NULL
+    tipe_konten VARCHAR(20) DEFAULT 'file',
+    link_url TEXT,         -- Menghapus 'DROP NOT NULL'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE tugas
+ADD COLUMN id_materi INT REFERENCES materi_ajar(id_materi);
+
+-- 15 TUGAS
+CREATE TABLE IF NOT EXISTS tugas (
+    id_tugas SERIAL PRIMARY KEY,
+    id_kelas INT NOT NULL REFERENCES kelas(id_kelas) ON DELETE CASCADE,
+    id_materi INT REFERENCES materi_ajar(id_materi) ON DELETE CASCADE,
+    id_pengajar INT NOT NULL REFERENCES pengajar(id_pengajar),
+    judul VARCHAR(255),
+    deskripsi TEXT,
+    deadline TIMESTAMP NOT NULL,
+    tipe_tugas VARCHAR(20) DEFAULT 'file',
+    link_url TEXT,
+    file_path TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- 16 PENGUMPULAN TUGAS
+CREATE TABLE IF NOT EXISTS pengumpulan_tugas (
+    id_pengumpulan SERIAL PRIMARY KEY,
+    id_tugas INT NOT NULL REFERENCES tugas(id_tugas) ON DELETE CASCADE,
+    id_santri INT NOT NULL REFERENCES santri(id_santri) ON DELETE CASCADE,
+    file_path TEXT,
+    tipe_konten VARCHAR(20) DEFAULT 'file',
+    link_url TEXT,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (id_tugas, id_santri)
+);
+
+
+
+-- 17. Progres Pembelajaran Santri
+CREATE TABLE progres_pembelajaran (
+    id_progres SERIAL PRIMARY KEY,
+    id_santri INT NOT NULL REFERENCES santri(id_santri) ON DELETE CASCADE,
+    id_kelas INT NOT NULL REFERENCES kelas(id_kelas) ON DELETE CASCADE,
+    minggu_ke INT NOT NULL,
+    catatan TEXT NOT NULL,
+    nilai INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(id_santri, id_kelas, minggu_ke)
 );
 
 -- insert

@@ -485,16 +485,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwid
 ###############################################################
 ### TAMBAH TUGAS PENGAJAR
 POST http://localhost:8000/api/tugas-media/tugas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2OTIzNzkyLCJleHAiOjE3NjcwMTAxOTJ9.Dyhg0VXJlLEztxZAch-AslT4zHG9B9xNT0j70xJ3BL8
 Content-Type: application/json
 
 {
-  "id_kelas": 1,
-  "judul": "Hafalan Surat Al-Mulk",
-  "deskripsi": "Setor hafalan surat Al-Mulk ayat 1–10",
-  "due_date": "2025-12-30 23:59",
-  "allow_file": true,
-  "allow_text": true
+    "id_kelas": 1,
+    "judul": "Tugas Hafalan Surat Al-Mulk",
+    "deskripsi": "Setorkan hafalan ayat 1-10",
+    "due_date": "2025-12-31",
+    "allow_file": "evaluasi portal.word",
+    "allow_text": true
 }
 
 

@@ -21,7 +21,7 @@
                     <li><a href="/dashboard/pengajar" class="nav-link nav-item" data-content-id="dashboard-content"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
                     <li><a href="/dashboard/pengajar/jadwal" class="nav-link nav-item" data-content-id="jadwal-content"><i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span></a></li>
                     <li class="active"><a href="/dashboard/pengajar/absensi" class="nav-link nav-item active" data-content-id="absensi-content"><i class="fas fa-check-square"></i> <span>Absensi</span></a></li>
-                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-book"></i> <span>Materi Ajar</span></a></li>
+                    <li><a href="/dashboard/pengajar/materi-ajar" class="nav-link"><i class="fas fa-book"></i> <span>Materi Ajar</span></a></li>
                     <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
                     <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
                 </ul>
@@ -29,7 +29,7 @@
             <div class="sidebar-footer">
                 <ul>
                     <li class="setting" id="btn-open-profil"><i class="fas fa-cog"></i> Pengaturan</li>
-                    <li class="logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</li>
+                    <li class="/login" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</li>
                 </ul>
             </div>
         </aside>
@@ -41,10 +41,25 @@
                 </button>
 
                 <h1>Absensi</h1>
-                <div class="user-profile">
-                    <span class="user-name">Pengajar</span>
+                <div class="user-profile" onclick="toggleMiniProfil()" style="cursor:pointer;">
+                    <span class="user-name" id="header-user-name">Pengajar</span>
                     <i class="fas fa-user-circle"></i>
-                </div>
+                  </div>
+            
+                  <!-- MINI PROFIL -->
+                  <div id="miniProfilCard" class="mini-profil-card">
+                    <div class="mini-card-content">
+                      <div class="mini-avatar" id="mini-avatar-initials">P</div>
+                      <h3 id="mini-nama">Nama Pengajar</h3>
+                      <p id="mini-email"><i class="fas fa-envelope"></i> email@example.com</p>
+                      <p id="mini-phone"><i class="fab fa-whatsapp"></i> 08xxxxxxxxxx</p>
+                      <hr>
+                      <button onclick="openProfil(); toggleMiniProfil()" class="btn-edit-profil">
+                        <i class="fas fa-user-edit"></i> Pengaturan Profil
+                      </button>
+                    </div>
+                  </div>
+                </header>
             </header>
 
             <section class="absensi-page-content">
@@ -132,9 +147,51 @@
             </div>
         </div>
     </div>
+    <div id="profilOverlay" class="modal-overlay">
+        <div class="modal-profil">
+            
+            <div class="modal-left">
+                <div class="profile-avatar-section">
+                    <div class="image-circle" id="profile-avatar-container">
+                        <span id="profile-initials">P</span>
+                    </div>
+                    <p style="font-size: 13px; color: #888; margin-top: 10px;">Inisial Pengajar</p>
+                </div>
+    
+                <div class="modal-footer-left">
+                    <button type="button" class="btn-primary" onclick="handleSimpanProfil()">Simpan Perubahan</button>
+                    <button type="button" class="btn-batal" onclick="closeModalProfil()">Batal</button>
+                </div>
+            </div>
+    
+            <div class="modal-right">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="input-nama" placeholder="Masukkan Nama Lengkap" oninput="updateInitials()">
+                    </div>
+                    
+                    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="input-email" placeholder="ahmad@email.com">
+    </div>
+    
+    <div class="form-group">
+        <label>Nomor WhatsApp</label>
+        <input type="text" id="input-wa" placeholder="08xxxxxxxxxx">
+    </div>
+    <div class="form-group">
+        <label>Tanggal Terdaftar</label>
+        <input type="text" id="input-terdaftar" readonly>
+    </div>
+    
+    </div>
+            </div> 
+        </div>
+    </div>
 
     <div id="notification-toast" class="toast-notification"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="/js/absensi-pengajar.js"></script>
     <script type="module" src="/js/profileSetting.js"></script>
 </body>

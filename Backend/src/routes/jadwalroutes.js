@@ -9,7 +9,8 @@ const {
   deleteJadwal,
   jadwalPengajar,
   jadwalSantri,
-  getJadwalByPengajar
+  getJadwalByPengajar,
+  jadwalPengajarByHari
 } = require("../controllers/jadwalcontrollers");
 
 const {
@@ -28,6 +29,12 @@ router.get("/pengajar-sesi/:id_pengajar", verifyToken, onlyAdmin, getJadwalByPen
 
 // ===================== PENGAJAR =============================
 router.get("/pengajar/me", verifyToken, onlyPengajar, jadwalPengajar);
+router.get(
+  "/pengajar/me/hari/:hari",
+  verifyToken,
+  onlyPengajar,
+  jadwalPengajarByHari
+);
 
 // ===================== SANTRI =============================
 router.get("/santri/me", verifyToken, onlySantri, jadwalSantri);
