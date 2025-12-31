@@ -5,25 +5,51 @@ import { apiGet, apiPostForm } from "../js/apiService.js";
 ====================================================== */
 let materiCache = [];
 
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value ?? "-";
-}
-
+// Fungsi untuk ambil parameter ID di URL
 function getUrlParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
+}
+
+// Fungsi PASTI sesuai tanggal laptop (Perbaikan dari sebelumnya)
+function setTanggalHariIni() {
+    const el = document.getElementById("tanggal-hari-ini");
+    if (!el) return;
+    const now = new Date();
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    el.textContent = now.toLocaleDateString('id-ID', options);
+}
+
+function getTodayISO() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+// Tambahkan fungsi setText yang mungkin ikut hilang
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? "-";
 }
 
 /* ======================================================
     INITIALIZATION & PAGE DETECTION
 ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
+    setTanggalHariIni();
 
     if (document.getElementById("jadwal-body")) {
         initDashboardSantri();
     }
 
+    // 2. Deteksi Halaman Dashboard
+    if (document.getElementById("jadwal-body")) {
+        initDashboardSantri();
+    }
+
+    // 3. Deteksi Halaman Materi
     if (document.getElementById("materi-table-body")) {
         initListMateriSantri();
     }
@@ -123,33 +149,52 @@ async function initListMateriSantri() {
 }
 
 function renderTableMateri(data) {
-  const tbody = document.getElementById("materi-table-body");
-  if (!tbody) return;
-
-  if (data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" align="center">Belum ada materi untuk kelas ini.</td></tr>`;
-      return;
+    const tbody = document.getElementById("materi-table-body");
+    if (!tbody) return;
+  
+    const today = getTodayISO(); // Ambil tanggal laptop format YYYY-MM-DD
+  
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" align="center">Belum ada materi untuk kelas ini.</td></tr>`;
+        return;
+    }
+  
+    tbody.innerHTML = data.map((item, index) => {
+        const tglRaw = item.deadline_tugas || item.deadline;
+        let displayDeadline = "-";
+        let deadlineStyle = "color:rgb(34, 230, 103);"; 
+  
+        if (tglRaw) {
+            const tglObj = new Date(tglRaw);
+            displayDeadline = tglObj.toLocaleDateString('id-ID');
+            
+            // Format tanggal item ke YYYY-MM-DD untuk dibandingkan
+            const itemDate = tglObj.getFullYear() + "-" + 
+                             String(tglObj.getMonth() + 1).padStart(2, '0') + "-" + 
+                             String(tglObj.getDate()).padStart(2, '0');
+  
+            if (itemDate < today) {
+                deadlineStyle = "color: #ef4444; font-weight: bold;"; // Merah jika sudah lewat
+            } else if (itemDate === today) {
+                deadlineStyle = "color:rgb(151, 149, 25); font-weight: bold;"; // Hijau jika hari ini
+            }
+        }
+  
+        return `
+            <tr>
+                <td>${index + 1}</td>
+                <td><strong>${item.judul}</strong></td>
+                <td>${item.id_tugas ? '<span class="status-badge" style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:4px; font-size:12px;">Ada Tugas</span>' : '<span style="color:#94a3b8">Hanya Materi</span>'}</td>
+                <td>${new Date(item.created_at).toLocaleDateString('id-ID')}</td>
+                <td><span style="${deadlineStyle}">${displayDeadline}</span></td>
+                <td style="text-align: center;">
+                    <button class="btn-detail-sqm" onclick="showDetailMateri(${item.id_materi})">
+                        <i class="fas fa-eye"></i> Detail
+                    </button>
+                </td>
+            </tr>`;
+    }).join("");
   }
-
-  tbody.innerHTML = data.map((item, index) => {
-      const tgl = item.deadline_tugas || item.deadline; 
-      let displayDeadline = tgl ? new Date(tgl).toLocaleDateString('id-ID') : "-";
-
-      return `
-          <tr>
-              <td>${index + 1}</td>
-              <td><strong>${item.judul}</strong></td>
-              <td>${item.id_tugas ? '<span class="status-badge" style="background:#e8f5e9; color:#2e7d32; padding:4px 8px; border-radius:4px; font-size:12px;">Ada Tugas</span>' : '<span style="color:#94a3b8">Hanya Materi</span>'}</td>
-              <td>${new Date(item.created_at).toLocaleDateString('id-ID')}</td>
-              <td><span style="color: #e67e22; font-weight: 600;">${displayDeadline}</span></td>
-              <td style="text-align: center;">
-                  <button class="btn-detail-sqm" onclick="showDetailMateri(${item.id_materi})">
-                      <i class="fas fa-eye"></i> Detail
-                  </button>
-              </td>
-          </tr>`;
-  }).join("");
-}
 
 /* ======================================================
     3. DETAIL VIEW & FORM SUBMISSION (FIXED)
