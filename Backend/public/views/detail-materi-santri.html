@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi & Tugas - Sahabat Quran</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/santri.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="santri">
+    <div class="main-container santri">
+        
+        <body class="santri">
+            <div class="main-container santri">
+                
+                <div id="view-list-materi" class="dashboard-card animated fadeIn">
+                    <div class="header-materi-wrapper">
+                        <div class="header-left">
+                            <h1 class="page-title">Materi & Tugas</h1>
+                        </div>
+                        <div class="header-right-info">
+                            <div class="info-pill">
+                                <i class='bx bxs-graduation'></i>
+                                <span id="nama-kelas-header">Kelas: Loading...</span>
+                            </div>
+                            <div class="info-pill date">
+                                <i class='bx bx-calendar'></i>
+                                <span id="tanggal-hari-ini">30 Des 2025</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="table-container-modern">
+                        <table class="sqm-table-modern">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Judul Materi</th>
+                                    <th>Status</th>
+                                    <th>Tanggal Upload</th>
+                                    <th>Batas Waktu</th>
+                                    <th style="text-align: center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="materi-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div class="form-actions-bottom">
+                        <a href="/dashboard/santri" class="btn-back-minimal">
+                            <i class='bx bx-chevron-left'></i> Kembali
+                        </a>
+                    </div>
+                </div>
+
+
+                <div id="view-detail-materi" class="dashboard-card animated fadeIn" style="display: none;">
+                    <div class="main-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h1>Detail Materi & Tugas</h1>
+                        <button onclick="backToList()" class="btn-back-footer" style="border:none; cursor:pointer;">
+                            <i class='bx bx-arrow-back'></i> Kembali ke Daftar
+                        </button>
+                    </div>
+        
+                    <div class="detail-materi-layout">
+                        <div class="left-content">
+                            <div class="materi-display-box">
+                                <h3 class="section-title"><i class="fas fa-book-open"></i> Materi Ajar</h3>
+                                <div class="content-box">
+                                    <h4 id="det-materi-judul" style="color: var(--primary-green); margin-bottom: 8px;"></h4>
+                                    <p id="det-materi-deskripsi">Loading materi...</p>
+                                </div>
+                                <div id="det-materi-file-container"></div>
+                            </div>
+                    
+                            <div id="tugas-container" class="tugas-display-box">
+                                <div class="tugas-header-inline" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h3 class="section-title" style="margin: 0;"><i class="fas fa-tasks"></i> Instruksi Tugas</h3>
+                                    <div class="deadline-badge-v2" style="background: #fff4e6; color: #d9480f; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
+                                        <i class="fas fa-clock"></i> Batas: <span id="det-tugas-deadline">-</span>
+                                    </div>
+                                </div>
+                                <div class="content-box">
+                                    <p id="det-tugas-instruksi">Memuat instruksi tugas...</p>
+                                </div>
+                                
+                                <div id="det-tugas-file-container" style="margin-top: 15px;"></div>
+                            </div>
+                        </div>
+                        <div class="tugas-upload-box">
+                            <h3 class="section-title"><i class="fas fa-user-edit"></i> Jawaban Anda</h3>
+                            
+                            <div id="mySubmissionInfo" style="display: none;"></div>
+                        
+                            <form id="submissionForm" class="form-dual-layout">
+                                <input type="hidden" id="active-id-tugas">
+                                <div class="form-left">
+                                    <div class="form-group-student">
+                                        <label>Tulis Catatan (Opsional):</label>
+                                        <textarea id="jawaban-teks" class="textarea-sqm" placeholder="Tulis pesan atau jawaban teks di sini..."></textarea>
+                                    </div>
+                                </div>
+                        
+                                <div class="form-right">
+                                    <div class="form-group-student">
+                                        <label>Lampiran File:</label>
+                                        <div class="audio-upload-box">
+                                            <label for="audioFile">
+                                                <i class='bx bx-cloud-upload'></i>
+                                                <p>Pilih File</p>
+                                            </label>
+                                            <input type="file" id="audioFile" class="input-file-sqm" style="display:none;">
+                                        </div>
+                                        <small id="fileStatusInfo" style="display:block; color: #10b981; margin-top: 5px; font-weight: 500;"></small>
+                                    </div>
+                        
+                                    <div class="form-group-student" style="margin-top: 15px;">
+                                        <label>Link Tugas (Opsional):</label>
+                                        <div class="input-link-wrapper">
+                                            <i class='bx bx-link'></i>
+                                            <input type="url" id="link-tugas" class="input-minimal" placeholder="https://drive.google.com/...">
+                                        </div>
+                                    </div>
+                        
+                                    <button type="submit" class="btn-send-task">
+                                        <i class='bx bxs-paper-plane'></i> Kirim Setoran
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+    </div>
+    <script type="module" src="/js/santri.js"></script>
+</body>
+</html>

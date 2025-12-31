@@ -153,8 +153,6 @@ CREATE TABLE IF NOT EXISTS materi_ajar (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE tugas
-ADD COLUMN id_materi INT REFERENCES materi_ajar(id_materi);
 
 -- 15 TUGAS
 CREATE TABLE IF NOT EXISTS tugas (
@@ -180,10 +178,12 @@ CREATE TABLE IF NOT EXISTS pengumpulan_tugas (
     file_path TEXT,
     tipe_konten VARCHAR(20) DEFAULT 'file',
     link_url TEXT,
+    nilai INTEGER DEFAULT NULL,
+    jawaban_teks TEXT, -- Untuk menyimpan catatan/jawaban santri
+    catatan_pengajar TEXT
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (id_tugas, id_santri)
 );
-
 
 
 -- 17. Progres Pembelajaran Santri

@@ -110,6 +110,10 @@ app.get("/dashboard/pengajar/materi-ajar", (_, res) => {
   res.sendFile(view("materi-ajar.html"));
 });
 
+app.get("/dashboard/materi-santri", (_, res) => {
+  res.sendFile(view("detail-materi-santri.html"));
+});
+
 // ================= API ROUTES =================
 app.use("/api/auth", require("./routes/authroutes"));
 app.use("/api/pendaftar", require("./routes/registerroutes"));
@@ -128,4 +132,18 @@ app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
 // ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`✅ Server running at http://localhost:${PORT}`);
+});
+
+//================ UPLOAD =========================
+const multer = require("multer");
+
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        error: "Ukuran file terlalu besar (maks 10MB)"
+      });
+    }
+  }
+  next(err);
 });

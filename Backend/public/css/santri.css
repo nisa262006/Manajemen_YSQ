@@ -141,6 +141,12 @@ body {
     border-bottom-color: #0b4528;
 }
 
+/* Khusus untuk menu pertama (Dashboard) agar garisnya lebih rapat ke atas */
+.sub-nav button:first-child, 
+.sub-nav a:first-child {
+    padding-bottom: 1px !important; /* Sesuaikan angka ini (0px - 4px) */
+}
+
 /* --- KARTU INFORMASI ABU --- */
 .info-tahsin {
     background-color: #e8e8e8;
@@ -230,7 +236,68 @@ body {
 }
 
 /* ========================================================= */
-/* 6. MEDIA QUERIES HALAMAN DASHBOARD SISWA (OPTIMASI HP)                            */
+/* 6. IKON TABEL MATERI & TUGAS (OPTIMASI RESPONSIVE)        */
+/* ========================================================= */
+
+/* Menghilangkan garis bawah pada link di dalam tabel */
+.info-table td a.materi-task-link {
+    text-decoration: none !important;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+    /* Memberikan area klik yang lebih luas di mobile */
+    padding: 5px; 
+}
+
+/* Wadah Ikon (Grup Ikon) - DIBUAT RESPONSIVE */
+.info-table .icon-group {
+    background-color: #f0f7f2;
+    color: #0b4528;
+    
+    /* Ukuran box otomatis mengecil di HP, membesar di Desktop */
+    /* clamp(min, preferred, max) */
+    width: clamp(32px, 8vw, 42px);
+    height: clamp(32px, 8vw, 42px);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: clamp(6px, 1.5vw, 10px); /* Kelengkungan ikut mengecil */
+    border: 1px solid #edf2ef;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ukuran Ikon Boxicons - DIBUAT RESPONSIVE */
+.info-table .icon-group i {
+    /* Ikon akan menyesuaikan ukuran box */
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    display: block;
+}
+
+/* Efek saat baris tabel atau ikon disentuh kursor (Hover) */
+.info-table tr:hover .icon-group {
+    background-color: #0b4528;
+    color: #ffffff;
+    border-color: #0b4528;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(11, 69, 40, 0.2);
+}
+
+/* Optimasi khusus untuk layar sangat kecil agar tabel tidak terlalu sesak */
+@media (max-width: 480px) {
+    .info-table td {
+        padding: 8px 4px; /* Mempersempit padding kolom di HP */
+    }
+    
+    .info-table .icon-group {
+        /* Sedikit lebih tegas di layar kecil agar tetap mudah ditekan jari */
+        margin: 0 auto; 
+    }
+}
+
+/* ========================================================= */
+/* 7. MEDIA QUERIES HALAMAN DASHBOARD SISWA (OPTIMASI HP)                            */
 /* ========================================================= */
 @media (max-width: 480px) {
     #role-user { display: none !important; }
@@ -442,4 +509,663 @@ body {
     .filter-row {
         gap: 10px;
     }
+}
+
+/* ========================================================= */
+/* 8. DETAIL MATERI SISWA - FULLY RESPONSIVE STACK           */
+/* ========================================================= */
+
+.santri #sqm-detail-materi {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(10px, 3vw, 20px);
+    box-sizing: border-box;
+}
+
+/* NAVIGASI TOMBOL KEMBALI */
+.santri #sqm-detail-materi .back-link {
+    text-decoration: none;
+    color: #0b4528;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background-color: #f0f7f2;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    transition: 0.3s;
+}
+
+/* LAYOUT UTAMA: DESKTOP 2 KOLOM, HP OTOMATIS 1 KOLOM */
+.santri #sqm-detail-materi .detail-materi-layout {
+    display: flex;
+    flex-direction: column; /* Default: Sejajar ke bawah */
+    gap: 20px;
+}
+
+/* Media Query untuk Desktop: Berubah jadi sampingan */
+@media (min-width: 992px) {
+    .santri #sqm-detail-materi .detail-materi-layout {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr; /* Sisi kiri lebih lebar */
+        gap: 30px;
+    }
+}
+
+/* BOX KONTEN UTAMA */
+.santri #sqm-detail-materi .materi-display-box, 
+.santri #sqm-detail-materi .tugas-display-box,
+.santri #sqm-detail-materi .tugas-upload-box {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: clamp(15px, 5vw, 30px);
+    border: 1px solid #edf2ef;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* JUDUL SEKSI */
+.santri #sqm-detail-materi .section-title {
+    font-size: clamp(1.1rem, 4vw, 1.3rem);
+    color: #0b4528;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f8fbf9;
+}
+
+/* BOX TEKS MATERI */
+.santri #sqm-detail-materi .content-box {
+    background: #f8fbf9;
+    padding: clamp(15px, 4vw, 25px);
+    border-radius: 12px;
+    line-height: 1.7;
+    color: #444;
+    border-left: 5px solid #c5a059;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    margin-bottom: 20px;
+}
+
+/* HEADER TUGAS (Judul & Deadline) */
+.santri #sqm-detail-materi .tugas-header-inline {
+    display: flex;
+    flex-direction: column; /* HP: Sejajar ke bawah */
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 600px) {
+    .santri #sqm-detail-materi .tugas-header-inline {
+        flex-direction: row; /* Tablet/Desktop: Sejajar ke samping */
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+/* KARTU FILE (Downloadable) */
+.santri #sqm-detail-materi .file-card-student {
+    display: flex;
+    flex-direction: column; /* HP: Sejajar ke bawah */
+    background: #ffffff;
+    border: 1.5px solid #edf2ef;
+    padding: 15px;
+    border-radius: 12px;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+@media (min-width: 600px) {
+    .santri #sqm-detail-materi .file-card-student {
+        flex-direction: row; /* Tablet/Desktop: Sejajar ke samping */
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 25px;
+    }
+}
+
+.santri #sqm-detail-materi .file-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    word-break: break-word;
+}
+
+.santri #sqm-detail-materi .file-info i {
+    font-size: 24px;
+    color: #c5a059;
+    flex-shrink: 0;
+}
+
+/* TOMBOL AKSI HIJAU */
+.santri #sqm-detail-materi .btn-action-green {
+    background: #0b4528;
+    color: white !important;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    text-decoration: none;
+    width: 100%; /* HP: Lebar penuh */
+    box-sizing: border-box;
+}
+
+@media (min-width: 600px) {
+    .santri #sqm-detail-materi .btn-action-green {
+        width: auto; /* Desktop: Lebar sesuai teks */
+    }
+}
+
+/* INPUT & FORM */
+.santri #sqm-detail-materi .form-group-student {
+    margin-bottom: 20px;
+}
+
+.santri #sqm-detail-materi .form-group-student label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Memperbesar Kotak Ketik Jawaban (Textarea) */
+.santri #sqm-detail-materi .textarea-sqm {
+    width: 100%;
+    /* Tinggi minimal ditingkatkan agar area ketik lebih luas */
+    min-height: 200px; 
+    
+    /* Padding diperbesar agar teks tidak mepet ke garis kotak */
+    padding: clamp(15px, 3vw, 25px); 
+    
+    border: 1.5px solid #eee;
+    border-radius: 12px;
+    resize: vertical; /* User tetap bisa menarik kotak ke bawah jika kurang besar */
+    box-sizing: border-box;
+    font-family: inherit;
+    line-height: 1.8; /* Jarak antar baris teks lebih lega */
+    font-size: clamp(0.9rem, 2.2vw, 1.05rem); /* Ukuran teks sedikit lebih besar */
+    background-color: #ffffff;
+    transition: border-color 0.3s ease;
+}
+
+/* Memperbesar Kotak Input Text & File */
+.santri #sqm-detail-materi .input-text-sqm,
+.santri #sqm-detail-materi .input-file-sqm {
+    width: 100%;
+    /* Tinggi input ditingkatkan */
+    padding: clamp(12px, 2.5vw, 18px); 
+    
+    border: 1.5px solid #eee;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    background-color: #ffffff;
+}
+
+/* Efek Fokus agar user tahu kotak mana yang sedang diketik */
+.santri #sqm-detail-materi .textarea-sqm:focus,
+.santri #sqm-detail-materi .input-text-sqm:focus {
+    outline: none;
+    border-color: #c5a059; /* Berubah warna emas saat diklik */
+    background-color: #fcfdfc;
+}
+
+/* Label juga diperbesar sedikit agar seimbang */
+.santri #sqm-detail-materi .form-group-student label {
+    display: block;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    color: #333;
+    margin-bottom: 12px;
+}
+
+/* AUDIO BOX */
+.santri #sqm-detail-materi .audio-upload-box {
+    background: #f0f7f2;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px dashed #0b4528;
+    margin: 20px 0;
+    text-align: center;
+}
+
+/* TOMBOL KIRIM */
+.santri #sqm-detail-materi .btn-send-task {
+    width: 100%;
+    background: #0b4528;
+    color: white;
+    
+    /* Ukuran tinggi dikurangi agar lebih proporsional */
+    padding: clamp(12px, 2.5vw, 15px); 
+    
+    border: none;
+    border-radius: 10px; /* Lengkungan sedikit diperhalus */
+    
+    /* Ukuran font disesuaikan agar tidak terlalu raksasa */
+    font-size: clamp(0.9rem, 2vw, 1rem); 
+    
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+/* Efek saat tombol ditekan/hover */
+.santri #sqm-detail-materi .btn-send-task:hover {
+    background: #c5a059;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.santri #sqm-detail-materi .btn-send-task:active {
+    transform: translateY(0);
+}
+
+/* Menyesuaikan ukuran ikon di dalam tombol */
+.santri #sqm-detail-materi .btn-send-task i {
+    font-size: 1.1rem;
+}
+
+/*=======================================================*/
+:root {
+    --primary-green: #2d5a3f;
+    --light-green: #e9f5ee;
+    --gold: #c5a059;
+    --text-dark: #334155;
+    --text-light: #64748b;
+    --shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* Layout Header */
+.header-materi-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.page-title { font-size: 1.5rem; color: var(--text-dark); margin: 0; }
+
+.header-right-info { display: flex; gap: 10px; }
+
+.info-pill {
+    background: var(--light-green);
+    color: var(--primary-green);
+    padding: 8px 15px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Table Modern */
+.table-container-modern {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+}
+
+.sqm-table-modern {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sqm-table-modern th {
+    background: #f8fafc;
+    padding: 15px;
+    text-align: left;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.sqm-table-modern td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-dark);
+}
+
+/* Button & Links */
+.btn-back-minimal {
+    display: flex;
+    align-items: center;
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-back-minimal:hover { color: var(--primary-green); }
+
+.btn-detail-sqm {
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* Grid Layout Detail */
+.detail-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+}
+
+@media (max-width: 900px) {
+    .detail-grid-layout { grid-template-columns: 1fr; }
+}
+
+.glass-card, .upload-card-modern {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: var(--shadow);
+}
+
+.description-text { line-height: 1.6; color: var(--text-dark); }
+
+.file-drop-area {
+    border: 2px dashed #cbd5e1;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    color: var(--text-light);
+    position: relative;
+    cursor: pointer;
+}
+
+.btn-back-footer {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-back-footer:hover {
+    background: #e2e8f0;
+    color: #2d5a3f;
+}
+
+/* Kontainer pembungkus di bagian bawah */
+.form-actions-bottom {
+    display: flex;
+    justify-content: flex-end; /* Menggeser isi ke kanan */
+    margin-top: 30px;          /* Jarak dari elemen di atasnya */
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9; /* Garis tipis pemisah agar rapi */
+}
+
+/* Style tombol kembali yang lebih elegan */
+.btn-back-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #f8fafc; /* Warna abu-abu sangat muda */
+    color: #64748b;            /* Warna teks kalem */
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.btn-back-footer i {
+    font-size: 1.2rem;
+}
+
+/* Efek saat tombol di-hover */
+.btn-back-footer:hover {
+    background-color: #f1f5f9;
+    color: #2d5a3f;            /* Berubah jadi hijau Sahabat Quran */
+    border-color: #2d5a3f;
+    transform: translateX(-3px); /* Sedikit bergeser ke kiri saat hover */
+}
+
+.form-actions-bottom {
+    display: flex;
+    justify-content: flex-end; /* Memaksa ke kanan */
+    padding: 20px;
+    margin-top: 20px;
+}
+
+/*============== INFORMASI ===================*/
+
+/* Container Utama: Ramping dan Geser ke Kiri */
+.detail-stack-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-width: 850px; /* Tidak terlalu lebar ke kanan */
+    margin: 20px 0 0 0; /* Menempel ke kiri */
+    padding-bottom: 50px;
+}
+
+/* Kotak General */
+.materi-display-box, 
+.tugas-display-box, 
+.tugas-upload-box {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+}
+
+/* Border Kiri Berwarna untuk Pembeda */
+.materi-display-box { border-left: 6px solid var(--primary-green); }
+.tugas-display-box { border-left: 6px solid var(--task-gold); }
+.tugas-upload-box { border-left: 6px solid #3b82f6; } /* Biru untuk Aksi */
+
+/* Merapikan Form "Jawaban Anda" */
+.form-group-student label {
+    display: block;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+/* Textarea Tulis Catatan (Ala Gambar 2) */
+.textarea-sqm {
+    width: 100%;
+    min-height: 160px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #1e293b;
+    resize: none;
+    transition: all 0.3s ease;
+}
+
+.textarea-sqm:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Kotak Upload File Minimalis */
+.audio-upload-box {
+    border: 2px dashed #cbd5e1;
+    background: #f8fafc;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.audio-upload-box:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+}
+
+/* Tombol Kirim */
+.btn-send-task {
+    width: 100%;
+    background: #2d5a3f;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+
+.btn-send-task:hover {
+    background: #1e3d2a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Layout Form di dalam kotak jawaban */
+.form-dual-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr; /* Sisi kiri sedikit lebih lebar */
+    gap: 25px;
+    align-items: start;
+}
+
+/* Responsif untuk HP: Jadi menumpuk kembali */
+@media (max-width: 768px) {
+    .form-dual-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Menyesuaikan Textarea agar tidak "offside" */
+.textarea-sqm {
+    width: 100%;
+    min-height: 180px; /* Sesuaikan tinggi agar sejajar dengan kolom kanan */
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px;
+    background: #f8fafc;
+    font-size: 0.95rem;
+    resize: none;
+    box-sizing: border-box; /* Penting agar tidak melebihi kolom */
+}
+
+/* Input Link Minimalis */
+.input-link-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+
+.input-link-wrapper i {
+    color: #3b82f6;
+    margin-right: 10px;
+}
+
+.input-minimal {
+    border: none;
+    background: transparent;
+    width: 100%;
+    outline: none;
+    font-size: 0.9rem;
+}
+
+/* Kotak Upload File yang diperkecil untuk Sidebar */
+.audio-upload-box {
+    border: 2px dashed #cbd5e1;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.audio-upload-box i {
+    font-size: 1.8rem;
+    color: #3b82f6;
+}
+
+.audio-upload-box p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 5px;
+    color: #475569;
+}
+
+/* Tombol Kirim di kolom kanan */
+.btn-send-task {
+    margin-top: 15px;
+    padding: 12px;
+}
+
+/*=================== SUBMISSION (TUGAS DI KIRIM BELUM) ========================*/
+.submission-card {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 15px;
+}
+.submission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dcfce7;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+.status-done {
+    color: #166534;
+    font-weight: bold;
+    font-size: 14px;
+}
+.score-badge {
+    background: #166534;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+.pending-badge {
+    background: #eab308;
+    color: #422006;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
 }

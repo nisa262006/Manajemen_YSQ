@@ -69,10 +69,14 @@ function setTodayDateInput() {
 }
 
 async function loadKelasByTanggal() {
-    const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
+    const tglInput = document.getElementById("tanggalAbsensiPengajar");
     const kelasSelect = document.getElementById("kelasSelect");
+    const tbody = document.getElementById("absensiBody");
 
-    if (!tanggal || !kelasSelect) return;
+    if (!tglInput || !kelasSelect) return;
+
+    const tanggal = tglInput.value;
+    if (!tanggal) return;
 
     const hari = new Date(tanggal)
         .toLocaleDateString("id-ID", { weekday: "long" })
@@ -84,34 +88,40 @@ async function loadKelasByTanggal() {
             { headers: { Authorization: `Bearer ${getToken()}` } }
         );
 
-        const list = res?.data || [];
+        const data = res.data || [];
 
-        if (list.length === 0) {
+        kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+
+        if (data.length === 0) {
             kelasSelect.innerHTML =
-                `<option value="">🚫 Tidak ada jadwal di hari ${hari}</option>`;
-
-            document.getElementById("absensiBody").innerHTML =
-                `<tr><td colspan="4" style="text-align:center; color:#b91c1c">
-                    Tidak ada kelas pada hari ini
-                </td></tr>`;
-
-            document.getElementById("jamAbsenDisplay").textContent = "-";
+                `<option value="">Tidak ada jadwal hari ${hari}</option>`;
+            if (tbody) {
+                tbody.innerHTML =
+                    `<tr><td colspan="4" align="center" style="color:red">
+                        Tidak ada jadwal mengajar hari ${hari}
+                    </td></tr>`;
+            }
             return;
         }
 
-        kelasSelect.innerHTML =
-            `<option value="">-- Pilih Kelas --</option>` +
-            list.map(k =>
-                `<option value="${k.id_kelas}">
-                    ${k.nama_kelas} (${k.jam_mulai} - ${k.jam_selesai})
-                </option>`
-            ).join("");
+        data.forEach(j => {
+            kelasSelect.innerHTML +=
+                `<option value="${j.id_kelas}">
+                    ${j.nama_kelas} (${j.jam_mulai} - ${j.jam_selesai})
+                </option>`;
+        });
+
+        if (tbody) {
+            tbody.innerHTML =
+                `<tr><td colspan="4" align="center">
+                    Silakan pilih kelas
+                </td></tr>`;
+        }
 
     } catch (err) {
-        console.error("Gagal load kelas by tanggal:", err);
+        console.error("Gagal load jadwal:", err);
     }
 }
-
 
 /* ======================================================
     LOAD PROFILE & UI
@@ -209,7 +219,7 @@ async function handleSimpanAbsenPengajar() {
         await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-            body: JSON.stringify({ id_jadwal: _jadwalUtama.id_jadwal, tanggal, status_absensi: status, catatan: "Absensi pengajar mandiri" })
+            body: JSON.stringify({ id_jadwal: _jadwalUtama.id_jadwal, tanggal, status_absensi: status, catatan: "Absensi pengajar" })
         });
         document.getElementById("absenPengajarInfo").textContent = "✓ Terkirim";
         alert("Absensi pengajar berhasil disimpan.");
@@ -221,7 +231,7 @@ async function handleSimpanAbsenPengajar() {
 async function handleSimpanAbsensiSantri() {
     const rows = document.querySelectorAll("#absensiBody tr");
     const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
-    if (!rows.length || !_jadwalUtama) return alert("Data tidak lengkap.");
+    if (!rows.length || !_jadwalUtama) return alert("absensi tidak ada.");
 
     try {
         for (const row of rows) {
@@ -315,11 +325,18 @@ async function applyRiwayatFilters() {
         if (tanggal) {
             data = data.filter(item => new Date(item.tanggal).toISOString().split('T')[0] === tanggal);
         }
-
-        if (kelasId && kelasId !== "") {
-            data = data.filter(item => String(item.id_kelas) === String(kelasId));
-        }
-
+        if (kelasId) {
+            const selectedText =
+              document.getElementById("riwayatKelasSelect")
+                .options[document.getElementById("riwayatKelasSelect").selectedIndex]
+                .text
+                .toLowerCase();
+          
+            data = data.filter(item =>
+              item.nama_kelas?.toLowerCase() === selectedText.toLowerCase()
+            );
+          }
+          
         renderRiwayatTable(data);
         updateRiwayatStats(data); // Sekarang sudah terdefinisi
     } catch (err) {
@@ -357,34 +374,33 @@ async function syncRiwayatKelasDropdown() {
     
     if (!riwayatKelasSelect || !tanggal) return;
 
-    // 1. Ambil nama hari dari tanggal yang dipilih
     const hari = new Date(tanggal)
         .toLocaleDateString("id-ID", { weekday: "long" })
         .toLowerCase();
 
     try {
-        // 2. Ambil jadwal pengajar
         const res = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
             headers: { Authorization: `Bearer ${getToken()}` }
         });
         
         const semuaJadwal = res.data || res || [];
-        
-        // 3. Filter jadwal yang hanya sesuai dengan hari tersebut
         const jadwalHariIni = semuaJadwal.filter(j => j.hari.toLowerCase() === hari);
 
-        // 4. Update Dropdown
         if (jadwalHariIni.length === 0) {
             riwayatKelasSelect.innerHTML = `<option value="">-- Tidak ada kelas hari ${hari} --</option>`;
+            const tbody = document.getElementById("riwayatBody");
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" align="center">Tidak ada jadwal pada hari ${hari}</td></tr>`;
         } else {
-            riwayatKelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' + 
-                jadwalHariIni.map(k => `<option value="${k.id_kelas}">${k.nama_kelas} (${k.jam_mulai})</option>`).join("");
-        }
-        
-        // 5. Kosongkan tabel karena kelas lama sudah tidak relevan dengan tanggal baru
-        const tbody = document.getElementById("riwayatBody");
-        if (tbody) tbody.innerHTML = `<tr><td colspan="7" align="center">Silahkan pilih kelas</td></tr>`;
-
+            riwayatKelasSelect.innerHTML = `<option value="">-- Pilih Kelas --</option>` +
+                jadwalHariIni.map(j => `<option value="${j.id_kelas}">${j.nama_kelas}</option>`).join("");
+            
+            // 🔥 OTOMATIS PILIH KELAS PERTAMA jika ada jadwal
+            // Ini yang membuat pengajar tidak perlu filter-filter lagi kalau memang ada jadwal
+            riwayatKelasSelect.selectedIndex = 1; // Pilih <option> setelah "-- Pilih Kelas --"
+            
+            // Langsung panggil filter untuk nampilin tabelnya
+            await applyRiwayatFilters();
+        }        
     } catch (err) {
         console.error("Gagal sinkronisasi dropdown kelas:", err);
     }
@@ -399,13 +415,14 @@ async function loadDropdownKelasRiwayat() {
     INITIALIZATION
 ====================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Setup Data Awal
+    // 1. Setup Data Awal (Mengisi tanggal hari ini ke semua input)
     setTodayDateInput();
-    await loadProfileData();
+    await loadPengajarProfile();
 
-    // 2. Setup Halaman Absensi Harian (Jika elemennya ada)
+    // 2. Setup Halaman Absensi Harian (Input Absen Baru)
     if (document.getElementById("absensiBody")) {
-        loadKelasByTanggal();
+        await loadKelasByTanggal(); // Langsung cari jadwal hari ini
+        
         document.getElementById("tanggalAbsensiPengajar")?.addEventListener("change", () => {
             loadKelasByTanggal();
             document.getElementById("absensiBody").innerHTML = `<tr><td colspan="4" style="text-align:center">Pilih kelas untuk melihat santri</td></tr>`;
@@ -415,30 +432,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("simpanAbsenPengajar")?.addEventListener("click", handleSimpanAbsenPengajar);
         document.getElementById("btnSimpanAbsensi")?.addEventListener("click", handleSimpanAbsensiSantri);
     }
-        // Logika Khusus Halaman Riwayat
-        const riwayatTabelElemen = document.getElementById("riwayatBody");
-        if (riwayatTabelElemen) {
-            // 1. Isi dropdown kelas
-            await loadDropdownKelasRiwayat();
-            
-            // 2. Tampilkan data awal
-            applyRiwayatFilters();
-    
-            // 3. Event Listeners (Gunakan ID yang benar sesuai riwayat-absensi.html)
-            document.getElementById("riwayatTanggal")?.addEventListener("change", async () => {
-                await syncRiwayatKelasDropdown();
-                applyRiwayatFilters();
-            });
-            
-            document.getElementById("riwayatKelasSelect")?.addEventListener("change", applyRiwayatFilters);
-            
-            // Perbaikan: Pastikan fungsi exportRiwayatKeExcel sudah didefinisikan di atas
-            document.getElementById("eksporLaporan")?.addEventListener("click", exportRiwayatKeExcel);
-        }
-    
-        // Logika Halaman Absensi Harian (Jika ada)
-        if (document.getElementById("absensiBody")) {
-            loadKelasByTanggal();
-            // ... listener absensi lainnya ...
-        }
+
+    // 3. SETUP HALAMAN RIWAYAT (Otomatis Load Hari Ini)
+    const riwayatTanggal = document.getElementById("riwayatTanggal");
+    const riwayatKelasSelect = document.getElementById("riwayatKelasSelect");
+
+    if (riwayatTanggal && riwayatKelasSelect) {
+        // 🔥 KUNCI UTAMA: Langsung jalankan sinkronisasi saat halaman dimuat
+        // Ini akan mengisi dropdown kelas berdasarkan tanggal hari ini secara otomatis
+        await syncRiwayatKelasDropdown(); 
+
+        // Listener jika pengajar ganti tanggal manual
+        riwayatTanggal.addEventListener("change", async () => {
+            await syncRiwayatKelasDropdown();
+        });
+
+        // Listener jika pengajar pilih kelas di riwayat
+        riwayatKelasSelect.addEventListener("change", applyRiwayatFilters);
+    }
 });
+
+/* ======================================================
+    LOGOUT FUNCTION
+====================================================== */
+window.handleLogout = function() {
+    // 1. Hapus token dari localStorage
+    localStorage.removeItem("token");
+    
+    // 2. (Opsional) Hapus data lain jika ada, misal:
+    // localStorage.removeItem("user_role");
+    
+    // 3. Arahkan ke halaman login
+    // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
+    window.location.replace("/login");
+};

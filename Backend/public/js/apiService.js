@@ -7,10 +7,21 @@ export function getToken() {
   return localStorage.getItem("token");
 }
 
-function buildHeaders() {
+/* ===========================
+   HEADER BUILDER
+=========================== */
+function buildHeaders(isFormData = false) {
   const token = getToken();
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const headers = {};
+
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   return headers;
 }
 
@@ -27,10 +38,7 @@ function normalizeResponse(data) {
    REQUEST
 =========================== */
 async function request(endpoint, options = {}) {
-  const res = await fetch(BASE_URL + endpoint, {
-    headers: buildHeaders(),
-    ...options
-  });
+  const res = await fetch(BASE_URL + endpoint, options);
 
   const json = await res.json().catch(() => null);
 
@@ -42,20 +50,49 @@ async function request(endpoint, options = {}) {
   return normalizeResponse(json);
 }
 
+/* ===========================
+   API METHODS
+=========================== */
 export const apiGet = (endpoint) =>
-  request(endpoint, { method: "GET" });
+  request(endpoint, {
+    method: "GET",
+    headers: buildHeaders()
+  });
 
-export const apiPost = (endpoint, body) =>
+export const apiPost = (endpoint, body, isFormData = false) =>
   request(endpoint, {
     method: "POST",
-    body: JSON.stringify(body)
+    headers: buildHeaders(isFormData),
+    body: isFormData ? body : JSON.stringify(body)
   });
 
 export const apiPut = (endpoint, body) =>
   request(endpoint, {
     method: "PUT",
+    headers: buildHeaders(),
     body: JSON.stringify(body)
   });
 
 export const apiDelete = (endpoint) =>
-  request(endpoint, { method: "DELETE" });
+  request(endpoint, {
+    method: "DELETE",
+    headers: buildHeaders()
+  });
+
+/*===============================================================*/
+
+export async function apiPostForm(endpoint, formData) {
+  const token = getToken();
+
+  const res = await fetch(BASE_URL + endpoint, {
+    method: "POST", // Tadi salah di sini (ada backslash)
+    headers: { 
+        ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: formData,
+  });
+
+  const json = await res.json().catch(() => null);
+  if (!res.ok) throw json;
+  return normalizeResponse(json);
+}

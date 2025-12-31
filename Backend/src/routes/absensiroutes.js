@@ -12,7 +12,8 @@ const {
   // ABSENSI PENGAJAR
   catatAbsensiPengajar,
   getAbsensiPengajar,
-  getAllAbsensiPengajar
+  getAllAbsensiPengajar,
+  getRekapAbsensiPengajar
 } = require("../controllers/absensicontrollers");
 
 const {
@@ -48,6 +49,7 @@ router.get("/santri/kelas/me", verifyToken, onlyPengajar, getAbsensiKelasPengaja
 router.post("/pengajar", verifyToken, onlyPengajar, catatAbsensiPengajar);
 router.get("/pengajar/me", verifyToken, onlyPengajar, getAbsensiPengajar);
 
+router.get("/pengajar/rekap", verifyToken, onlyPengajar, getRekapAbsensiPengajar);
 
 // ============================================================
 //                         SANTRI

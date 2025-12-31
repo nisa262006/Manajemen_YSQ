@@ -14,7 +14,8 @@ router.put("/materi/:id", verifyToken, onlyPengajar, upload.single("file"), ctrl
 // --- TUGAS ---
 router.post("/tugas", verifyToken, onlyPengajar, upload.single("file"), ctrl.createTugas); // Gunakan upload jika tugas juga pakai file
 router.get("/tugas/kelas/:id/pengajar", verifyToken, onlyPengajar, ctrl.getTugasByKelasPengajar);
-router.put("/tugas/:id", verifyToken, onlyPengajar, ctrl.updateTugas);
+// Ganti baris ini di tugasmateriajarroutes.js
+router.put("/tugas/:id", verifyToken, onlyPengajar, upload.single("file"), ctrl.updateTugas);
 router.get("/tugas/:id/status", verifyToken, onlyPengajar, ctrl.getStatusPengumpulan);
 router.get(
   "/tugas/materi/:id",
@@ -23,10 +24,27 @@ router.get(
   ctrl.getTugasByMateri
 );
 
-
 // --- SANTRI ---
-router.get("/materi/kelas/:id", verifyToken, onlySantri, ctrl.getMateriByKelas);
+router.get(
+  "/materi/kelas/:id_kelas",
+  verifyToken,
+  onlySantri,
+  ctrl.getMateriByKelasForSantri
+);
 router.get("/tugas/kelas/:id", verifyToken, onlySantri, ctrl.getTugasByKelas);
-router.post("/tugas/:id/submit", verifyToken, onlySantri, upload.single("file"), ctrl.submitTugas);
+router.post(
+  "/tugas/submit",
+  verifyToken,
+  onlySantri,
+  upload.single("file"),
+  ctrl.submitTugasSantri
+);
+
+router.get(
+  "/tugas/:id_tugas/submission/me",
+  verifyToken,
+  onlySantri,
+  ctrl.getMySubmission
+);
 
 module.exports = router;

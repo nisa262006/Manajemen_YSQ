@@ -105,33 +105,63 @@ async function loadKelasByTanggal() {
   } catch (err) { console.error(err); }
 }
 
+// Di materi-ajar.js
 async function loadMateri() {
   if (!selectedKelas || !tableBody) return;
-  tableBody.innerHTML = `<tr><td colspan="5" align="center">Memuat materi...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="6" align="center">Memuat materi...</td></tr>`;
 
   try {
     const materi = await fetchWithAuth(`/tugas-media/materi/kelas/${selectedKelas}/pengajar`);
-    window.currentMateriList = materi; // Simpan ke global agar bisa diakses lihatDetail
+    console.log("Data Materi dari Server:", materi); // CEK DI CONSOLE F12
+    window.currentMateriList = materi; 
 
-    if (!materi.length) {
-      tableBody.innerHTML = `<tr><td colspan="5" align="center">Belum ada materi.</td></tr>`;
+    if (!materi || materi.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="6" align="center">Belum ada materi.</td></tr>`;
       return;
     }
 
-    tableBody.innerHTML = materi.map((m, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td><strong>${m.judul}</strong></td>
-        <td><span class="badge-${m.tipe_konten}">${m.tipe_konten === 'file' ? '📁 File' : '🔗 Link'}</span></td>
-        <td>${new Date(m.created_at).toLocaleDateString("id-ID")}</td>
-        <td>
-          <button class="btn-detail" onclick="lihatDetail(${m.id_materi})">
-            <i class="fas fa-eye"></i> Detail
-          </button>
-        </td>
-      </tr>
-    `).join("");
-  } catch (err) { console.error(err); }
+    tableBody.innerHTML = materi.map((m, i) => {
+      // 1. Jenis Konten
+      const jenisKonten = m.file_path 
+        ? `<span style="color: #0ea5e9;"><i class="fas fa-file-alt"></i> File</span>` 
+        : (m.link_url ? `<span style="color: #f59e0b;"><i class="fas fa-link"></i> Link</span>` : "-");
+
+      // 2. STATUS (MENYESUAIKAN ISI DETAIL)
+      // Cek apakah id_tugas ada. Jika null, berarti di detail tidak akan ada tugas.
+      const adaTugas = m.id_tugas !== null && m.id_tugas !== undefined;
+      
+      const statusHTML = adaTugas 
+        ? `<div style="background: #eef2ff; color: #4338ca; padding: 6px; border-radius: 6px; border: 1px solid #c7d2fe; font-weight: bold; font-size: 11px; text-align: center;">
+             <i class="fas fa-thumbtack"></i> ADA TUGAS
+           </div>`
+        : `<div style="background: #f8fafc; color: #94a3b8; padding: 6px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 11px; text-align: center;">
+             <i class="fas fa-minus"></i> HANYA MATERI
+           </div>`;
+
+      // 3. Tanggal Upload
+      const tglUpload = m.created_at 
+        ? new Date(m.created_at).toLocaleDateString("id-ID", { day: '2-digit', month: '2-digit', year: 'numeric' })
+        : "-";
+
+      return `
+        <tr>
+          <td align="center">${i + 1}</td>
+          <td><strong>${m.judul}</strong></td>
+          <td align="center">${jenisKonten}</td>
+          <td>${statusHTML}</td> 
+          <td align="center">${tglUpload}</td>
+          <td align="center">
+            <button class="btn-detail" onclick="lihatDetail(${m.id_materi})">
+              <i class="fas fa-eye"></i> Detail
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  } catch (err) {
+    console.error("Error Load Materi:", err);
+    tableBody.innerHTML = `<tr><td colspan="6" align="center" style="color:red;">Gagal memuat data</td></tr>`;
+  }
 }
 
 /* =====================================================
@@ -139,26 +169,46 @@ async function loadMateri() {
 ===================================================== */
 window.lihatDetail = async (idMateri) => {
   try {
-    activeMateriId = idMateri;
-    const materi = window.currentMateriList.find(m => m.id_materi === idMateri);
-    if (!materi) return alert("Materi tidak ditemukan");
-
-    // 1. Isi Data Materi
-    document.getElementById("detMateriJudul").innerText = materi.judul;
-    document.getElementById("detMateriDeskripsi").innerText = materi.deskripsi || "Tidak ada deskripsi";
+    // Pastikan ID dalam bentuk Number untuk perbandingan
+    activeMateriId = Number(idMateri);
     
-    const kontanBox = document.getElementById("detMateriKonten");
-    kontanBox.innerHTML = materi.file_path 
-      ? `<a href="${materi.file_path}" target="_blank" class="btn-view"><i class="fas fa-file-download"></i> Lihat File Materi</a>` 
-      : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "");
+    if (!window.currentMateriList) {
+        console.error("List materi kosong");
+        return;
+    }
 
-    // 2. Ambil & Render Tugas
-    const tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${idMateri}`);
+    const materi = window.currentMateriList.find(m => Number(m.id_materi) === activeMateriId);
+    
+    if (!materi) {
+        alert("Materi tidak ditemukan di daftar");
+        return;
+    }
+
+    // Gunakan optional chaining (?.) untuk mencegah error jika elemen DOM tidak ada
+    const judulEl = document.getElementById("detMateriJudul");
+    const deskEl = document.getElementById("detMateriDeskripsi");
+    const kontanBox = document.getElementById("detMateriKonten");
+
+    if (judulEl) judulEl.innerText = materi.judul;
+    if (deskEl) deskEl.innerText = materi.deskripsi || "Tidak ada deskripsi";
+    
+    if (kontanBox) {
+        kontanBox.innerHTML = materi.file_path 
+          ? `<a href="${materi.file_path}" target="_blank" class="btn-view"><i class="fas fa-file-download"></i> Lihat File Materi</a>` 
+          : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "<p class='text-muted'>Tidak ada lampiran</p>");
+    }
+
+    // Ambil data tugas dari backend
+    const tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${activeMateriId}`);
     renderTugasInfo(tugasRes);
 
-    document.getElementById("modalDetailTerpadu").style.display = "flex";
+    // Tampilkan Modal
+    const modalDetail = document.getElementById("modalDetailTerpadu");
+    if (modalDetail) modalDetail.style.display = "flex";
+
   } catch (err) {
-    alert("Gagal memuat detail");
+    console.error("Detail Error:", err);
+    alert("Gagal memuat detail: " + (err.message || "Masalah koneksi"));
   }
 };
 
@@ -169,46 +219,55 @@ function renderTugasInfo(tugasList) {
   const lampiranTugas = document.getElementById("detTugasLampiran");
 
   if (!tugasList || tugasList.length === 0) {
-      section.style.display = "none";
-      statusWrapper.style.display = "none";
-      btnBuatWrapper.style.display = "block";
-      
-      // Buat tombol "Buat Tugas" jadi cantik & lebar
-      btnBuatWrapper.innerHTML = `
-          <button class="btn-status-full" onclick="openModalTugasBaru()" style="width:100%; background:#0ea5e9; color:white; padding:12px; border-radius:8px; border:none; font-weight:600; cursor:pointer; margin-top:15px;">
-              <i class="fas fa-plus-circle"></i> Buat Tugas untuk Materi Ini
-          </button>
-      `;
+      if (section) section.style.display = "none";
+      if (statusWrapper) statusWrapper.style.display = "none";
+      if (btnBuatWrapper) {
+          btnBuatWrapper.style.display = "block";
+          btnBuatWrapper.innerHTML = `
+              <button class="btn-status-full" onclick="openModalTugasBaru()" style="width:100%; background:#0ea5e9; color:white; padding:12px; border-radius:8px; border:none; font-weight:600; cursor:pointer; margin-top:15px;">
+                  <i class="fas fa-plus-circle"></i> Buat Tugas untuk Materi Ini
+              </button>
+          `;
+      }
       activeTugasId = null;
       return;
   }
 
-  // Jika tugas ada
   const t = tugasList[0];
   activeTugasId = t.id_tugas;
 
-  section.style.display = "block";
-  btnBuatWrapper.style.display = "none";
-  statusWrapper.style.display = "block";
+  if (section) section.style.display = "block";
+  if (btnBuatWrapper) btnBuatWrapper.style.display = "none";
+  if (statusWrapper) statusWrapper.style.display = "block";
 
-  document.getElementById("detTugasJudul").innerText = t.deskripsi;
-  document.getElementById("detTugasDeadline").innerText = new Date(t.deadline).toLocaleDateString('id-ID', {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
+  // Gunakan ID yang sesuai dengan HTML yang baru (detTugasJudul & detTugasDeadline)
+  const judulEl = document.getElementById("detTugasJudul");
+  const deadEl = document.getElementById("detTugasDeadline");
 
-  // Render Lampiran Pengajar
-  let htmlLampiran = "";
-  if (t.file_path) {
-      htmlLampiran += `<a href="${t.file_path}" target="_blank" class="btn-view" style="margin-right:10px;"><i class="fas fa-file-download"></i> File Tugas</a>`;
+  if (judulEl) judulEl.innerText = t.deskripsi;
+  if (deadEl) {
+      deadEl.innerText = new Date(t.deadline).toLocaleDateString('id-ID', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
   }
-  if (t.link_url) {
-      htmlLampiran += `<a href="${t.link_url}" target="_blank" class="btn-view"><i class="fas fa-external-link-alt"></i> Link Tugas</a>`;
-  }
-  lampiranTugas.innerHTML = htmlLampiran || "<p class='text-muted' style='font-size:12px;'>Tidak ada lampiran dokumen</p>";
 
-  // AKTIFKAN TOMBOL EDIT
-  document.getElementById("btnEditTugas").onclick = () => openEditTugas(t);
-  document.getElementById("btnEditMateri").onclick = () => openEditMateri();
+  // Render Lampiran
+  if (lampiranTugas) {
+      let htmlLampiran = "";
+      if (t.file_path) {
+          htmlLampiran += `<a href="${t.file_path}" target="_blank" class="btn-view" style="margin-right:10px;"><i class="fas fa-file-download"></i> File Tugas</a>`;
+      }
+      if (t.link_url) {
+          htmlLampiran += `<a href="${t.link_url}" target="_blank" class="btn-view"><i class="fas fa-external-link-alt"></i> Link Tugas</a>`;
+      }
+      lampiranTugas.innerHTML = htmlLampiran || "<p class='text-muted' style='font-size:12px;'>Tidak ada lampiran dokumen</p>";
+  }
+
+  // Set tombol aksi
+  const btnEditT = document.getElementById("btnEditTugas");
+  const btnEditM = document.getElementById("btnEditMateri");
+  if (btnEditT) btnEditT.onclick = () => openEditTugas(t);
+  if (btnEditM) btnEditM.onclick = () => openEditMateri();
 }
 
 /* =====================================================
@@ -256,33 +315,38 @@ window.showStatusSantri = async () => {
       // Pastikan route ini sesuai dengan backend: /api/tugas-media/tugas/:id/status
       const data = await fetchWithAuth(`/tugas-media/tugas/${activeTugasId}/status`);
       
-      listBody.innerHTML = "";
-      if (!data || data.length === 0) {
-          listBody.innerHTML = "<tr><td colspan='4' align='center'>Belum ada santri di kelas ini.</td></tr>";
-          return;
-      }
+     // Di dalam fungsi showStatusSantri, bagian listBody.innerHTML:
+listBody.innerHTML = data.map(s => {
+    const isSudah = s.status === 'Sudah Kirim';
+    
+    // Logika Aksi (Tombol lihat file/link)
+    let aksiHTML = "-";
+    if (isSudah) {
+        const fileIcon = s.file_path ? `<a href="${s.file_path}" target="_blank" style="color: #e67e22; margin-right: 8px;"><i class="fas fa-file-audio fa-lg"></i></a>` : '';
+        const linkIcon = s.link_url ? `<a href="${s.link_url}" target="_blank" style="color: #3498db;"><i class="fas fa-link fa-lg"></i></a>` : '';
+        aksiHTML = `${fileIcon} ${linkIcon}`;
+    }
 
-      data.forEach(s => {
-          const isSudah = s.status === 'Sudah Kirim';
-          let aksiHTML = "-";
-
-          if (isSudah) {
-              const fileIcon = s.file_path ? `<a href="${s.file_path}" target="_blank" class="btn-view" title="Lihat File"><i class="fas fa-file-pdf"></i></a>` : '';
-              const linkIcon = s.link_url ? `<a href="${s.link_url}" target="_blank" class="btn-view" title="Buka Link"><i class="fas fa-link"></i></a>` : '';
-              aksiHTML = `${fileIcon} ${linkIcon}` || "<small>Tanpa Lampiran</small>";
-          } else {
-              aksiHTML = `<span style="color: #ef4444; font-size: 11px; font-style: italic;">Belum mengirim tugas</span>`;
-          }
-
-          listBody.innerHTML += `
-              <tr>
-                  <td><strong>${s.nama}</strong></td>
-                  <td><span class="badge ${isSudah ? 'badge-success' : 'badge-danger'}">${s.status}</span></td>
-                  <td>${s.submitted_at ? new Date(s.submitted_at).toLocaleString('id-ID') : '-'}</td>
-                  <td align="center">${aksiHTML}</td>
-              </tr>`;
-      });
-
+    return `
+        <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;"><strong>${s.nama}</strong></td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                <span style="padding: 4px 10px; border-radius: 20px; font-size: 11px; background: ${isSudah ? '#dcfce7' : '#fee2e2'}; color: ${isSudah ? '#166534' : '#991b1b'};">
+                    ${s.status}
+                </span>
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                ${s.submitted_at ? new Date(s.submitted_at).toLocaleString('id-ID', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}) : '-'}
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;" align="center">
+                ${aksiHTML}
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;" align="center">
+                <span style="font-weight: bold; color: #64748b;">-</span>
+            </td>
+        </tr>
+    `;
+}).join("");
   } catch (err) {
       console.error("Error Detail:", err);
       alert("Gagal memuat status: " + (err.error || err.message || "Masalah koneksi"));
@@ -298,37 +362,65 @@ window.closeStatusAndBackToDetail = () => {
 };
 
 /* =====================================================
-   SUBMIT HANDLERS
+   SUBMIT HANDLERS (FIXED)
 ===================================================== */
 window.handleKirimTugas = async () => {
   if (isSubmittingTugas) return;
-  const desc = document.getElementById("modalTugasDesc").value;
-  const deadline = document.getElementById("tugasDeadline").value;
-  if (!desc || !deadline) return alert("Deskripsi & Deadline wajib diisi");
+
+  // Pastikan ID elemen sesuai dengan HTML: "tugasDeadline"
+  const desc = document.getElementById("modalTugasDesc")?.value?.trim();
+  const deadlineInput = document.getElementById("tugasDeadline");
+  const deadlineValue = deadlineInput?.value;
+
+  if (!desc || !deadlineValue) {
+      alert("Deskripsi & Deadline wajib diisi!");
+      return;
+  }
 
   isSubmittingTugas = true;
   const formData = new FormData();
   formData.append("id_kelas", selectedKelas);
   formData.append("id_materi", activeMateriId);
-  formData.append("judul", desc.substring(0, 50));
   formData.append("deskripsi", desc);
-  formData.append("deadline", deadline);
+  
+  // 🔥 KUNCI PERBAIKAN: Kirim field "deadline" secara konsisten
+  formData.append("deadline", deadlineValue); 
 
   const fileEl = document.getElementById("modalTugasFile");
-  if (fileEl?.files[0]) formData.append("file", fileEl.files[0]);
+  if (fileEl?.files?.[0]) formData.append("file", fileEl.files[0]);
+
+  const link = document.getElementById("modalTugasLink")?.value?.trim();
+  if (link) formData.append("link_url", link);
 
   try {
-    const res = await fetch(BASE_URL + "/tugas-media/tugas", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
-      body: formData
-    });
-    if (!res.ok) throw await res.json();
-    alert("Tugas berhasil dibuat!");
-    closeModalTugas();
-    lihatDetail(activeMateriId); // Refresh tampilan detail
-  } catch (err) { alert(err.error || "Gagal simpan"); }
-  finally { isSubmittingTugas = false; }
+      const url = isEditModeTugas 
+          ? `${BASE_URL}/tugas-media/tugas/${activeTugasId}` 
+          : `${BASE_URL}/tugas-media/tugas`;
+      
+      const method = isEditModeTugas ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+          method: method,
+          headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+          body: formData
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw result;
+
+      alert(isEditModeTugas ? "Tugas diperbarui!" : "Tugas berhasil dibuat!");
+      
+      isEditModeTugas = false;
+      closeModalTugas();
+      // Refresh detail agar info tugas terbaru muncul
+      lihatDetail(activeMateriId); 
+      
+  } catch (err) {
+      console.error("SUBMIT ERROR:", err);
+      alert(err.error || err.message || "Gagal menyimpan tugas");
+  } finally {
+      isSubmittingTugas = false;
+  }
 };
 
 /* =====================================================
@@ -377,118 +469,96 @@ window.openEditMateri = () => {
 
 // EDIT TUGAS
 window.openEditTugas = (tugas) => {
+  if (!tugas || !tugas.id_tugas) {
+    alert("ID Tugas tidak valid");
+    return;
+  }
+
+  activeTugasId = tugas.id_tugas; // 🔥 FIX PENTING
   isEditModeTugas = true;
+
   document.getElementById("modalTugas").style.display = "flex";
-  document.querySelector("#modalTugas h3").innerHTML = '<i class="fas fa-edit"></i> Edit Tugas';
-  
-  document.getElementById("modalTugasDesc").value = tugas.deskripsi;
+  document.querySelector("#modalTugas h3").innerHTML =
+    '<i class="fas fa-edit"></i> Edit Tugas';
+
+  document.getElementById("modalTugasDesc").value = tugas.deskripsi || "";
   document.getElementById("modalTugasLink").value = tugas.link_url || "";
-  
-  // Format tanggal untuk input date (YYYY-MM-DD)
-  const date = new Date(tugas.deadline).toISOString().split('T')[0];
-  document.getElementById("tugasDeadline").value = date;
+
+  document.getElementById("tugasDeadline").value =
+    new Date(tugas.deadline).toISOString().split("T")[0];
+    
+    const info = document.getElementById("infoFileLamaTugas");
+    if (info) {
+      if (tugas.file_path) {
+        info.innerHTML = `
+          <small style="color:#0f766e">
+            📎 File saat ini:
+            <a href="${tugas.file_path}" target="_blank">Lihat file</a>
+          </small>
+        `;
+      } else {
+        info.innerHTML = "<small>Tidak ada file sebelumnya</small>";
+      }
+    }
+    
 };
 
-/* ======================================================
-    LOGIKA PROFIL (Header, Mini Profile & Pengaturan)
-====================================================== */
-window.openProfil = function() {
-  const modal = document.getElementById("modalProfil");
-  if (modal) {
-      modal.style.display = "flex";
-      // Panggil fungsi untuk memuat data profil ke dalam form
-      if (typeof loadProfileData === "function") {
-          loadProfileData();
-      }
+
+document.getElementById("formMateri").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData();
+  formData.append("id_kelas", selectedKelas);
+  formData.append("judul", document.getElementById("judulMateri").value);
+  formData.append("deskripsi", document.getElementById("deskripsiMateri").value);
+  formData.append("tipe_konten", document.getElementById("tipeMateri").value);
+
+  // Penanganan File/Link
+  if (tipeMateri.value === "file") {
+    const file = document.getElementById("fileMateri").files[0];
+    if (file) formData.append("file", file); 
+    // Saat edit, file tidak wajib diisi ulang jika tidak ingin ganti file
   } else {
-      console.error("Elemen modalProfil tidak ditemukan di HTML");
+    formData.append("link_url", document.getElementById("linkMateri").value);
   }
-};
 
-// Pastikan fungsi tutup juga ada
-window.closeModalProfil = function() {
-  const modal = document.getElementById("modalProfil");
-  if (modal) modal.style.display = "none";
-};
-
-
-async function loadProfileData() {
   try {
-      // Menggunakan fetchWithAuth agar konsisten dengan file ini
-      const res = await fetchWithAuth("/me");
-      
-      // Sesuaikan dengan struktur respons API Anda (biasanya res.profile atau res langsung)
-      const p = res.profile || res;
+    // TENTUKAN URL DAN METHOD (POST jika baru, PUT jika edit)
+    const url = isEditModeMateri 
+                ? `/api/tugas-media/materi/${activeMateriId}` 
+                : "/api/tugas-media/materi";
+    const method = isEditModeMateri ? "PUT" : "POST";
 
-      // 1. Update Semua elemen nama di Header & Sidebar
-      document.querySelectorAll(".user-name").forEach(el => {
-          el.textContent = p.nama || "Pengajar";
-      });
+    const res = await fetch(url, {
+      method: method,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: formData,
+    });
 
-      // 2. Update Popup Mini Profile (Quick View)
-      if (document.getElementById("mini-nama")) {
-          document.getElementById("mini-nama").textContent = p.nama || "-";
-          document.getElementById("mini-email").innerHTML = `<i class="fas fa-envelope"></i> ${p.email || "-"}`;
-          document.getElementById("mini-phone").innerHTML = `<i class="fab fa-whatsapp"></i> ${p.no_kontak || "-"}`;
-          document.getElementById("mini-avatar-initials").textContent = (p.nama || "P").charAt(0).toUpperCase();
-      }
+    if (!res.ok) throw await res.json();
 
-      // 3. Update Input Form di Modal Pengaturan (Agar siap diedit)
-      if (document.getElementById("input-nama")) {
-          document.getElementById("input-nama").value = p.nama || "";
-          document.getElementById("input-email").value = p.email || "";
-          document.getElementById("input-wa").value = p.no_kontak || "";
-          // Jika ada field tanggal terdaftar di HTML:
-          const tglEl = document.getElementById("input-terdaftar");
-          if (tglEl) tglEl.value = p.tanggal_terdaftar || "-";
-      }
-      
-      // Update inisial di avatar bulat header
-      const initialEl = document.getElementById("profile-initials");
-      if (initialEl) initialEl.textContent = (p.nama || "P").charAt(0).toUpperCase();
-
-  } catch (err) { 
-      console.error("Gagal memuat profil:", err); 
+    alert(isEditModeMateri ? "Materi berhasil diperbarui" : "Materi berhasil ditambahkan");
+    isEditModeMateri = false; // Reset state
+    closeMateriModal();
+    loadMateri();
+  } catch (err) {
+    alert("Gagal menyimpan: " + (err.message || "Terjadi kesalahan"));
   }
-}
-
-// Fungsi untuk membuka Modal Pengaturan
-window.openModalProfil = function() {
-  // Sembunyikan mini profile jika sedang terbuka
-  const card = document.getElementById("miniProfilCard");
-  if (card) card.style.display = "none";
-  
-  // Tampilkan modal pengaturan
-  document.getElementById("modalProfil").style.display = "flex";
-  
-  // Pastikan data terbaru masuk ke input form
-  loadProfileData(); 
-};
-
-window.closeModalProfil = function() {
-  document.getElementById("modalProfil").style.display = "none";
-};
-
-// Jalankan loadProfileData saat halaman selesai dimuat
-document.addEventListener("DOMContentLoaded", () => {
-  loadProfileData();
 });
 
-window.handleSimpanProfil = async () => {
-  const nama = document.getElementById("input-nama").value;
-  const no_kontak = document.getElementById("input-wa").value;
-
-  try {
-      await fetchWithAuth("/update-profil-pengajar", { // Sesuaikan endpoint backend
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nama, no_kontak })
-      });
-
-      alert("Profil berhasil diperbarui!");
-      closeModalProfil();
-      loadProfileData(); // Refresh tampilan nama di seluruh halaman
-  } catch (err) {
-      alert("Gagal menyimpan: " + (err.error || "Terjadi kesalahan"));
-  }
+/* ======================================================
+    LOGOUT FUNCTION
+====================================================== */
+window.handleLogout = function() {
+  // 1. Hapus token dari localStorage
+  localStorage.removeItem("token");
+  
+  // 2. (Opsional) Hapus data lain jika ada, misal:
+  // localStorage.removeItem("user_role");
+  
+  // 3. Arahkan ke halaman login
+  // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
+  window.location.replace("/login");
 };

@@ -4,43 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Absensi - Sahabat Quran</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
     <link rel="stylesheet" href="/css/pengajar.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <body class="allow-scroll">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="container">
         <aside class="sidebar">
             <div class="logo">
-                <img src="/images/LogoYSQ.png" alt="Logo">
+                <img src="/images/logoYSQ.png" alt="Logo">
             </div>
-            <nav class="nav-menu">
+            <nav>
                 <ul>
-                    <li><a href="/dashboard/pengajar" class="nav-link nav-item" data-content-id="dashboard-content"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
-                    <li><a href="/dashboard/pengajar/jadwal" class="nav-link nav-item" data-content-id="jadwal-content"><i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span></a></li>
-                    <li class="active"><a href="/dashboard/pengajar/absensi" class="nav-link nav-item active" data-content-id="absensi-content"><i class="fas fa-check-square"></i> <span>Absensi</span></a></li>
+                    <li><a href="/dashboard/pengajar" class="nav-link"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
+                    <li><a href="/dashboard/pengajar/jadwal" class="nav-link"><i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span></a></li>
+                    <li class="active"><a href="/dashboard/pengajar/absensi" class="nav-link"><i class="fas fa-check-square"></i> <span>Absensi</span></a></li>
                     <li><a href="/dashboard/pengajar/materi-ajar" class="nav-link"><i class="fas fa-book"></i> <span>Materi Ajar</span></a></li>
-                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
-                    <li><a href="#" class="nav-link" data-dev="true"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
+                    <li><a href="#" class="nav-link"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
+                    <li><a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
                 <ul>
-                    <li class="setting" id="btn-open-profil"><i class="fas fa-cog"></i> Pengaturan</li>
+                    <li onclick="openProfil()" style="cursor: pointer;"><i class="fas fa-user-cog"></i> Profil Pengajar</li>
                     <li class="/login" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</li>
                 </ul>
             </div>
         </aside>
 
         <main class="main-content">
-            <header>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-
-                <h1>Absensi</h1>
+            <header class="top-header">
+                <h1 class="page-title">Absensi</h1>
                 <div class="user-profile" onclick="toggleMiniProfil()" style="cursor:pointer;">
                     <span class="user-name" id="header-user-name">Pengajar</span>
                     <i class="fas fa-user-circle"></i>
@@ -60,6 +57,7 @@
                     </div>
                   </div>
                 </header>
+                <div class="date-display-box" id="tanggal-otomatis"></div>
             </header>
 
             <section class="absensi-page-content">
@@ -67,7 +65,7 @@
                     <div class="absensi-header-row">
                         <h2>Absensi Santri</h2>
                         <button class="btn-tambah-catatan" id="btnTambahCatatan">
-                            <i class="fas fa-edit"></i> Tambah Catatan Materi
+                            <i class="fas fa-edit"></i> Catatan Materi
                         </button>
                     </div>
 
@@ -78,23 +76,24 @@
                         </div>
                         <div class="filter-group">
                             <label>Pilih Kelas:</label>
-                            <select id="kelasSelect" class="custom-select">
+                            <select id="kelasSelect" class="select-clean">
                                 <option value="">-- Pilih Kelas --</option>
                             </select>
                         </div>
                         <div class="filter-group">
                             <label>Tanggal:</label>
-                            <input id="tanggalAbsensiPengajar" type="date" class="custom-select">
+                            <input type="date" id="tanggalAbsensiPengajar" class="input-date-clean">
                         </div>
                     </div>
 
                     <div class="absen-pengajar-box">
                         <div class="absen-pengajar-input">
                             <label>Absen Pengajar Hari Ini:</label>
-                            <select id="statusAbsensiPengajar">
-                                <option value="">Pilih Kehadiran</option>
+                            <select id="statusAbsensiPengajar" class="select-clean">
+                                <option value="" disabled selected>- Status Anda -</option>
                                 <option value="Hadir">Hadir</option>
                                 <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
                                 <option value="Tidak Hadir">Tidak Hadir</option>
                             </select>
                             <button class="btn-simpan-absen" id="simpanAbsenPengajar">Simpan</button>
@@ -102,13 +101,15 @@
                         </div>
                     </div>
 
-                    <div class="label-jam-absen">
-                        <span class="badge-hari">Absen Hari</span>
-                        <span class="jam-val" id="jamAbsenDisplay">08.00 - 08.30</span>
+                    <div class="jam-box-wrapper">
+                        <div id="boxJamAbsen" class="jam-result-box">
+                            <span class="label-absen">JADWAL KELAS</span>
+                            <span id="jamAbsenDisplay">--.-- - --.--</span>
+                        </div>
                     </div>
 
-                    <div class="table-wrapper">
-                        <table class="table-absensi-santri absensi-harian-table">
+                    <div class="table-container">
+                        <table class="table-absensi-santri">
                             <thead>
                                 <tr>
                                     <th>NO</th>
@@ -118,7 +119,9 @@
                                 </tr>
                             </thead>
                             <tbody id="absensiBody">
-                                <tr><td colspan="4" style="text-align:center">Pilih kelas untuk memuat data santri...</td></tr>
+                                <tr>
+                                    <td colspan="4" style="text-align:center">Pilih kelas untuk memuat data santri...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -136,62 +139,20 @@
         </main>
     </div>
 
-    <div id="catatanModal" class="modal">
+    <div id="catatanModal" class="modal modal-materi" style="display: none;">
         <div class="modal-content">
             <span class="close-button" onclick="document.getElementById('catatanModal').style.display='none'">&times;</span>
-            <h3>Tambah Catatan Materi</h3> 
-            <textarea id="classNoteInput" placeholder="Masukkan materi yang diajarkan hari ini..."></textarea>
+            <h3 id="modalTitle">Tambah Catatan Materi</h3> 
+            <textarea id="classNoteInput" placeholder="Masukkan materi, kendala, atau pencapaian kelas hari ini..."></textarea>
             <div class="modal-footer">
                 <button class="btn-batal" onclick="document.getElementById('catatanModal').style.display='none'">Batal</button>
                 <button class="btn-simpan" id="saveNoteButton">Simpan Catatan</button>
             </div>
         </div>
     </div>
-    <div id="profilOverlay" class="modal-overlay">
-        <div class="modal-profil">
-            
-            <div class="modal-left">
-                <div class="profile-avatar-section">
-                    <div class="image-circle" id="profile-avatar-container">
-                        <span id="profile-initials">P</span>
-                    </div>
-                    <p style="font-size: 13px; color: #888; margin-top: 10px;">Inisial Pengajar</p>
-                </div>
-    
-                <div class="modal-footer-left">
-                    <button type="button" class="btn-primary" onclick="handleSimpanProfil()">Simpan Perubahan</button>
-                    <button type="button" class="btn-batal" onclick="closeModalProfil()">Batal</button>
-                </div>
-            </div>
-    
-            <div class="modal-right">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Nama Lengkap</label>
-                        <input type="text" id="input-nama" placeholder="Masukkan Nama Lengkap" oninput="updateInitials()">
-                    </div>
-                    
-                    <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="input-email" placeholder="ahmad@email.com">
-    </div>
-    
-    <div class="form-group">
-        <label>Nomor WhatsApp</label>
-        <input type="text" id="input-wa" placeholder="08xxxxxxxxxx">
-    </div>
-    <div class="form-group">
-        <label>Tanggal Terdaftar</label>
-        <input type="text" id="input-terdaftar" readonly>
-    </div>
-    
-    </div>
-            </div> 
-        </div>
-    </div>
 
     <div id="notification-toast" class="toast-notification"></div>
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <div id="toast-container" class="toast-container"></div>
     <script type="module" src="/js/absensi-pengajar.js"></script>
     <script type="module" src="/js/profileSetting.js"></script>
 </body>

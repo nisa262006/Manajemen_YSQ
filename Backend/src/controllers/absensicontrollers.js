@@ -192,22 +192,23 @@ exports.getAbsensiKelasPengajar = async (req, res) => {
 
     const result = await db.query(`
       SELECT 
-        a.id_absensi,
-        TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
-        a.status_absensi,
-        a.catatan,
-        s.nama AS nama_santri,
-        k.nama_kelas,
-        j.hari,
-        j.jam_mulai,
-        j.jam_selesai
-      FROM absensi a
-      JOIN santri s ON a.id_santri = s.id_santri
-      JOIN jadwal j ON a.id_jadwal = j.id_jadwal
-      JOIN kelas k ON j.id_kelas = k.id_kelas
-      WHERE k.id_pengajar = $1
-        AND s.status = 'aktif'
-      ORDER BY a.tanggal DESC
+      a.id_absensi,
+      TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+      a.status_absensi,
+      a.catatan,
+      s.nama AS nama_santri,
+      k.id_kelas,            -- 🔥 TAMBAHKAN
+      j.id_jadwal,           -- 🔥 TAMBAHKAN
+      k.nama_kelas,
+      j.hari,
+      j.jam_mulai,
+      j.jam_selesai
+    FROM absensi a
+    JOIN santri s ON a.id_santri = s.id_santri
+    JOIN jadwal j ON a.id_jadwal = j.id_jadwal
+    JOIN kelas k ON j.id_kelas = k.id_kelas
+    WHERE k.id_pengajar = $1
+    ORDER BY a.tanggal DESC
     `, [id_pengajar]);
 
     res.json({
@@ -386,3 +387,25 @@ exports.getAllAbsensiPengajar = async (req, res) => {
   }
 };
 
+
+// Backend/src/controllers/absensiControllers.js (Asumsi nama filenya)
+exports.getRekapAbsensiPengajar = async (req, res) => {
+  try {
+      const id_users = req.user.id_users;
+      
+      // Logika query database kamu...
+      const result = await db.query(`SELECT 
+              COUNT(*) FILTER (WHERE status = 'hadir') as total_hadir,
+              COUNT(*) FILTER (WHERE status = 'izin') as total_izin,
+              COUNT(*) FILTER (WHERE status = 'alfa') as total_alfa
+          FROM absensi_pengajar ap
+          JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
+          WHERE p.id_users = $1
+      `, [id_users]);
+
+      res.json(result.rows[0]);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal mengambil rekap" });
+  }
+};

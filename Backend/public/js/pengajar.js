@@ -20,6 +20,35 @@ function getToken() {
     return localStorage.getItem("token");
 }
 
+// Letakkan di bagian atas pengajar.js
+async function fetchWithAuth(url, options = {}) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+    // Gunakan BASE_URL jika url tidak diawali http
+    const fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
+
+    const res = await fetch(fullUrl, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+            ...options.headers
+        }
+    });
+
+    if (res.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+    }
+
+    return res;
+}
+
 /* ================== RESPONSIF =================*/
 document.querySelector('.calendar-card')?.addEventListener('click', function () {
     this.classList.toggle('expanded');
@@ -226,7 +255,7 @@ function renderJadwalTable(data) {
     if (!tbody) return;
 
     tbody.innerHTML = data.length === 0 
-        ? `<tr><td colspan="6" style="text-align:center">Tidak ada jadwal yang sesuai.</td></tr>`
+        ? `<tr><td colspan="6" style="text-align:center">Tidak ada jadwal hari ini.</td></tr>`
         : data.map((j, i) => `
             <tr class="main-row">
                 <td><strong>${j.nama_kelas ?? "-"}</strong></td>
@@ -386,16 +415,49 @@ window.closeReminderModal = function() {
 ====================================================== */
 async function loadTeacherAttendanceStats() {
     try {
-        const token = getToken();
-        const rekap = await fetchJSON(`${BASE_URL}/absensi/pengajar/rekap`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        const elPersen = document.querySelector(".persentase-kehadiran");
-        if (elPersen) elPersen.textContent = rekap?.persentase || "0%";
-    } catch (e) {
-        if (document.querySelector(".persentase-kehadiran")) {
-            document.querySelector(".persentase-kehadiran").textContent = "0%";
+        // Panggil API rekap yang sudah kita buat di backend
+        const response = await fetchWithAuth("/absensi/pengajar/rekap");
+        const data = await response.json();
+
+        if (data) {
+            const hadir = parseInt(data.total_hadir) || 0;
+            const izin = parseInt(data.total_izin) || 0;
+            const alfa = parseInt(data.total_alfa) || 0;
+            const totalSesi = hadir + izin + alfa;
+
+            // Hitung persentase kehadiran
+            let persentase = 0;
+            if (totalSesi > 0) {
+                persentase = Math.round((hadir / totalSesi) * 100);
+            }
+
+            // Update ke DOM (HTML)
+            const elementPersentase = document.querySelector(".persentase-kehadiran");
+            if (elementPersentase) {
+                elementPersentase.innerText = `${persentase}%`;
+            }
         }
+    } catch (err) {
+        console.error("Gagal memuat statistik kehadiran:", err);
+    }
+}
+
+async function loadKelasHariIni() {
+    try {
+        const hariIni = new Intl.DateTimeFormat('id-ID', { weekday: 'long' }).format(new Date());
+        // Misal API jadwal pengajar berdasarkan hari
+        const response = await fetchWithAuth(`/jadwal/pengajar/me/hari/${hariIni}`);
+        const result = await response.json();
+
+        if (result.success) {
+            const count = result.data.length;
+            const elementKelas = document.querySelector(".kelas-hari-ini");
+            if (elementKelas) {
+                elementKelas.innerText = count;
+            }
+        }
+    } catch (err) {
+        console.error("Gagal memuat jumlah kelas hari ini:", err);
     }
 }
 
@@ -465,15 +527,24 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
     }
+    document.addEventListener("DOMContentLoaded", async () => {
+        // Fungsi lainnya...
+        await loadTeacherAttendanceStats(); // Tarik data kehadiran
+        await loadKelasHariIni();          // Tarik data jadwal hari ini
+    });
 });
 
 /* ======================================================
     LOGOUT FUNCTION
 ====================================================== */
 window.handleLogout = function() {
-    if (confirm("Apakah anda yakin ingin keluar?")) {
-        localStorage.removeItem("token");
-        window.location.replace("/login");
-    }
+    // 1. Hapus token dari localStorage
+    localStorage.removeItem("token");
+    
+    // 2. (Opsional) Hapus data lain jika ada, misal:
+    // localStorage.removeItem("user_role");
+    
+    // 3. Arahkan ke halaman login
+    // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
+    window.location.replace("/login");
 };
-
