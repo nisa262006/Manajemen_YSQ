@@ -57,22 +57,30 @@ document.addEventListener("DOMContentLoaded", () => {
         subForm.addEventListener("submit", handleSubmission);
     }
 
-    const fileInput = document.getElementById("audioFile");
-    if (fileInput) {
-        fileInput.addEventListener("change", function () {
-            const fileNameDisplay = document.querySelector(".audio-upload-box p");
-            const fileStatusInfo = document.getElementById("fileStatusInfo");
+   // Di santri.js (Bagian DOMContentLoaded)
+const fileInput = document.getElementById("audioFile");
+if (fileInput) {
+    fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB sesuaikan dengan backend
 
-            if (this.files && this.files.length > 0) {
-                const name = this.files[0].name;
-                if (fileNameDisplay) fileNameDisplay.textContent = "File Terpilih";
-                if (fileStatusInfo) {
-                    fileStatusInfo.innerHTML =
-                        `<i class='bx bx-check-circle'></i> Siap kirim: <strong>${name}</strong>`;
-                }
-            }
-        });
-    }
+        if (file && file.size > MAX_SIZE) {
+            alert(`File "${file.name}" terlalu besar! Maksimal ukuran adalah 10MB.`);
+            this.value = ""; // Reset input agar tidak jadi diupload
+            return;
+        }
+
+        // Jika lolos validasi, tampilkan nama file seperti biasa
+        const fileNameDisplay = document.querySelector(".audio-upload-box p");
+        const fileStatusInfo = document.getElementById("fileStatusInfo");
+        if (fileNameDisplay) fileNameDisplay.textContent = "File Terpilih";
+        if (fileStatusInfo) {
+            fileStatusInfo.innerHTML = `<i class='bx bx-check-circle'></i> Siap kirim: <strong>${file.name}</strong>`;
+        }
+    });
+}
+
+    
 });
 
 
