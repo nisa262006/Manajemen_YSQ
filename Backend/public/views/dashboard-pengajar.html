@@ -44,10 +44,6 @@
             </nav>
             <div class="sidebar-footer">
                 <ul>
-                    <li id="btn-open-profil" onclick="openProfil()" style="cursor: pointer;">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Profil Pengajar</span>
-                    </li>
                     <li onclick="handleLogout()" style="cursor: pointer;">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Keluar</span>
@@ -81,7 +77,7 @@
                                 <p id="mini-phone"><i class="fab fa-whatsapp"></i> 08xxxxxxxxxx</p>
                                 <hr>
                                 <button onclick="openProfil()" class="btn-edit-profil">
-                                    <i class="fas fa-user-edit"></i> Pengaturan Profil
+                                    <li class="setting" onclick="openProfil()"><i class="fas fa-cog"></i> Pengaturan</li>
                                 </button>
                             </div>
                         </div>

@@ -5,20 +5,44 @@ import { apiGet, apiPostForm } from "../js/apiService.js";
 ====================================================== */
 let materiCache = [];
 
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value ?? "-";
-}
-
+// Fungsi untuk ambil parameter ID di URL
 function getUrlParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
+}
+
+// Fungsi PASTI sesuai tanggal laptop (Perbaikan dari sebelumnya)
+function setTanggalHariIni() {
+    const el = document.getElementById("tanggal-hari-ini");
+    if (!el) return;
+    const now = new Date();
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    el.textContent = now.toLocaleDateString('id-ID', options);
+}
+
+function getTodayISO() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+// Tambahkan fungsi setText yang mungkin ikut hilang
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? "-";
 }
 
 /* ======================================================
     INITIALIZATION & PAGE DETECTION
 ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
+    setTanggalHariIni(); // Set tanggal di pojok kanan atas
+
+    if (document.getElementById("materi-table-body")) {
+        initListMateriSantri();
+    }
 
     if (document.getElementById("jadwal-body")) {
         initDashboardSantri();
