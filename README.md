@@ -65,7 +65,8 @@ SAHABAT-QURAN-WEB/
 │   │   ├── init.sql                   
 │   │   └── schema.sql                  
 │   ├── node_modules/                 
-│   ├── public/                        
+│   ├── public/
+│   │   ├── uploads/                    
 │   │   ├── css/                        
 │   │   │   ├── admin.css
 │   │   │   ├── pengajar.css
@@ -128,7 +129,8 @@ SAHABAT-QURAN-WEB/
 │   │   │   ├── santricontrollers.js
 │   │   │   └── santridashboardcontrollers.js
 │   │   ├── middleware/                 
-│   │   │   ├── auth.js                 
+│   │   │   ├── auth.js
+│   │   │   ├── upload.js                
 │   │   │   └── role.js                 
 │   │   ├── routes/                     
 │   │   │   ├── absensiroutes.js
