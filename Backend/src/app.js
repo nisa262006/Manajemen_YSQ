@@ -23,9 +23,11 @@ app.use(express.static(path.join(__dirname, "../public")));
 const publicPath = path.join(__dirname, "../public");
 const viewsPath = path.join(publicPath, "views");
 
-// serve css, js, images
-app.use(express.static(publicPath));
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// Cari baris ini di app.js dan ganti:
+const externalUploadPath = "D:/TUGAS KULIAH/aplikasi - YSQ/storage_external/uploads";
+
+// Express static akan melayani semua yang ada di dalam folder tersebut
+app.use("/uploads", express.static(externalUploadPath));
 
 // helper biar gak nulis sendFile panjang-panjang
 const view = (file) => path.join(viewsPath, file);

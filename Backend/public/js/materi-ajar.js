@@ -1,6 +1,6 @@
-
+/* =====================================================
    CONFIG & STATE
-/*===================================================== */
+===================================================== */
 const BASE_URL = "/api";
 let selectedKelas = null;
 let userRole = null;
@@ -192,11 +192,14 @@ window.lihatDetail = async (idMateri) => {
     if (judulEl) judulEl.innerText = materi.judul;
     if (deskEl) deskEl.innerText = materi.deskripsi || "Tidak ada deskripsi";
     
+    // Di dalam fungsi lihatDetail
     if (kontanBox) {
-        kontanBox.innerHTML = materi.file_path 
-          ? `<a href="${materi.file_path}" target="_blank" class="btn-view"><i class="fas fa-file-download"></i> Lihat File Materi</a>` 
-          : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "<p class='text-muted'>Tidak ada lampiran</p>");
-    }
+      kontanBox.innerHTML = materi.file_path 
+        ? `<a href="/uploads/materi/${materi.file_path}" target="_blank" class="btn-view">
+              <i class="fas fa-file-download"></i> Lihat File Materi
+           </a>` 
+        : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "...");
+  }
 
     // Ambil data tugas dari backend
     const tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${activeMateriId}`);
@@ -253,10 +256,13 @@ function renderTugasInfo(tugasList) {
 
   // Render Lampiran
   if (lampiranTugas) {
-      let htmlLampiran = "";
-      if (t.file_path) {
-          htmlLampiran += `<a href="${t.file_path}" target="_blank" class="btn-view" style="margin-right:10px;"><i class="fas fa-file-download"></i> File Tugas</a>`;
-      }
+    let htmlLampiran = "";
+    // Di dalam fungsi renderTugasInfo (materi-ajar.js)
+if (t.file_path) {
+  htmlLampiran += `<a href="/uploads/tugas/${t.file_path}" target="_blank" class="btn-view">
+                      <i class="fas fa-file-download"></i> File Tugas
+                   </a>`;
+}
       if (t.link_url) {
           htmlLampiran += `<a href="${t.link_url}" target="_blank" class="btn-view"><i class="fas fa-external-link-alt"></i> Link Tugas</a>`;
       }
@@ -321,11 +327,13 @@ listBody.innerHTML = data.map(s => {
     
     // Logika Aksi (Tombol lihat file/link)
     let aksiHTML = "-";
-    if (isSudah) {
-        const fileIcon = s.file_path ? `<a href="${s.file_path}" target="_blank" style="color: #e67e22; margin-right: 8px;"><i class="fas fa-file-audio fa-lg"></i></a>` : '';
-        const linkIcon = s.link_url ? `<a href="${s.link_url}" target="_blank" style="color: #3498db;"><i class="fas fa-link fa-lg"></i></a>` : '';
-        aksiHTML = `${fileIcon} ${linkIcon}`;
-    }
+if (isSudah) {
+    // TAMBAHKAN /uploads/ di sini
+    const fileIcon = s.file_path 
+    ? `<a href="/uploads/submit/${s.file_path}" target="_blank" style="color: #e67e22; margin-right: 8px;"><i class="fas fa-file-audio fa-lg"></i></a>` : '';
+    const linkIcon = s.link_url ? `<a href="${s.link_url}" target="_blank" style="color: #3498db;"><i class="fas fa-link fa-lg"></i></a>` : '';
+    aksiHTML = `${fileIcon} ${linkIcon}`;
+}
 
     return `
         <tr>
@@ -414,7 +422,9 @@ window.handleKirimTugas = async () => {
       closeModalTugas();
       // Refresh detail agar info tugas terbaru muncul
       lihatDetail(activeMateriId); 
-      
+      await loadMateri();
+await lihatDetail(activeMateriId)
+
   } catch (err) {
       console.error("SUBMIT ERROR:", err);
       alert(err.error || err.message || "Gagal menyimpan tugas");
@@ -542,7 +552,7 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
     alert(isEditModeMateri ? "Materi berhasil diperbarui" : "Materi berhasil ditambahkan");
     isEditModeMateri = false; // Reset state
     closeMateriModal();
-    loadMateri();
+    await loadMateri();
   } catch (err) {
     alert("Gagal menyimpan: " + (err.message || "Terjadi kesalahan"));
   }

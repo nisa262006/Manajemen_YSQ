@@ -34,6 +34,20 @@ function setText(id, value) {
     if (el) el.textContent = value ?? "-";
 }
 
+
+// 🔧 FIX PATH uploads (TANPA ROMBAK)
+function fixUploadPath(filePath, folder = "") {
+    if (!filePath) return null;
+
+    // Jika DB sudah simpan "/uploads/..."
+    if (filePath.startsWith("/uploads")) return filePath;
+
+    // Jika DB hanya simpan nama file
+    return folder
+        ? `/uploads/${folder}/${filePath}`
+        : `/uploads/${filePath}`;
+}
+
 /* ======================================================
     INITIALIZATION & PAGE DETECTION
 ====================================================== */
@@ -211,9 +225,9 @@ window.showDetailMateri = async function (idMateri) {
     const materiFileBox = document.getElementById("det-materi-file-container");
     if (materiFileBox) {
         materiFileBox.innerHTML = "";
-        if (materi.file_path) {
+        if (fixUploadPath(materi.file_path)) {
             materiFileBox.innerHTML = `
-                <a href="/uploads/materi/${materi.file_path}" target="_blank" class="file-link">
+               <a href="${fixUploadPath(materi.file_path, 'materi')}" target="_blank">
                     <i class="fas fa-file-download"></i> Unduh File Materi
                 </a>`;
         } else if (materi.link_url) {
@@ -254,7 +268,7 @@ window.showDetailMateri = async function (idMateri) {
             tugasFileBox.innerHTML = "";
             if (materi.file_tugas) {
                 tugasFileBox.innerHTML = `
-                    <a href="/uploads/tugas/${materi.file_tugas}" target="_blank" class="file-link" style="background: #fdf2f2; color: #991b1b; border: 1px solid #fecaca;">
+                    <a href="${fixUploadPath(materi.file_tugas, 'tugas')}" target="_blank" class="file-link" style="background: #fdf2f2; color: #991b1b; border: 1px solid #fecaca;">
                         <i class="fas fa-file-pdf"></i> Unduh Panduan Tugas
                     </a>`;
             } else if (materi.link_tugas) {
@@ -349,21 +363,25 @@ async function cekPengumpulanSaya(idTugas) {
             formSection.style.display = "none"; 
             infoSection.style.display = "block";
             
-            // Cek Lampiran
+            // --- FIX LOGIKA LAMPIRAN ---
             let lampiranHTML = "";
             if (data.file_path) {
-                lampiranHTML = `<a href="/uploads/tugas/${data.file_path}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
-                                    <i class='bx bx-file'></i> Lihat File yang Dikirim
-                                </a>`;
+                // Pastikan folder adalah 'submit' dan tag <a> ditutup dengan benar
+                const fullPath = fixUploadPath(data.file_path, 'submit');
+                lampiranHTML = `
+                    <a href="${fullPath}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
+                        <i class='bx bx-file'></i> Lihat File yang Dikirim
+                    </a>`;
             } else if (data.link_url) {
-                lampiranHTML = `<a href="${data.link_url}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
-                                    <i class='bx bx-link'></i> Buka Link yang Dikirim
-                                </a>`;
+                lampiranHTML = `
+                    <a href="${data.link_url}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
+                        <i class='bx bx-link'></i> Buka Link yang Dikirim
+                    </a>`;
             } else {
                 lampiranHTML = "<span style='color: #94a3b8;'>Tidak ada lampiran</span>";
             }
 
-            // Render Tampilan Sesuai Request
+            // Render Tampilan
             infoSection.innerHTML = `
                 <div style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 12px; position: relative;">
                     <div style="margin-bottom: 15px;">
