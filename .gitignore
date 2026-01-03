@@ -28,6 +28,8 @@ Backend/public/uploads/submit/*
 
 # JANGAN abaikan file permintaan klien (misal: formatnya .pdf atau .png)
 # atau cukup jangan abaikan file .gitkeep jika kamu menggunakannya nanti
-!Backend/public/uploads/materi/*.pdf
-!Backend/public/uploads/materi/*.png
-!**/public/uploads/**/.gitkeep
+!Backend/public/uploads/submit/*.docx
+!Backend/public/uploads/materi/*.doc
+!Backend/public/uploads/materi/*.docx
+!Backend/public/uploads/tugas/*.doc
+!Backend/public/uploads/tugas/*.docx
