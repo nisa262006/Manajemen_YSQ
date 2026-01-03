@@ -6,10 +6,10 @@
 Backend/node_modules/
 node_modules/
 
-# Environment Variables (Rahasia)
+# Environment Variables
 Backend/.env
 
-# Database Data (Jika ada folder data dari Docker)
+# Database Data
 pgdata/
 
 # Editor Settings
@@ -17,3 +17,17 @@ pgdata/
 
 # Logs
 npm-debug.log*
+
+# ========================================
+#  UPLOADS (Hanya simpan struktur & file awal klien)
+# ========================================
+# Abaikan semua file di dalam subfolder uploads
+Backend/public/uploads/materi/*
+Backend/public/uploads/tugas/*
+Backend/public/uploads/submit/*
+
+# JANGAN abaikan file permintaan klien (misal: formatnya .pdf atau .png)
+# atau cukup jangan abaikan file .gitkeep jika kamu menggunakannya nanti
+!Backend/public/uploads/materi/*.pdf
+!Backend/public/uploads/materi/*.png
+!**/public/uploads/**/.gitkeep

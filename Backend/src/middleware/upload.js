@@ -2,14 +2,14 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// PATH ABSOLUT WINDOWS
-const baseUploadDir = "D:/TUGAS KULIAH/aplikasi - YSQ/storage_external/uploads";
+// SEKARANG RELATIF: Mengarah ke Sahabat-Quran-Web/Backend/public/uploads
+// __dirname adalah lokasi file upload.js ini berada (biasanya di folder middleware atau utils)
+const baseUploadDir = path.join(__dirname, "../public/uploads");
 
 const storage = multer.diskStorage({
-  destination: (req, res, cb) => {
+  destination: (req, file, cb) => {
     let subFolder = "";
 
-    // Logika penentuan folder berdasarkan URL Route
     if (req.originalUrl.includes("/materi")) {
       subFolder = "materi";
     } else if (req.originalUrl.includes("/tugas") && !req.originalUrl.includes("/submit")) {
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
     const finalDir = path.join(baseUploadDir, subFolder);
 
-    // Buat folder jika belum ada (misal folder 'materi' belum ada)
+    // Otomatis buat folder jika belum ada, sangat membantu untuk anggota tim baru
     if (!fs.existsSync(finalDir)) {
       fs.mkdirSync(finalDir, { recursive: true });
     }
@@ -28,7 +28,6 @@ const storage = multer.diskStorage({
     cb(null, finalDir);
   },
   filename: (req, file, cb) => {
-    // Membersihkan nama file dari spasi
     const safeName = file.originalname.replace(/\s+/g, "_");
     cb(null, Date.now() + "-" + safeName);
   }

@@ -446,7 +446,7 @@ exports.getStatusPengumpulan = async (req, res) => {
 function deletePhysicalFile(fileName, subFolder) {
   if (!fileName) return;
   try {
-    const filePath = path.join("D:/TUGAS KULIAH/aplikasi - YSQ/storage_external/uploads", subFolder, fileName);
+    const filePath = path.join(__dirname, "../../public/uploads", subFolder, fileName);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
       console.log(`✅ File lama dihapus: ${filePath}`);

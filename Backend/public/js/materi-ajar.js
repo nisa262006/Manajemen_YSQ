@@ -503,7 +503,7 @@ window.openEditTugas = (tugas) => {
         info.innerHTML = `
           <small style="color:#0f766e">
             📎 File saat ini:
-            <a href="${tugas.file_path}" target="_blank">Lihat file</a>
+            <a href="/uploads/tugas/${tugas.file_path}" target="_blank">Lihat file</a>
           </small>
         `;
       } else {

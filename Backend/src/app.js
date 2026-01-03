@@ -18,18 +18,18 @@ app.use((req, res, next) => {
 });
 
 // ================= STATIC FILES =================
-// path ke folder public
+// 1. Sajikan folder public secara umum (untuk CSS, JS frontend, dll)
 app.use(express.static(path.join(__dirname, "../public")));
+
+// 2. GANTI BAGIAN INI: Jangan pakai D:/TUGAS KULIAH/...
+const internalUploadPath = path.join(__dirname, "../public/uploads");
+
+// Melayani file upload sehingga bisa diakses via http://localhost:8000/uploads/...
+app.use("/uploads", express.static(internalUploadPath));
+
+// Path untuk views tetap sama
 const publicPath = path.join(__dirname, "../public");
 const viewsPath = path.join(publicPath, "views");
-
-// Cari baris ini di app.js dan ganti:
-const externalUploadPath = "D:/TUGAS KULIAH/aplikasi - YSQ/storage_external/uploads";
-
-// Express static akan melayani semua yang ada di dalam folder tersebut
-app.use("/uploads", express.static(externalUploadPath));
-
-// helper biar gak nulis sendFile panjang-panjang
 const view = (file) => path.join(viewsPath, file);
 
 // ================= HALAMAN UMUM =================

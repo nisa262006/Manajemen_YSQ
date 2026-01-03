@@ -62,10 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
         initDashboardSantri();
     }
 
-    if (document.getElementById("materi-table-body")) {
-        initListMateriSantri();
-    }
-
     const subForm = document.getElementById("submissionForm");
     if (subForm) {
         subForm.addEventListener("submit", handleSubmission);
