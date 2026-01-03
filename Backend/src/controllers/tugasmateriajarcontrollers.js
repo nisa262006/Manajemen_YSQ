@@ -1,4 +1,6 @@
 const db = require("../config/db");
+const path = require("path"); // Tambahkan ini
+const fs = require("fs");
 
 // Helper internal untuk mendapatkan ID Pengajar/Santri dari ID Users
 async function getRoleSpecificId(id_users, role) {
@@ -223,10 +225,17 @@ exports.updateTugas = async (req, res) => {
       return res.status(400).json({ error: "Deadline wajib diisi" });
     }
 
+    const oldTugas = await db.query("SELECT file_path FROM tugas WHERE id_tugas = $1", [id]);
+    const oldFileName = oldTugas.rows[0]?.file_path;
+    // ----------------------------
+
     let query;
     let params;
 
     if (req.file) {
+      // 2. Jika ada file baru, hapus file lama secara fisik
+      if (oldFileName) deletePhysicalFile(oldFileName, "tugas");
+
       query = `UPDATE tugas SET deskripsi=$1, deadline=$2, link_url=$3, file_path=$4 
                WHERE id_tugas=$5 AND id_pengajar=$6 RETURNING *`;
       params = [deskripsi, deadline, link_url || null, req.file.filename, id, id_pengajar];
@@ -433,11 +442,16 @@ exports.getStatusPengumpulan = async (req, res) => {
 };
 
 
-const deletePhysicalFile = (fileName, subFolder) => {
+// Gunakan kata kunci 'function' agar bisa dipanggil dari baris mana pun
+function deletePhysicalFile(fileName, subFolder) {
   if (!fileName) return;
-  const filePath = path.join("D:/TUGAS KULIAH/aplikasi - YSQ/storage_external/uploads", subFolder, fileName);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    console.log(`✅ File lama dihapus: ${filePath}`);
+  try {
+    const filePath = path.join("D:/TUGAS KULIAH/aplikasi - YSQ/storage_external/uploads", subFolder, fileName);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`✅ File lama dihapus: ${filePath}`);
+    }
+  } catch (error) {
+    console.error(`❌ Gagal menghapus file fisik: ${error.message}`);
   }
-};
+}

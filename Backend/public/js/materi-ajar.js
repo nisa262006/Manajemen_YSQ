@@ -518,25 +518,34 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const formData = new FormData();
+  // Ambil elemen tipe_konten terlebih dahulu
+  const tipeKontenEl = document.getElementById("tipeMateri");
+  const tipeKontenValue = tipeKontenEl.value;
+
   formData.append("id_kelas", selectedKelas);
   formData.append("judul", document.getElementById("judulMateri").value);
   formData.append("deskripsi", document.getElementById("deskripsiMateri").value);
-  formData.append("tipe_konten", document.getElementById("tipeMateri").value);
+  formData.append("tipe_konten", tipeKontenValue);
 
-  // Penanganan File/Link
-  if (tipeMateri.value === "file") {
-    const file = document.getElementById("fileMateri").files[0];
-    if (file) formData.append("file", file); 
-    // Saat edit, file tidak wajib diisi ulang jika tidak ingin ganti file
+  // Gunakan variabel yang sudah didefinisikan (tipeKontenValue)
+  if (tipeKontenValue === "file") {
+    const fileInput = document.getElementById("fileMateri");
+    if (fileInput.files[0]) {
+      formData.append("file", fileInput.files[0]); 
+    }
   } else {
-    formData.append("link_url", document.getElementById("linkMateri").value);
+    const linkInput = document.getElementById("linkMateri");
+    if (linkInput.value) {
+      formData.append("link_url", linkInput.value);
+    }
   }
 
   try {
-    // TENTUKAN URL DAN METHOD (POST jika baru, PUT jika edit)
+    // TENTUKAN URL DAN METHOD (Gunakan BASE_URL agar konsisten)
     const url = isEditModeMateri 
-                ? `/api/tugas-media/materi/${activeMateriId}` 
-                : "/api/tugas-media/materi";
+                ? `${BASE_URL}/tugas-media/materi/${activeMateriId}` 
+                : `${BASE_URL}/tugas-media/materi`;
+    
     const method = isEditModeMateri ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -547,14 +556,19 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
       body: formData,
     });
 
-    if (!res.ok) throw await res.json();
+    const result = await res.json();
+    if (!res.ok) throw result;
 
     alert(isEditModeMateri ? "Materi berhasil diperbarui" : "Materi berhasil ditambahkan");
-    isEditModeMateri = false; // Reset state
+    
+    // RESET STATE
+    isEditModeMateri = false; 
+    document.querySelector("#modalMateri h3").innerHTML = '<i class="fas fa-plus-circle"></i> Tambah Materi';
+    
     closeMateriModal();
     await loadMateri();
   } catch (err) {
-    alert("Gagal menyimpan: " + (err.message || "Terjadi kesalahan"));
+    alert("Gagal menyimpan: " + (err.error || err.message || "Terjadi kesalahan"));
   }
 });
 
