@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body class="allow-scroll">
+<body class="allow-scroll page-absensi">
+
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="container">
         <aside class="sidebar">
@@ -36,6 +37,9 @@
 
         <main class="main-content">
             <header class="top-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <h1 class="page-title">Absensi</h1>
                 <div class="user-profile" onclick="toggleMiniProfil()" style="cursor:pointer;">
                     <span class="user-name" id="header-user-name">Pengajar</span>
@@ -47,8 +51,8 @@
                     <div class="mini-card-content">
                       <div class="mini-avatar" id="mini-avatar-initials">P</div>
                       <h3 id="mini-nama">Nama Pengajar</h3>
-                      <p id="mini-email"><i class="fas fa-envelope"></i> email@example.com</p>
-                      <p id="mini-phone"><i class="fab fa-whatsapp"></i> 08xxxxxxxxxx</p>
+                      <p id="mini-email"><i class="fas fa-envelope"></i> </p>
+                      <p id="mini-phone"><i class="fab fa-whatsapp"></i> </p>
                       <hr>
                       <button onclick="openProfil(); toggleMiniProfil()" class="btn-edit-profil">
                         <i class="fas fa-user-edit"></i> Pengaturan Profil
@@ -69,10 +73,7 @@
                     </div>
 
                     <div class="filter-absen-row">
-                        <div class="filter-group">
-                            <label>Pengajar:</label>
-                            <span class="static-value user-name">Pengajar</span>
-                        </div>
+
                         <div class="filter-group">
                             <label>Pilih Kelas:</label>
                             <select id="kelasSelect" class="select-clean">

@@ -534,6 +534,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+
 /* ======================================================
     LOGOUT FUNCTION
 ====================================================== */
@@ -548,3 +549,15 @@ window.handleLogout = function() {
     // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
     window.location.replace("/login");
 };
+
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+
+mobileMenuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+});
+
+overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+});

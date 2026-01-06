@@ -586,3 +586,46 @@ window.handleLogout = function() {
   // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
   window.location.replace("/login");
 };
+
+
+/* ================== RESPONSIF =================*/
+document.querySelector('.calendar-card')?.addEventListener('click', function () {
+  this.classList.toggle('expanded');
+});
+
+const menuBtn = document.getElementById("mobileMenuBtn");
+const sidebar = document.querySelector(".sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+
+if (menuBtn && sidebar && overlay) {
+  menuBtn.addEventListener("click", () => {
+      sidebar.classList.add("show");
+      overlay.classList.add("show");
+  });
+
+  overlay.addEventListener("click", () => {
+      sidebar.classList.remove("show");
+      overlay.classList.remove("show");
+  });
+}
+
+document.querySelectorAll(".nav-link").forEach(link => {
+  link.addEventListener("click", () => {
+      if (window.innerWidth <= 768) {
+          sidebar.classList.remove("show");
+          overlay.classList.remove("show");
+      }
+  });
+});
+
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+
+mobileMenuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+});
+
+overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+});

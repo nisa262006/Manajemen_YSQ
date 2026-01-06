@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS pengumpulan_tugas (
     link_url TEXT,
     nilai INTEGER DEFAULT NULL,
     jawaban_teks TEXT, -- Untuk menyimpan catatan/jawaban santri
-    catatan_pengajar TEXT
+    catatan_pengajar TEXT,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (id_tugas, id_santri)
 );
