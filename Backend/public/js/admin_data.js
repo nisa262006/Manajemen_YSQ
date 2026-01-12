@@ -133,14 +133,30 @@ function initDaftarSantri() {
             Nama: s.nama,
             Kelas: s.nama_kelas,
             Email: s.user_email ?? s.email,
+            "No. WhatsApp": s.no_wa ?? s.telepon ?? "-", // Menambahkan kolom No WA
+            Alamat: s.alamat ?? "-",                   // Menambahkan kolom Alamat
             Kategori: s.kategori,
             Status: s.status
         }));
-
+    
         const ws = XLSX.utils.json_to_sheet(rows);
+        
+        // Opsional: Mengatur lebar kolom agar Alamat dan Email tidak terpotong
+        ws['!cols'] = [
+            { wch: 5 },  // No
+            { wch: 15 }, // NIS
+            { wch: 25 }, // Nama
+            { wch: 15 }, // Kelas
+            { wch: 25 }, // Email
+            { wch: 20 }, // No WA
+            { wch: 40 }, // Alamat
+            { wch: 15 }, // Kategori
+            { wch: 10 }, // Status
+        ];
+    
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Santri");
-        XLSX.writeFile(wb, "data_santri.xlsx");
+        XLSX.writeFile(wb, "data_santri_lengkap.xlsx");
     };
 
     loadAll();

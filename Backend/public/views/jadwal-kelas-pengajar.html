@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="allow-scroll">
+
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="container">
@@ -28,77 +29,83 @@
             </nav>
             <div class="sidebar-footer">
                 <ul>
-                    <li onclick="openProfil()" style="cursor: pointer;"><i class="fas fa-user-cog"></i> <span>Profil Pengajar</span></li>
                     <li class="/login" onclick="handleLogout()" style="cursor: pointer;"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></li>
                 </ul>
             </div>
         </aside>
 
         <main class="main-content">
-          <header class="top-header">
-            <h1 class="page-title">Jadwal Kelas</h1>
-
-            <div class="user-profile" onclick="toggleMiniProfil()" style="cursor:pointer;">
-                <span class="user-name" id="header-user-name">Pengajar</span>
-                <i class="fas fa-user-circle"></i>
-              </div>
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Jadwal Kelas</h1>
+                </div>
         
-              <!-- MINI PROFIL -->
-              <div id="miniProfilCard" class="mini-profil-card">
-                <div class="mini-card-content">
-                  <div class="mini-avatar" id="mini-avatar-initials">P</div>
-                  <h3 id="mini-nama">Nama Pengajar</h3>
-                  <p id="mini-email"><i class="fas fa-envelope"></i> email@example.com</p>
-                  <p id="mini-phone"><i class="fab fa-whatsapp"></i> 08xxxxxxxxxx</p>
-                  <hr>
-                  <button onclick="openProfil(); toggleMiniProfil()" class="btn-edit-profil">
-                    <i class="fas fa-user-edit"></i> Pengaturan Profil
-                  </button>
+                <div class="header-right">
+                    <div class="user-profile" onclick="toggleMiniProfil()" style="cursor:pointer;">
+                        <span class="user-name" id="header-user-name">Pengajar</span>
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    
+                    <div id="miniProfilCard" class="mini-profil-card">
+                        <div class="mini-card-content">
+                            <div class="mini-avatar" id="mini-avatar-initials">P</div>
+                            <h3 id="mini-nama">Nama Pengajar</h3>
+                            <p id="mini-email"><i class="fas fa-envelope"></i> email@example.com</p>
+                            <p id="mini-phone"><i class="fab fa-whatsapp"></i> 08xxxxxxxxxx</p>
+                            <hr>
+                            <button onclick="openProfil(); toggleMiniProfil()" class="btn-edit-profil">
+                                <i class="fas fa-user-edit"></i> Pengaturan Profil
+                            </button>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </header>
-            <div class="date-display-box" id="tanggal-otomatis"></div>
-        </header>
-
+        
             <div class="filter-card">
-                <div class="filter-group">
-                    <label>Pilih Kelas:</label>
-                    <select id="filter-kelas" class="custom-select-minimal">
-                        <option value="">Semua Kelas</option>
-                    </select>
+                <div class="filter-row-modern">
+                    <div class="filter-group">
+                        <label>Pilih Kelas:</label>
+                        <select id="filter-kelas" class="custom-select-minimal">
+                            <option value="">Semua Kelas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Tanggal:</label>
+                        <input type="date" id="filter-tanggal" class="custom-select-minimal">
+                    </div>
                 </div>
-                
-                <div class="filter-group">
-                    <label>Pilih Hari:</label>
-                    <input type="date" id="filter-tanggal" class="custom-select-minimal">
-                </div>
-
+        
                 <button class="btn-export" id="export-excel">
                     <i class="fas fa-file-excel"></i> Ekspor Excel
                 </button>
             </div>
-
+        
             <div class="table-container card">
-                <table class="table-jadwal-clean">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left; padding-left: 20px;">KELAS</th>
-                            <th>HARI</th>
-                            <th>WAKTU</th>
-                            <th>KATEGORI</th>
-                            <th>PENGAJAR</th>
-                            <th>AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table_jadwal">
-                        <tr>
-                            <td colspan="6" style="text-align:center">Memuat jadwal dari sistem...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive-wrapper">
+                    <table class="table-jadwal-clean">
+                        <thead>
+                            <tr>
+                                <th style="text-align: left; padding-left: 20px;">KELAS</th>
+                                <th>HARI</th>
+                                <th>WAKTU</th>
+                                <th>KATEGORI</th>
+                                <th>PENGAJAR</th>
+                                <th>AKSI</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table_jadwal">
+                            <tr>
+                                <td colspan="6" style="text-align:center">Memuat jadwal...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script type="module" src="/js/pengajar.js"></script>

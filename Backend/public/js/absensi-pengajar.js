@@ -69,53 +69,37 @@ function setTodayDateInput() {
 }
 
 async function loadKelasByTanggal() {
-    const tglInput = document.getElementById("tanggalAbsensiPengajar");
     const kelasSelect = document.getElementById("kelasSelect");
     const tbody = document.getElementById("absensiBody");
 
-    if (!tglInput || !kelasSelect) return;
-
-    const tanggal = tglInput.value;
-    if (!tanggal) return;
-
-    const hari = new Date(tanggal)
-        .toLocaleDateString("id-ID", { weekday: "long" })
-        .toLowerCase();
+    if (!kelasSelect) return;
 
     try {
+        // Ambil SEMUA jadwal milik pengajar (tanpa filter hari dari backend)
         const res = await fetchJSON(
-            `${BASE_URL}/jadwal/pengajar/me/hari/${hari}`,
+            `${BASE_URL}/jadwal/pengajar/me`, 
             { headers: { Authorization: `Bearer ${getToken()}` } }
         );
 
-        const data = res.data || [];
+        const data = res.data || res || [];
 
         kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
 
         if (data.length === 0) {
-            kelasSelect.innerHTML =
-                `<option value="">Tidak ada jadwal hari ${hari}</option>`;
-            if (tbody) {
-                tbody.innerHTML =
-                    `<tr><td colspan="4" align="center" style="color:red">
-                        Tidak ada jadwal mengajar hari ${hari}
-                    </td></tr>`;
-            }
+            kelasSelect.innerHTML = `<option value="">Anda tidak memiliki jadwal mengajar</option>`;
             return;
         }
 
+        // Tampilkan semua jadwal di dropdown
         data.forEach(j => {
             kelasSelect.innerHTML +=
-                `<option value="${j.id_kelas}">
-                    ${j.nama_kelas} (${j.jam_mulai} - ${j.jam_selesai})
+                `<option value="${j.id_kelas}" data-jadwal-id="${j.id_jadwal}">
+                    ${j.nama_kelas} (${j.hari}: ${j.jam_mulai} - ${j.jam_selesai})
                 </option>`;
         });
 
         if (tbody) {
-            tbody.innerHTML =
-                `<tr><td colspan="4" align="center">
-                    Silakan pilih kelas
-                </td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" align="center">Silakan pilih kelas</td></tr>`;
         }
 
     } catch (err) {
@@ -164,25 +148,31 @@ async function populateAbsensiFilters() {
 }
 
 async function loadAbsensiData() {
-    const id_kelas = document.getElementById("kelasSelect")?.value;
-    const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
+    const kelasSelect = document.getElementById("kelasSelect");
+    const id_kelas = kelasSelect?.value;
     const tbody = document.getElementById("absensiBody");
 
     if (!id_kelas || !tbody) return;
 
+    // Ambil id_jadwal dari atribut data yang kita pasang di dropdown tadi
+    const selectedOption = kelasSelect.options[kelasSelect.selectedIndex];
+    const id_jadwal_terpilih = selectedOption.getAttribute("data-jadwal-id");
+
     try {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Memuat data...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Memuat data santri...</td></tr>';
+        
         const res = await fetchJSON(`${BASE_URL}/kelas/pengajar/detail/${id_kelas}`, {
             headers: { Authorization: `Bearer ${getToken()}` }
         });
 
         const santri = res?.santri || [];
-        const jadwal = res?.jadwal || [];
-        const selectedDay = new Date(tanggal).toLocaleDateString("id-ID", { weekday: "long" });
-        _jadwalUtama = jadwal.find(j => j.hari.toLowerCase() === selectedDay.toLowerCase()) || jadwal[0];
+        const jadwalList = res?.jadwal || [];
+
+        // Cari data jadwal yang spesifik dipilih
+        _jadwalUtama = jadwalList.find(j => j.id_jadwal == id_jadwal_terpilih) || jadwalList[0];
 
         if (document.getElementById("jamAbsenDisplay") && _jadwalUtama) {
-            document.getElementById("jamAbsenDisplay").textContent = `${_jadwalUtama.jam_mulai} - ${_jadwalUtama.jam_selesai}`;
+            document.getElementById("jamAbsenDisplay").textContent = `${_jadwalUtama.hari}: ${_jadwalUtama.jam_mulai} - ${_jadwalUtama.jam_selesai}`;
         }
 
         if (santri.length === 0) {
@@ -197,7 +187,7 @@ async function loadAbsensiData() {
                             <option value="Hadir">Hadir</option>
                             <option value="Izin">Izin</option>
                             <option value="Sakit">Sakit</option>
-                            <option value="mustamiah">mustamiah</option>
+                            <option value="mustamiah">Mustamiah</option>
                             <option value="Alfa">Alfa</option>
                         </select>
                     </td>
@@ -316,32 +306,39 @@ async function applyRiwayatFilters() {
     tbody.innerHTML = `<tr><td colspan="7" align="center">Memuat data riwayat...</td></tr>`;
 
     try {
-        // Mengambil data dari endpoint absensi santri
+        // Mengambil seluruh riwayat absensi santri di kelas milik pengajar ini
         const res = await fetchJSON(`${BASE_URL}/absensi/santri/kelas/me`, {
             headers: { Authorization: `Bearer ${getToken()}` }
         });
+        
         let data = (res.data || res || []);
 
+        // Filter 1: Berdasarkan Tanggal (jika diisi)
         if (tanggal) {
-            data = data.filter(item => new Date(item.tanggal).toISOString().split('T')[0] === tanggal);
+            data = data.filter(item => {
+                // Pastikan format tanggal sama YYYY-MM-DD
+                const tglItem = new Date(item.tanggal).toISOString().split('T')[0];
+                return tglItem === tanggal;
+            });
         }
+
+        // Filter 2: Berdasarkan Kelas (jika dipilih salah satu)
         if (kelasId) {
-            const selectedText =
-              document.getElementById("riwayatKelasSelect")
+            // Kita cari nama kelas yang dipilih dari dropdown riwayat
+            const selectedText = document.getElementById("riwayatKelasSelect")
                 .options[document.getElementById("riwayatKelasSelect").selectedIndex]
-                .text
-                .toLowerCase();
+                .text.split(' (')[0].toLowerCase(); // Ambil nama kelasnya saja sebelum tanda "("
           
             data = data.filter(item =>
               item.nama_kelas?.toLowerCase() === selectedText.toLowerCase()
             );
-          }
+        }
           
         renderRiwayatTable(data);
-        updateRiwayatStats(data); // Sekarang sudah terdefinisi
+        updateRiwayatStats(data); 
     } catch (err) {
         console.error("Error filter riwayat:", err);
-        tbody.innerHTML = `<tr><td colspan="7" align="center" style="color:red">Gagal memuat data</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" align="center" style="color:red">Gagal memuat data riwayat</td></tr>`;
     }
 }
 
@@ -369,40 +366,30 @@ function renderRiwayatTable(data) {
 
 /* --- Fungsi Pendukung Riwayat --- */
 async function syncRiwayatKelasDropdown() {
-    const tanggal = document.getElementById("riwayatTanggal")?.value;
     const riwayatKelasSelect = document.getElementById("riwayatKelasSelect");
     
-    if (!riwayatKelasSelect || !tanggal) return;
-
-    const hari = new Date(tanggal)
-        .toLocaleDateString("id-ID", { weekday: "long" })
-        .toLowerCase();
+    if (!riwayatKelasSelect) return;
 
     try {
+        // Ambil semua jadwal pengajar tanpa peduli hari
         const res = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
             headers: { Authorization: `Bearer ${getToken()}` }
         });
         
         const semuaJadwal = res.data || res || [];
-        const jadwalHariIni = semuaJadwal.filter(j => j.hari.toLowerCase() === hari);
 
-        if (jadwalHariIni.length === 0) {
-            riwayatKelasSelect.innerHTML = `<option value="">-- Tidak ada kelas hari ${hari} --</option>`;
-            const tbody = document.getElementById("riwayatBody");
-            if (tbody) tbody.innerHTML = `<tr><td colspan="7" align="center">Tidak ada jadwal pada hari ${hari}</td></tr>`;
+        if (semuaJadwal.length === 0) {
+            riwayatKelasSelect.innerHTML = `<option value="">-- Anda tidak memiliki kelas --</option>`;
         } else {
-            riwayatKelasSelect.innerHTML = `<option value="">-- Pilih Kelas --</option>` +
-                jadwalHariIni.map(j => `<option value="${j.id_kelas}">${j.nama_kelas}</option>`).join("");
+            // Tampilkan semua kelas yang diampu pengajar
+            riwayatKelasSelect.innerHTML = `<option value="">-- Semua Kelas --</option>` +
+                semuaJadwal.map(j => `<option value="${j.id_kelas}">${j.nama_kelas} (${j.hari})</option>`).join("");
             
-            // 🔥 OTOMATIS PILIH KELAS PERTAMA jika ada jadwal
-            // Ini yang membuat pengajar tidak perlu filter-filter lagi kalau memang ada jadwal
-            riwayatKelasSelect.selectedIndex = 1; // Pilih <option> setelah "-- Pilih Kelas --"
-            
-            // Langsung panggil filter untuk nampilin tabelnya
+            // Langsung panggil filter untuk menampilkan tabel (default: Semua Kelas)
             await applyRiwayatFilters();
         }        
     } catch (err) {
-        console.error("Gagal sinkronisasi dropdown kelas:", err);
+        console.error("Gagal sinkronisasi dropdown kelas riwayat:", err);
     }
 }
 
@@ -466,3 +453,15 @@ window.handleLogout = function() {
     // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
     window.location.replace("/login");
 };
+
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+
+mobileMenuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+});
+
+overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+});

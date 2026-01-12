@@ -192,11 +192,14 @@ window.lihatDetail = async (idMateri) => {
     if (judulEl) judulEl.innerText = materi.judul;
     if (deskEl) deskEl.innerText = materi.deskripsi || "Tidak ada deskripsi";
     
+    // Di dalam fungsi lihatDetail
     if (kontanBox) {
-        kontanBox.innerHTML = materi.file_path 
-          ? `<a href="${materi.file_path}" target="_blank" class="btn-view"><i class="fas fa-file-download"></i> Lihat File Materi</a>` 
-          : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "<p class='text-muted'>Tidak ada lampiran</p>");
-    }
+      kontanBox.innerHTML = materi.file_path 
+        ? `<a href="/uploads/materi/${materi.file_path}" target="_blank" class="btn-view">
+              <i class="fas fa-file-download"></i> Lihat File Materi
+           </a>` 
+        : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "...");
+  }
 
     // Ambil data tugas dari backend
     const tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${activeMateriId}`);
@@ -253,10 +256,13 @@ function renderTugasInfo(tugasList) {
 
   // Render Lampiran
   if (lampiranTugas) {
-      let htmlLampiran = "";
-      if (t.file_path) {
-          htmlLampiran += `<a href="${t.file_path}" target="_blank" class="btn-view" style="margin-right:10px;"><i class="fas fa-file-download"></i> File Tugas</a>`;
-      }
+    let htmlLampiran = "";
+    // Di dalam fungsi renderTugasInfo (materi-ajar.js)
+if (t.file_path) {
+  htmlLampiran += `<a href="/uploads/tugas/${t.file_path}" target="_blank" class="btn-view">
+                      <i class="fas fa-file-download"></i> File Tugas
+                   </a>`;
+}
       if (t.link_url) {
           htmlLampiran += `<a href="${t.link_url}" target="_blank" class="btn-view"><i class="fas fa-external-link-alt"></i> Link Tugas</a>`;
       }
@@ -319,13 +325,28 @@ window.showStatusSantri = async () => {
 listBody.innerHTML = data.map(s => {
     const isSudah = s.status === 'Sudah Kirim';
     
+    let jamTampil = '-';
+    if (s.submitted_at) {
+        const date = new Date(s.submitted_at);
+        // Jika dari database dikirim format UTC murni, kita pastikan dibaca sebagai WIB
+        jamTampil = date.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }).replace(/\./g, ':');
+    }
+
     // Logika Aksi (Tombol lihat file/link)
     let aksiHTML = "-";
-    if (isSudah) {
-        const fileIcon = s.file_path ? `<a href="${s.file_path}" target="_blank" style="color: #e67e22; margin-right: 8px;"><i class="fas fa-file-audio fa-lg"></i></a>` : '';
-        const linkIcon = s.link_url ? `<a href="${s.link_url}" target="_blank" style="color: #3498db;"><i class="fas fa-link fa-lg"></i></a>` : '';
-        aksiHTML = `${fileIcon} ${linkIcon}`;
-    }
+if (isSudah) {
+    // TAMBAHKAN /uploads/ di sini
+    const fileIcon = s.file_path 
+    ? `<a href="/uploads/submit/${s.file_path}" target="_blank" style="color: #e67e22; margin-right: 8px;"><i class="fas fa-file-audio fa-lg"></i></a>` : '';
+    const linkIcon = s.link_url ? `<a href="${s.link_url}" target="_blank" style="color: #3498db;"><i class="fas fa-link fa-lg"></i></a>` : '';
+    aksiHTML = `${fileIcon} ${linkIcon}`;
+}
 
     return `
         <tr>
@@ -414,7 +435,9 @@ window.handleKirimTugas = async () => {
       closeModalTugas();
       // Refresh detail agar info tugas terbaru muncul
       lihatDetail(activeMateriId); 
-      
+      await loadMateri();
+await lihatDetail(activeMateriId)
+
   } catch (err) {
       console.error("SUBMIT ERROR:", err);
       alert(err.error || err.message || "Gagal menyimpan tugas");
@@ -493,7 +516,7 @@ window.openEditTugas = (tugas) => {
         info.innerHTML = `
           <small style="color:#0f766e">
             📎 File saat ini:
-            <a href="${tugas.file_path}" target="_blank">Lihat file</a>
+            <a href="/uploads/tugas/${tugas.file_path}" target="_blank">Lihat file</a>
           </small>
         `;
       } else {
@@ -508,25 +531,34 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const formData = new FormData();
+  // Ambil elemen tipe_konten terlebih dahulu
+  const tipeKontenEl = document.getElementById("tipeMateri");
+  const tipeKontenValue = tipeKontenEl.value;
+
   formData.append("id_kelas", selectedKelas);
   formData.append("judul", document.getElementById("judulMateri").value);
   formData.append("deskripsi", document.getElementById("deskripsiMateri").value);
-  formData.append("tipe_konten", document.getElementById("tipeMateri").value);
+  formData.append("tipe_konten", tipeKontenValue);
 
-  // Penanganan File/Link
-  if (tipeMateri.value === "file") {
-    const file = document.getElementById("fileMateri").files[0];
-    if (file) formData.append("file", file); 
-    // Saat edit, file tidak wajib diisi ulang jika tidak ingin ganti file
+  // Gunakan variabel yang sudah didefinisikan (tipeKontenValue)
+  if (tipeKontenValue === "file") {
+    const fileInput = document.getElementById("fileMateri");
+    if (fileInput.files[0]) {
+      formData.append("file", fileInput.files[0]); 
+    }
   } else {
-    formData.append("link_url", document.getElementById("linkMateri").value);
+    const linkInput = document.getElementById("linkMateri");
+    if (linkInput.value) {
+      formData.append("link_url", linkInput.value);
+    }
   }
 
   try {
-    // TENTUKAN URL DAN METHOD (POST jika baru, PUT jika edit)
+    // TENTUKAN URL DAN METHOD (Gunakan BASE_URL agar konsisten)
     const url = isEditModeMateri 
-                ? `/api/tugas-media/materi/${activeMateriId}` 
-                : "/api/tugas-media/materi";
+                ? `${BASE_URL}/tugas-media/materi/${activeMateriId}` 
+                : `${BASE_URL}/tugas-media/materi`;
+    
     const method = isEditModeMateri ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -537,14 +569,19 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
       body: formData,
     });
 
-    if (!res.ok) throw await res.json();
+    const result = await res.json();
+    if (!res.ok) throw result;
 
     alert(isEditModeMateri ? "Materi berhasil diperbarui" : "Materi berhasil ditambahkan");
-    isEditModeMateri = false; // Reset state
+    
+    // RESET STATE
+    isEditModeMateri = false; 
+    document.querySelector("#modalMateri h3").innerHTML = '<i class="fas fa-plus-circle"></i> Tambah Materi';
+    
     closeMateriModal();
-    loadMateri();
+    await loadMateri();
   } catch (err) {
-    alert("Gagal menyimpan: " + (err.message || "Terjadi kesalahan"));
+    alert("Gagal menyimpan: " + (err.error || err.message || "Terjadi kesalahan"));
   }
 });
 
@@ -562,3 +599,46 @@ window.handleLogout = function() {
   // Menggunakan replace agar user tidak bisa klik "Back" kembali ke dashboard
   window.location.replace("/login");
 };
+
+
+/* ================== RESPONSIF =================*/
+document.querySelector('.calendar-card')?.addEventListener('click', function () {
+  this.classList.toggle('expanded');
+});
+
+const menuBtn = document.getElementById("mobileMenuBtn");
+const sidebar = document.querySelector(".sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+
+if (menuBtn && sidebar && overlay) {
+  menuBtn.addEventListener("click", () => {
+      sidebar.classList.add("show");
+      overlay.classList.add("show");
+  });
+
+  overlay.addEventListener("click", () => {
+      sidebar.classList.remove("show");
+      overlay.classList.remove("show");
+  });
+}
+
+document.querySelectorAll(".nav-link").forEach(link => {
+  link.addEventListener("click", () => {
+      if (window.innerWidth <= 768) {
+          sidebar.classList.remove("show");
+          overlay.classList.remove("show");
+      }
+  });
+});
+
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+
+mobileMenuBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+});
+
+overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+});

@@ -306,32 +306,36 @@ exports.updatePengajar = async (req, res) => {
 
 
 /* =========================================
-   5. Delete Pengajar
+   5. Delete Pengajar (PERBAIKAN)
 ========================================= */
 exports.deletePengajar = async (req, res) => {
+  const client = await db.connect();
   try {
     const { id_pengajar } = req.params;
+    await client.query("BEGIN");
 
-    const check = await db.query(
-      `SELECT * FROM pengajar WHERE id_pengajar=$1`,
+    const check = await client.query(
+      `SELECT id_users, email FROM pengajar WHERE id_pengajar=$1`,
       [id_pengajar]
     );
+
     if (check.rowCount === 0) {
+      await client.query("ROLLBACK");
       return res.status(404).json({ message: "Pengajar tidak ditemukan" });
     }
 
-    const id_users = check.rows[0].id_users;
+    const { id_users, email } = check.rows[0];
 
-    await db.query(`DELETE FROM pengajar WHERE id_pengajar=$1`, [id_pengajar]);
-    await db.query(`DELETE FROM users WHERE id_users=$1`, [id_users]);
+    // Hapus dari pendaftar dan users
+    await client.query(`DELETE FROM pendaftar WHERE email = $1`, [email]);
+    await client.query(`DELETE FROM users WHERE id_users = $1`, [id_users]);
 
-    res.json({
-      message: "Pengajar berhasil dihapus",
-      id_pengajar
-    });
-
+    await client.query("COMMIT");
+    res.json({ message: "Pengajar berhasil dihapus sepenuhnya" });
   } catch (err) {
-    console.error("DELETE PENGAJAR ERROR:", err);
+    await client.query("ROLLBACK");
     res.status(500).json({ message: "Terjadi kesalahan server" });
+  } finally {
+    client.release();
   }
 };

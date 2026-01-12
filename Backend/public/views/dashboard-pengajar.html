@@ -9,8 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="page-dashboard-pengajar"> <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
+<body class="page-dashboard-pengajar"> 
+    
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+   
     <div class="container">
         <aside class="sidebar">
             <div class="logo">
@@ -44,10 +46,6 @@
             </nav>
             <div class="sidebar-footer">
                 <ul>
-                    <li id="btn-open-profil" onclick="openProfil()" style="cursor: pointer;">
-                        <i class="fas fa-user-cog"></i>
-                        <span>Profil Pengajar</span>
-                    </li>
                     <li onclick="handleLogout()" style="cursor: pointer;">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Keluar</span>
@@ -59,7 +57,7 @@
         <main class="main-wrapper">
             <div class="main-content">
                 <header class="top-header">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display: none;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
                         <i class="fas fa-bars"></i>
                     </button>
 
@@ -81,7 +79,7 @@
                                 <p id="mini-phone"><i class="fab fa-whatsapp"></i> 08xxxxxxxxxx</p>
                                 <hr>
                                 <button onclick="openProfil()" class="btn-edit-profil">
-                                    <i class="fas fa-user-edit"></i> Pengaturan Profil
+                                    <li class="setting" onclick="openProfil()"><i class="fas fa-cog"></i> Pengaturan</li>
                                 </button>
                             </div>
                         </div>

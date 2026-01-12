@@ -1,4 +1,6 @@
 const db = require("../config/db");
+const path = require("path"); // Tambahkan ini
+const fs = require("fs");
 
 // Helper internal untuk mendapatkan ID Pengajar/Santri dari ID Users
 async function getRoleSpecificId(id_users, role) {
@@ -176,39 +178,32 @@ exports.getTugasByKelasPengajar = async (req, res) => {
 exports.updateMateri = async (req, res) => {
   try {
     const { judul, deskripsi, tipe_konten, link_url } = req.body;
+    const { id } = req.params;
     const id_pengajar = await getRoleSpecificId(req.user.id_users, "pengajar");
 
-    if (!id_pengajar) {
-      return res.status(403).json({
-        error: "Akun pengajar tidak terdaftar"
-      });
-    }
+    // 1. Ambil data materi lama untuk mendapatkan nama file
+    const oldMateri = await db.query("SELECT file_path FROM materi_ajar WHERE id_materi = $1", [id]);
+    const oldFileName = oldMateri.rows[0]?.file_path;
 
-    let query = `
-      UPDATE materi_ajar 
-      SET judul=$1, deskripsi=$2, tipe_konten=$3, link_url=$4
-    `;
+    let query = `UPDATE materi_ajar SET judul=$1, deskripsi=$2, tipe_konten=$3, link_url=$4`;
     let params = [judul, deskripsi, tipe_konten, link_url || null];
 
     if (req.file) {
+      // 2. Jika ada file baru, hapus file fisik yang lama
+      if (oldFileName) deletePhysicalFile(oldFileName, "materi");
+      
       query += `, file_path=$5 WHERE id_materi=$6 AND id_pengajar=$7`;
-      params.push(req.file.filename, req.params.id, id_pengajar);
+      params.push(req.file.filename, id, id_pengajar);
     } else {
       query += ` WHERE id_materi=$5 AND id_pengajar=$6`;
-      params.push(req.params.id, id_pengajar);
+      params.push(id, id_pengajar);
     }
 
     const result = await db.query(query, params);
+    if (result.rowCount === 0) return res.status(404).json({ error: "Materi tidak ditemukan" });
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        error: "Materi tidak ditemukan atau bukan milik Anda"
-      });
-    }
-
-    res.json({ success: true, message: "Materi berhasil diperbarui" });
+    res.json({ success: true, message: "Materi diperbarui dan file lama dibersihkan" });
   } catch (err) {
-    console.error("UPDATE MATERI ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -230,10 +225,17 @@ exports.updateTugas = async (req, res) => {
       return res.status(400).json({ error: "Deadline wajib diisi" });
     }
 
+    const oldTugas = await db.query("SELECT file_path FROM tugas WHERE id_tugas = $1", [id]);
+    const oldFileName = oldTugas.rows[0]?.file_path;
+    // ----------------------------
+
     let query;
     let params;
 
     if (req.file) {
+      // 2. Jika ada file baru, hapus file lama secara fisik
+      if (oldFileName) deletePhysicalFile(oldFileName, "tugas");
+
       query = `UPDATE tugas SET deskripsi=$1, deadline=$2, link_url=$3, file_path=$4 
                WHERE id_tugas=$5 AND id_pengajar=$6 RETURNING *`;
       params = [deskripsi, deadline, link_url || null, req.file.filename, id, id_pengajar];
@@ -293,17 +295,22 @@ exports.submitTugasSantri = async (req, res) => {
       });
     }
 
-    // 4️⃣ SIMPAN PENGUMPULAN
-    await db.query(
-      `INSERT INTO pengumpulan_tugas (id_tugas, id_santri, file_path, link_url)
-       VALUES ($1, $2, $3, $4)`,
-      [
-        id_tugas,
-        id_santri,
-        req.file?.filename || null,
-        req.body.link_url || null
-      ]
-    );
+// 4️⃣ SIMPAN PENGUMPULAN
+const sekarang = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"});
+
+await db.query(
+  `INSERT INTO pengumpulan_tugas (id_tugas, id_santri, file_path, link_url, jawaban_teks, submitted_at)
+   VALUES ($1, $2, $3, $4, $5, $6)`, 
+  [
+    id_tugas,
+    id_santri,
+    req.file?.filename || null,
+    req.body.link_url || null,
+    req.body.jawaban_teks || null,
+    sekarang // Memaksa jam Jakarta masuk ke kolom submitted_at
+  ]
+);
+
 
     res.json({ success: true, message: "Tugas berhasil dikirim" });
 
@@ -369,7 +376,6 @@ exports.getTugasByKelas = async (req, res) => {
 };
 
 
-// ================ MY SUBMIT (LIHAT TUGAS SENDIRI)===================
 // ================ MY SUBMIT (LIHAT TUGAS SENDIRI) ===================
 exports.getMySubmission = async (req, res) => {
   try {
@@ -382,7 +388,7 @@ exports.getMySubmission = async (req, res) => {
         pt.link_url,
         pt.submitted_at,
         pt.nilai,
-        pt.jawaban_teks AS catatan_santri, -- Pastikan alias ini ada
+        pt.jawaban_teks, -- JANGAN PAKAI ALIAS BERBEDA
         pt.catatan_pengajar
        FROM pengumpulan_tugas pt
        WHERE pt.id_tugas = $1
@@ -396,7 +402,7 @@ exports.getMySubmission = async (req, res) => {
 
     res.json({
       submitted: true,
-      data: result.rows[0]
+      data: result.rows[0] // data.jawaban_teks sekarang tersedia
     });
 
   } catch (err) {
@@ -439,3 +445,17 @@ exports.getStatusPengumpulan = async (req, res) => {
   }
 };
 
+
+// Gunakan kata kunci 'function' agar bisa dipanggil dari baris mana pun
+function deletePhysicalFile(fileName, subFolder) {
+  if (!fileName) return;
+  try {
+    const filePath = path.join(__dirname, "../../public/uploads", subFolder, fileName);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`✅ File lama dihapus: ${filePath}`);
+    }
+  } catch (error) {
+    console.error(`❌ Gagal menghapus file fisik: ${error.message}`);
+  }
+}

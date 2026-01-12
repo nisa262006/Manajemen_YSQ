@@ -9,6 +9,44 @@ let materiCache = [];
 function getUrlParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
+
+}
+
+// Fungsi PASTI sesuai tanggal laptop (Perbaikan dari sebelumnya)
+function setTanggalHariIni() {
+    const el = document.getElementById("tanggal-hari-ini");
+    if (!el) return;
+    const now = new Date();
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    el.textContent = now.toLocaleDateString('id-ID', options);
+}
+
+function getTodayISO() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+// Tambahkan fungsi setText yang mungkin ikut hilang
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? "-";
+}
+
+
+// 🔧 FIX PATH uploads (TANPA ROMBAK)
+function fixUploadPath(filePath, folder = "") {
+    if (!filePath) return null;
+
+    // Jika DB sudah simpan "/uploads/..."
+    if (filePath.startsWith("/uploads")) return filePath;
+
+    // Jika DB hanya simpan nama file
+    return folder
+        ? `/uploads/${folder}/${filePath}`
+        : `/uploads/${filePath}`;
 }
 
 // Fungsi PASTI sesuai tanggal laptop (Perbaikan dari sebelumnya)
@@ -38,11 +76,14 @@ function setText(id, value) {
     INITIALIZATION & PAGE DETECTION
 ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
+
     setTanggalHariIni();
 
     if (document.getElementById("jadwal-body")) {
         initDashboardSantri();
     }
+
+    setTanggalHariIni(); // Set tanggal di pojok kanan atas
 
     // 2. Deteksi Halaman Dashboard
     if (document.getElementById("jadwal-body")) {
@@ -54,27 +95,39 @@ document.addEventListener("DOMContentLoaded", () => {
         initListMateriSantri();
     }
 
+    if (document.getElementById("jadwal-body")) {
+        initDashboardSantri();
+    }
+
     const subForm = document.getElementById("submissionForm");
     if (subForm) {
         subForm.addEventListener("submit", handleSubmission);
     }
 
-    const fileInput = document.getElementById("audioFile");
-    if (fileInput) {
-        fileInput.addEventListener("change", function () {
-            const fileNameDisplay = document.querySelector(".audio-upload-box p");
-            const fileStatusInfo = document.getElementById("fileStatusInfo");
+   // Di santri.js (Bagian DOMContentLoaded)
+const fileInput = document.getElementById("audioFile");
+if (fileInput) {
+    fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB sesuaikan dengan backend
 
-            if (this.files && this.files.length > 0) {
-                const name = this.files[0].name;
-                if (fileNameDisplay) fileNameDisplay.textContent = "File Terpilih";
-                if (fileStatusInfo) {
-                    fileStatusInfo.innerHTML =
-                        `<i class='bx bx-check-circle'></i> Siap kirim: <strong>${name}</strong>`;
-                }
-            }
-        });
-    }
+        if (file && file.size > MAX_SIZE) {
+            alert(`File "${file.name}" terlalu besar! Maksimal ukuran adalah 10MB.`);
+            this.value = ""; // Reset input agar tidak jadi diupload
+            return;
+        }
+
+        // Jika lolos validasi, tampilkan nama file seperti biasa
+        const fileNameDisplay = document.querySelector(".audio-upload-box p");
+        const fileStatusInfo = document.getElementById("fileStatusInfo");
+        if (fileNameDisplay) fileNameDisplay.textContent = "File Terpilih";
+        if (fileStatusInfo) {
+            fileStatusInfo.innerHTML = `<i class='bx bx-check-circle'></i> Siap kirim: <strong>${file.name}</strong>`;
+        }
+    });
+}
+
+    
 });
 
 
@@ -224,9 +277,9 @@ window.showDetailMateri = async function (idMateri) {
     const materiFileBox = document.getElementById("det-materi-file-container");
     if (materiFileBox) {
         materiFileBox.innerHTML = "";
-        if (materi.file_path) {
+        if (fixUploadPath(materi.file_path)) {
             materiFileBox.innerHTML = `
-                <a href="/uploads/materi/${materi.file_path}" target="_blank" class="file-link">
+               <a href="${fixUploadPath(materi.file_path, 'materi')}" target="_blank">
                     <i class="fas fa-file-download"></i> Unduh File Materi
                 </a>`;
         } else if (materi.link_url) {
@@ -267,7 +320,7 @@ window.showDetailMateri = async function (idMateri) {
             tugasFileBox.innerHTML = "";
             if (materi.file_tugas) {
                 tugasFileBox.innerHTML = `
-                    <a href="/uploads/tugas/${materi.file_tugas}" target="_blank" class="file-link" style="background: #fdf2f2; color: #991b1b; border: 1px solid #fecaca;">
+                    <a href="${fixUploadPath(materi.file_tugas, 'tugas')}" target="_blank" class="file-link" style="background: #fdf2f2; color: #991b1b; border: 1px solid #fecaca;">
                         <i class="fas fa-file-pdf"></i> Unduh Panduan Tugas
                     </a>`;
             } else if (materi.link_tugas) {
@@ -291,11 +344,11 @@ window.showDetailMateri = async function (idMateri) {
 };
   
 ///====================================================================
-  async function handleSubmission(e) {
+async function handleSubmission(e) {
     e.preventDefault();
     
-    // Ambil element
     const idTugasInput = document.getElementById("active-id-tugas");
+    const catatan = document.getElementById("jawaban-teks").value; // Ambil nilai textarea
     const fileInput = document.getElementById("audioFile");
     const linkInput = document.getElementById("link-tugas");
     const btn = e.target.querySelector('button[type="submit"]');
@@ -303,7 +356,7 @@ window.showDetailMateri = async function (idMateri) {
     const id_tugas = idTugasInput ? idTugasInput.value : null;
 
     if (!id_tugas) {
-        return alert("Error: ID Tugas tidak ditemukan. Coba refresh halaman.");
+        return alert("Error: ID Tugas tidak ditemukan.");
     }
 
     if (!fileInput.files[0] && !linkInput.value.trim()) {
@@ -311,9 +364,10 @@ window.showDetailMateri = async function (idMateri) {
     }
 
     const formData = new FormData();
+    // Hapus append ganda, cukup lakukan sekali di sini:
     formData.append("id_tugas", id_tugas);
+    formData.append("jawaban_teks", catatan); 
     
-    // Nama field harus "file" agar dibaca oleh upload.single("file") di backend
     if (fileInput.files[0]) {
         formData.append("file", fileInput.files[0]);
     }
@@ -362,27 +416,32 @@ async function cekPengumpulanSaya(idTugas) {
             formSection.style.display = "none"; 
             infoSection.style.display = "block";
             
-            // Cek Lampiran
+            // --- FIX JAM (Force to Local WIB) ---
+            const options = { 
+                day: '2-digit', month: '2-digit', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false 
+            };
+            const waktuKirim = new Date(data.submitted_at).toLocaleString('id-ID', options).replace(/\./g, ':');
+
+            // --- FIX LOGIKA LAMPIRAN ---
             let lampiranHTML = "";
             if (data.file_path) {
-                lampiranHTML = `<a href="/uploads/tugas/${data.file_path}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
-                                    <i class='bx bx-file'></i> Lihat File yang Dikirim
-                                </a>`;
+                const fullPath = fixUploadPath(data.file_path, 'submit');
+                lampiranHTML = `<a href="${fullPath}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;"><i class='bx bx-file'></i> Lihat File yang Dikirim</a>`;
             } else if (data.link_url) {
-                lampiranHTML = `<a href="${data.link_url}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
-                                    <i class='bx bx-link'></i> Buka Link yang Dikirim
-                                </a>`;
+                lampiranHTML = `<a href="${data.link_url}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;"><i class='bx bx-link'></i> Buka Link yang Dikirim</a>`;
             } else {
                 lampiranHTML = "<span style='color: #94a3b8;'>Tidak ada lampiran</span>";
             }
 
-            // Render Tampilan Sesuai Request
+            // Render Tampilan (Perhatikan variabel data.jawaban_teks)
             infoSection.innerHTML = `
                 <div style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 12px; position: relative;">
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; font-weight: bold; color: #64748b; font-size: 0.75rem; text-transform: uppercase;">Catatan/Jawaban Anda:</label>
                         <p style="margin-top: 5px; color: #1e293b; font-size: 0.95rem; line-height: 1.5;">
-                            ${data.catatan_santri || "<i>Tidak ada catatan.</i>"}
+                            ${data.jawaban_teks || "<i>Tidak ada catatan.</i>"} 
                         </p>
                     </div>
 
@@ -392,7 +451,7 @@ async function cekPengumpulanSaya(idTugas) {
                     </div>
 
                     <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-                        <small style="color: #94a3b8;">Dikirim pada: ${new Date(data.submitted_at).toLocaleString('id-ID')}</small>
+                        <small style="color: #94a3b8;">Dikirim pada: ${waktuKirim}</small>
                     </div>
 
                     <div style="position: absolute; bottom: 15px; right: 15px; text-align: right;">
@@ -402,7 +461,6 @@ async function cekPengumpulanSaya(idTugas) {
                         </div>
                     </div>
                 </div>
-                
                 ${data.catatan_pengajar ? `
                     <div style="margin-top: 15px; padding: 10px; background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 4px;">
                         <small style="font-weight: bold; color: #b45309;">Catatan Pengajar:</small>

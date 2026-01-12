@@ -129,10 +129,12 @@ function initAbsensiPengajar() {
 /* ======================================================
    LOGIKA ABSENSI SANTRI
 ====================================================== */
+/* ======================================================
+   LOGIKA ABSENSI SANTRI (FIXED)
+====================================================== */
 function initAbsensiSantri() {
     const pilihKelas = $("pilih_kelas");
     const pilihSantri = $("pilih_santri");
-    // Cek apakah ini halaman riwayat absensi santri
     if (!pilihKelas || !pilihSantri) return;
 
     const dateInputs = document.querySelectorAll('.attendance-filter-horizontal input[type="date"]');
@@ -147,16 +149,21 @@ function initAbsensiSantri() {
 
     let allAbsensi = [];
     let allSantri = [];
+    let allKelas = [];
     let filteredAbsensi = [];
 
     async function init() {
         setDefaultDate(startDate, endDate); 
-        const [absRes, santriRes] = await Promise.all([
+        // PERBAIKAN: Menambahkan apiGet("/kelas") ke dalam array Promise
+        const [absRes, santriRes, kelasRes] = await Promise.all([
             apiGet("/absensi/santri/all"),
-            apiGet("/santri?limit=9999")
+            apiGet("/santri?limit=9999"),
+            apiGet("/kelas") 
         ]);
+
         allAbsensi = absRes?.data ?? absRes ?? [];
         allSantri = santriRes?.data ?? santriRes ?? [];
+        allKelas = kelasRes?.data ?? kelasRes ?? [];
 
         renderDropdownKelas();
         renderDropdownSantri();
@@ -164,10 +171,12 @@ function initAbsensiSantri() {
     }
 
     function renderDropdownKelas() {
-        const kelasSet = [...new Set(allSantri.map(s => s.nama_kelas).filter(Boolean))];
         pilihKelas.innerHTML = `<option value="">Semua Kelas</option>`;
-        kelasSet.forEach(k => {
-            pilihKelas.innerHTML += `<option value="${k}">${k}</option>`;
+        allKelas.forEach(k => {
+            // Hilangkan karakter "-" dari dropdown
+            if (k.nama_kelas && k.nama_kelas !== "-") {
+                pilihKelas.innerHTML += `<option value="${k.nama_kelas}">${k.nama_kelas}</option>`;
+            }
         });
     }
 
@@ -201,16 +210,22 @@ function initAbsensiSantri() {
 
     function renderTable() {
         tableBody.innerHTML = filteredAbsensi.length ? "" : `<tr><td colspan="5" align="center">Tidak ada data</td></tr>`;
-        filteredAbsensi.sort((a, b) => fixDateDisplay(b.tanggal).localeCompare(fixDateDisplay(a.tanggal)));
+        
+        // Urutkan berdasarkan tanggal terbaru
+        const sorted = [...filteredAbsensi].sort((a, b) => fixDateDisplay(b.tanggal).localeCompare(fixDateDisplay(a.tanggal)));
 
-        filteredAbsensi.forEach(a => {
+        sorted.forEach(a => {
+            // PERBAIKAN TAMPILAN: Hilangkan strip "-"
+            const displayKelas = (a.nama_kelas && a.nama_kelas !== "-") ? a.nama_kelas : "Tanpa Kelas";
+            const displayCatatan = (a.catatan && a.catatan !== "-") ? a.catatan : "";
+
             tableBody.innerHTML += `
                 <tr>
                     <td>${fixDateDisplay(a.tanggal)}</td>
                     <td>${a.nama_santri}</td>
-                    <td>${a.nama_kelas}</td>
+                    <td>${displayKelas}</td>
                     <td><span class="status-badge ${a.status_absensi?.toLowerCase()}">${a.status_absensi}</span></td>
-                    <td>${a.catatan ?? "-"}</td>
+                    <td>${displayCatatan}</td>
                 </tr>`;
         });
     }

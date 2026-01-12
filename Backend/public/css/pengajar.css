@@ -2309,43 +2309,45 @@ input[type="date"] {
   }
   
 /*============== MOBILE ATAU TAB =====================*/
-/* =========================================================
-   MOBILE MODE (TABLET & HP)
-   ========================================================= */
-   @media (max-width: 768px) {
+/* ================== RESPONSIVE STYLES ================= */
 
+/* =====================================================
+   MOBILE DASHBOARD PENGAJAR (AMAN DESKTOP)
+   ===================================================== */
+
+/* Default: sembunyikan tombol hamburger di desktop */
+.mobile-menu-btn {
+    display: none;
+}
+
+/* ======================
+   TABLET & MOBILE
+   ====================== */
+@media (max-width: 1024px) {
+
+    /* ---------------------
+       GLOBAL FIX
+    --------------------- */
     body {
         overflow: auto;
     }
 
     .container {
         flex-direction: column;
+        height: auto;
     }
 
-    /* =========================
-       HEADER / APP BAR
-       ========================= */
-    header {
-        position: sticky;
-        top: 0;
-        z-index: 999;
-        background: var(--bg-color);
-        padding: 10px 15px;
-        gap: 10px;
+    /* ---------------------
+       HEADER
+    --------------------- */
+    .top-header {
+        gap: 12px;
     }
 
-    header h1 {
+    .top-header h1 {
         font-size: 18px;
-        flex: 1;
-        text-align: center;
     }
 
-    .user-profile {
-        padding: 6px 12px;
-        font-size: 13px;
-    }
-
-    /* Tombol Hamburger */
     .mobile-menu-btn {
         display: block;
         background: none;
@@ -2355,417 +2357,684 @@ input[type="date"] {
         cursor: pointer;
     }
 
-    /* =========================
-       SIDEBAR → DRAWER
-       ========================= */
+    /* ---------------------
+       SIDEBAR (OFF CANVAS)
+    --------------------- */
     .sidebar {
         position: fixed;
-        left: -260px;
         top: 0;
-        width: 260px;
+        left: -260px;
         height: 100vh;
-        transition: 0.3s ease;
-        z-index: 1200;
+        width: 260px;
+        transition: left 0.3s ease;
+        z-index: 1001;
     }
 
-    .sidebar.show {
+    .sidebar.active {
         left: 0;
     }
 
-    /* Overlay saat sidebar terbuka */
     .sidebar-overlay {
-        display: none;
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.45);
-        z-index: 1100;
+        display: none;
+        z-index: 1000;
     }
-    
-    .sidebar-overlay.show {
+
+    .sidebar-overlay.active {
         display: block;
     }
-    
 
-    /* =========================
+    /* ---------------------
        MAIN CONTENT
-       ========================= */
+    --------------------- */
     .main-content {
-        padding: 15px !important;
+        padding: 20px 16px;
         height: auto;
     }
 
-    /* =========================
-       DASHBOARD LAYOUT
-       ========================= */
-    .dashboard-layout {
+    /* ---------------------
+       STAT CARDS
+    --------------------- */
+    .stats-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 30px;
     }
 
-    .right-column {
-        margin-right: 0;
+    .card {
+        padding: 18px;
+        border-radius: 16px;
     }
 
-    /* =========================
-       STATS ROW → STACK
-       ========================= */
-    .stats-row {
-        flex-direction: column;
+    .info-card h4 {
+        font-size: 16px;
     }
 
-    .info-kelas {
-        width: 100%;
+    .info-row {
+        font-size: 14px;
     }
 
-    .mini-card {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 15px;
+    /* ---------------------
+       USER PROFILE (HEADER)
+    --------------------- */
+    .user-profile {
+        padding: 6px 12px;
     }
 
-    .mini-card i {
-        font-size: 22px;
+    .user-name {
+        display: none; /* hanya avatar di mobile */
     }
 
-    /* =========================
-       TABLE → SCROLL HORIZONTAL
-       ========================= */
-    .table-wrapper {
+    /* ---------------------
+       TABLE SECTION
+    --------------------- */
+    .table-section h3 {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .table-container {
         overflow-x: auto;
-        max-height: unset;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 12px;
     }
 
     table {
-        min-width: 600px;
+        min-width: 900px; /* KUNCI scroll horizontal */
     }
 
-    /* ===============================
-   MOBILE CALENDAR COLLAPSIBLE
+    th, td {
+        font-size: 13px;
+        padding: 14px;
+    }
+}
+
+/* ======================
+   EXTRA SMALL DEVICE
+   ====================== */
+@media (max-width: 480px) {
+
+    .top-header h1 {
+        font-size: 16px;
+    }
+
+    .card h2 {
+        font-size: 20px;
+    }
+
+    .card p {
+        font-size: 13px;
+    }
+
+    th, td {
+        font-size: 12px;
+        padding: 12px;
+    }
+}
+
+
+/* ===============================
+   MINI PROFIL - MOBILE FIX
    =============================== */
 @media (max-width: 768px) {
 
-    .calendar-card {
-        max-height: 70px; /* MODE KECIL */
-        overflow: hidden;
-        transition: max-height 0.4s ease;
-        cursor: pointer;
+    .mini-profil-card {
+      position: fixed;
+      top: 70px;
+      right: 12px;
+      left: 12px;
+      width: auto;
+      max-width: none;
+      border-radius: 18px;
+      padding: 16px;
+      z-index: 2000;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.18);
     }
+  
+    .mini-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    /* HEADER MINI PROFIL */
+    .mini-avatar {
+      width: 52px;
+      height: 52px;
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+  
+    .mini-card-content h3 {
+      font-size: 16px;
+      margin: 0;
+    }
+  
+    .mini-card-content p {
+      font-size: 13px;
+      margin: 0;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+  
+    /* BUTTON */
+    .btn-edit-profil {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+  
+    .btn-edit-profil i {
+      margin-right: 6px;
+    }
+  }
+  @media (max-width: 768px) {
+    .mini-profil-card::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      right: 30px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      transform: rotate(45deg);
+      border-radius: 3px;
+    }
+  }
+    
 
-    .calendar-card h3 {
-        font-size: 15px;
-        margin-bottom: 0;
-    }
+  /* =========================================
+   FIX TAMPILAN MOBILE (HP) 
+   ========================================= */
 
-    .calendar-card.expanded {
-        max-height: 400px; /* MODE TERBUKA */
-    }
-
-    .calendar-days {
-        margin-top: 10px;
-    }
+/* Sembunyikan tombol hamburger di Desktop */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--primary-green);
+    cursor: pointer;
+    margin-right: 15px;
 }
 
-
-    /* =========================
-       MODAL RESPONSIVE
-       ========================= */
-    .modal-content {
-        width: 90% !important;
-        max-width: 360px;
+@media screen and (max-width: 768px) {
+    /* 1. Header: [ ☰ ] Judul [ 👤 ] */
+    .mobile-menu-btn { display: block; }
+    
+    .top-header {
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .page-title { font-size: 1.1rem; }
+
+    /* 2. Filter: Bertumpuk Rapi */
+    .filter-card {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .filter-row-modern {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .custom-select-minimal {
+        width: 100% !important;
+        min-width: unset;
+    }
+
+    /* 3. Button Export Lebar Penuh */
+    .filter-card .btn-export {
+        position: static !important;
+        transform: none !important;
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    /* 4. Table: Scroll Samping */
+    .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto; /* Mengaktifkan scroll horizontal */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-jadwal-clean {
+        min-width: 650px; /* Lebar minimum agar tabel tidak gepeng di HP */
+    }
+    
+    .main-content {
+        padding: 15px; /* Kurangi padding samping di HP */
+    }
 }
 
 /* =========================================================
-   DESKTOP ONLY (SEMBUNYIKAN HAMBURGER)
-   ========================================================= */
-@media (min-width: 769px) {
-    .mobile-menu-btn {
-        display: none;
-    }
-}
-
-
-/* =========================================================
-   MOBILE ONLY – JADWAL KELAS (DENGAN TEKS WAKTU TURUN KE BAWAH)
+   MOBILE – KHUSUS HALAMAN ABSENSI
+   AMAN GLOBAL | TANPA UBAH HTML | TANPA RUSAK HALAMAN LAIN
    ========================================================= */
    @media (max-width: 768px) {
 
-    /* Pastikan container urut ke bawah */
-    .jadwal-page-container {
+    /* =========================
+       GLOBAL KHUSUS ABSENSI
+       ========================= */
+    .page-absensi .container {
+      flex-direction: column;
+    }
+  
+    .page-absensi .main-content {
+      padding: 15px;
+      height: auto;
+    }
+  
+    /* =========================
+       HEADER
+       ========================= */
+    .page-absensi .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: var(--bg-color);
+      padding: 12px 15px;
+      margin-bottom: 10px;
+    }
+  
+    .page-absensi .page-title {
+      font-size: 18px;
+    }
+  
+    .page-absensi .user-profile {
+      padding: 6px 12px;
+    }
+  
+    /* =========================
+       CARD UTAMA
+       ========================= */
+    .page-absensi .absensi-main-card {
+      padding: 18px;
+    }
+  
+    .page-absensi .absensi-header-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+  
+    .page-absensi .absensi-header-row h2 {
+      font-size: 17px;
+    }
+  
+    .page-absensi .btn-tambah-catatan {
+      width: 100%;
+    }
+  
+    /* =========================
+       FILTER
+       ========================= */
+    .page-absensi .filter-absen-row {
+      flex-direction: column;
+      gap: 14px;
+    }
+  
+    .page-absensi .filter-group {
+      width: 100%;
+    }
+  
+    /* =========================
+       ABSEN PENGAJAR
+       ========================= */
+    .page-absensi .absen-pengajar-input {
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .page-absensi .btn-simpan-absen {
+      width: 100%;
+    }
+  
+    /* =========================
+       JAM KELAS
+       ========================= */
+    .page-absensi .jam-result-box {
+      width: 100%;
+      justify-content: space-between;
+    }
+  
+    /* =========================
+       TABLE – SCROLL KE SAMPING
+       ========================= */
+    .page-absensi .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  
+    .page-absensi .table-absensi-santri {
+      min-width: 650px;
+    }
+  
+    .page-absensi .table-absensi-santri th,
+    .page-absensi .table-absensi-santri td {
+      white-space: nowrap;
+      font-size: 13px;
+    }
+  
+    /* =========================
+       FOOTER BUTTON
+       ========================= */
+    .page-absensi .absensi-footer {
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .page-absensi .absensi-footer .btn-simpan,
+    .page-absensi .absensi-footer .btn-view-riwayat {
+      width: 100%;
+      text-align: center;
+    }
+  
+    /* =========================
+       MODAL
+       ========================= */
+    .page-absensi .modal-content {
+      width: 92%;
+      max-width: 360px;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    /* Header dibuat sticky agar tetap di atas tapi sebagai satu baris utuh */
+    .top-header {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        background: white;
+        z-index: 999;
+        height: 60px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Tombol tidak lagi fixed, tapi mengikuti posisi header */
+    .mobile-menu-btn {
+        display: flex !important;
+        position: relative !important; /* Ubah dari fixed ke relative */
+        top: 0 !important;
+        left: 0 !important;
+        background: none !important; /* Hilangkan background kotak hijau jika ingin lebih bersih */
+        color: var(--primary-green) !important;
+        font-size: 24px !important;
+        border: none;
+        box-shadow: none !important;
+        padding: 0;
+        margin-right: 10px;
+        z-index: 10;
+    }
+
+    /* Judul berada di tengah */
+    .page-title {
+        flex: 1;
+        text-align: left;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    /* Sidebar tetap muncul menutupi layar saat aktif */
+    .sidebar {
+        z-index: 2000 !important;
+    }
+    
+    .sidebar-overlay {
+        z-index: 1500 !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Scroll samping aktif */
+        margin-top: 10px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    table {
+        min-width: 700px; /* Paksa lebar agar tabel bisa di-swipe */
+    }
+}
+
+/* =========================================================
+   FIX FINAL: RIWAYAT ABSENSI MOBILE 
+   (FILTER STACK + SUMMARY CARDS SLIDE + TABLE SCROLL)
+   ========================================================= */
+   @media screen and (max-width: 768px) {
+    
+    /* 1. SUMMARY CARDS SLIDE (SWIPE HORIZONTAL) */
+    .page-riwayat .stats-riwayat-row {
+        display: flex !important;
+        flex-direction: row !important; /* Paksa sejajar ke samping */
+        overflow-x: auto !important;    /* Aktifkan scroll horizontal */
+        overflow-y: hidden;
+        gap: 12px !important;
+        padding: 5px 5px 15px 5px !important;
+        margin-bottom: 20px !important;
+        -webkit-overflow-scrolling: touch; /* Scroll halus di iOS */
+        scroll-snap-type: x mandatory;    /* Efek magnet saat swipe */
+    }
+
+    /* Hilangkan scrollbar agar terlihat seperti aplikasi native */
+    .page-riwayat .stats-riwayat-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .page-riwayat .stat-card {
+        flex: 0 0 80% !important; /* Lebar kartu 80% layar agar kartu sebelah terlihat sedikit */
+        max-width: 300px;
+        scroll-snap-align: center; /* Kartu berhenti di tengah saat di-swipe */
+        background: white;
+        padding: 20px !important;
+        border-radius: 15px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-    }
-
-    /* Filter tetap di atas */
-    .filter-card {
-        order: 1;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .btn-export {
-        margin-left: 0;
         justify-content: center;
     }
 
-    /* =========================
-       TABEL DI PALING BAWAH
-       ========================= */
-    .table-full-card {
-        order: 2;
-        padding: 15px;
-        overflow-x: auto;        /* Scrollbar horizontal rapi di bawah */
+    /* 2. FILTER: Bertumpuk ke bawah (Stack) */
+    .page-riwayat .filter-riwayat-row,
+    .page-riwayat .filter-container {
+        display: flex !important;
+        flex-direction: column !important; 
+        width: 100% !important;
+        gap: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .page-riwayat .filter-item {
+        width: 100% !important;
+    }
+
+    /* Input & Button Tinggi 48px */
+    .page-riwayat .filter-item select,
+    .page-riwayat .filter-item input,
+    .page-riwayat .btn-export {
+        width: 100% !important;
+        height: 48px !important;
+        border-radius: 10px !important;
+        font-size: 14px !important;
+    }
+
+    .page-riwayat .btn-export {
+        background-color: #217346 !important;
+        color: white !important;
+        border: none !important;
+        font-weight: 600 !important;
+        margin-top: 5px;
+    }
+
+    /* 3. TABEL: Scroll Samping Rapi */
+    .page-riwayat .table-container {
+        width: 100% !important;
+        overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;
+        background: white;
         border-radius: 12px;
-        background: #fff;
+        border: 1px solid #eee;
     }
 
-    /* Pengaturan tabel agar kolom waktu bisa wrap */
-    .table-full-card table {
-        min-width: 600px;        /* Lebar minimal agar tidak terlalu sempit */
-        width: 100%;
-        border-collapse: collapse;
+    .page-riwayat .table-riwayat {
+        min-width: 900px !important; /* Paksa lebar agar tidak gepeng */
     }
 
-    /* HILANGKAN SEMUA KETERANGAN TEKS YANG MENGGANGGU DI ATAS JUDUL */
-    .table-full-card::after, 
-    .table-wrapper::after,
-    .table-full-card::before {
-        display: none !important;
-        content: none !important;
-    }
-
-    /* Pengaturan Baris Header dan Data */
-    .table-full-card th, 
-    .table-full-card td {
-        padding: 12px 8px;
-        text-align: left;
-    }
-
-    /* KHUSUS KOLOM WAKTU: JIKA TIDAK MUAT AKAN TURUN KE BAWAH */
-    .table-full-card td:nth-child(2) {
-        white-space: normal;      /* Mengizinkan teks turun ke bawah */
-        min-width: 100px;         /* Memberi ruang agar wrap tidak terlalu ekstrem */
-        line-height: 1.4;
-    }
-
-    /* Kolom lainnya tetap satu baris agar rapi saat scroll */
-    .table-full-card td:not(:nth-child(2)) {
-        white-space: nowrap;
-    }
-
-    /* Supaya judul tidak nempel layar */
-    .table-full-card h3 {
-        margin-bottom: 10px;
+    .page-riwayat .table-riwayat th,
+    .page-riwayat .table-riwayat td {
+        padding: 12px 15px !important;
+        white-space: nowrap !important;
+        font-size: 13px !important;
     }
 }
 
-/* ==========================================================================
-   OPTIMASI HALAMAN ABSENSI (MOBILE SCROLLABLE TABLE)
-   JANGAN UBAH BAGIAN INI AGAR TAMPILAN DEKSTOP TETAP AMAN
-   ========================================================================== */
-
-   .absensi-main-card {
-    padding: 30px;
-    margin-top: 20px;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-/* Container utama tabel agar bisa scroll ke samping di HP */
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto; /* Mengizinkan scroll horizontal */
-    overflow-y: hidden;
-    margin-top: 20px;
-    border-radius: 8px;
-    border: 1px solid #f0f0f0;
-    -webkit-overflow-scrolling: touch; /* Scroll halus di iOS */
-}
-
-/* Pastikan tabel memiliki lebar minimum di HP agar tidak gepeng */
-.table-absensi-santri {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 750px; /* MEMAKSA TABEL PANJANG KE SAMPING DI MOBILE */
-    table-layout: fixed; /* Menjaga lebar kolom sesuai TH */
-}
-
-.table-absensi-santri thead th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #275238;
-    padding: 15px;
-    text-align: left;
-    color: #555;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.table-absensi-santri tbody td {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    vertical-align: middle;
-    font-size: 14px;
-    color: #333;
-}
-
-/* Pengaturan Lebar Kolom (Sesuai Struktur HTML Anda) */
-.table-absensi-santri th:nth-child(1), 
-.table-absensi-santri td:nth-child(1) { width: 60px; text-align: center; } /* NO */
-
-.table-absensi-santri th:nth-child(2), 
-.table-absensi-santri td:nth-child(2) { width: 250px; } /* NAMA SANTRI */
-
-.table-absensi-santri th:nth-child(3), 
-.table-absensi-santri td:nth-child(3) { width: 220px; } /* STATUS KEHADIRAN */
-
-.table-absensi-santri th:nth-child(4), 
-.table-absensi-santri td:nth-child(4) { width: 220px; } /* CATATAN */
-
-/* Responsive Adjustments for Mobile Only */
-@media screen and (max-width: 768px) {
-    .absensi-main-card {
-        padding: 15px; /* Perkecil padding kartu di HP agar ruang scroll lebih luas */
+/* =========================================================
+   FIX FINAL: MATERI AJAR MOBILE - SESUAI SKETSA USER
+   ========================================================= */
+   @media screen and (max-width: 768px) {
+    /* Pastikan body bisa scroll */
+    .page-materi, body.page-materi {
+        overflow-y: auto !important;
+        height: auto !important;
+        background-color: #f8f9fa;
     }
 
-    .absensi-header-row {
-        flex-direction: column;
-        align-items: flex-start;
+    /* 1. APP BAR (Header) - Ikon Hamburger + Judul */
+    .page-materi .top-header {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0 15px;
+        background: #ffffff;
+        height: 60px;
+        z-index: 1100;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .page-materi .mobile-menu-btn {
+        display: block !important;
+        margin-right: 15px;
+        font-size: 22px;
+    }
+
+    .page-materi .page-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    /* 2. FILTER & TOMBOL (Stacked/Bertumpuk) */
+    .page-materi .materi-controls-bar {
+        padding: 15px;
+        background: transparent;
+    }
+
+    .page-materi .filter-group-wrapper {
+        display: flex;
+        flex-direction: column; /* PAKSA BERTUMPUK */
         gap: 15px;
     }
 
-    .filter-absen-row {
-        flex-direction: column;
-        gap: 12px;
+    .page-materi .filter-item {
+        width: 100% !important;
+        border-left: none !important; /* Hapus border samping */
+        background: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        border: 1px solid #eee;
     }
 
-    .absen-pengajar-input {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+    .page-materi .filter-item label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+        display: block;
     }
 
-    .absen-pengajar-input .btn-simpan-absen {
-        width: 100%;
-        margin-left: 0;
+    .page-materi .select-clean, 
+    .page-materi .input-date-clean {
+        width: 100% !important;
+        height: 40px;
+        border: none !important;
+        font-size: 14px;
+        background: transparent;
     }
 
-    .absensi-footer {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .absensi-footer button, 
-    .absensi-footer a {
-        width: 100%;
-        text-align: center;
+    /* Tombol Tambah Materi Utama (Di bawah filter) */
+    .page-materi .btn-buat-materi-utama {
+        width: 100% !important;
+        height: 50px;
+        border-radius: 12px;
+        margin-top: 5px;
         justify-content: center;
+        font-size: 15px;
+        box-shadow: 0 4px 12px rgba(45, 90, 63, 0.2);
     }
 
-    /* Indikator scroll di HP */
-    .table-wrapper::after {
-        content: '← Geser untuk lihat detail →';
+    /* 3. INDIKATOR GESER */
+    .page-materi .table-container::before {
+        content: "⇆ Geser tabel ke kanan untuk detail";
         display: block;
         text-align: center;
         font-size: 11px;
         color: #999;
-        padding: 10px 0;
-        background: #fdfdfd;
-    }
-}
-
-/* ==========================================================================
-   OPTIMASI HALAMAN RIWAYAT ABSENSI (MOBILE SCROLLABLE TABLE)
-   TIDAK MENGUBAH TAMPILAN DESKTOP
-   ========================================================================== */
-
-   .riwayat-main-card {
-    padding: 30px;
-    margin-top: 20px;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-/* Container utama tabel agar bisa scroll ke samping di HP */
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto; /* Mengaktifkan scroll horizontal */
-    overflow-y: hidden;
-    margin-top: 20px;
-    border-radius: 12px;
-    border: 1px solid #f0f0f0;
-    -webkit-overflow-scrolling: touch; /* Scroll halus di iOS */
-}
-
-/* Memaksa tabel panjang ke samping di Mobile */
-.table-riwayat {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1000px; /* Nilai ini memastikan tabel memanjang ke samping di HP */
-    table-layout: fixed; /* Menjaga konsistensi lebar kolom */
-}
-
-.table-riwayat th {
-    background: #fcfcfc;
-    color: #999;
-    font-size: 11px;
-    text-transform: uppercase;
-    padding: 15px;
-    border-bottom: 2px solid #f0f0f0;
-    text-align: left;
-}
-
-.table-riwayat td {
-    padding: 18px 15px;
-    border-bottom: 1px solid #f5f5f5;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-/* Pengaturan Lebar Kolom agar rapi saat di-scroll */
-.table-riwayat th:nth-child(1), .table-riwayat td:nth-child(1) { width: 50px; text-align: center; } /* NO */
-.table-riwayat th:nth-child(2), .table-riwayat td:nth-child(2) { width: 180px; } /* NAMA */
-.table-riwayat th:nth-child(3), .table-riwayat td:nth-child(3) { width: 150px; } /* HARI/TANGGAL */
-.table-riwayat th:nth-child(4), .table-riwayat td:nth-child(4) { width: 120px; } /* JAM */
-.table-riwayat th:nth-child(5), .table-riwayat td:nth-child(5) { width: 130px; } /* KEHADIRAN */
-.table-riwayat th:nth-child(6), .table-riwayat td:nth-child(6) { width: 200px; } /* CATATAN SANTRI */
-.table-riwayat th:nth-child(7), .table-riwayat td:nth-child(7) { width: 200px; } /* MATERI KELAS */
-
-/* Penyesuaian Responsif Khusus Mobile */
-@media screen and (max-width: 768px) {
-    .riwayat-main-card {
-        padding: 15px;
+        margin: 10px 0;
+        font-style: italic;
     }
 
-    .filter-riwayat-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
+    /* 4. TABEL (Horizontal Scroll) */
+    .page-materi .table-container {
+        width: 100%;
+        overflow-x: auto !important;
+        background: white;
+        border-radius: 0; /* Full width di mobile lebih enak dilihat */
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .stats-riwayat-row {
-        grid-template-columns: 1fr; /* Stat card menumpuk ke bawah di HP */
-        gap: 15px;
+    .page-materi .table-materi {
+        min-width: 750px !important; /* Paksa lebar agar bisa digeser */
     }
 
-    .stat-card {
-        padding: 15px;
+    .page-materi .table-materi th, 
+    .page-materi .table-materi td {
+        padding: 15px 12px !important;
+        font-size: 13px;
+        white-space: nowrap; /* Teks tidak kepotong/turun */
     }
 
-    /* Indikator visual agar pengajar tahu tabel bisa digeser */
-    .table-wrapper::after {
-        content: '← Geser tabel untuk melihat lebih banyak →';
-        display: block;
-        text-align: center;
-        font-size: 11px;
-        color: #bbb;
-        padding: 10px 0;
-        background: #fafafa;
+    /* Tombol Aksi di dalam tabel */
+    .page-materi .btn-edit, 
+    .page-materi .btn-detail {
+        padding: 8px 12px;
     }
 }
