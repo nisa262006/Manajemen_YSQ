@@ -288,11 +288,11 @@ window.showDetailMateri = async function (idMateri) {
 };
   
 ///====================================================================
-  async function handleSubmission(e) {
+async function handleSubmission(e) {
     e.preventDefault();
     
-    // Ambil element
     const idTugasInput = document.getElementById("active-id-tugas");
+    const catatan = document.getElementById("jawaban-teks").value; // Ambil nilai textarea
     const fileInput = document.getElementById("audioFile");
     const linkInput = document.getElementById("link-tugas");
     const btn = e.target.querySelector('button[type="submit"]');
@@ -300,7 +300,7 @@ window.showDetailMateri = async function (idMateri) {
     const id_tugas = idTugasInput ? idTugasInput.value : null;
 
     if (!id_tugas) {
-        return alert("Error: ID Tugas tidak ditemukan. Coba refresh halaman.");
+        return alert("Error: ID Tugas tidak ditemukan.");
     }
 
     if (!fileInput.files[0] && !linkInput.value.trim()) {
@@ -308,9 +308,10 @@ window.showDetailMateri = async function (idMateri) {
     }
 
     const formData = new FormData();
+    // Hapus append ganda, cukup lakukan sekali di sini:
     formData.append("id_tugas", id_tugas);
+    formData.append("jawaban_teks", catatan); 
     
-    // Nama field harus "file" agar dibaca oleh upload.single("file") di backend
     if (fileInput.files[0]) {
         formData.append("file", fileInput.files[0]);
     }
@@ -359,31 +360,32 @@ async function cekPengumpulanSaya(idTugas) {
             formSection.style.display = "none"; 
             infoSection.style.display = "block";
             
+            // --- FIX JAM (Force to Local WIB) ---
+            const options = { 
+                day: '2-digit', month: '2-digit', year: 'numeric', 
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false 
+            };
+            const waktuKirim = new Date(data.submitted_at).toLocaleString('id-ID', options).replace(/\./g, ':');
+
             // --- FIX LOGIKA LAMPIRAN ---
             let lampiranHTML = "";
             if (data.file_path) {
-                // Pastikan folder adalah 'submit' dan tag <a> ditutup dengan benar
                 const fullPath = fixUploadPath(data.file_path, 'submit');
-                lampiranHTML = `
-                    <a href="${fullPath}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
-                        <i class='bx bx-file'></i> Lihat File yang Dikirim
-                    </a>`;
+                lampiranHTML = `<a href="${fullPath}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;"><i class='bx bx-file'></i> Lihat File yang Dikirim</a>`;
             } else if (data.link_url) {
-                lampiranHTML = `
-                    <a href="${data.link_url}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;">
-                        <i class='bx bx-link'></i> Buka Link yang Dikirim
-                    </a>`;
+                lampiranHTML = `<a href="${data.link_url}" target="_blank" style="color: #2d5a3f; font-weight: 600; text-decoration: underline;"><i class='bx bx-link'></i> Buka Link yang Dikirim</a>`;
             } else {
                 lampiranHTML = "<span style='color: #94a3b8;'>Tidak ada lampiran</span>";
             }
 
-            // Render Tampilan
+            // Render Tampilan (Perhatikan variabel data.jawaban_teks)
             infoSection.innerHTML = `
                 <div style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 20px; border-radius: 12px; position: relative;">
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; font-weight: bold; color: #64748b; font-size: 0.75rem; text-transform: uppercase;">Catatan/Jawaban Anda:</label>
                         <p style="margin-top: 5px; color: #1e293b; font-size: 0.95rem; line-height: 1.5;">
-                            ${data.catatan_santri || "<i>Tidak ada catatan.</i>"}
+                            ${data.jawaban_teks || "<i>Tidak ada catatan.</i>"} 
                         </p>
                     </div>
 
@@ -393,7 +395,7 @@ async function cekPengumpulanSaya(idTugas) {
                     </div>
 
                     <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e2e8f0;">
-                        <small style="color: #94a3b8;">Dikirim pada: ${new Date(data.submitted_at).toLocaleString('id-ID')}</small>
+                        <small style="color: #94a3b8;">Dikirim pada: ${waktuKirim}</small>
                     </div>
 
                     <div style="position: absolute; bottom: 15px; right: 15px; text-align: right;">
@@ -403,7 +405,6 @@ async function cekPengumpulanSaya(idTugas) {
                         </div>
                     </div>
                 </div>
-                
                 ${data.catatan_pengajar ? `
                     <div style="margin-top: 15px; padding: 10px; background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 4px;">
                         <small style="font-weight: bold; color: #b45309;">Catatan Pengajar:</small>

@@ -84,8 +84,10 @@ exports.getJadwalById = async (req, res) => {
 exports.updateJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
-    const { hari, jam_mulai, jam_selesai, kategori, id_pengajar } = req.body;
+    // Tambahkan id_kelas dan kapasitas di sini
+    const { hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_kelas, kapasitas } = req.body;
 
+    // 1. Update Tabel Jadwal
     await db.query(
       `UPDATE jadwal 
        SET hari=$1, jam_mulai=$2, jam_selesai=$3, kategori=$4, id_pengajar=$5
@@ -93,7 +95,15 @@ exports.updateJadwal = async (req, res) => {
       [hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_jadwal]
     );
 
-    res.json({ message: "Jadwal berhasil diupdate" });
+    // 2. Update Tabel Kelas (Kapasitas/Jumlah Siswa Maks)
+    if (id_kelas && kapasitas) {
+      await db.query(
+        `UPDATE kelas SET kapasitas = $1 WHERE id_kelas = $2`,
+        [kapasitas, id_kelas]
+      );
+    }
+
+    res.json({ message: "Perubahan jadwal berhasil disimpan!" });
   } catch (err) {
     console.error("ERR updateJadwal:", err);
     res.status(500).json({ message: "Gagal update jadwal" });

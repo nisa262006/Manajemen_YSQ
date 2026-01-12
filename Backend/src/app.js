@@ -6,6 +6,7 @@ const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+process.env.TZ = "Asia/Jakarta";
 
 // ================= MIDDLEWARE =================
 app.use(cors());

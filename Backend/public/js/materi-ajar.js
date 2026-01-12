@@ -325,6 +325,19 @@ window.showStatusSantri = async () => {
 listBody.innerHTML = data.map(s => {
     const isSudah = s.status === 'Sudah Kirim';
     
+    let jamTampil = '-';
+    if (s.submitted_at) {
+        const date = new Date(s.submitted_at);
+        // Jika dari database dikirim format UTC murni, kita pastikan dibaca sebagai WIB
+        jamTampil = date.toLocaleString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }).replace(/\./g, ':');
+    }
+
     // Logika Aksi (Tombol lihat file/link)
     let aksiHTML = "-";
 if (isSudah) {

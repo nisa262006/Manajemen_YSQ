@@ -333,6 +333,45 @@ document.addEventListener("click", async (e) => {
 });
 
 /* ============================================================
+   SIMPAN PERUBAHAN JADWAL (UPDATE)
+============================================================ */
+if ($("btn-edit-simpan")) {
+    $("btn-edit-simpan").onclick = async () => {
+        const idJadwal = $("edit-id-jadwal").value;
+        
+        const payload = {
+            id_kelas: $("edit-id-kelas").value, // Pastikan ID Kelas terkirim
+            kapasitas: $("jumlah-siswa-maks").value, // Kapasitas/Jumlah Maks
+            hari: $("edit-hari").value,
+            jam_mulai: $("edit-mulai").value + ":00",
+            jam_selesai: $("edit-selesai").value + ":00",
+            kategori: $("kategori-edit").value,
+            id_pengajar: $("pengajar").value
+        };
+
+        try {
+            await apiPut(`/jadwal/${idJadwal}`, payload);
+            toast("Perubahan jadwal berhasil disimpan!");
+            
+            $("edit-jadwal-modal").style.display = "none";
+            
+            // PAKSA REFRESH DATA
+            await loadJadwal(); 
+        } catch (err) {
+            console.error(err);
+            toast("Gagal memperbarui jadwal", "error");
+        }
+    };
+}
+
+// Logika tombol batal di modal edit
+if ($("btn-edit-cancel") || $("btn-close-edit-x")) {
+    const closeEdit = () => $("edit-jadwal-modal").style.display = "none";
+    if ($("btn-edit-cancel")) $("btn-edit-cancel").onclick = closeEdit;
+    if ($("btn-close-edit-x")) $("btn-close-edit-x").onclick = closeEdit;
+}
+
+/* ============================================================
    HAPUS JADWAL
 ============================================================ */
 document.addEventListener("click", async (e) => {

@@ -295,17 +295,22 @@ exports.submitTugasSantri = async (req, res) => {
       });
     }
 
-    // 4️⃣ SIMPAN PENGUMPULAN
-    await db.query(
-      `INSERT INTO pengumpulan_tugas (id_tugas, id_santri, file_path, link_url)
-       VALUES ($1, $2, $3, $4)`,
-      [
-        id_tugas,
-        id_santri,
-        req.file?.filename || null,
-        req.body.link_url || null
-      ]
-    );
+// 4️⃣ SIMPAN PENGUMPULAN
+const sekarang = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"});
+
+await db.query(
+  `INSERT INTO pengumpulan_tugas (id_tugas, id_santri, file_path, link_url, jawaban_teks, submitted_at)
+   VALUES ($1, $2, $3, $4, $5, $6)`, 
+  [
+    id_tugas,
+    id_santri,
+    req.file?.filename || null,
+    req.body.link_url || null,
+    req.body.jawaban_teks || null,
+    sekarang // Memaksa jam Jakarta masuk ke kolom submitted_at
+  ]
+);
+
 
     res.json({ success: true, message: "Tugas berhasil dikirim" });
 
@@ -371,7 +376,6 @@ exports.getTugasByKelas = async (req, res) => {
 };
 
 
-// ================ MY SUBMIT (LIHAT TUGAS SENDIRI)===================
 // ================ MY SUBMIT (LIHAT TUGAS SENDIRI) ===================
 exports.getMySubmission = async (req, res) => {
   try {
@@ -384,7 +388,7 @@ exports.getMySubmission = async (req, res) => {
         pt.link_url,
         pt.submitted_at,
         pt.nilai,
-        pt.jawaban_teks AS catatan_santri, -- Pastikan alias ini ada
+        pt.jawaban_teks, -- JANGAN PAKAI ALIAS BERBEDA
         pt.catatan_pengajar
        FROM pengumpulan_tugas pt
        WHERE pt.id_tugas = $1
@@ -398,7 +402,7 @@ exports.getMySubmission = async (req, res) => {
 
     res.json({
       submitted: true,
-      data: result.rows[0]
+      data: result.rows[0] // data.jawaban_teks sekarang tersedia
     });
 
   } catch (err) {
