@@ -275,7 +275,8 @@ function initDaftarPengajar() {
                     <td>${i + 1}</td>
                     <td>${p.nip ?? "-"}</td>
                     <td>${p.nama}</td>
-                    <td>${p.mapel ?? p.nama_kelas ?? "-"}</td> <td>${p.user_email ?? p.email ?? "-"}</td>
+                   <td>${p.nama_kelas !== '-' ? p.nama_kelas : (p.mapel || "-")}</td>
+                   <td>${p.user_email ?? p.email ?? "-"}</td>
                     <td>
                         <span class="status-badge ${p.status === "aktif" ? "status-aktif" : "status-nonaktif"}">
                             ${p.status}

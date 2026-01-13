@@ -231,32 +231,29 @@ async function loadFullJadwalPage() {
 
 function applyJadwalFilters() {
     const classVal = document.getElementById("filter-kelas")?.value;
-    const dateVal = document.getElementById("filter-tanggal")?.value;
+    const dateVal = document.getElementById("filter-tanggal")?.value || getTodayLocal();
     
     let filtered = allJadwalData;
 
-    // Filter Kelas
+    // Filter Kelas tetap berjalan jika user memilih kelas spesifik
     if (classVal) {
         filtered = filtered.filter(j => j.nama_kelas === classVal);
     }
-
-    // Filter Tanggal (Hari)
-    if (dateVal) {
-        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-        const dayName = days[new Date(dateVal).getDay()];
-        filtered = filtered.filter(j => j.hari?.toLowerCase() === dayName.toLowerCase());
-    }
-
-    renderJadwalTable(filtered);
+    
+    renderJadwalTable(filtered, dateVal); // Kirim dateVal ke fungsi render
 }
 
-function renderJadwalTable(data) {
+function renderJadwalTable(data, selectedDate) {
     const tbody = document.getElementById("table_jadwal");
     if (!tbody) return;
 
     tbody.innerHTML = data.length === 0 
-        ? `<tr><td colspan="6" style="text-align:center">Tidak ada jadwal hari ini.</td></tr>`
-        : data.map((j, i) => `
+        ? `<tr><td colspan="6" style="text-align:center">Anda belum memiliki jadwal kelas.</td></tr>`
+        : data.map((j, i) => {
+            // Buat link dinamis dengan parameter tanggal
+            const urlAbsensi = `/dashboard/pengajar/absensi?id_kelas=${j.id_kelas}&tanggal=${selectedDate}`;
+            
+            return `
             <tr class="main-row">
                 <td><strong>${j.nama_kelas ?? "-"}</strong></td>
                 <td>${j.hari ?? "-"}</td>
@@ -272,14 +269,17 @@ function renderJadwalTable(data) {
             <tr id="detail-${i}" class="detail-row" style="display:none; background-color: #f9f9f9;">
                 <td colspan="6">
                     <div class="detail-container" style="padding: 15px; display: flex; gap: 10px; justify-content: center;">
-                        <button onclick="window.location.href='/dashboard/pengajar/absensi'" class="btn-simpan" style="padding: 8px 15px;">Absen Santri</button>
-                        <button class="btn-absen-pengajar" style="background: #275238; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                        <button onclick="window.location.href='${urlAbsensi}'" class="btn-simpan" style="padding: 8px 15px;">Absen Santri</button>
+                        
+                        <button class="btn-absen-pengajar" data-id="${j.id_jadwal}" style="background: #275238; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
                             Simpan Absen Pengajar
                         </button>
                     </div>
                 </td>
-            </tr>`).join("");
+            </tr>`;
+        }).join("");
 
+    // Re-bind event listener untuk tombol detail
     document.querySelectorAll(".btn-detail").forEach(btn => {
         btn.onclick = () => {
             const idx = btn.dataset.idx;

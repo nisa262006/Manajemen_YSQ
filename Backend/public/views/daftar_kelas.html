@@ -124,41 +124,41 @@
         <h2 class="modal-title-tambah-kelas">Tambah Kelas</h2>
 
         <form id="form-tambah-kelas">
-            <div class="input-group-full">
-                <label for="input-kelas-tingkatan">Kelas/tingkatan</label>
+            <div class="input-group-full" style="margin-bottom: 15px;">
+                <label for="input-kelas-tingkatan" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Nama Kelas / Tingkatan</label>
                 <input type="text" id="input-kelas-tingkatan" placeholder="Contoh: Tahsin" required>
             </div>
             
-            <div class="form-row-tambah">
-                <div class="input-group-tambah">
-                    <label for="select-pengajar-kelas">Pengajar</label>
-                    <select id="select-pengajar-kelas" required>
+            <div class="form-row-tambah" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group-tambah" style="flex: 1;">
+                    <label for="select-pengajar-kelas" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Pilih Pengajar</label>
+                    <select id="select-pengajar-kelas" required style="width: 100%;">
                         <option value="">Pilih Pengajar</option>
                     </select>
                 </div>
-                <div class="input-group-tambah">
-                    <label for="input-kapasitas">Kapasitas</label>
-                    <input type="number" id="input-kapasitas" placeholder="Contoh: 15" required>
+                <div class="input-group-tambah" style="flex: 1;">
+                    <label for="input-kapasitas" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Kapasitas Siswa</label>
+                    <input type="number" id="input-kapasitas" placeholder="Contoh: 15" required style="width: 100%;">
                 </div>
             </div>
 
-            <div class="input-group-full">
-                <label for="input-kategori">Kategori</label>
+            <div class="input-group-full" style="margin-bottom: 15px;">
+                <label for="input-kategori" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Kategori</label>
                 <input type="text" id="input-kategori" placeholder="Contoh: Tahsin Dewasa" required>
             </div>
             
-            <div class="form-row-tambah">
-                <div class="input-group-tambah">
-                    <label for="input-waktu-mulai">Waktu Awal Periode</label>
-                    <input type="date" id="input-waktu-mulai" required>
+            <div class="form-row-tambah" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="input-group-tambah" style="flex: 1;">
+                    <label for="input-waktu-mulai" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Waktu Awal Periode</label>
+                    <input type="date" id="input-waktu-mulai" required style="width: 100%;">
                 </div>
-                <div class="input-group-tambah">
-                    <label for="input-waktu-selesai">Waktu Selesai Periode</label>
-                    <input type="date" id="input-waktu-selesai" required>
+                <div class="input-group-tambah" style="flex: 1;">
+                    <label for="input-waktu-selesai" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Waktu Selesai Periode</label>
+                    <input type="date" id="input-waktu-selesai" required style="width: 100%;">
                 </div>
             </div>
 
-            <div class="modal-footer-tambah-kelas">
+            <div class="modal-footer-tambah-kelas" style="margin-top: 20px;">
                 <button type="button" class="action-btn-form cancel-btn-kelas" id="btn-cancel-kelas">Batalkan</button>
                 <button type="submit" class="action-btn-form save-btn-kelas" id="btn-simpan-kelas">Simpan</button>
             </div>

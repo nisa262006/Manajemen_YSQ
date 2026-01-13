@@ -576,7 +576,6 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
   }
 
   try {
-    // TENTUKAN URL DAN METHOD (Gunakan BASE_URL agar konsisten)
     const url = isEditModeMateri 
                 ? `${BASE_URL}/tugas-media/materi/${activeMateriId}` 
                 : `${BASE_URL}/tugas-media/materi`;
@@ -596,15 +595,30 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
 
     alert(isEditModeMateri ? "Materi berhasil diperbarui" : "Materi berhasil ditambahkan");
     
-    // RESET STATE
+    // --- KUNCI UPDATE OTOMATIS ADA DI SINI ---
+    
+    // 1. Ambil ID Materi yang baru diupdate
+    const idYangBaruSajaDiedit = activeMateriId;
+
+    // 2. Tutup Modal Form Input
+    closeMateriModal();
+    
+    // 3. Refresh List Materi (Agar Tabel terupdate)
+    await loadMateri(); 
+    
+    // 4. Jika sedang mode edit, refresh isi Modal Detail agar teks berubah instan
+    if (isEditModeMateri && idYangBaruSajaDiedit) {
+        await lihatDetail(idYangBaruSajaDiedit);
+    }
+
+    // 5. Reset State
     isEditModeMateri = false; 
     document.querySelector("#modalMateri h3").innerHTML = '<i class="fas fa-plus-circle"></i> Tambah Materi';
-    
-    closeMateriModal();
-    await loadMateri();
+
   } catch (err) {
     alert("Gagal menyimpan: " + (err.error || err.message || "Terjadi kesalahan"));
   }
+  // Hapus kode isEditModeMateri yang ada di luar blok catch di sini
 });
 
 /* ======================================================

@@ -127,13 +127,11 @@ exports.getAllPengajar = async (req, res) => {
         p.no_kontak,
         p.status,
         p.mapel,
-        
-        -- RELASI KE KELAS
-        COALESCE(k.nama_kelas, '-') AS nama_kelas,
-        k.id_kelas
-
+        -- Menggabungkan banyak kelas menjadi satu string, jika tidak ada tampilkan '-'
+        COALESCE(STRING_AGG(k.nama_kelas, ', '), '-') AS nama_kelas
       FROM pengajar p
       LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
+      GROUP BY p.id_pengajar -- Wajib menggunakan GROUP BY karena ada STRING_AGG
       ORDER BY p.id_pengajar ASC
     `);
 
@@ -141,13 +139,11 @@ exports.getAllPengajar = async (req, res) => {
       message: "List pengajar",
       data: result.rows
     });
-
   } catch (err) {
     console.error("GET ALL PENGAJAR ERROR:", err);
     res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 };
-
 
 /* =========================================
    3. Detail Pengajar by ID

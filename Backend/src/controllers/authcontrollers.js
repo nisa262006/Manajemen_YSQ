@@ -11,11 +11,12 @@ exports.login = async (req, res) => {
 
     console.log("REQUEST MASUK LOGIN:", identifier);
 
+    // 1. Cari user di tabel users sekaligus cek status di tabel santri
     const result = await db.query(
       `
       SELECT 
         u.*,
-        s.status AS status_santri
+        s.status AS status_konfirmasi_santri
       FROM users u
       LEFT JOIN santri s ON u.id_users = s.id_users
       WHERE u.username = $1 OR u.email = $1
@@ -24,21 +25,32 @@ exports.login = async (req, res) => {
       [identifier]
     );
 
-    if (result.rowCount === 0) {
-      return res.status(400).json({
-        message: "Username/Email atau password salah"
-      });
-    }
+   // 1. KONDISI: Akun tidak ditemukan (Belum Daftar)
+if (result.rowCount === 0) {
+  return res.status(404).json({
+    message: "Akun tidak ditemukan. Silakan melakukan pendaftaran terlebih dahulu."
+  });
+}
 
-    const user = result.rows[0];
+const user = result.rows[0];
 
-    // 🔒 BLOK USER NONAKTIF
-    if (user.status_user !== "aktif") {
-      return res.status(403).json({
-        message: "Akun Anda tidak aktif. Hubungi admin."
-      });
-    }
+// 2. PRIORITAS UTAMA: Cek status_user di tabel 'users'
+// Gabungkan pengecekan status
+if (user.status_user.toLowerCase() !== "aktif") {
+  return res.status(403).json({
+    message: "Akun Anda tidak aktif. Hubungi admin."
+  });
+}
 
+// Cek status pendaftaran santri
+if (user.role === 'santri' && user.status_konfirmasi_santri && user.status_konfirmasi_santri.toLowerCase() === 'pending') {
+  return res.status(403).json({
+    message: "Pendaftaran Anda belum dikonfirmasi oleh Admin. Mohon tunggu konfirmasi.",
+    statusAcc: "pending"
+  });
+}
+
+    // 4. Verifikasi Password
     const validPassword = await bcrypt.compare(
       password,
       user.password_hash
@@ -46,10 +58,11 @@ exports.login = async (req, res) => {
 
     if (!validPassword) {
       return res.status(400).json({
-        message: "Username/Email atau password salah"
+        message: "Password yang Anda masukkan salah."
       });
     }
 
+    // 5. Generate Token jika semua valid
     const token = jwt.sign(
       {
         id_users: user.id_users,
@@ -69,7 +82,7 @@ exports.login = async (req, res) => {
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     return res.status(500).json({
-      message: "Terjadi kesalahan server"
+      message: "Terjadi kesalahan server internal"
     });
   }
 };
