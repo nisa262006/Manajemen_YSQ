@@ -49,9 +49,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     userRole = me.role;
     if (userRole !== "pengajar") throw { message: "Akses khusus pengajar" };
 
+    // GANTI MENJADI INI
     initElements();
-    setToday();
-    await loadKelasByTanggal();
+    await loadDaftarSemuaKelas(); // Fungsi baru untuk ambil semua kelas
   } catch (err) {
     alert(err.message || "Akses ditolak");
     window.location.href = "/login";
@@ -63,46 +63,63 @@ function initElements() {
   tanggalInput = document.getElementById("materiTanggal");
   tableBody = document.getElementById("materiTableBody");
 
-  tanggalInput?.addEventListener("change", loadKelasByTanggal);
+  setToday(); 
+  
   kelasSelect?.addEventListener("change", () => {
     selectedKelas = kelasSelect.value;
     loadMateri();
   });
+
 }
 
 function setToday() { 
-  if(tanggalInput) tanggalInput.value = new Date().toISOString().split("T")[0]; 
+  if(tanggalInput) {
+    tanggalInput.value = new Date().toISOString().split("T")[0]; 
+  }
 }
 
 /* =====================================================
    LOGIKA JADWAL & TABEL
 ===================================================== */
-async function loadKelasByTanggal() {
-  if (!kelasSelect || !tableBody) return;
+async function loadDaftarSemuaKelas() {
+  if (!kelasSelect) return;
+  
   kelasSelect.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
-  const hari = new Date(tanggalInput.value).toLocaleDateString("id-ID", { weekday: "long" });
 
   try {
     const jadwal = await fetchWithAuth("/jadwal/pengajar/me");
-    const kelasHariIni = jadwal.filter(j => j.hari === hari);
 
-    if (!kelasHariIni.length) {
-      selectedKelas = null;
-      tableBody.innerHTML = `<tr><td colspan="5" align="center">Tidak ada jadwal hari ini</td></tr>`;
+    const uniqueKelas = [];
+    const map = new Map();
+    for (const item of jadwal) {
+      if(!map.has(item.id_kelas)){
+          map.set(item.id_kelas, true);
+          uniqueKelas.push(item);
+      }
+    }
+
+    if (!uniqueKelas.length) {
+      tableBody.innerHTML = `<tr><td colspan="6" align="center">Anda belum memiliki kelas</td></tr>`;
       return;
     }
 
-    kelasHariIni.forEach(k => {
+    uniqueKelas.forEach(k => {
       const opt = document.createElement("option");
       opt.value = k.id_kelas;
-      opt.textContent = `${k.nama_kelas} (${k.jam_mulai})`;
+      opt.textContent = k.nama_kelas; 
       kelasSelect.appendChild(opt);
     });
 
-    selectedKelas = kelasHariIni[0].id_kelas;
-    kelasSelect.value = selectedKelas;
-    loadMateri();
-  } catch (err) { console.error(err); }
+    if (uniqueKelas.length > 0) {
+        // Otomatis pilih kelas pertama agar tabel tidak kosong
+        kelasSelect.value = uniqueKelas[0].id_kelas;
+        selectedKelas = uniqueKelas[0].id_kelas;
+        loadMateri(); 
+    }
+
+  } catch (err) {
+    console.error("Gagal memuat daftar kelas:", err);
+  }
 }
 
 // Di materi-ajar.js
@@ -534,6 +551,11 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
   // Ambil elemen tipe_konten terlebih dahulu
   const tipeKontenEl = document.getElementById("tipeMateri");
   const tipeKontenValue = tipeKontenEl.value;
+
+  const tglInput = document.getElementById("materiTanggal");
+  if (tglInput && tglInput.value) {
+    formData.append("tanggal_manual", tglInput.value);
+  }
 
   formData.append("id_kelas", selectedKelas);
   formData.append("judul", document.getElementById("judulMateri").value);

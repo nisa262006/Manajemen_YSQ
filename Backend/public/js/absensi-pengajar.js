@@ -269,31 +269,100 @@ function updateRiwayatStats(list) {
 }
 
 // 2. Fungsi Export Excel (Mencegah error exportRiwayatKeExcel is not defined)
-function exportRiwayatKeExcel() {
-    const tbody = document.getElementById("riwayatBody");
-    if (!tbody || tbody.rows.length === 0 || tbody.rows[0].cells.length < 2) {
-        return alert("Tidak ada data untuk diekspor.");
+async function exportRiwayatKeExcel() {
+    try {
+        // 1. Ambil Identitas Pengajar & Filter
+        const namaPengajar = document.getElementById("header-user-name")?.textContent || "Pengajar";
+        const elKelas = document.getElementById("riwayatKelasSelect");
+        const idKelasTerpilih = elKelas?.value; // ID Kelas dari dropdown
+        const namaKelasTerpilih = elKelas?.options[elKelas.selectedIndex]?.text.split(' (')[0] || "Semua_Kelas";
+        
+        // 2. Tentukan Rentang Waktu (1 Tahun)
+        const now = new Date();
+        const setahunLalu = new Date();
+        setahunLalu.setFullYear(now.getFullYear() - 1);
+        
+        const tglMulai = setahunLalu.toISOString().split('T')[0];
+        const tglSelesai = now.toISOString().split('T')[0];
+
+        // 3. Ambil Semua Data dari Backend (Endpoint: getAbsensiKelasPengajar)
+        const res = await fetchJSON(`${BASE_URL}/absensi/santri/kelas/me`, {
+            headers: { Authorization: `Bearer ${getToken()}` }
+        });
+        
+        const allData = res.data || [];
+
+        // 4. Filter Data untuk Laporan (Berdasarkan Kelas & Rentang 1 Tahun)
+        const dataLaporan = allData.filter(item => {
+            const tglItem = item.tanggal; // Format YYYY-MM-DD dari backend
+            const matchKelas = !idKelasTerpilih || item.id_kelas == idKelasTerpilih;
+            const matchRentang = tglItem >= tglMulai && tglItem <= tglSelesai;
+            return matchKelas && matchRentang;
+        });
+
+        if (dataLaporan.length === 0) {
+            return alert("Tidak ada data absensi dalam 1 tahun terakhir untuk kelas ini.");
+        }
+
+        // 5. Susun Header Excel
+        const wsData = [
+            ["LAPORAN ABSENSI SANTRI (PERIODE 1 TAHUN)"],
+            ["Pengajar:", namaPengajar],
+            ["Kelas:", namaKelasTerpilih],
+            ["Rentang:", `${tglMulai} s/d ${tglSelesai}`],
+            [],
+            ["NO", "NAMA SANTRI", "TANGGAL", "JAM", "STATUS", "CATATAN", "KELAS"]
+        ];
+
+        // 6. Masukkan Data Detail
+        dataLaporan.forEach((item, i) => {
+            wsData.push([
+                i + 1,
+                item.nama_santri,
+                item.tanggal,
+                `${item.jam_mulai} - ${item.jam_selesai}`,
+                item.status_absensi,
+                item.catatan || "-",
+                item.nama_kelas
+            ]);
+        });
+
+        // 7. LOGIKA REKAPITULASI OTOMATIS (Sesuai Permintaan)
+        wsData.push([], ["RINGKASAN TOTAL KEHADIRAN PER SANTRI"], ["NAMA SANTRI", "HADIR", "IZIN", "SAKIT", "MUSTAMIAH", "ALFA"]);
+
+        // Menghitung jumlah status per nama santri
+        const rekapMap = dataLaporan.reduce((acc, curr) => {
+            const nama = curr.nama_santri;
+            if (!acc[nama]) acc[nama] = { hadir: 0, izin: 0, sakit: 0, mustamiah: 0, alfa: 0 };
+            
+            const st = curr.status_absensi.toLowerCase();
+            if (st === "hadir") acc[nama].hadir++;
+            else if (st === "izin") acc[nama].izin++;
+            else if (st === "sakit") acc[nama].sakit++;
+            else if (st === "mustamiah") acc[nama].mustamiah++;
+            else if (st === "alfa" || st === "tidak hadir") acc[nama].alfa++;
+            
+            return acc;
+        }, {});
+
+        // Masukkan objek rekap ke dalam baris Excel
+        Object.keys(rekapMap).forEach(nama => {
+            const r = rekapMap[nama];
+            wsData.push([nama, r.hadir, r.izin, r.sakit, r.mustamiah, r.alfa]);
+        });
+
+        // 8. Eksekusi Download
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
+        
+        const fileName = `Laporan_1Tahun_${namaKelasTerpilih.replace(/\s/g, '_')}_${tglSelesai}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+
+    } catch (err) {
+        console.error("Export Error:", err);
+        alert("Gagal mengekspor laporan.");
     }
-
-    const elKelas = document.getElementById("riwayatKelasSelect");
-    const namaKelas = elKelas?.options[elKelas.selectedIndex]?.text || "Semua_Kelas";
-    const tglFilter = document.getElementById("riwayatTanggal")?.value || "Semua_Tanggal";
-
-    const wsData = [
-        ["LAPORAN RIWAYAT ABSENSI SANTRI"],
-        ["Kelas:", namaKelas], ["Tanggal:", tglFilter], [],
-        ["No", "Nama Santri", "Hari / Tanggal", "Jam", "Status", "Catatan", "Kelas"]
-    ];
-
-    Array.from(tbody.rows).forEach((row, i) => {
-        const rowData = Array.from(row.cells).map(cell => cell.innerText);
-        wsData.push(rowData);
-    });
-
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Riwayat");
-    XLSX.writeFile(wb, `Riwayat_Absensi_${namaKelas.replace(/\s/g, '_')}.xlsx`);
 }
 
 // 3. Filter Riwayat Utama
@@ -436,6 +505,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Listener jika pengajar pilih kelas di riwayat
         riwayatKelasSelect.addEventListener("change", applyRiwayatFilters);
+    }
+
+    const btnExport = document.getElementById("eksporLaporan");
+    if (btnExport) {
+        btnExport.addEventListener("click", exportRiwayatKeExcel);
     }
 });
 

@@ -5,14 +5,11 @@ import { apiGet, apiPostForm } from "../js/apiService.js";
 ====================================================== */
 let materiCache = [];
 
-// Fungsi untuk ambil parameter ID di URL
 function getUrlParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
-
 }
 
-// Fungsi PASTI sesuai tanggal laptop (Perbaikan dari sebelumnya)
 function setTanggalHariIni() {
     const el = document.getElementById("tanggal-hari-ini");
     if (!el) return;
@@ -29,107 +26,60 @@ function getTodayISO() {
     return `${y}-${m}-${d}`;
 }
 
-// Tambahkan fungsi setText yang mungkin ikut hilang
 function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value ?? "-";
 }
 
-
-// 🔧 FIX PATH uploads (TANPA ROMBAK)
 function fixUploadPath(filePath, folder = "") {
     if (!filePath) return null;
-
-    // Jika DB sudah simpan "/uploads/..."
     if (filePath.startsWith("/uploads")) return filePath;
-
-    // Jika DB hanya simpan nama file
-    return folder
-        ? `/uploads/${folder}/${filePath}`
-        : `/uploads/${filePath}`;
-}
-
-// Fungsi PASTI sesuai tanggal laptop (Perbaikan dari sebelumnya)
-function setTanggalHariIni() {
-    const el = document.getElementById("tanggal-hari-ini");
-    if (!el) return;
-    const now = new Date();
-    const options = { day: 'numeric', month: 'short', year: 'numeric' };
-    el.textContent = now.toLocaleDateString('id-ID', options);
-}
-
-function getTodayISO() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-}
-
-// Tambahkan fungsi setText yang mungkin ikut hilang
-function setText(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value ?? "-";
+    return folder ? `/uploads/${folder}/${filePath}` : `/uploads/${filePath}`;
 }
 
 /* ======================================================
     INITIALIZATION & PAGE DETECTION
 ====================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-
+    // Jalankan fungsi umum
     setTanggalHariIni();
 
+    // 1. Deteksi Halaman Dashboard Santri
     if (document.getElementById("jadwal-body")) {
         initDashboardSantri();
     }
 
-    setTanggalHariIni(); // Set tanggal di pojok kanan atas
-
-    // 2. Deteksi Halaman Dashboard
-    if (document.getElementById("jadwal-body")) {
-        initDashboardSantri();
-    }
-
-    // 3. Deteksi Halaman Materi
+    // 2. Deteksi Halaman List Materi
     if (document.getElementById("materi-table-body")) {
         initListMateriSantri();
     }
 
-    if (document.getElementById("jadwal-body")) {
-        initDashboardSantri();
-    }
-
+    // 3. Setup Form Submission (Halaman Detail)
     const subForm = document.getElementById("submissionForm");
     if (subForm) {
         subForm.addEventListener("submit", handleSubmission);
     }
 
-   // Di santri.js (Bagian DOMContentLoaded)
-const fileInput = document.getElementById("audioFile");
-if (fileInput) {
-    fileInput.addEventListener("change", function () {
-        const file = this.files[0];
-        const MAX_SIZE = 10 * 1024 * 1024; // 10MB sesuaikan dengan backend
-
-        if (file && file.size > MAX_SIZE) {
-            alert(`File "${file.name}" terlalu besar! Maksimal ukuran adalah 10MB.`);
-            this.value = ""; // Reset input agar tidak jadi diupload
-            return;
-        }
-
-        // Jika lolos validasi, tampilkan nama file seperti biasa
-        const fileNameDisplay = document.querySelector(".audio-upload-box p");
-        const fileStatusInfo = document.getElementById("fileStatusInfo");
-        if (fileNameDisplay) fileNameDisplay.textContent = "File Terpilih";
-        if (fileStatusInfo) {
-            fileStatusInfo.innerHTML = `<i class='bx bx-check-circle'></i> Siap kirim: <strong>${file.name}</strong>`;
-        }
-    });
-}
-
-    
+    // 4. Validasi Ukuran File Audio
+    const fileInput = document.getElementById("audioFile");
+    if (fileInput) {
+        fileInput.addEventListener("change", function () {
+            const file = this.files[0];
+            const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+            if (file && file.size > MAX_SIZE) {
+                alert(`File "${file.name}" terlalu besar! Maksimal 10MB.`);
+                this.value = "";
+                return;
+            }
+            const fileNameDisplay = document.querySelector(".audio-upload-box p");
+            const fileStatusInfo = document.getElementById("fileStatusInfo");
+            if (fileNameDisplay) fileNameDisplay.textContent = "File Terpilih";
+            if (fileStatusInfo) {
+                fileStatusInfo.innerHTML = `<i class='bx bx-check-circle'></i> Siap kirim: <strong>${file.name}</strong>`;
+            }
+        });
+    }
 });
-
 
 /* ======================================================
     1. DASHBOARD SANTRI

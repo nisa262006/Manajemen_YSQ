@@ -103,19 +103,40 @@ function initAbsensiPengajar() {
 
     function exportToExcel() {
         if (!filteredAbsensi.length) return alert("Data kosong");
-        const pengajarName = selectData.options[selectData.selectedIndex].text;
+        
+        // Ambil info filter untuk nama file
+        const pengajarName = selectData.options[selectData.selectedIndex].text.replace(/\s+/g, '_');
+        const rangeTanggal = `${startDate.value}_hingga_${endDate.value}`;
+        const fileName = `Laporan_Absensi_Pengajar_${pengajarName}_${rangeTanggal}.xlsx`;
+    
+        // Hitung Rekap Global
+        const rekap = {
+            Hadir: filteredAbsensi.filter(a => a.status_absensi === "Hadir").length,
+            Izin: filteredAbsensi.filter(a => a.status_absensi === "Izin").length,
+            Sakit: filteredAbsensi.filter(a => a.status_absensi === "Sakit").length,
+            Alfa: filteredAbsensi.filter(a => ["Alfa", "Tidak Hadir"].includes(a.status_absensi)).length
+        };
+    
         const wsData = [
             ["LAPORAN ABSENSI PENGAJAR"],
-            ["Pengajar:", pengajarName],
+            ["Nama:", selectData.options[selectData.selectedIndex].text],
             ["Periode:", `${startDate.value} s/d ${endDate.value}`],
+            [],
+            ["RINGKASAN KEHADIRAN"],
+            ["Hadir", "Izin", "Sakit", "Alfa"],
+            [rekap.Hadir, rekap.Izin, rekap.Sakit, rekap.Alfa],
             [],
             ["No", "Tanggal", "Kelas", "Status", "Catatan"]
         ];
-        filteredAbsensi.forEach((a, i) => wsData.push([i + 1, fixDateDisplay(a.tanggal), a.nama_kelas, a.status_absensi, a.catatan]));
+    
+        filteredAbsensi.forEach((a, i) => {
+            wsData.push([i + 1, fixDateDisplay(a.tanggal), a.nama_kelas, a.status_absensi, a.catatan]);
+        });
+    
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-        XLSX.writeFile(wb, `Laporan_Absensi_Pengajar_${startDate.value}.xlsx`);
+        XLSX.writeFile(wb, fileName);
     }
 
     selectData.addEventListener("change", applyFilter);
@@ -239,17 +260,58 @@ function initAbsensiSantri() {
 
     function exportToExcel() {
         if (!filteredAbsensi.length) return alert("Data kosong");
-        const wsData = [
+    
+        // 1. Logika Penamaan File Dinamis
+        const kls = pilihKelas.value || "Semua_Kelas";
+        const snt = pilihSantri.value || "Semua_Santri";
+        const fileName = `Laporan_Absensi_${kls}_${snt}_${startDate.value}.xlsx`;
+    
+        // 2. Header Laporan
+        let wsData = [
             ["LAPORAN ABSENSI SANTRI"],
+            ["Kelas:", kls],
+            ["Santri:", snt],
             ["Periode:", `${startDate.value} s/d ${endDate.value}`],
             [],
             ["No", "Tanggal", "Nama Santri", "Kelas", "Status", "Catatan"]
         ];
-        filteredAbsensi.forEach((a, i) => wsData.push([i + 1, fixDateDisplay(a.tanggal), a.nama_santri, a.nama_kelas, a.status_absensi, a.catatan]));
+    
+        // 3. Masukkan Data Detail (Data Harian)
+        filteredAbsensi.forEach((a, i) => {
+            wsData.push([i + 1, fixDateDisplay(a.tanggal), a.nama_santri, a.nama_kelas, a.status_absensi, a.catatan]);
+        });
+    
+        // 4. LOGIKA REKAP PER SANTRI (Grup berdasarkan Nama)
+        wsData.push([], ["REKAPITULASI KEHADIRAN PER SANTRI"], ["Nama Santri", "Hadir", "Izin", "Sakit", "Mustamiah", "Alfa"]);
+    
+        // Kelompokkan data berdasarkan nama santri
+        const rekapPerSantri = filteredAbsensi.reduce((acc, curr) => {
+            const nama = curr.nama_santri;
+            if (!acc[nama]) {
+                acc[nama] = { hadir: 0, izin: 0, sakit: 0, mustamiah: 0, alfa: 0 };
+            }
+            
+            const status = curr.status_absensi?.toLowerCase();
+            if (status === "hadir") acc[nama].hadir++;
+            else if (status === "izin") acc[nama].izin++;
+            else if (status === "sakit") acc[nama].sakit++;
+            else if (status === "mustamiah") acc[nama].mustamiah++;
+            else if (status === "alfa" || status === "tidak hadir") acc[nama].alfa++;
+            
+            return acc;
+        }, {});
+    
+        // Masukkan hasil pengelompokan ke dalam sheet
+        Object.keys(rekapPerSantri).forEach(nama => {
+            const r = rekapPerSantri[nama];
+            wsData.push([nama, r.hadir, r.izin, r.sakit, r.mustamiah, r.alfa]);
+        });
+    
+        // 5. Generate File
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan");
-        XLSX.writeFile(wb, `Laporan_Absensi_Santri_${startDate.value}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
+        XLSX.writeFile(wb, fileName);
     }
 
     pilihKelas.addEventListener("change", () => { renderDropdownSantri(); applyFilter(); });

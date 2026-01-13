@@ -127,36 +127,109 @@ function initDaftarSantri() {
     });
 
     exportBtn.onclick = () => {
-        const rows = SANTRI.map((s, i) => ({
-            No: i + 1,
-            NIS: s.nis,
-            Nama: s.nama,
-            Kelas: s.nama_kelas,
-            Email: s.user_email ?? s.email,
-            "No. WhatsApp": s.no_wa ?? s.telepon ?? "-", // Menambahkan kolom No WA
-            Alamat: s.alamat ?? "-",                   // Menambahkan kolom Alamat
-            Kategori: s.kategori,
-            Status: s.status
-        }));
+        const katFilter = kategoriSelect.value;
+        const kelFilter = kelasSelect.value;
+        const elKelas = kelasSelect;
+        const namaKelasFilter = elKelas.options[elKelas.selectedIndex].text.replace(/\s/g, '_');
     
-        const ws = XLSX.utils.json_to_sheet(rows);
-        
-        // Opsional: Mengatur lebar kolom agar Alamat dan Email tidak terpotong
-        ws['!cols'] = [
-            { wch: 5 },  // No
-            { wch: 15 }, // NIS
-            { wch: 25 }, // Nama
-            { wch: 15 }, // Kelas
-            { wch: 25 }, // Email
-            { wch: 20 }, // No WA
-            { wch: 40 }, // Alamat
-            { wch: 15 }, // Kategori
-            { wch: 10 }, // Status
-        ];
+        let filteredData = [...SANTRI];
+        if (katFilter) filteredData = filteredData.filter(s => s.kategori === katFilter);
+        if (kelFilter) filteredData = filteredData.filter(s => String(s.id_kelas) === kelFilter);
+    
+        // 1. Urutkan berdasarkan Kelas, lalu Nama
+        filteredData.sort((a, b) => {
+            const kelasA = (a.nama_kelas || "Tanpa Kelas").toLowerCase();
+            const kelasB = (b.nama_kelas || "Tanpa Kelas").toLowerCase();
+            if (kelasA !== kelasB) return kelasA.localeCompare(kelasB);
+            return a.nama.localeCompare(b.nama);
+        });
     
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Santri");
-        XLSX.writeFile(wb, "data_santri_lengkap.xlsx");
+    
+        // 2. Logika Pengelompokan (Kelas di atas Header Kolom)
+        const createGroupedRows = (dataList) => {
+            let rows = [];
+            let currentClass = null;
+            let noUrut = 1;
+    
+            dataList.forEach((s) => {
+                const namaKelas = s.nama_kelas || "TANPA KELAS";
+    
+                if (namaKelas !== currentClass) {
+                    if (currentClass !== null) {
+                        rows.push({}); // Spasi antar kelas
+                        rows.push({}); 
+                    }
+                    
+                    // HEADER KELAS
+                    rows.push({ "No": `KELAS: ${namaKelas.toUpperCase()}` });
+                    
+                    // HEADER KOLOM (Ditampilkan ulang setiap ganti kelas)
+                    rows.push({
+                        "No": "No",
+                        "NIS": "NIS",
+                        "Nama": "Nama Santri",
+                        "Kelas": "Kelas",
+                        "Email": "Email",
+                        "No. WhatsApp": "No. WhatsApp",
+                        "Alamat": "Alamat",
+                        "Kategori": "Kategori",
+                        "Status": "Status"
+                    });
+    
+                    currentClass = namaKelas;
+                    noUrut = 1;
+                }
+    
+                rows.push({
+                    "No": noUrut++,
+                    "NIS": s.nis || "-",
+                    "Nama": s.nama,
+                    "Kelas": s.nama_kelas || "-",
+                    "Email": s.user_email ?? s.email ?? "-",
+                    "No. WhatsApp": s.no_wa ?? s.telepon ?? "-",
+                    "Alamat": s.alamat ?? "-",
+                    "Kategori": s.kategori,
+                    "Status": s.status
+                });
+            });
+            return rows;
+        };
+    
+        // 3. Eksekusi Berdasarkan Kategori
+        if (!katFilter) {
+            const dataAnak = filteredData.filter(s => s.kategori?.toLowerCase() === "anak");
+            const dataDewasa = filteredData.filter(s => s.kategori?.toLowerCase() === "dewasa");
+    
+            if (dataAnak.length > 0) {
+                const wsAnak = XLSX.utils.json_to_sheet(createGroupedRows(dataAnak), { skipHeader: true });
+                applyWsStyles(wsAnak);
+                XLSX.utils.book_append_sheet(wb, wsAnak, "Santri Anak");
+            }
+            if (dataDewasa.length > 0) {
+                const wsDewasa = XLSX.utils.json_to_sheet(createGroupedRows(dataDewasa), { skipHeader: true });
+                applyWsStyles(wsDewasa);
+                XLSX.utils.book_append_sheet(wb, wsDewasa, "Santri Dewasa");
+            }
+        } else {
+            const ws = XLSX.utils.json_to_sheet(createGroupedRows(filteredData), { skipHeader: true });
+            applyWsStyles(ws);
+            XLSX.utils.book_append_sheet(wb, ws, `Santri ${katFilter}`);
+        }
+    
+        function applyWsStyles(ws) {
+            ws['!cols'] = [
+                { wch: 20 }, { wch: 15 }, { wch: 30 }, { wch: 15 }, 
+                { wch: 25 }, { wch: 18 }, { wch: 40 }, { wch: 12 }, { wch: 10 }
+            ];
+        }
+    
+        // 4. Nama File Dinamis
+        const kategoriName = katFilter ? katFilter : "Semua_Kategori";
+        const kelasName = kelFilter ? namaKelasFilter : "Semua_Kelas";
+        const fileName = `Daftar_Santri_${kategoriName}_${kelasName}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    
+        XLSX.writeFile(wb, fileName);
     };
 
     loadAll();

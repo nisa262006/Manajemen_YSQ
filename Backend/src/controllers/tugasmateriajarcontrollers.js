@@ -19,9 +19,9 @@ async function getRoleSpecificId(id_users, role) {
 // ============================================================
 exports.uploadMateri = async (req, res) => {
   try {
-    const { id_kelas, judul, deskripsi, tipe_file, tipe_konten, link_url } = req.body;
+    // Tambahkan 'tanggal_manual' di destruktur body
+    const { id_kelas, judul, deskripsi, tipe_file, tipe_konten, link_url, tanggal_manual } = req.body;
     
-    // Ambil ID Pengajar otomatis dari id_users di token
     const id_pengajar = await getRoleSpecificId(req.user.id_users, "pengajar");
 
     if (!id_pengajar) {
@@ -30,14 +30,17 @@ exports.uploadMateri = async (req, res) => {
 
     let filePath = null;
     if (tipe_konten === "file") {
-      if (!req.file) return res.status(400).json({ error: "File wajib diunggah untuk tipe konten file" });
+      if (!req.file) return res.status(400).json({ error: "File wajib diunggah" });
       filePath = req.file.filename;
     }
 
+    // Jika pengajar memilih tanggal, gunakan itu. Jika tidak, gunakan waktu sekarang.
+    const finalDate = tanggal_manual ? new Date(tanggal_manual) : new Date();
+
     await db.query(
       `INSERT INTO materi_ajar
-       (id_kelas, id_pengajar, judul, deskripsi, tipe_file, tipe_konten, file_path, link_url)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+       (id_kelas, id_pengajar, judul, deskripsi, tipe_file, tipe_konten, file_path, link_url, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, // Tambah kolom created_at
       [
         id_kelas,
         id_pengajar,
@@ -45,12 +48,13 @@ exports.uploadMateri = async (req, res) => {
         deskripsi,
         tipe_file || "materi",
         tipe_konten,
-        filePath,         // Akan null jika tipe_konten = 'link'
-        link_url || null  // Akan null jika tipe_konten = 'file'
+        filePath,
+        link_url || null,
+        finalDate // Masukkan tanggal dari frontend ke sini
       ]
     );
 
-    res.json({ success: true, message: "Materi berhasil disimpan" });
+    res.json({ success: true, message: "Materi berhasil disimpan sesuai tanggal pilihan" });
   } catch (err) {
     console.error("UPLOAD MATERI ERROR:", err);
     res.status(500).json({ error: err.message });
