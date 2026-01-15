@@ -9,18 +9,42 @@ exports.tambahJadwal = async (req, res) => {
   try {
     const { id_kelas, hari, jam_mulai, jam_selesai, kategori, id_pengajar } = req.body;
 
-    if (!id_kelas || !hari || !jam_mulai || !jam_selesai || !kategori) {
+    // 1. Validasi input wajib
+    if (!id_kelas || !hari || !jam_mulai || !jam_selesai || !kategori || !id_pengajar) {
       return res.status(400).json({ message: "Lengkapi semua field jadwal" });
     }
 
+    const bentrok = await db.query(
+      `SELECT j.*, k.nama_kelas 
+       FROM jadwal j
+       JOIN kelas k ON j.id_kelas = k.id_kelas
+       WHERE j.id_pengajar = $1 
+       AND LOWER(j.hari) = LOWER($2)
+       AND ($3 < j.jam_selesai AND $4 > j.jam_mulai)`,
+      [id_pengajar, hari, jam_mulai, jam_selesai]
+    );
+
+    if (bentrok.rowCount > 0) {
+      const b = bentrok.rows[0];
+      return res.status(400).json({ 
+        message: `Gagal! Pengajar sudah memiliki jadwal di hari ${hari} jam ${b.jam_mulai.slice(0,5)}-${b.jam_selesai.slice(0,5)} pada kelas ${b.nama_kelas}` 
+      });
+    }
+
+    // 3. Validasi pengajar aktif (logika lama Anda)
+    const cekPengajar = await db.query(`SELECT status FROM pengajar WHERE id_pengajar = $1`, [id_pengajar]);
+    if (cekPengajar.rowCount === 0 || cekPengajar.rows[0].status !== 'aktif') {
+      return res.status(400).json({ message: "Pengajar tidak ditemukan atau non-aktif" });
+    }
+
+    // 4. Jika lolos validasi, baru masukkan data
     await db.query(
       `INSERT INTO jadwal(id_kelas, hari, jam_mulai, jam_selesai, kategori, id_pengajar)
        VALUES($1,$2,$3,$4,$5,$6)`,
       [id_kelas, hari, jam_mulai, jam_selesai, kategori, id_pengajar]
     );
 
-    res.json({ message: "Jadwal berhasil ditambahkan" });
-
+    res.json({ success: true, message: "Jadwal berhasil ditambahkan" });
   } catch (err) {
     console.error("ERR tambahJadwal:", err);
     res.status(500).json({ message: "Gagal menambah jadwal" });
@@ -29,7 +53,7 @@ exports.tambahJadwal = async (req, res) => {
 
 
 // ➤ List semua jadwal
-exports.getAllJadwal = async (req, res) => {
+exports.getAllJadwal = async (req, res) => { 
   try {
     const result = await db.query(`
       SELECT 

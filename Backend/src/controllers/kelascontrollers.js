@@ -6,13 +6,30 @@ const db = require("../config/db");
 exports.tambahKelas = async (req, res) => {
   const { nama_kelas, kapasitas, id_pengajar, id_program, kategori } = req.body;
 
-  await db.query(
-    `INSERT INTO kelas (nama_kelas, kapasitas, id_pengajar, id_program, kategori)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [nama_kelas, kapasitas, id_pengajar, id_program, kategori]
-  );
+  try {
+    // Cek apakah pengajar aktif sebelum insert
+    const cekStatus = await db.query(
+        "SELECT status FROM pengajar WHERE id_pengajar = $1", 
+        [id_pengajar]
+    );
 
-  res.json({ message: "Kelas berhasil ditambahkan" });
+    if (cekStatus.rowCount > 0 && cekStatus.rows[0].status !== 'aktif') {
+      return res.status(400).json({ 
+        message: "Gagal: Pengajar ini sudah tidak aktif dan tidak bisa memegang kelas baru." 
+      });
+    }
+
+    await db.query(
+      `INSERT INTO kelas (nama_kelas, kapasitas, id_pengajar, id_program, kategori)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [nama_kelas, kapasitas, id_pengajar, id_program, kategori]
+    );
+
+    res.json({ message: "Kelas berhasil ditambahkan" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal menambah kelas" });
+  }
 };
 
 // List kelas

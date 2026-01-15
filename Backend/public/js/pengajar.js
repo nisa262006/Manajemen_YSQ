@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = "/api";
 
 // 1. Proteksi Halaman: Cek Token saat awal load
 if (!localStorage.getItem("token")) {

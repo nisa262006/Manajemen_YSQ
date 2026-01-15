@@ -85,6 +85,7 @@ CREATE TABLE jadwal (
     id_kelas INT REFERENCES kelas(id_kelas) ON DELETE CASCADE,
     id_pengajar INT REFERENCES pengajar(id_pengajar) ON DELETE SET NULL,
     hari VARCHAR(20) NOT NULL,
+    kategori VARCHAR(20),
     jam_mulai TIME NOT NULL,
     jam_selesai TIME NOT NULL,
     lokasi VARCHAR(100)

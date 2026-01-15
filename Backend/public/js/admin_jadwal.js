@@ -79,28 +79,27 @@ async function loadKelasDropdowns() {
    FIXED: LOAD PENGAJAR DROPDOWNS (ANTI-DOBEL)
 ============================================================ */
 async function loadPengajarDropdowns() {
-    // Pastikan elemen target ada di halaman (tambah atau edit)
     if (!$("pengajar-tambah") && !$("pengajar")) return;
 
     try {
         const res = await apiGet("/pengajar");
         const list = Array.isArray(res) ? res : res.data ?? [];
 
-        // --- LOGIKA FILTER UNIK BERDASARKAN ID_PENGAJAR ---
+        // FILTER: Hanya pengajar yang statusnya 'aktif'
+        const activePengajar = list.filter(p => p.status === 'aktif');
+
         const uniquePengajar = [];
         const seenIds = new Set();
 
-        list.forEach(p => {
+        activePengajar.forEach(p => {
             if (p.id_pengajar && !seenIds.has(p.id_pengajar)) {
                 seenIds.add(p.id_pengajar);
                 uniquePengajar.push(p);
             }
         });
 
-        // Simpan data unik ke variabel global agar sinkron dengan fungsi lain
         window._pengajarList = uniquePengajar;
 
-        // 1. Reset & Isi Dropdown TAMBAH JADWAL
         const selectTambah = $("pengajar-tambah");
         if (selectTambah) {
             selectTambah.innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
@@ -108,17 +107,7 @@ async function loadPengajarDropdowns() {
                 selectTambah.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
             });
         }
-
-        // 2. Reset & Isi Dropdown EDIT JADWAL
-        const selectEdit = $("pengajar");
-        if (selectEdit) {
-            // Berikan opsi kosong default agar tidak langsung terpilih baris pertama
-            selectEdit.innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
-            uniquePengajar.forEach(p => {
-                selectEdit.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
-            });
-        }
-
+        // ... (lanjutkan ke selectEdit seperti kode aslimu)
     } catch (err) {
         console.error("Error loading unique teachers:", err);
         toast("Gagal memuat daftar pengajar", "error");
@@ -216,14 +205,23 @@ if ($("form-tambah-jadwal")) {
         };
 
         try {
-            await apiPost("/jadwal", payload);
+            // Mengirim data ke backend
+            const response = await apiPost("/jadwal", payload);
+            
+            // Jika berhasil
             toast("Jadwal berhasil ditambahkan!");
             $("tambah-jadwal-modal").style.display = "none";
-            loadJadwal();
+            $("form-tambah-jadwal").reset(); // Bersihkan form
+            loadJadwal(); // Refresh tabel
 
         } catch (err) {
-            console.error(err);
-            toast("Gagal menambah jadwal", "error");
+            console.error("Error Tambah Jadwal:", err);
+            
+            // MENGAMBIL PESAN ERROR DARI BACKEND (Termasuk pesan "Jadwal Bentrok")
+            const pesanError = err.response?.data?.message || "Gagal menambah jadwal";
+            
+            // Tampilkan pesan error di toast dengan tipe 'error' (merah)
+            toast(pesanError, "error");
         }
     });
 }
@@ -581,11 +579,13 @@ if ($("form-tambah-kelas")) {
     
             dropdown.innerHTML = `<option value="">Pilih Pengajar</option>`;
     
-            // --- LOGIKA ANTI-DOBEL ---
+            // FILTER: Hanya ambil yang aktif
+            const activeOnly = list.filter(p => p.status === 'aktif');
+    
             const uniquePengajar = [];
             const seenIds = new Set();
     
-            list.forEach(p => {
+            activeOnly.forEach(p => {
                 if (!seenIds.has(p.id_pengajar)) {
                     seenIds.add(p.id_pengajar);
                     uniquePengajar.push(p);

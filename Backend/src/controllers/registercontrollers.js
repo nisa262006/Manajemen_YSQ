@@ -177,7 +177,9 @@ exports.terimaPendaftar = async (req, res) => {
 
     const id_users = user.rows[0].id_users;
 
-    // 7️⃣ Insert SANTRI
+    // 7️⃣ Insert SANTRI 
+    const tanggalSekarang = new Date().toISOString().split('T')[0]; // Menghasilkan format "2024-05-20"
+
     await client.query(
       `
       INSERT INTO santri (
@@ -186,10 +188,10 @@ exports.terimaPendaftar = async (req, res) => {
         tanggal_lahir, alamat,
         status, tanggal_terdaftar
       ) VALUES (
-        $1,$2,$3,$4,
-        $5,$6,$7,
-        $8,$9,
-        'aktif', NOW()
+        $1, $2, $3, $4,
+        $5, $6, $7,
+        $8, $9,
+        'aktif', $10
       )
       `,
       [
@@ -201,7 +203,8 @@ exports.terimaPendaftar = async (req, res) => {
         p.email,
         p.tempat_lahir,
         p.tanggal_lahir,
-        p.alamat || null
+        p.alamat || null,
+        tanggalSekarang // <--- Menggunakan variabel string, bukan NOW()
       ]
     );
 

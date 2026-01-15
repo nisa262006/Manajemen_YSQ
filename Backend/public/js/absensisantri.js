@@ -1,7 +1,7 @@
 /* =========================================================
    CONFIG & AUTH
 ========================================================= */
-const API_BASE = "http://localhost:8000/api";
+const BASE_URL = "/api";
 const token = localStorage.getItem("token");
 
 if (!token) {
