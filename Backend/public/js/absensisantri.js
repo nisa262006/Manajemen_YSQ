@@ -1,7 +1,7 @@
 /* =========================================================
    CONFIG & AUTH
 ========================================================= */
-const BASE_URL = "/api";
+const API_BASE = "/api"; // Gunakan nama API_BASE agar sinkron dengan baris bawah
 const token = localStorage.getItem("token");
 
 if (!token) {
@@ -52,15 +52,15 @@ function formatTanggalDisplay(dateString) {
 
 function setDefaultDate() {
     const now = new Date();
-    const past = new Date();
-    past.setMonth(now.getMonth() - 1);
+    // Mengimbangi timezone agar mendapatkan tanggal lokal yang benar
+    const offset = now.getTimezoneOffset() * 60000;
+    const localISOTime = new Date(now - offset).toISOString().split('T')[0];
 
-    const formatYMD = (d) => {
-        return d.toISOString().split('T')[0];
-    };
-
-    startDateInput.value = formatYMD(past);
-    endDateInput.value = formatYMD(now);
+    // Atur start date ke awal bulan (agar riwayat muncul)
+    const firstDayOfMonth = localISOTime.substring(0, 8) + "01";
+    
+    startDateInput.value = firstDayOfMonth; 
+    endDateInput.value = localISOTime;
 }
 
 /* =========================================================
@@ -68,19 +68,28 @@ function setDefaultDate() {
 ========================================================= */
 async function loadAbsensiSantri() {
     try {
-        const res = await fetch(`${API_BASE}/absensi/santri/me`, {
-            headers: { Authorization: `Bearer ${token}` }
+        // 1. Pastikan Path sesuai dengan di absensiroutes.js (/absensi/santri/me)
+        const response = await fetch(`${API_BASE}/absensi/santri/me`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
         });
 
-        if (!res.ok) throw new Error("Gagal mengambil data");
+        if (!response.ok) throw new Error("Gagal mengambil data");
 
-        const json = await res.json();
-        RAW_DATA = Array.isArray(json.data) ? json.data : (json.absensi || []);
+        const result = await response.json();
+        
+        // 2. Ambil .data karena backend mengirim { success: true, data: [...] }
+        RAW_DATA = result.data || []; 
 
-        applyFilterAndRender();
+        // 3. Panggil fungsi yang benar
+        renderTable(RAW_DATA);
+        renderSummary(RAW_DATA); // Tadi Anda menulis updateSummary, itu penyebab errornya
+        
     } catch (err) {
-        console.error(err);
-        tbody.innerHTML = `<tr><td colspan="5" align="center">Gagal memuat data atau data kosong</td></tr>`;
+        console.error("Error loadAbsensiSantri:", err);
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Gagal memuat data atau data belum ada.</td></tr>`;
     }
 }
 
@@ -92,10 +101,15 @@ function applyFilterAndRender() {
     const endVal = endDateInput.value;
 
     const filtered = RAW_DATA.filter(item => {
-        const dbDate = fixDate(item.tanggal);
-        const matchStart = !startVal || dbDate >= startVal;
-        const matchEnd = !endVal || dbDate <= endVal;
-        return matchStart && matchEnd;
+        const dbDate = fixDate(item.tanggal); // Format YYYY-MM-DD
+        const startVal = startDateInput.value;
+        const endVal = endDateInput.value;
+    
+        // Pastikan perbandingan hanya pada level tanggal
+        const isAfterStart = !startVal || dbDate >= startVal;
+        const isBeforeEnd = !endVal || dbDate <= endVal;
+    
+        return isAfterStart && isBeforeEnd;
     });
 
     // Urutkan Tanggal Terbaru di Atas
@@ -177,9 +191,14 @@ function exportToExcel() {
 /* =========================================================
    INIT
 ========================================================= */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     setDefaultDate();
-    loadAbsensiSantri();
+    
+    // Tunggu data selesai ditarik baru jalankan filter
+    await loadAbsensiSantri();
+    
+    // Jalankan filter agar tabel menyaring data sesuai tanggal hari ini
+    applyFilterAndRender();
 
     startDateInput.addEventListener("change", applyFilterAndRender);
     endDateInput.addEventListener("change", applyFilterAndRender);
