@@ -250,28 +250,40 @@ if (document.body.classList.contains("page-tambah-kelas")) {
     /* ===============================================================
        LOAD KELAS
     =============================================================== */
-    async function loadKelasYSQ() {
-      try {
-        const res = await apiGet("/kelas");
-        const list = res?.data ?? res ?? [];
+    /* ===============================================================
+   LOAD KELAS DENGAN INFO LENGKAP (NAMA, KATEGORI, PENGAJAR)
+=============================================================== */
+async function loadKelasYSQ() {
+    try {
+      const res = await apiGet("/kelas");
+      // Pastikan list mengambil data array dari respon
+      const list = Array.isArray(res) ? res : res?.data ?? [];
   
-        window._allKelasYSQ = list;
+      window._allKelasYSQ = list;
   
-        selectKelas.innerHTML =
-          `<option value="">-- Pilih Kelas --</option>`;
+      const selectKelas = document.getElementById("id_kelas");
+      if (!selectKelas) return;
   
-        list.forEach(k => {
-          selectKelas.innerHTML += `
-            <option value="${k.id_kelas}">
-              ${k.nama_kelas} (${k.kategori})
-            </option>`;
-        });
+      selectKelas.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
   
-      } catch (err) {
-        console.error(err);
-        showNotification("Gagal memuat kelas", "error");
-      }
+      list.forEach(k => {
+        // Ambil nama pengajar, jika null tampilkan "-"
+        const pengajar = k.nama_pengajar ? k.nama_pengajar : "-";
+        
+        // Susun teks option: Nama Kelas - Kategori - Pengajar
+        const label = `${k.nama_kelas} | ${k.kategori} (${pengajar})`;
+  
+        selectKelas.innerHTML += `
+          <option value="${k.id_kelas}">
+            ${label}
+          </option>`;
+      });
+  
+    } catch (err) {
+      console.error(err);
+      showNotification("Gagal memuat kelas", "error");
     }
+  }
   
     /* ===============================================================
        LOAD SANTRI

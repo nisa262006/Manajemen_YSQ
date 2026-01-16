@@ -78,7 +78,11 @@ async function loadKelasDropdowns() {
 /* ============================================================
    FIXED: LOAD PENGAJAR DROPDOWNS (ANTI-DOBEL)
 ============================================================ */
+/* ============================================================
+   FIXED: LOAD PENGAJAR DROPDOWNS (ISI TAMBAH & EDIT)
+============================================================ */
 async function loadPengajarDropdowns() {
+    // Pastikan salah satu elemen ada di halaman
     if (!$("pengajar-tambah") && !$("pengajar")) return;
 
     try {
@@ -100,6 +104,7 @@ async function loadPengajarDropdowns() {
 
         window._pengajarList = uniquePengajar;
 
+        // 1. ISI DROPDOWN TAMBAH
         const selectTambah = $("pengajar-tambah");
         if (selectTambah) {
             selectTambah.innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
@@ -107,7 +112,16 @@ async function loadPengajarDropdowns() {
                 selectTambah.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
             });
         }
-        // ... (lanjutkan ke selectEdit seperti kode aslimu)
+
+        // 2. ISI DROPDOWN EDIT (Penting agar data muncul saat edit)
+        const selectEdit = $("pengajar"); // ID ini sesuai dengan yang dipanggil di modal edit
+        if (selectEdit) {
+            selectEdit.innerHTML = `<option value="">-- Pilih Pengajar --</option>`;
+            uniquePengajar.forEach(p => {
+                selectEdit.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
+            });
+        }
+
     } catch (err) {
         console.error("Error loading unique teachers:", err);
         toast("Gagal memuat daftar pengajar", "error");
@@ -295,6 +309,8 @@ async function loadDaftarSesiPengajar(idPengajar) {
         sesiBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Gagal memuat sesi.</td></tr>`;
     }
 }
+
+
 
 /* ============================================================
    LOGIKA HAPUS SESI DARI DALAM MODAL

@@ -34,25 +34,28 @@ exports.tambahKelas = async (req, res) => {
 
 // List kelas
 // List kelas (Hanya menampilkan kelas unik)
+// List kelas (Menampilkan semua kelas dengan informasi pengajar)
 exports.getAllKelas = async (req, res) => {
-  const result = await db.query(`
-    SELECT 
-      k.id_kelas,
-      k.nama_kelas,
-      k.kapasitas,
-      k.kategori,
-      p.nama_program,
-      pg.nama AS nama_pengajar,
-      pg.id_pengajar, -- Tambahkan ID Pengajar
-      u.email AS email_pengajar
-    FROM kelas k
-    LEFT JOIN program p ON p.id_program = k.id_program
-    LEFT JOIN pengajar pg ON pg.id_pengajar = k.id_pengajar
-    LEFT JOIN users u ON u.id_users = pg.id_users
-    ORDER BY k.id_kelas DESC
-  `);
+  try {
+    const result = await db.query(`
+      SELECT 
+        k.id_kelas, 
+        k.nama_kelas, 
+        k.kapasitas, 
+        k.kategori,
+        p.nama AS nama_pengajar,
+        pr.nama_program
+      FROM kelas k
+      LEFT JOIN pengajar p ON k.id_pengajar = p.id_pengajar
+      LEFT JOIN program pr ON k.id_program = pr.id_program
+      ORDER BY k.nama_kelas ASC, p.nama ASC
+    `);
 
-  res.json(result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal mengambil daftar kelas" });
+  }
 };
 
 // Detail kelas

@@ -53,24 +53,37 @@ exports.tambahJadwal = async (req, res) => {
 
 
 // ➤ List semua jadwal
-exports.getAllJadwal = async (req, res) => { 
+// ➤ Ambil Semua Jadwal (Untuk Tabel Admin)
+exports.getAllJadwal = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
-        j.*,
+        j.id_jadwal,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        j.kategori,
         k.nama_kelas,
-        k.kapasitas,
-        p.nama AS nama_pengajar
+        p.nama AS nama_pengajar -- Ambil nama pengajar
       FROM jadwal j
       JOIN kelas k ON j.id_kelas = k.id_kelas
-      LEFT JOIN pengajar p ON p.id_pengajar = j.id_pengajar
-      ORDER BY j.id_jadwal ASC
+      LEFT JOIN pengajar p ON j.id_pengajar = p.id_pengajar -- Join ke pengajar
+      ORDER BY 
+        CASE 
+          WHEN j.hari='Senin' THEN 1
+          WHEN j.hari='Selasa' THEN 2
+          WHEN j.hari='Rabu' THEN 3
+          WHEN j.hari='Kamis' THEN 4
+          WHEN j.hari='Jumat' THEN 5
+          WHEN j.hari='Sabtu' THEN 6
+          WHEN j.hari='Minggu' THEN 7
+        END, j.jam_mulai ASC
     `);
 
-    res.json(result.rows);
+    res.json({ success: true, data: result.rows });
   } catch (err) {
     console.error("ERR getAllJadwal:", err);
-    res.status(500).json({ message: "Gagal mengambil jadwal" });
+    res.status(500).json({ message: "Gagal mengambil data jadwal" });
   }
 };
 
@@ -82,9 +95,8 @@ exports.getJadwalById = async (req, res) => {
 
     const result = await db.query(`
       SELECT 
-        j.*,
+        j.*,                -- Ini akan mengambil id_pengajar, hari, jam, dll
         k.nama_kelas,
-        k.kapasitas,
         p.nama AS nama_pengajar
       FROM jadwal j
       JOIN kelas k ON j.id_kelas = k.id_kelas
@@ -96,13 +108,12 @@ exports.getJadwalById = async (req, res) => {
       return res.status(404).json({ message: "Jadwal tidak ditemukan" });
     }
 
-    res.json(result.rows[0]);
+    res.json(result.rows[0]); // Data ini dikirim ke frontend
   } catch (err) {
     console.error("ERR getJadwalById:", err);
     res.status(500).json({ message: "Gagal mengambil detail jadwal" });
   }
 };
-
 
 // ➤ Update jadwal
 exports.updateJadwal = async (req, res) => {
