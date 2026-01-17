@@ -111,6 +111,12 @@ CREATE TABLE absensi_pengajar (
     catatan TEXT
 );
 
+ALTER TABLE absensi_pengajar 
+DROP CONSTRAINT absensi_pengajar_id_jadwal_fkey;
+ALTER TABLE absensi_pengajar 
+ADD CONSTRAINT absensi_pengajar_id_jadwal_fkey 
+FOREIGN KEY (id_jadwal) REFERENCES jadwal(id_jadwal) ON DELETE CASCADE;
+
 --10
 CREATE TABLE password_reset_tokens (
   id SERIAL PRIMARY KEY,

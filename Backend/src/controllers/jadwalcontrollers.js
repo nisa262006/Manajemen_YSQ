@@ -39,9 +39,9 @@ exports.tambahJadwal = async (req, res) => {
 
     // 4. Jika lolos validasi, baru masukkan data
     await db.query(
-      `INSERT INTO jadwal(id_kelas, hari, jam_mulai, jam_selesai, kategori, id_pengajar)
-       VALUES($1,$2,$3,$4,$5,$6)`,
-      [id_kelas, hari, jam_mulai, jam_selesai, kategori, id_pengajar]
+      `INSERT INTO jadwal(id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kategori)
+       VALUES($1, $2, $3, $4, $5, $6)`, 
+      [id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kategori] // kategori dimasukkan ke sini
     );
 
     res.json({ success: true, message: "Jadwal berhasil ditambahkan" });
@@ -64,10 +64,10 @@ exports.getAllJadwal = async (req, res) => {
         j.jam_selesai,
         j.kategori,
         k.nama_kelas,
-        p.nama AS nama_pengajar -- Ambil nama pengajar
+        p.nama AS nama_pengajar
       FROM jadwal j
       JOIN kelas k ON j.id_kelas = k.id_kelas
-      LEFT JOIN pengajar p ON j.id_pengajar = p.id_pengajar -- Join ke pengajar
+      LEFT JOIN pengajar p ON j.id_pengajar = p.id_pengajar
       ORDER BY 
         CASE 
           WHEN j.hari='Senin' THEN 1
@@ -86,7 +86,6 @@ exports.getAllJadwal = async (req, res) => {
     res.status(500).json({ message: "Gagal mengambil data jadwal" });
   }
 };
-
 
 // ➤ Get detail jadwal
 exports.getJadwalById = async (req, res) => {
@@ -119,18 +118,17 @@ exports.getJadwalById = async (req, res) => {
 exports.updateJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
-    // Tambahkan id_kelas dan kapasitas di sini
     const { hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_kelas, kapasitas } = req.body;
 
-    // 1. Update Tabel Jadwal
+    // 1. Update Tabel Jadwal (Pastikan kolom kategori sudah ada di DB)
     await db.query(
       `UPDATE jadwal 
-       SET hari=$1, jam_mulai=$2, jam_selesai=$3, kategori=$4, id_pengajar=$5
-       WHERE id_jadwal=$6`,
-      [hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_jadwal]
+       SET hari=$1, jam_mulai=$2, jam_selesai=$3, kategori=$4, id_pengajar=$5, id_kelas=$6
+       WHERE id_jadwal=$7`,
+      [hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_kelas, id_jadwal]
     );
 
-    // 2. Update Tabel Kelas (Kapasitas/Jumlah Siswa Maks)
+    // 2. Update Kapasitas di Tabel Kelas (Jika ada input kapasitas)
     if (id_kelas && kapasitas) {
       await db.query(
         `UPDATE kelas SET kapasitas = $1 WHERE id_kelas = $2`,
@@ -138,10 +136,10 @@ exports.updateJadwal = async (req, res) => {
       );
     }
 
-    res.json({ message: "Perubahan jadwal berhasil disimpan!" });
+    res.json({ success: true, message: "Perubahan jadwal berhasil disimpan!" });
   } catch (err) {
     console.error("ERR updateJadwal:", err);
-    res.status(500).json({ message: "Gagal update jadwal" });
+    res.status(500).json({ message: "Gagal update jadwal: " + err.message });
   }
 };
 
@@ -171,7 +169,7 @@ exports.getJadwalByPengajar = async (req, res) => {
         j.hari,
         j.jam_mulai,
         j.jam_selesai,
-        j.kategori,
+        k.kategori,
         k.nama_kelas
       FROM jadwal j
       JOIN kelas k ON j.id_kelas = k.id_kelas
@@ -222,7 +220,7 @@ exports.jadwalPengajar = async (req, res) => {
         j.hari,
         j.jam_mulai,
         j.jam_selesai,
-        j.kategori,
+        k.kategori,
         k.nama_kelas
       FROM jadwal j
       JOIN kelas k ON j.id_kelas = k.id_kelas

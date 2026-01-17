@@ -18,18 +18,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// ================= STATIC FILES =================
-// 1. Sajikan folder public secara umum (untuk CSS, JS frontend, dll)
-app.use(express.static(path.join(__dirname, "../public")));
+// ================= STATIC FILES & PATHS =================
+// Definisikan publicPath terlebih dahulu agar tidak ReferenceError
+const publicPath = path.join(__dirname, "../public");
 
-// 2. GANTI BAGIAN INI: Jangan pakai D:/TUGAS KULIAH/...
-const internalUploadPath = path.join(__dirname, "../public/uploads");
+// 1. Sajikan folder public secara umum
+app.use(express.static(publicPath));
 
-// Melayani file upload sehingga bisa diakses via http://localhost:8000/uploads/...
+// 2. Definisi path untuk Uploads
+const internalUploadPath = path.join(publicPath, "uploads");
 app.use("/uploads", express.static(internalUploadPath));
 
-// Path untuk views tetap sama
-const publicPath = path.join(__dirname, "../public");
+// 3. Definisi path untuk Views (HTML)
 const viewsPath = path.join(publicPath, "views");
 const view = (file) => path.join(viewsPath, file);
 

@@ -159,7 +159,8 @@ function renderJadwal() {
     let list = [...window._jadwalList];
 
     if (fkelas) list = list.filter(j => j.id_kelas == fkelas);
-    if (fkat) list = list.filter(j => j.kategori == fkat);
+    // PERBAIKAN: Gunakan 'j' bukan 'k'
+    if (fkat) list = list.filter(j => j.kategori == fkat); 
 
     tb.innerHTML = "";
 
@@ -170,14 +171,13 @@ function renderJadwal() {
 
     list.forEach((j, i) => {
         tb.innerHTML += `
-            <tr>
-                <td>${i + 1}</td>
-                <td>${j.nama_kelas}</td>
-                <td>${j.pengajar_nama}</td>
-                <td>${j.hari}</td>
-                <td>${formatJam(j.jam_mulai, j.jam_selesai)}</td>
-                <td>${j.kategori}</td>
-                <td><span class="status-badge status-aktif">AKTIF</span></td>
+        <tr>
+            <td>${i + 1}</td>
+            <td>${j.nama_kelas}</td>
+            <td>${j.pengajar_nama}</td>
+            <td>${j.hari}</td>
+            <td>${formatJam(j.jam_mulai, j.jam_selesai)}</td>
+            <td>${j.kategori}</td> <td><span class="status-badge status-aktif">AKTIF</span></td>
                 <td class="action-icons">
                     <button class="icon-btn edit-btn" data-id="${j.id_jadwal}">
                         <i class="fas fa-pen"></i>
@@ -241,7 +241,7 @@ if ($("form-tambah-jadwal")) {
 }
 
 /* ============================================================
-   EDIT JADWAL & DAFTAR SESI PEMBELAJARAN
+   PERBAIKAN: EDIT JADWAL 
 ============================================================ */
 document.addEventListener("click", async (e) => {
     const btn = e.target.closest(".edit-btn");
@@ -250,24 +250,30 @@ document.addEventListener("click", async (e) => {
     const id = btn.dataset.id;
 
     try {
-        // 1. Ambil Detail Jadwal yang dipilih
+        // 1. Ambil Detail Jadwal & Detail Kelas
         const jd = await apiGet(`/jadwal/${id}`);
         const resKelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
 
-        // 2. Isi Data Utama ke Form Modal
+        // 2. Isi Data ke Form Modal
         $("edit-id-jadwal").value = id;
         $("edit-id-kelas").value = jd.id_kelas;
         $("kelas-nama-edit").innerText = jd.nama_kelas;
-        $("pengajar").value = jd.id_pengajar;
-        $("kategori-edit").value = jd.kategori;
+        
+        // PASTI KAN ID DROPDOWN SESUAI (Gunakan ID yang ada di HTML Modal Edit Anda)
+        if ($("pengajar")) $("pengajar").value = jd.id_pengajar;
+        
+        // --- INI PERBAIKAN UNTUK KATEGORI ---
+        if ($("kategori-edit")) {
+            $("kategori-edit").value = jd.kategori; // Masukkan kategori dari database
+        }
+
         $("edit-hari").value = jd.hari;
         $("edit-mulai").value = jd.jam_mulai.slice(0, 5);
         $("edit-selesai").value = jd.jam_selesai.slice(0, 5);
         $("jumlah-siswa-maks").value = resKelas.kelas.kapasitas;
 
-        // 3. AMBIL DAFTAR SESI PENGAJAR TERSEBUT
+        // 3. Load Sesi Pengajar
         if (jd.id_pengajar) {
-            // Kita simpan id_pengajar di dataset modal agar fungsi hapus bisa refresh tabel ini
             $("edit-jadwal-modal").dataset.currentPengajarId = jd.id_pengajar;
             await loadDaftarSesiPengajar(jd.id_pengajar);
         }
@@ -276,7 +282,7 @@ document.addEventListener("click", async (e) => {
 
     } catch (err) {
         console.error(err);
-        toast("Gagal memuat data", "error");
+        toast("Gagal memuat data kategori/jadwal", "error");
     }
 });
 

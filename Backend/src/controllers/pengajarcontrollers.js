@@ -310,6 +310,7 @@ exports.deletePengajar = async (req, res) => {
     const { id_pengajar } = req.params;
     await client.query("BEGIN");
 
+    // 1. Cek keberadaan pengajar
     const check = await client.query(
       `SELECT id_users, email FROM pengajar WHERE id_pengajar=$1`,
       [id_pengajar]
@@ -322,15 +323,28 @@ exports.deletePengajar = async (req, res) => {
 
     const { id_users, email } = check.rows[0];
 
-    // Hapus dari pendaftar dan users
+    // 2. LEPASKAN pengajar dari tabel kelas (Set id_pengajar menjadi NULL)
+    // Ini agar data kelas tidak ikut terhapus, tapi pengajarnya hilang
+    await client.query(
+      `UPDATE kelas SET id_pengajar = NULL WHERE id_pengajar = $1`,
+      [id_pengajar]
+    );
+
+    // 3. Jika ada tabel JADWAL, lakukan hal yang sama
+    // await client.query(`DELETE FROM jadwal WHERE id_pengajar = $1`, [id_pengajar]);
+
+    // 4. Hapus dari pendaftar
     await client.query(`DELETE FROM pendaftar WHERE email = $1`, [email]);
+
+    // 5. Hapus dari users (Ini akan otomatis menghapus di tabel pengajar jika ada CASCADE)
     await client.query(`DELETE FROM users WHERE id_users = $1`, [id_users]);
 
     await client.query("COMMIT");
     res.json({ message: "Pengajar berhasil dihapus sepenuhnya" });
   } catch (err) {
     await client.query("ROLLBACK");
-    res.status(500).json({ message: "Terjadi kesalahan server" });
+    console.error("DETAIL ERROR DELETE:", err); // Tambahkan log ini agar terlihat di terminal
+    res.status(500).json({ message: "Gagal menghapus: Data masih terikat dengan jadwal atau kelas." });
   } finally {
     client.release();
   }

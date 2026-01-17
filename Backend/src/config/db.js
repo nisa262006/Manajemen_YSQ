@@ -7,6 +7,9 @@ const pool = new Pool({
   port: process.env.DB_PORT,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  max: 20, // Maksimal 20 koneksi simultan
+  idleTimeoutMillis: 30000, // Tutup koneksi nganggur setelah 30 detik
+  connectionTimeoutMillis: 2000,
 });
 
 pool.on("connect", () => {

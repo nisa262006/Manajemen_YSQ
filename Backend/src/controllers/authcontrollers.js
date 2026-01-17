@@ -194,41 +194,39 @@ exports.forgotPassword = async (req, res) => {
       [user.id_users, token, expired_at]
     );
 
-    // 3. Konfigurasi Transporter
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465, 
-      secure: true, 
-      auth: {
-        user: process.env.EMAIL_SENDER,
-        pass: process.env.EMAIL_PASSWORD 
-      }
-    });
+   // 3. Konfigurasi Transporter (Pastikan variabel sesuai .env)
+   const transporter = nodemailer.createTransport({
+    service: 'gmail', // Menambahkan service agar konfigurasi host/port lebih otomatis
+    auth: {
+      user: process.env.EMAIL_SENDER, // Sesuaikan dengan .env: EMAIL_SENDER
+      pass: process.env.EMAIL_PASSWORD // Sesuaikan dengan .env: EMAIL_PASSWORD
+    }
+  });
 
-    // Sesuaikan link dengan letak file frontend Anda
-    const resetLink = `${process.env.BASE_URL}/views/reset_password.html?token=${token}`;
+  // Sesuaikan BASE_URL untuk link reset
+  // Gunakan rute express yang sudah Anda buat: /reset-password
+  const resetLink = `${process.env.BASE_URL}/reset-password?token=${token}`;
 
-    // 4. Kirim Email
-    await transporter.sendMail({
-      from: `"Sahabat Quran Bogor" <${process.env.EMAIL_SENDER}>`,
-      to: email,
-      subject: "Reset Password - Sahabat Quran Bogor",
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
-          <h2 style="color: #1b4332;">Permintaan Reset Password</h2>
-          <p>Kami menerima permintaan untuk mereset password akun Sahabat Quran Anda.</p>
-          <p>Klik tombol di bawah ini untuk mengatur ulang password:</p>
-          <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #1b4332; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
-          <p>Link ini berlaku selama 10 menit. Jika Anda tidak merasa melakukan ini, abaikan email ini.</p>
-        </div>`
-    });
+  // 4. Kirim Email
+  await transporter.sendMail({
+    from: `"Sahabat Quran Bogor" <${process.env.EMAIL_SENDER}>`,
+    to: email,
+    subject: "Reset Password - Sahabat Quran Bogor",
+    html: `
+      <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd;">
+        <h2 style="color: #1b4332;">Permintaan Reset Password</h2>
+        <p>Klik tombol di bawah ini untuk mengatur ulang password akun Anda:</p>
+        <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #1b4332; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+        <p>Link ini berlaku selama 10 menit.</p>
+      </div>`
+  });
 
-    return res.status(200).json({ message: "Link reset password telah dikirim ke email Anda. Cek kotak masuk atau spam." });
+  return res.status(200).json({ message: "Link reset password telah dikirim ke email Anda." });
 
-  } catch (err) {
-    console.error("FORGOT PASSWORD ERROR:", err);
-    return res.status(500).json({ message: "Gagal mengirim email. Pastikan server terhubung ke internet." });
-  }
+} catch (err) {
+  console.error("FORGOT PASSWORD ERROR:", err);
+  return res.status(500).json({ message: "Gagal mengirim email. Periksa koneksi atau kredensial email." });
+}
 };
 
 // ==================== RESET PASSWORD (FIXED) ====================
