@@ -1169,3 +1169,53 @@ body {
     border-radius: 20px;
     font-size: 12px;
 }
+
+/* =========================================================
+   RESPONSIVE FIX: TABEL MATERI (SCROLL SAMPING)
+   ========================================================= */
+   @media screen and (max-width: 768px) {
+    /* 1. Header: Buat judul lebih kecil di HP */
+    .page-title {
+        font-size: 1.2rem !important;
+    }
+
+    /* 2. Kontainer Tabel: Aktifkan Scroll */
+    .dashboard-card {
+        padding: 15px !important;
+        overflow: hidden; /* Mencegah card ikut melebar */
+    }
+
+    /* Kita bungkus tabel dengan div yang bisa scroll */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch; /* Scroll halus di iPhone */
+        margin-top: 15px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* 3. Paksa Tabel Tetap Lebar (Tidak Gepeng) */
+    .table-materi-sqm {
+        min-width: 700px !important; /* Kunci: Tabel tidak akan mengecil di bawah 700px */
+        width: 100%;
+    }
+
+    /* 4. Indikator Visual agar User tahu bisa digeser */
+    .table-responsive::after {
+        content: "⇆ Geser ke samping untuk melihat detail";
+        display: block;
+        text-align: center;
+        font-size: 11px;
+        color: #94a3b8;
+        padding: 10px;
+        background: #f8fafc;
+    }
+
+    .table-materi-sqm th, 
+    .table-materi-sqm td {
+        padding: 12px 10px !important;
+        font-size: 0.85rem !important;
+        white-space: nowrap; /* Mencegah teks turun ke bawah */
+    }
+}

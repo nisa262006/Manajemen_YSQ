@@ -78,6 +78,19 @@ function setToday() {
   }
 }
 
+
+/* =====================================================
+   VALIDATION HELPER
+===================================================== */
+function validateFileSize(file, maxMb = 10) {
+  const maxSizeInBytes = maxMb * 1024 * 1024;
+  if (file && file.size > maxSizeInBytes) {
+    alert(`Gagal: Ukuran file "${file.name}" terlalu besar. Maksimal ${maxMb}MB.`);
+    return false;
+  }
+  return true;
+}
+
 /* =====================================================
    LOGIKA JADWAL & TABEL
 ===================================================== */
@@ -218,18 +231,24 @@ window.lihatDetail = async (idMateri) => {
         : (materi.link_url ? `<a href="${materi.link_url}" target="_blank" class="btn-view"><i class="fas fa-link"></i> Buka Link</a>` : "...");
   }
 
-    // Ambil data tugas dari backend
-    const tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${activeMateriId}`);
-    renderTugasInfo(tugasRes);
+  const modalDetail = document.getElementById("modalDetailTerpadu");
+  if (modalDetail) modalDetail.style.display = "flex";
 
-    // Tampilkan Modal
-    const modalDetail = document.getElementById("modalDetailTerpadu");
-    if (modalDetail) modalDetail.style.display = "flex";
-
+  let tugasRes = [];
+  try {
+    tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${activeMateriId}`);
   } catch (err) {
-    console.error("Detail Error:", err);
-    alert("Gagal memuat detail: " + (err.message || "Masalah koneksi"));
+    console.warn("Info: Materi ini belum memiliki tugas.");
+    tugasRes = []; // Set array kosong agar renderTugasInfo tahu tugas memang tidak ada
   }
+
+  renderTugasInfo(tugasRes);
+
+} catch (err) {
+  console.error("Detail Error:", err);
+  alert("Gagal memuat detail materi: " + (err.message || "Terjadi kesalahan"));
+}
+
 };
 
 function renderTugasInfo(tugasList) {
@@ -425,8 +444,17 @@ window.handleKirimTugas = async () => {
   formData.append("deadline", deadlineValue); 
 
   const fileEl = document.getElementById("modalTugasFile");
-  if (fileEl?.files?.[0]) formData.append("file", fileEl.files[0]);
+if (fileEl?.files?.[0]) {
+    const file = fileEl.files[0];
+    const maxSize = 10 * 1024 * 1024; // 10MB
 
+    if (file.size > maxSize) {
+        alert(`Ukuran file "${file.name}" terlalu besar (Maks 10MB).`);
+        isSubmittingTugas = false; 
+        return; // Menghentikan kirim jika terlalu besar
+    }
+    formData.append("file", file); // Cukup satu kali saja
+}
   const link = document.getElementById("modalTugasLink")?.value?.trim();
   if (link) formData.append("link_url", link);
 
@@ -566,6 +594,9 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
   if (tipeKontenValue === "file") {
     const fileInput = document.getElementById("fileMateri");
     if (fileInput.files[0]) {
+      // Gunakan fungsi validasi yang sama
+      if (!validateFileSize(fileInput.files[0], 10)) return;
+  
       formData.append("file", fileInput.files[0]); 
     }
   } else {
