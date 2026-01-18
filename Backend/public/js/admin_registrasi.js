@@ -115,9 +115,8 @@ function renderStat(data) {
     $("count_pending").innerText = data.filter(p => p.status === "pending").length;
     $("count_diterima").innerText = data.filter(p => p.status === "diterima").length;
 
-    const TOTAL_KUOTA = 100;
-    $("count_kuota").innerText =
-        TOTAL_KUOTA - data.filter(p => p.status === "diterima").length;
+    // Logika baru: Menghitung total pendaftar yang statusnya 'ditolak'
+    $("count_ditolak").innerText = data.filter(p => p.status === "ditolak").length;
 }
 
 /* =========================

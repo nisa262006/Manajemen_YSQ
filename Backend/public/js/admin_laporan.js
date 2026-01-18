@@ -80,13 +80,22 @@ function initAbsensiPengajar() {
     }
 
     function renderTable() {
-        tableBody.innerHTML = filteredAbsensi.length ? "" : `<tr><td colspan="4" align="center">Tidak ada data</td></tr>`;
+        // Pastikan colspan 5 karena ada kolom: Tanggal, Nama, Kelas, Status, Catatan
+        tableBody.innerHTML = filteredAbsensi.length ? "" : `<tr><td colspan="5" align="center">Tidak ada data</td></tr>`;
+        const selectedPengajarName = selectData.options[selectData.selectedIndex].text;
+    
         filteredAbsensi.sort((a, b) => fixDateDisplay(b.tanggal).localeCompare(fixDateDisplay(a.tanggal)));
-
+    
         filteredAbsensi.forEach(a => {
+            let displayName = a.nama_pengajar || a.nama; 
+            if ((!displayName || displayName === "-") && selectData.value !== "") {
+                displayName = selectedPengajarName;
+            }
+    
             tableBody.innerHTML += `
                 <tr>
                     <td>${fixDateDisplay(a.tanggal)}</td>
+                    <td style="font-weight: bold;">${displayName || "-"}</td> 
                     <td>${a.nama_kelas ?? "-"}</td>
                     <td><span class="status-badge ${a.status_absensi?.toLowerCase()}">${a.status_absensi}</span></td>
                     <td>${a.catatan ?? "-"}</td>
@@ -104,38 +113,65 @@ function initAbsensiPengajar() {
     function exportToExcel() {
         if (!filteredAbsensi.length) return alert("Data kosong");
         
-        // Ambil info filter untuk nama file
-        const pengajarName = selectData.options[selectData.selectedIndex].text.replace(/\s+/g, '_');
+        const selectedOption = selectData.options[selectData.selectedIndex];
+        const pengajarName = selectedOption.text;
+        const isSemua = selectData.value === "";
         const rangeTanggal = `${startDate.value}_hingga_${endDate.value}`;
-        const fileName = `Laporan_Absensi_Pengajar_${pengajarName}_${rangeTanggal}.xlsx`;
+        const fileName = `Laporan_Absensi_Pengajar_${pengajarName.replace(/\s+/g, '_')}_${rangeTanggal}.xlsx`;
     
-        // Hitung Rekap Global
-        const rekap = {
-            Hadir: filteredAbsensi.filter(a => a.status_absensi === "Hadir").length,
-            Izin: filteredAbsensi.filter(a => a.status_absensi === "Izin").length,
-            Sakit: filteredAbsensi.filter(a => a.status_absensi === "Sakit").length,
-            Alfa: filteredAbsensi.filter(a => ["Alfa", "Tidak Hadir"].includes(a.status_absensi)).length
-        };
-    
-        const wsData = [
+        // 1. Header Laporan
+        let wsData = [
             ["LAPORAN ABSENSI PENGAJAR"],
-            ["Nama:", selectData.options[selectData.selectedIndex].text],
+            ["Nama Pengajar:", pengajarName],
             ["Periode:", `${startDate.value} s/d ${endDate.value}`],
             [],
-            ["RINGKASAN KEHADIRAN"],
-            ["Hadir", "Izin", "Sakit", "Alfa"],
-            [rekap.Hadir, rekap.Izin, rekap.Sakit, rekap.Alfa],
-            [],
-            ["No", "Tanggal", "Kelas", "Status", "Catatan"]
+            ["DATA DETAIL KEHADIRAN"],
+            ["No", "Tanggal", "Nama Pengajar", "Kelas", "Status", "Catatan"]
         ];
     
+        // 2. Masukkan Data Detail
         filteredAbsensi.forEach((a, i) => {
-            wsData.push([i + 1, fixDateDisplay(a.tanggal), a.nama_kelas, a.status_absensi, a.catatan]);
+            const rowName = a.nama_pengajar || a.nama || (isSemua ? "-" : pengajarName);
+            wsData.push([
+                i + 1, 
+                fixDateDisplay(a.tanggal), 
+                rowName, 
+                a.nama_kelas ?? "-", 
+                a.status_absensi, 
+                a.catatan ?? "-"
+            ]);
         });
     
+        // 3. LOGIKA REKAP PER PENGAJAR (Ini bagian yang Anda minta)
+        // Bagian ini akan muncul di bawah tabel detail
+        wsData.push([], ["REKAPITULASI TOTAL PER PENGAJAR"], ["Nama Pengajar", "Hadir", "Izin", "Sakit", "Tidak Hadir (Alfa)"]);
+    
+        // Mengelompokkan data berdasarkan nama pengajar
+        const rekapPerPengajar = filteredAbsensi.reduce((acc, curr) => {
+            const nama = curr.nama_pengajar || curr.nama || (isSemua ? "Tidak Diketahui" : pengajarName);
+            if (!acc[nama]) {
+                acc[nama] = { hadir: 0, izin: 0, sakit: 0, alfa: 0 };
+            }
+            
+            const status = curr.status_absensi?.toLowerCase();
+            if (status === "hadir") acc[nama].hadir++;
+            else if (status === "izin") acc[nama].izin++;
+            else if (status === "sakit") acc[nama].sakit++;
+            else if (status === "alfa" || status === "tidak hadir") acc[nama].alfa++;
+            
+            return acc;
+        }, {});
+    
+        // Masukkan hasil pengelompokan ke dalam array wsData
+        Object.keys(rekapPerPengajar).forEach(nama => {
+            const r = rekapPerPengajar[nama];
+            wsData.push([nama, r.hadir, r.izin, r.sakit, r.alfa]);
+        });
+    
+        // 4. Generate File Excel
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
         XLSX.writeFile(wb, fileName);
     }
 

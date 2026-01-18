@@ -508,9 +508,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const btnExport = document.getElementById("eksporLaporan");
-    if (btnExport) {
-        btnExport.addEventListener("click", exportRiwayatKeExcel);
-    }
+if (btnExport) {
+    btnExport.onclick = async (e) => {
+        e.preventDefault();
+        await exportRiwayatKeExcel();
+    };
+}
+
+// Load data awal
+await applyRiwayatFilters();
+
 });
 
 /* ======================================================
