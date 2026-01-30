@@ -254,21 +254,33 @@ exports.getAbsensiSantri = async (req, res) => {
 };
 
 /* ============================================================================
-   PENGAJAR → MENCATAT ABSENSI PENGAJAR SENDIRI - MODIFIED
+   PENGAJAR → MENCATAT ABSENSI PENGAJAR SENDIRI (FIXED)
 ============================================================================ */
 exports.catatAbsensiPengajar = async (req, res) => {
   try {
     const id_users = req.user.id_users;
-    const { id_jadwal, tanggal, status_absensi, catatan } = req.body;
+    
+    // PERBAIKAN: Tambahkan fallback agar tidak mengirim undefined ke DB
+    // Pastikan nama field status_absensi sesuai dengan yang dikirim Frontend (cek Inspect -> Network)
+    let { id_jadwal, tanggal, status_absensi, catatan } = req.body;
 
-    // Gunakan tanggal hari ini jika tidak dikirim dari frontend
+    // Jika frontend mengirimkan dengan nama "status", kita tangkap di sini
+    if (!status_absensi && req.body.status) {
+        status_absensi = req.body.status;
+    }
+
     const tanggalFinal = tanggal || new Date().toISOString().split('T')[0];
 
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar)
       return res.status(403).json({ message: "Anda bukan pengajar" });
 
-    // 🔒 CEK JADWAL (Hanya memastikan ini memang jadwal pengajar tersebut)
+    // Validasi dasar: Jangan biarkan status_absensi kosong sebelum masuk ke Query
+    if (!status_absensi) {
+      return res.status(400).json({ message: "Status absensi harus dipilih" });
+    }
+
+    // 🔒 CEK JADWAL
     const cekJadwal = await db.query(`
       SELECT j.id_jadwal
       FROM jadwal j
@@ -279,9 +291,6 @@ exports.catatAbsensiPengajar = async (req, res) => {
     if (cekJadwal.rowCount === 0)
       return res.status(403).json({ message: "Jadwal bukan milik Anda" });
 
-    // 🔓 LOGIKA CEK HARI DIHAPUS 
-    // Tidak ada lagi error: "Anda tidak memiliki jadwal mengajar pada hari..."
-
     // 🔒 CEK DUPLIKAT
     const cekDuplikat = await db.query(`
       SELECT 1 FROM absensi_pengajar
@@ -291,13 +300,19 @@ exports.catatAbsensiPengajar = async (req, res) => {
     if (cekDuplikat.rowCount > 0)
       return res.status(400).json({ message: "Absensi pengajar sudah tercatat untuk tanggal ini" });
 
-    // ✅ INSERT DATA
+    // ✅ INSERT DATA - Pastikan menggunakan nilai default string kosong atau null yang valid
     const insert = await db.query(`
       INSERT INTO absensi_pengajar
       (id_pengajar, id_jadwal, tanggal, status_absensi, catatan)
-      VALUES ($1,$2,$3,$4,$5)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
-    `, [id_pengajar, id_jadwal, tanggalFinal, status_absensi, catatan ?? null]);
+    `, [
+        id_pengajar, 
+        id_jadwal, 
+        tanggalFinal, 
+        status_absensi, 
+        catatan || null // Jika catatan undefined, kirim null asli ke DB
+    ]);
 
     res.json({
       success: true,
@@ -307,7 +322,7 @@ exports.catatAbsensiPengajar = async (req, res) => {
 
   } catch (err) {
     console.error("ABSENSI PENGAJAR ERROR:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error: " + err.message });
   }
 };
 

@@ -367,31 +367,28 @@ async function loadKelasYSQ() {
         for (const cb of checked) {
           const tr = cb.closest("tr");
           const idSantri = Number(tr.dataset.id);
-  
+      
           if (!idSantri) continue;
-  
-          const santri = window._allSantri.find(
-            s => s.id_santri === idSantri
-          );
-  
+      
+          const santri = window._allSantri.find(s => s.id_santri === idSantri);
+      
           if (santri?.id_kelas) {
-            await apiPut(`/kelas/pindah/${idSantri}`, {
-              id_kelas_baru: idKelas
-            });
+            await apiPut(`/kelas/pindah/${idSantri}`, { id_kelas_baru: idKelas });
           } else {
-            await apiPost(`/kelas/${idKelas}/santri`, {
-              id_santri: idSantri
-            });
+            await apiPost(`/kelas/${idKelas}/santri`, { id_santri: idSantri });
           }
         }
-  
+      
         showNotification("Santri berhasil dimasukkan ke kelas", "success");
         await loadSantri();
         await loadKelasYSQ();
-  
+      
       } catch (err) {
-        console.error(err);
-        showNotification("Gagal menyimpan kelas", "error");
+        console.error("Error detail:", err);
+        
+        // TANGKAP PESAN ERROR DARI BACKEND DISINI
+        const errorMsg = err.response?.data?.message || err.message || "Gagal menyimpan kelas";
+        showNotification(errorMsg, "error"); // Ini akan memunculkan "Kapasitas kelas penuh"
       }
     });
   

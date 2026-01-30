@@ -119,6 +119,28 @@ app.get("/dashboard/materi-santri", (_, res) => {
   res.sendFile(view("detail-materi-santri.html"));
 });
 
+app.get("/dashboard/santri/rapor", (_, res) => {
+  res.sendFile(view("raporsiswa.html"));
+});
+
+// ================= KEUANGAN =================
+app.get("/dashboard/billing", (_, res) =>
+  res.sendFile(view("billing.html"))
+);
+
+app.get("/dashboard/pembayaran", (_, res) =>
+  res.sendFile(view("pembayaran.html"))
+);
+
+// Tambahkan ini di bawah rute pengajar lainnya
+app.get("/dashboard/pengajar/rapor", (_, res) => {
+  res.sendFile(view("rapor-pengajar.html"));
+});
+
+app.get("/dashboard/pengajar/laporan", (_, res) => {
+  res.sendFile(view("laporan-pengajar.html"));
+});
+
 // ================= API ROUTES =================
 app.use("/api/auth", require("./routes/authroutes"));
 app.use("/api/pendaftar", require("./routes/registerroutes"));
@@ -132,7 +154,9 @@ app.use("/api/me", require("./routes/meroutes"));
 app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
 app.use("/api/tugas-media", require("./routes/tugasmateriajarroutes"));
 app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
-
+app.use("/api/rapor", require("./routes/raporroutes"));
+app.use("/api/billing-santri", require("./routes/billingSantriRoutes"));
+app.use("/api/pembayaran", require("./routes/pembayaranroutes"));
 
 // ================= START SERVER =================
 app.listen(PORT, () => {

@@ -398,9 +398,6 @@ if (isSudah) {
             <td style="padding: 12px; border-bottom: 1px solid #eee;" align="center">
                 ${aksiHTML}
             </td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee;" align="center">
-                <span style="font-weight: bold; color: #64748b;">-</span>
-            </td>
         </tr>
     `;
 }).join("");
