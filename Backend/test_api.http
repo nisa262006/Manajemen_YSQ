@@ -1,5 +1,5 @@
 ### LOGIN TEST
-POST http://localhost:8000/auth/login
+POST http://localhost:8000/api/auth/login
 Content-Type: application/json
 
 {
@@ -22,8 +22,8 @@ POST http://localhost:8000/api/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "rahmafitriatunnisa.xtpgma@gmail.com",
-  "password": "rahma123"
+  "identifier": "santri1@ysq.com",
+  "password": "santri1123"
 }
 
 
@@ -557,11 +557,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwic
 
 ## SANTRI LIHAT TUGAS
 GET http://localhost:8000/api/tugas-media/tugas/saya
-Authorization: Bearer {{token_santri}}
+Authorization: Bearer token_santri
 
 ## SANTRI NGUMPULIN TUGAS TEXT
 POST http://localhost:8000/api/tugas-media/tugas/kumpul
-Authorization: Bearer {{token_santri}}
+Authorization: Bearer token_santri
 Content-Type: application/json
 
 {
@@ -572,7 +572,7 @@ Content-Type: application/json
 
 ## FILE
 POST http://localhost:8000/api/tugas-media/tugas/kumpul
-Authorization: Bearer {{token_santri}}
+Authorization: Bearer token_santri
 Content-Type: application/json
 
 {
@@ -583,7 +583,7 @@ Content-Type: application/json
 
 ## SANTRI LIHAT MEDIA AJAR
 GET http://localhost:8000/api/tugas-media/media/saya
-Authorization: Bearer {{token_santri}}
+Authorization: Bearer token_santri
 
 ###############################################################
 ### NILAI DAN PROGRES
@@ -603,7 +603,7 @@ Content-Type: application/json
 
 ### LIHAT PROGRES SANTRI
 GET http://localhost:8000/api/nilai-progres/saya
-Authorization: Bearer {{token_santri}}
+Authorization: Bearer token_santri
 
 ### REKAP KELAS
 GET http://localhost:8000/api/nilai-progres/rekap/kelas/2
@@ -611,4 +611,124 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwic
 
 ### LAPORAN ADMIN
 GET http://localhost:8000/api/nilai-progres/laporan
-Authorization: Bearer {{token_admin}}
+Authorization: Bearer token_admin
+
+
+### tambah raport
+### CREATE RAPOR (PENGAJAR)
+POST  http://localhost:8000/api/rapor
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
+Content-Type: application/json
+
+{
+  "id_santri": 11,
+  "periode": "Semester Ganjil 2024",
+  "nilai_tahsin": 85,
+  "nilai_tahfidz": 90,
+  "adab": 95,
+  "kehadiran": 92,
+  "catatan": "Perkembangan sangat baik"
+}
+
+### GET RAPOR BY PENGAJAR
+GET   http://localhost:8000/api/rapor/pengajar/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
+
+
+### GET RAPOR BY SANTRI
+GET  http://localhost:8000/api/rapor/santri/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjA2NDMsImV4cCI6MTc2OTYwNzA0M30.Y3Um-_PwWpCVoZgoVGSHqezgSWhxn0lXzGbd0fCJGNk
+
+
+### UPDATE RAPOR
+PUT  http://localhost:8000/api/rapor/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
+Content-Type: application/json
+
+{
+  "nilai_tahsin": 88,
+  "nilai_tahfidz": 92,
+  "adab": 97,
+  "kehadiran": 95,
+  "catatan": "Meningkat signifikan"
+}
+
+### DELETE RAPOR
+DELETE  http://localhost:8000/api/rapor/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
+
+### CREATE BILLING SANTRI
+POST http://localhost:8000/api/billing-santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+Content-Type: application/json
+
+{
+  "id_santri": 11,
+  "jenis": "SPP",
+  "periode": "Januari 2026",
+  "nominal": 250000
+}
+
+### GET ALL BILLING (ADMIN)
+GET http://localhost:8000/api/billing-santri/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+
+### UPDATE BILLING
+PUT http://localhost:8000/api/billing-santri/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+Content-Type: application/json
+
+{
+  "jenis": "SPP",
+  "periode": "Januari 2026",
+  "nominal": 250000,
+  "status": "lunas"
+}
+
+### DELETE BILLING
+DELETE http://localhost:8000/api/billing-santri/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+
+### GET BILLING SANTRI (ME)
+GET http://localhost:8000/api/billing-santri/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjI2NDEsImV4cCI6MTc2OTYwOTA0MX0.WWnbOaEJrD6vC5oFDs0XDIQCYzmoelXmrlMMfrp0zAM
+
+
+### SANTRI - CREATE PEMBAYARAN
+POST http://localhost:8000/api/pembayaran
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjUzNjQsImV4cCI6MTc2OTYxMTc2NH0.q9Kq2N0th2hV2kXiirvo9IniB16ow3nlMyuKDeP79sc
+Content-Type: application/json
+
+{
+  "id_billing": 2,
+  "jumlah_bayar": 300000,
+  "metode": "transfer"
+}
+
+
+### SANTRI - DUPLIKAT PEMBAYARAN
+POST http://localhost:8000/api/pembayaran
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjUzNjQsImV4cCI6MTc2OTYxMTc2NH0.q9Kq2N0th2hV2kXiirvo9IniB16ow3nlMyuKDeP79sc
+Content-Type: application/json
+
+{
+  "id_billing": 2,
+  "jumlah_bayar": 300000,
+  "metode": "transfer"
+}
+
+### SANTRI - GET PEMBAYARAN ME
+GET http://localhost:8000/api/pembayaran/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjUzNjQsImV4cCI6MTc2OTYxMTc2NH0.q9Kq2N0th2hV2kXiirvo9IniB16ow3nlMyuKDeP79sc
+
+### ADMIN - GET ALL PEMBAYARAN
+GET http://localhost:8000/api/pembayaran/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+
+### ADMIN - VERIFIKASI PEMBAYARAN
+PUT http://localhost:8000/api/pembayaran/1/verifikasi
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+
+###
+GET http://localhost:8000/api/billing-santri/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk

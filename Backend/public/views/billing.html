@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Bill - Sahabat Quran</title>
+    <link rel="stylesheet" href="/css/santri.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="ysq-dashboard-wrapper">
+
+    <header class="header">
+        <div class="logo-section">
+            <img src="/images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
+            <h2>YAYASAN SAHABAT QUR'AN</h2>
+        </div>
+        <div class="user-info">
+            <span id="role-user">Santri</span>
+            <i class='bx bx-user-circle icon-user'></i>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="dashboard-card">
+            <div class="main-header-row">
+                <h1>STUDENT BILL</h1>
+            </div>
+
+            <div class="sub-nav scroll-x">
+                <a href="/dashboard/santri"><button class="nav-btn">Dashboard</button></a>
+                <a href="/dashboard/absensi-siswa"><button class="nav-btn">Riwayat Absen</button></a>
+                <a href="/dashboard/santri/rapor"><button class="nav-btn">Rapor</button></a>
+                <a href="/dashboard/billing"><button class="nav-btn active">Student Bill</button></a>
+            </div>
+
+            <section class="ysq-content-card">
+                <div class="ysq-bill-summary-grid">
+                    <div class="ysq-bill-card highlight">
+                        <div class="bill-card-icon"><i class='bx bx-wallet'></i></div>
+                        <div class="bill-card-info">
+                            <span id="label-total-dinamis">Total Tagihan SPP Belum Lunas</span>
+                            <h3 id="nominal-tagihan-aktif">Rp 350.000</h3>
+                            <div class="ysq-tunggakan-badge">
+                                <i class='bx bx-error-circle'></i> Ada tunggakan! 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ysq-action-bar">
+                    <h2 class="ysq-section-title">Detail Tagihan</h2>
+                    <div class="ysq-filter-group">
+                        <div class="ysq-filter-item">
+                            <label class="ysq-filter-label">Kategori:</label>
+                            <select id="main-filter" class="ysq-select-custom">
+                                <option value="spp">SPP (Iuran Bulanan)</option>
+                                <option value="non-iuran">Biaya Lainnya (Non-Iuran)</option>
+                            </select>
+                        </div>
+
+                        <div id="spp-filters-container" style="display: flex; gap: 15px;">
+                            <div id="year-filter-container" class="ysq-filter-item">
+                                <label class="ysq-filter-label">Tahun:</label>
+                                <select id="year-filter" class="ysq-select-custom">
+                                    <option value="2026" selected>2026</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+
+                            <div id="status-filter-container" class="ysq-filter-item">
+                                <label class="ysq-filter-label">Status:</label>
+                                <select id="status-filter" class="ysq-select-custom">
+                                    <option value="all">Semua Status</option>
+                                    <option value="success">Lunas</option>
+                                    <option value="warning">Mencicil</option>
+                                    <option value="danger">Belum Bayar</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-spp-table" class="view-section">
+                    <h3 class="view-subtitle">Histori Pembayaran SPP Tahun <span id="display-year">2026</span></h3>
+                    <div class="ysq-table-wrapper">
+                        <div class="ysq-grid-table">
+                            <div class="grid-header grid-row">
+                                <div class="grid-cell text-left">Bulan</div>
+                                <div class="grid-cell">Tagihan</div>
+                                <div class="grid-cell">Dibayar</div>
+                                <div class="grid-cell">Sisa</div>
+                                <div class="grid-cell">Status</div>
+                                <div class="grid-cell">Tindakan</div>
+                            </div>
+                            <div id="spp-data-container" class="grid-body"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="section-non-iuran" class="view-section" style="display: none;">
+                    <h3 class="view-subtitle">Daftar Tagihan Non-Rutin (Lainnya)</h3>
+                    <div class="ysq-table-wrapper">
+                        <div class="ysq-grid-table">
+                            <div class="grid-header grid-row">
+                                <div class="grid-cell text-left">Nama Tagihan</div>
+                                <div class="grid-cell">Total Biaya</div>
+                                <div class="grid-cell">Dibayar</div>
+                                <div class="grid-cell">Sisa</div>
+                                <div class="grid-cell">Status</div>
+                                <div class="grid-cell">Tindakan</div>
+                            </div>
+                            <div class="grid-body">
+                                <div class="grid-row">
+                                    <div class="grid-cell text-left">Uang Seragam 2026</div>
+                                    <div class="grid-cell">Rp 500.000</div>
+                                    <div class="grid-cell">Rp 0</div>
+                                    <div class="grid-cell">Rp 500.000</div>
+                                    <div class="grid-cell"><span class="ysq-status-pill danger">Belum Bayar</span></div>
+                                    <div class="grid-cell">
+                                        <button class="ysq-btn-upload" data-item="Uang Seragam" data-amount="500.000">Konfirmasi</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="paymentModal" class="ysq-modal">
+        <div class="ysq-modal-content">
+            <span id="close-modal" class="close-btn-top">&times;</span>
+            <div class="ysq-modal-header-info">
+                <i class='bx bxs-check-shield'></i>
+                <div class="ysq-bill-details">
+                    <h4>Konfirmasi Pembayaran</h4>
+                    <p id="billPeriodInfo">-</p>
+                    <p><strong>Sisa Tagihan: Rp <span id="billAmountInfo">0</span></strong></p>
+                </div>
+            </div>
+            <div class="ysq-modal-body">
+                <form id="paymentForm">
+                    <div class="ysq-form-group">
+                        <label>Jumlah Bayar (Rp)</label>
+                        <input type="text" id="inputAmount" placeholder="Contoh: 200.000" required>
+                    </div>
+                    <div class="ysq-form-group">
+                        <label>Tanggal Transfer</label>
+                        <input type="date" required>
+                    </div>
+                    <div class="ysq-form-group">
+                        <label>Metode Pembayaran</label>
+                        <select class="ysq-select-custom" style="width: 100%;" required>
+                            <option value="" disabled selected>Pilih Bank/E-Wallet</option>
+                            <option value="BSI">Bank Syariah Indonesia (BSI)</option>
+                            <option value="Mandiri">Bank Mandiri</option>
+                            <option value="BCA">BCA</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="ysq-btn-submit-payment">Kirim Konfirmasi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="ysq-toast" class="ysq-toast"></div>
+
+    <div id="ysq-toast" class="ysq-toast"></div>
+    <script src="js/billing.js"></script>
+</body>
+</html>

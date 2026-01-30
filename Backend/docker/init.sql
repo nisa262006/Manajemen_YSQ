@@ -205,6 +205,104 @@ CREATE TABLE progres_pembelajaran (
     UNIQUE(id_santri, id_kelas, minggu_ke)
 );
 
+--18 RAPOR tahsin
+CREATE TABLE rapor_tahsin (
+  id_rapor SERIAL PRIMARY KEY,
+  id_santri INT NOT NULL,
+  id_pengajar INT NOT NULL,
+  periode VARCHAR(50) NOT NULL,
+
+  nilai_pekanan DECIMAL(5,2),
+  ujian_tilawah DECIMAL(5,2),
+  nilai_teori DECIMAL(5,2),
+  nilai_presensi DECIMAL(5,2),
+  nilai_akhir DECIMAL(5,2),
+
+  catatan TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  UNIQUE (id_santri, periode),
+  FOREIGN KEY (id_santri) REFERENCES santri(id_santri),
+  FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
+);
+
+CREATE TABLE rapor_tahfidz (
+  id_rapor SERIAL PRIMARY KEY,
+  id_santri INT NOT NULL,
+  id_pengajar INT NOT NULL,
+  periode VARCHAR(50) NOT NULL,
+
+  nilai_rata_simakan DECIMAL(5,2),
+  nilai_ujian_akhir DECIMAL(5,2),
+  nilai_akhir DECIMAL(5,2),
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  UNIQUE (id_santri, periode),
+  FOREIGN KEY (id_santri) REFERENCES santri(id_santri),
+  FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
+);
+
+CREATE TABLE tahfidz_simakan (
+  id_simakan SERIAL PRIMARY KEY,
+  id_rapor INT NOT NULL,
+  juz INT CHECK (juz BETWEEN 1 AND 30),
+  nilai DECIMAL(5,2),
+
+  UNIQUE (id_rapor, juz),
+  FOREIGN KEY (id_rapor) REFERENCES rapor_tahfidz(id_rapor)
+);
+
+--19 BILLING
+CREATE TABLE billing_santri (
+  id_billing SERIAL PRIMARY KEY,
+  id_santri INT NOT NULL,
+  jenis VARCHAR(50) NOT NULL,
+  nominal INT NOT NULL,
+  periode VARCHAR(50),
+  status VARCHAR(20) DEFAULT 'belum bayar',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_billing_santri
+    FOREIGN KEY (id_santri) REFERENCES santri(id_santri)
+);
+
+CREATE TABLE gaji_pengajar (
+  id_gaji SERIAL PRIMARY KEY,
+  id_pengajar INT NOT NULL,
+  periode VARCHAR(50) NOT NULL,
+  nominal INT NOT NULL,
+  status VARCHAR(20) DEFAULT 'belum dibayar',
+  catatan TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_gaji_pengajar
+    FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
+);
+
+--20 PEMBAYARAN
+CREATE TABLE pembayaran (
+  id_pembayaran SERIAL PRIMARY KEY,
+  id_billing INT NOT NULL,
+  tanggal_bayar DATE NOT NULL,
+  jumlah_bayar INT NOT NULL,
+  metode VARCHAR(50), -- transfer, cash, dll
+  bukti_bayar TEXT,
+  status VARCHAR(20) DEFAULT 'menunggu',
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_billing
+    FOREIGN KEY (id_billing)
+    REFERENCES billing_santri(id_billing)
+);
+
+UPDATE billing_santri
+SET status = 'belum bayar'
+WHERE status IS NULL
+   OR status = 'belum';
+
+
 -- insert
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin1@ysq.com', '$2a$12$a8YvFLJ3dhQJaPCdHgeY7Og62137S9KOqbImtWBMipqCzaIf3VRM.', 'admin', 'aktif', 'admin1');

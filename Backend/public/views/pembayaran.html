@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Metode Pembayaran - Sahabat Quran</title>
+    <link rel="stylesheet" href="/css/santri.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="ysq-dashboard-wrapper">
+
+    <header class="header">
+        <div class="logo-section">
+            <img src="/images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
+            <h2>YAYASAN SAHABAT QUR'AN</h2>
+        </div>
+        <div class="user-info">
+            <span id="role-user">Santri</span>
+            <i class='bx bx-user-circle icon-user'></i>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="dashboard-card">
+            <div class="main-header-row">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <a href="billing.html" class="ysq-btn-back"><i class='bx bx-left-arrow-alt'></i></a>
+                    <h1>PILIH METODE PEMBAYARAN</h1>
+                </div>
+            </div>
+
+            <section class="ysq-content-card">
+                <p class="ysq-instruction-text">Silakan pilih saluran pembayaran. Pastikan Anda menyimpan bukti transfer untuk diunggah.</p>
+
+                <div class="ysq-payment-section">
+                    <h3 class="ysq-payment-title"><i class='bx bx-mobile-alt'></i> E-Wallet</h3>
+                    <div class="ysq-payment-list">
+                        <div class="ysq-payment-item" onclick="openUploadPopup('DANA', '0812-3456-7890')">
+                            <div class="payment-icon"><i class='bx bx-wallet-alt' style="color: #118EEA; font-size: 28px;"></i></div>
+                            <div class="payment-details"><strong>DANA</strong><span>0812-3456-7890 a.n Sahabat Quran</span></div>
+                            <i class='bx bx-chevron-right'></i>
+                        </div>
+                        <div class="ysq-payment-item" onclick="openUploadPopup('GoPay', '0812-3456-7890')">
+                            <div class="payment-icon"><i class='bx bxs-badge-check' style="color: #00AA13; font-size: 28px;"></i></div>
+                            <div class="payment-details"><strong>GoPay</strong><span>0812-3456-7890 a.n Sahabat Quran</span></div>
+                            <i class='bx bx-chevron-right'></i>
+                        </div>
+                        <div class="ysq-payment-item" onclick="openUploadPopup('ShopeePay', '0812-3456-7890')">
+                            <div class="payment-icon"><i class='bx bxs-shopping-bag' style="color: #EE4D2D; font-size: 28px;"></i></div>
+                            <div class="payment-details"><strong>ShopeePay</strong><span>0812-3456-7890 a.n Sahabat Quran</span></div>
+                            <i class='bx bx-chevron-right'></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ysq-payment-section">
+                    <h3 class="ysq-payment-title"><i class='bx bxs-bank'></i> Transfer Bank</h3>
+                    <div class="ysq-payment-list">
+                        <div class="ysq-payment-item" onclick="openUploadPopup('BSI', '7123456789')">
+                            <div class="payment-icon"><i class='bx bxs-bank' style="color: #00a3ad; font-size: 28px;"></i></div>
+                            <div class="payment-details"><strong>BSI (Bank Syariah Indonesia)</strong><span>7123456789 a.n YSQ</span></div>
+                            <i class='bx bx-chevron-right'></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="js/billing.js"></script>
+</body>
+</html>

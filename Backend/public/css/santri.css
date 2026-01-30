@@ -1170,6 +1170,1270 @@ body {
     font-size: 12px;
 }
 
+/* ========================================================= */
+/* 9. RAPOR SANTRI - PROGRES BELAJAR & DETAIL NILAI          */
+/* ========================================================= */
+
+/* Container Utama: Membagi ruang antara Judul (Kiri) dan Tab (Kanan) */
+.main-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.main-header-row h1 {
+    margin: 0;
+    font-size: clamp(1.1rem, 4vw, 1.6rem);
+    font-weight: 800;
+}
+
+/* Styling Tab Kontrol */
+.ysq-header-tabs {
+    display: flex;
+    background: #f1f3f0;
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+.ysq-tab-btn {
+    padding: 6px 15px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #888;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.ysq-tab-btn.active {
+    background: #0b4528;
+    color: white;
+}
+
+/* AREA KONTEN & FILTER */
+.ysq-content-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.ysq-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.ysq-filter-container {
+    display: flex;
+    gap: 20px;
+}
+
+.ysq-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ysq-filter-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0b4528;
+    white-space: nowrap;
+}
+
+.ysq-filter-box {
+    background: #D9E3C0; /* Warna Krem Khas YSQ [cite: 24] */
+    padding: 8px 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ysq-filter-select, .ysq-date-picker {
+    background: transparent;
+    border: none;
+    color: #0b4528;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    font-size: 0.85rem;
+}
+
+/* TABEL MODERN & TOMBOL AKSI */
+.ysq-table-modern {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ysq-table-modern th {
+    color: #0b4528;
+    border-bottom: 2.5px solid #0b4528;
+    padding: 15px 10px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.ysq-table-modern td {
+    padding: 18px 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+}
+
+.ysq-trigger-detail {
+    background: #ffffff;
+    border: 1.5px solid #0b4528;
+    color: #0b4528;
+    padding: 6px 15px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.ysq-trigger-detail:hover {
+    background: #0b4528;
+    color: #ffffff;
+}
+
+/* DETAIL CONTAINER (TENGAH & SIMETRIS) */
+.ysq-detail-container {
+    padding: 30px;
+    background: #fcfcfc;
+    border: 1px solid #f0f0f0;
+    border-radius: 0 0 15px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ysq-score-title {
+    text-align: center;
+    color: #0b4528;
+    font-weight: 800;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+/* GRID 4 ASPEK LISAN [cite: 100] */
+.ysq-grid-scores-2col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 15px;
+    width: 100%;
+    max-width: 550px;
+    margin-bottom: 20px;
+}
+
+.ysq-pill-score {
+    background: #D9E3C0;
+    padding: 12px 20px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 180px;
+}
+
+.ysq-pill-score span {
+    color: #0b4528;
+    font-weight: 800;
+    margin-left: 15px;
+}
+
+/* AREA AKSI GOOGLE FORM [cite: 101, 108] */
+.ysq-gf-action-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.ysq-btn-gf-link {
+    text-decoration: none;
+    background: transparent;
+    border: 2px solid #0b4528;
+    color: #0b4528;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+.ysq-btn-gf-link:hover {
+    background: #0b4528;
+    color: #ffffff;
+}
+
+/* CONTAINER FEEDBACK KHUSUS (MENGHINDARI KOSONG) [cite: 103, 114] */
+.ysq-feedback-box {
+    margin-top: 20px;
+    background: #f1f3f0;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid #0b4528;
+    width: 100%;
+    max-width: 650px;
+    text-align: left;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.ysq-feedback-label {
+    display: block;
+    font-weight: 800;
+    color: #0b4528;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.ysq-feedback-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #444;
+    font-weight: 500;
+}
+
+/* UTILITY & ANIMASI */
+.ysq-is-hidden {
+    display: none !important;
+}
+
+.ysq-detail-container {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+    .ysq-grid-scores-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================================= */
+/* BAGIAN 10 : PREMIUM PERFORMANCE RAPORT YSQ (FR.007)       */
+/* ========================================================= */
+
+.ysq-raport-module {
+    --ysq-green-dark: #0b4528;
+    --ysq-green-mid: #27ae60;
+    --ysq-green-pale: #f1f8f4;
+    --ysq-text-primary: #2d3436;
+    --ysq-text-secondary: #636e72;
+    --ysq-border: #e9ecef;
+    --ysq-white: #ffffff;
+}
+
+/* --- Student Identity Box (Dashboard View) --- */
+.ysq-student-identity-box {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    background: var(--ysq-white);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--ysq-border);
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.ysq-student-identity-box .id-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ysq-student-identity-box .id-label {
+    font-size: 0.7rem;
+    color: var(--ysq-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.ysq-student-identity-box .id-value {
+    font-size: 0.95rem;
+    color: var(--ysq-green-dark);
+    font-weight: 800;
+}
+
+/* --- Container Section --- */
+.ysq-raport-module .ysq-content-card {
+    background: var(--ysq-white);
+    padding: 25px;
+}
+
+/* --- Container Section --- */
+.ysq-raport-module .ysq-content-card {
+    background: var(--ysq-white);
+    padding: 25px;
+}
+
+/* --- Action Bar: Periode & Status --- */
+.ysq-raport-module .ysq-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--ysq-border);
+}
+
+.ysq-raport-module .ysq-label-minimal {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--ysq-text-secondary);
+    margin-right: 8px;
+}
+
+/* --- Dropdown Custom (Mematikan Ikon Bawaan Browser) --- */
+.ysq-raport-module .ysq-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ysq-raport-module .ysq-select-minimal {
+    /* Menghapus gaya panah default browser */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    
+    border: none;
+    background: transparent;
+    font-weight: 800;
+    color: var(--ysq-green-dark);
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+    padding-right: 25px; /* Memberi ruang untuk ikon Boxicons */
+}
+
+/* Mematikan panah default khusus Internet Explorer/Edge */
+.ysq-raport-module .ysq-select-minimal::-ms-expand {
+    display: none;
+}
+
+.ysq-raport-module .ysq-select-wrapper i {
+    position: absolute;
+    right: 0;
+    pointer-events: none; /* Memastikan klik menembus ikon ke elemen select */
+    color: var(--ysq-green-dark);
+    font-size: 1.2rem;
+}
+
+/* Status Published sesuai aturan akses Santri [cite: 14, 38] */
+.ysq-raport-module .ysq-badge-published {
+    background: var(--ysq-green-pale);
+    color: var(--ysq-green-mid);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid rgba(39, 174, 96, 0.2);
+}
+
+/* --- Tabel Premium (Clean Layout) --- */
+.ysq-raport-module .ysq-table-container {
+    border: 1px solid var(--ysq-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.ysq-raport-module .ysq-table-premium {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Header Tabel 3 Kolom - Rata Tengah [cite: 3, 41] */
+.ysq-raport-module .ysq-table-premium thead th {
+    background: #fafafa;
+    color: var(--ysq-text-secondary);
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 15px 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    border-bottom: 2px solid var(--ysq-green-dark);
+}
+
+/* Pengaturan khusus kolom baru: Tanggal */
+.ysq-raport-module .col-date {
+    width: 180px;
+}
+
+.ysq-raport-module .val-date {
+    font-size: 0.85rem;
+    color: var(--ysq-text-secondary);
+}
+
+/* Isi Sel Tabel 3 Kolom - Rata Tengah secara Konsisten [cite: 11, 18] */
+.ysq-raport-module .ysq-table-premium tbody td {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--ysq-border);
+    color: var(--ysq-text-primary);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* Zebra Effect untuk kemudahan baca [cite: 11, 18] */
+.ysq-raport-module .ysq-table-premium tbody tr:nth-child(even) {
+    background-color: #fdfdfd;
+}
+
+/* Baris Rata-rata Akhir (Summary) [cite: 13, 37] */
+.ysq-raport-module .ysq-row-summary {
+    background: var(--ysq-green-pale) !important;
+}
+
+.ysq-raport-module .ysq-row-summary td {
+    padding: 20px;
+    font-weight: 800;
+    color: var(--ysq-green-dark);
+    border: none;
+    font-size: 1rem;
+}
+
+/* Label Rata-rata Akhir pada Kolom 1-2 [cite: 13, 37] */
+.ysq-raport-module .ysq-row-summary .label-summary {
+    text-align: right;
+    padding-right: 80px;
+}
+
+.ysq-raport-module .ysq-row-summary .val-total {
+    font-size: 1.25rem;
+    font-weight: 900;
+    text-align: center;
+}
+
+/* --- Footer Rapor: Status & Tombol --- */
+.ysq-raport-module .ysq-report-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.ysq-raport-module .ysq-status-info {
+    max-width: 60%;
+}
+
+.ysq-raport-module .ysq-text-status {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--ysq-text-primary);
+}
+
+/* Highlight Status Kenaikan Tingkat [cite: 37, 63] */
+.ysq-raport-module .ysq-text-status strong {
+    color: var(--ysq-green-mid);
+    background: #e8f5e9;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 800;
+}
+
+.ysq-raport-module .ysq-text-note {
+    font-size: 0.85rem;
+    color: var(--ysq-text-secondary);
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* --- Button Unduh PDF Resmi [cite: 68, 69] --- */
+.ysq-raport-module .ysq-btn-primary-download {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--ysq-green-dark);
+    color: var(--ysq-white);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(11, 69, 40, 0.2);
+}
+
+.ysq-raport-module .ysq-btn-primary-download:hover {
+    background: #08361f;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(11, 69, 40, 0.3);
+}
+
+/* Utilitas */
+.ysq-is-hidden { display: none; }
+
+/* ========================================================= */
+/* BAGIAN 10 (2) : SECTION RAPOR TAHFIDZ (PREMIUM STYLE)     */
+/* ========================================================= */
+
+#section-rapor-tahfidz {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* --- Pengaturan Tabel Utama --- */
+#section-rapor-tahfidz .ysq-table-container {
+    border: 1px solid var(--ysq-border);
+    border-radius: 12px 12px 0 0; /* Melengkung hanya di atas agar menyatu dengan baris biru */
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+#section-rapor-tahfidz .ysq-table-premium {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#section-rapor-tahfidz .ysq-table-premium th,
+#section-rapor-tahfidz .ysq-table-premium td {
+    width: 33.33%;
+    text-align: center;
+    padding: 15px 20px;
+}
+
+/* --- Baris Rata-rata Simakan (Sejajar Tanggal) --- */
+#section-rapor-tahfidz .ysq-row-summary {
+    background-color: var(--ysq-green-pale) !important;
+}
+
+#section-rapor-tahfidz .ysq-row-summary .label-summary {
+    text-align: right;
+    padding-right: 100px; /* Jarak kunci agar sejajar dengan kolom tengah */
+    font-weight: 800;
+    color: var(--ysq-green-dark);
+}
+
+#section-rapor-tahfidz .ysq-row-summary .val-total {
+    font-weight: 800;
+    color: var(--ysq-green-dark);
+}
+
+/* --- Baris Rata-rata Akhir (Biru - Sejajar di Bawah Tabel) --- */
+.ysq-row-final-score {
+    display: flex;
+    background-color: #2980b9;
+    color: #ffffff;
+    border-radius: 0 0 12px 12px; /* Melengkung di bawah untuk menutup tabel */
+    overflow: hidden;
+}
+
+/* --- Baris Rata-rata Akhir (Biru) --- */
+.ysq-row-final-score {
+    display: flex;
+    background-color: #2980b9;
+    color: #ffffff;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.ysq-row-final-score .label-final {
+    flex: 2; 
+    text-align: right;
+    padding-right: 170px; 
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    align-self: center;
+}
+
+.ysq-row-final-score .value-final {
+    flex: 1;
+    text-align: center;
+    padding-right: 35px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+/* --- Area Predikat Menonjol --- */
+.ysq-summary-predikat-v2 {
+    margin: 50px 0;
+    text-align: center;
+}
+
+.ysq-summary-predikat-v2 .text-p {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #0b4528;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    display: block;
+}
+
+.ysq-summary-predikat-v2 .decoration-line {
+    width: 80px;
+    height: 5px;
+    background: #f1c40f;
+    margin: 15px auto 0 auto; /* Tengah secara otomatis */
+    border-radius: 10px;
+}
+
+/* --- Area Predikat Sangat Menonjol --- */
+.ysq-summary-predikat-v2 {
+    margin: 50px 0;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ysq-summary-predikat-v2 .label-p {
+    font-size: 0.85rem;
+    color: var(--ysq-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.ysq-summary-predikat-v2 .text-p {
+    font-size: 2.8rem; /* Ukuran besar untuk focal point */
+    font-weight: 900;
+    color: var(--ysq-green-dark);
+    text-transform: uppercase;
+    letter-spacing: 8px; /* Jarak antar huruf mewah */
+    line-height: 1;
+    margin: 10px 0;
+}
+
+.ysq-summary-predikat-v2 .decoration-line {
+    width: 80px;
+    height: 5px;
+    background: #f1c40f; /* Garis emas prestasi */
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+/* --- Footer Info --- */
+.ysq-report-footer {
+    border-top: 1px solid var(--ysq-border);
+    padding-top: 30px;
+    margin-top: 20px;
+}
+
+/* Responsif */
+@media (max-width: 600px) {
+    #section-rapor-tahfidz .ysq-row-summary .label-summary,
+    .ysq-row-final-score .label-final {
+        padding-right: 30px; /* Jarak disesuaikan untuk layar kecil */
+    }
+    .ysq-summary-predikat-v2 .text-p {
+        font-size: 1.8rem;
+        letter-spacing: 4px;
+    }
+}
+
+/* Menyamakan gaya baris UAS dengan baris Rata-rata Simakan */
+.ysq-row-uas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--ysq-green-pale) !important; /* Hijau muda yang sama */
+    padding: 15px 20px;
+    margin-top: 5px; /* Memberi sedikit jarak dari tabel atas */
+    border-radius: 4px; /* Opsional, agar sudutnya lembut */
+}
+
+.ysq-row-uas .label-summary {
+    flex: 1;
+    text-align: right;
+    padding-right: 30px; /* Jarak yang sama agar angka sejajar vertikal */
+    font-weight: 800;
+    color: var(--ysq-green-dark);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.ysq-row-uas .val-total {
+    width: 150px; /* Sesuaikan dengan lebar kolom nilai di tabel simakan */
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--ysq-green-dark);
+}
+
+/* ========================================================= */
+/* 11. BILLING SECTION                                       */
+/* ========================================================= */
+
+/* Card Billing Summary Dinamis */
+.ysq-bill-summary-grid {
+    margin-bottom: 30px;
+}
+
+.ysq-bill-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.ysq-bill-card.highlight {
+    border-left: 5px solid #0b4528;
+}
+
+.bill-card-icon {
+    background: #f1f3f0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #0b4528;
+}
+
+.bill-card-info span { 
+    font-size: 0.9rem; 
+    color: #666; 
+    display: block;
+}
+
+.bill-card-info h3 { 
+    font-size: 1.6rem; 
+    color: #0b4528; 
+    margin-bottom: 10px; 
+}
+
+#nominal-tagihan-aktif {
+    transition: all 0.5s ease; /* Efek angka berubah halus */
+    color: #0b4528;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+/* Badge Tunggakan Dasar */
+.ysq-tunggakan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+/* State: Masih ada Sisa (Merah) */
+.ysq-tunggakan-badge.danger {
+    background-color: #fff5f5;
+    color: #e74c3c;
+}
+
+/* State: Sudah Lunas (Hijau) */
+.ysq-tunggakan-badge.success {
+    background-color: #f0fff4;
+    color: #2ecc71;
+}
+
+/* Filter Kategori */
+.ysq-action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.ysq-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ysq-select-custom {
+    padding: 10px 15px;
+    border: 1.5px solid #0b4528;
+    border-radius: 8px;
+    background-color: #f9fbf2;
+    color: #333;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: 0.3s;
+}
+
+.ysq-select-custom:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(11, 69, 40, 0.1);
+}
+
+/* Filter Tahun */
+
+.ysq-filter-item {
+    display: flex;
+    align-items: center; /* Menyelaraskan teks label dan dropdown secara vertikal di tengah */
+    gap: 10px;           /* Memberikan jarak yang pas antara teks dan kotak select */
+}
+
+.ysq-filter-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #555;
+    margin: 0;           /* Menghilangkan margin bawaan yang mungkin mendorong teks ke atas */
+    line-height: 1;      /* Memastikan tinggi baris teks tidak melebihi kotak input */
+    white-space: nowrap; /* Mencegah teks terpotong atau turun ke bawah */
+}
+
+/* ========================================================= */
+/* MODERNISED GRID TABLE SYSTEM (SPP)                        */
+/* ========================================================= */
+
+.ysq-table-wrapper {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #f1f1f1;
+    overflow-x: auto; /* Aktifkan scroll horizontal */
+    -webkit-overflow-scrolling: touch;
+}
+
+.ysq-grid-table {
+    display: block; /* Gunakan block sebagai container utama */
+    width: 100%;
+    min-width: 850px; /* Kunci lebar minimal agar kolom tidak hancur */
+}
+
+/* Header & Body */
+.grid-header, .grid-body {
+    display: block;
+    width: 100%;
+}
+
+/* BARIS DATA: Kunci utama kesejajaran ada di sini */
+.grid-row {
+    display: grid;
+    /* Dibagi menjadi 6 kolom dengan persentase tetap agar sejajar sempurna */
+    /* Kolom 1 (Deskripsi) lebih lebar, sisanya dibagi rata */
+    grid-template-columns: 17% 17% 17% 15% 16% 17%; 
+    align-items: center;
+    border-bottom: 1px solid #f2f2f2;
+    transition: background 0.2s;
+}
+
+/* Header Spesifik */
+.grid-header .grid-row {
+    background-color: #f8fbf9;
+    border-bottom: 2px solid #e0e6e2;
+}
+
+/* Styling Sel Grid */
+.grid-cell {
+    padding: 18px 10px;
+    font-size: 0.9rem;
+    color: #444;
+    text-align: center; /* Rata tengah universal */
+}
+
+/* Judul Kolom (Header Text) */
+.grid-header .grid-cell {
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* SIMETRIS: Kolom Pertama (Kiri) & Kolom Terakhir (Kanan) */
+.grid-cell:first-child {
+    text-align: center;
+    padding-left: 20px; /* Jarak dari tepi kiri kartu */
+}
+
+.grid-cell:last-child {
+    padding-right: 20px; /* Jarak dari tepi kanan kartu */
+}
+
+/* Efek Interaksi */
+.grid-body .grid-row:hover {
+    background-color: #fcfdfc;
+}
+
+/* ========================================================= */
+/* KOMPONEN TOMBOL & STATUS                                  */
+/* ========================================================= */
+
+.ysq-btn-upload {
+    background: #ffffff;
+    color: #0b4528;
+    border: 1.5px solid #0b4528;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%; /* Tombol memenuhi area kolom 17% */
+    max-width: 120px;
+    margin: 0 auto;
+}
+
+.ysq-btn-upload:hover {
+    background: #0b4528;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(11, 69, 40, 0.15);
+}
+
+.success-icon {
+    color: #2ecc71;
+    font-size: 1.4rem;
+}
+
+/* ========================================================= */
+/* MODAL KONFIRMASI PEMBAYARAN (VERSI RAMPING & RINGKAS)     */
+/* ========================================================= */
+.ysq-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+}
+
+.ysq-modal-content {
+    background: #fff;
+    width: 85%;
+    /* DIKECILKAN: Lebar maksimal hanya 360px agar ramping */
+    max-width: 360px; 
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+    /* Animasi Menyembul */
+    transform: scale(0.6); 
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.ysq-modal.active .ysq-modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Header Modal Lebih Compact */
+.ysq-modal-header-info {
+    background-color: #f8fbf9;
+    padding: 18px 20px; 
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #f1f3f0;
+}
+
+.ysq-modal-header-info i {
+    font-size: 2rem; /* Ikon dikecilkan */
+    color: #0b4528;
+}
+
+.ysq-bill-details h4 {
+    margin: 0;
+    color: #333;
+    font-size: 1rem; /* Teks lebih kecil */
+    font-weight: 700;
+}
+
+.ysq-bill-details p {
+    margin-top: 3px;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Body Modal dengan Padding yang Efisien */
+.ysq-modal-body {
+    padding: 20px 25px; 
+}
+
+/* ========================================================= */
+/* FORM GROUP (DIBUAT RINGKAS)                               */
+/* ========================================================= */
+.ysq-form-group {
+    margin-bottom: 15px; /* Jarak antar input dipersempit */
+}
+
+.ysq-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 0.75rem; /* Label lebih kecil */
+    color: #0b4528;
+    text-transform: uppercase;
+}
+
+.ysq-form-group input,
+.ysq-form-group select {
+    width: 100%;
+    padding: 10px 12px; /* Input lebih tipis */
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+
+/* Tombol Submit Lebih Kecil */
+.ysq-btn-submit-payment {
+    width: 100%;
+    padding: 12px;
+    background-color: #0b4528;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 5px;
+}
+
+.close-btn-top {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #ccc;
+}
+
+/* Class untuk mengunci layar total */
+.no-scroll {
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed; /* Kunci posisi layar agar tidak bergeser */
+    touch-action: none; /* Mencegah scroll di layar sentuh */
+}
+
+/* ========================================================= */
+/* 14. TOAST NOTIFICATION                                    */
+/* ========================================================= */
+
+.ysq-toast {
+    visibility: hidden;
+    min-width: 300px;
+    background-color: #0b4528; /* Hijau YSQ */
+    color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    padding: 16px;
+    position: fixed;
+    z-index: 11000; /* Di atas modal */
+    left: 50%;
+    top: 30px;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.ysq-toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+    from { top: 0; opacity: 0; }
+    to { top: 30px; opacity: 1; }
+}
+
+@keyframes fadeout {
+    from { top: 30px; opacity: 1; }
+    to { top: 0; opacity: 0; }
+}
+
+/* ========================================================= */
+/* 15. CSS KHUSUS POPUPLIST-TUNGGAKAN                            */
+/* ========================================================= */
+
+.popuplist-tunggakan-overlay {
+    display: none; 
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.popuplist-tunggakan-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.popuplist-tunggakan-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fffafa;
+}
+
+.popuplist-tunggakan-header h3 {
+    margin: 0;
+    color: #c81e1e; /* Merah Peringatan */
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.popuplist-tunggakan-body {
+    padding: 20px 24px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.popuplist-tunggakan-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #fdf2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: 0.2s;
+}
+
+.popuplist-tunggakan-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.popuplist-tunggakan-item span {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+.popuplist-tunggakan-btn {
+    background-color: #0b4528; /* Hijau Yayasan */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.popuplist-tunggakan-btn:hover {
+    background-color: #052e16;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Tambahan CSS Khusus Cetak */
+
+@media print {
+    /* 1. Sembunyikan elemen yang tidak perlu di PDF */
+    .header, .sub-nav, .ysq-header-tabs, .ysq-btn-primary-download, .ysq-badge-published {
+        display: none !important;
+    }
+
+    /* 2. Reset layout untuk kertas A4 */
+    body {
+        background: white !important;
+        padding: 0 !important;
+    }
+
+    .main-container {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .dashboard-card {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* 3. Rapikan Tabel agar pas di kertas */
+    .ysq-table-container {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+    }
+
+    .ysq-table-premium thead th {
+        background: #eee !important;
+        color: black !important;
+        border-bottom: 1px solid #000 !important;
+    }
+
+    /* 4. Pastikan baris biru dan hijau tetap tercetak warnanya */
+    .ysq-row-summary {
+        background-color: #f1f8f4 !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .ysq-row-final-score {
+        background-color: #2980b9 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    /* 5. Predikat dibuat sangat jelas */
+    .text-p {
+        color: #0b4528 !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
 /* =========================================================
    RESPONSIVE FIX: TABEL MATERI (SCROLL SAMPING)
    ========================================================= */
@@ -1219,3 +2483,4 @@ body {
         white-space: nowrap; /* Mencegah teks turun ke bawah */
     }
 }
+

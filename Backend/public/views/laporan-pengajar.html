@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Monitoring - Sahabat Quran</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/pengajar.css"> 
+    <link rel="stylesheet" href="laporan-pengajar.css"> <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="allow-scroll">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div> 
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/LogoYSQ.png" alt="Logo Sahabat Quran">
+            </div>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/dashboard/pengajar" class="nav-link">
+                            <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/pengajar/jadwal" class="nav-link">
+                            <i class="fas fa-calendar-alt"></i> <span>Jadwal Kelas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/pengajar/absensi" class="nav-link">
+                            <i class="fas fa-check-square"></i> <span>Absensi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/dashboard/pengajar/materi-ajar" class="nav-link">
+                            <i class="fas fa-book"></i> <span>Materi Ajar</span>
+                        </a>
+                    </li>
+                    <li><a href="/dashboard/pengajar/rapor" class="nav-link"><i class="fas fa-file-alt"></i> <span>Rapor</span></a></li>
+                    <li class="active"><a href="/dashboard/pengajar/laporan" class="nav-link"><i class="fas fa-chart-bar"></i> <span>Laporan</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <ul>
+                    <li class="/login"><i class="fas fa-sign-out-alt"></i> <span>Keluar</span></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="ysq-laporan-module">
+                
+                <header class="top-header">
+                    <h1 class="page-title">Laporan Monitoring</h1>
+                    <div class="user-profile">
+                        <span id="tanggal-otomatis" class="date-display-box">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span id="text-tanggal">Memuat...</span>
+                        </span>
+                    </div>
+                </header>
+
+                <div class="ysq-stats-grid">
+                    <div class="ysq-stat-card">
+                        <div class="stat-icon icon-blue"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <p>Santri Binaan</p>
+                            <h3 id="stat-total-santri">0</h3>
+                        </div>
+                    </div>
+                    <div class="ysq-stat-card">
+                        <div class="stat-icon icon-red"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-info">
+                            <p>Rapor Belum Selesai</p>
+                            <h3 id="stat-pending">0</h3>
+                        </div>
+                    </div>
+                    <div class="ysq-stat-card">
+                        <div class="stat-icon icon-green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <p>Rapor Selesai</p>
+                            <h3 id="stat-done">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ysq-report-card">
+                    <div class="report-header">
+                        <div class="header-left">
+                            <h3>Rekapitulasi Capaian Santri</h3>
+                            <p class="subtitle" id="periode-info">Periode: -</p>
+                        </div>
+                        
+                        <div class="report-controls-wrapper">
+                            <div class="filter-group">
+                                <label>KATEGORI:</label>
+                                <select id="filter-kategori" class="sqm-input-box-mini" onchange="updatePeriode()">
+                                    <option value="Anak">Anak (Per 6 Bulan)</option>
+                                    <option value="Dewasa">Dewasa (Per 1 Tahun)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label>KELAS:</label>
+                                <select id="filter-kelas" class="sqm-input-box-mini">
+                                    <option value="">-- Pilih Kelas --</option>
+                                    <option value="Tahsin 1">Tahsin 1</option>
+                                    <option value="Tahfidz A">Tahfidz A</option>
+                                </select>
+                            </div>
+                            <button class="btn-export-excel" onclick="exportToExcel()" title="Export ke Excel">
+                                <i class="fas fa-file-excel"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="ysq-table-report" id="tabel-laporan-utama">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Nama Santri</th>
+                                    <th>Tahsin</th>
+                                    <th>Tahfidz (Juz)</th>
+                                    <th>Kehadiran</th>
+                                    <th>Status Rapor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="laporan-tbody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script type="module" src="/js/laporan-pengajar.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapor Siswa - Sahabat Quran</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/santri.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="ysq-dashboard-wrapper">
+
+    <header class="header">
+        <div class="logo-section">
+            <img src="/images/LogoYSQ.png" alt="Logo YSQ" class="logo" />
+            <h2>YAYASAN SAHABAT QUR'AN</h2>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="ysq-raport-module">
+            <div class="dashboard-card">
+                
+                <div class="main-header-row">
+                    <h1>RAPOR SANTRI</h1>
+                    <div class="ysq-header-tabs">
+                        <button class="ysq-tab-btn active" onclick="showTab('tahsin')">Rapor Tahsin</button>
+                        <button class="ysq-tab-btn" onclick="showTab('rapor-tahfidz')">Rapor Tahfidz</button>
+                    </div>
+                </div>
+
+                <div class="sub-nav scroll-x">
+                    <a href="/dashboard/santri"><button class="nav-btn">Dashboard</button></a>
+                    <a href="/dashboard/absensi-siswa"><button class="nav-btn">Riwayat Absen</button></a>
+                    <a href="/dashboard/santri/rapor"><button class="nav-btn active">Rapor</button></a>
+                    <a href="/dashboard/billing"><button class="nav-btn">Student Bill</button></a>
+                </div>
+
+                <div class="ysq-student-identity-box">
+                    <div class="id-item">
+                        <span class="id-label">Nama Santri</span>
+                        <span class="id-value" id="nama-santri"></span>
+                    </div>
+                    <div class="id-item">
+                        <span class="id-label">NIS</span>
+                        <span id="nis-santri"></span>
+                    </div>
+                    <div class="id-item">
+                        <span class="id-label">Kelas</span>
+                        <span id="kelas-santri"></span>
+                    </div>
+                    <div class="id-item">
+                        <span class="id-label">Pengajar</span>
+                        <span id="pengajar-santri"></span>
+                    </div>
+                </div>
+
+                <div id="section-tahsin">
+                    <section class="ysq-content-card">
+                        <div class="ysq-table-header">
+                            <div class="ysq-filter-group">
+                                <label class="ysq-label-minimal">Periode Belajar:</label>
+                                <div class="ysq-select-wrapper">
+                                    <select class="ysq-select-minimal">
+                                        <option>Semester Genap 2025</option>
+                                    </select>
+                                    <i class='bx bx-chevron-down'></i>
+                                </div>
+                            </div>
+                            <span class="ysq-badge-published">Status: Published</span>
+                        </div>
+                        <div class="ysq-table-container">
+                            <table class="ysq-table-premium">
+                                <thead>
+                                    <tr>
+                                        <th class="col-center">KOMPONEN PENILAIAN TAHSIN</th>
+                                        <th class="col-center">NILAI</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>Nilai Pekanan</td><td class="val-bold"></td></tr>
+                                    <tr><td>Ujian Tilawah (Lisan)</td><td class="val-bold"></td></tr>
+                                    <tr><td>Nilai Teori (G-Form)</td><td class="val-bold"></td></tr>
+                                    <tr><td>Presensi Kehadiran</td><td class="val-bold"></td></tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="ysq-row-summary">
+                                        <td colspan="1" class="label-summary">RATA-RATA AKHIR</td>
+                                        <td class="val-total">00.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="ysq-report-footer">
+                            <div class="ysq-status-info">
+                                <p class="ysq-text-status">Status: <strong>Naik Tingkat</strong></p>
+                                <p class="ysq-text-note">Catatan: Selamat! Pertahankan kefasihan makhrajul huruf di level berikutnya.</p>
+                            </div>
+                            <button class="ysq-btn-primary-download" onclick="downloadPDF('Tahsin')">
+                                <i class='bx bxs-file-pdf'></i> Unduh Rapor Tahsin (PDF) 
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="section-rapor-tahfidz" class="ysq-is-hidden">
+                    <section class="ysq-content-card">
+                        <div class="ysq-table-header">
+                            <div class="ysq-label-minimal">Rincian Simakan Per Juz</div>
+                            <span class="ysq-badge-published">Status: Published</span>
+                        </div>
+
+                        <div class="ysq-table-container">
+                            <table class="ysq-table-premium">
+                                <thead>
+                                    <tr>
+                                        <th class="col-nomor-juz">NOMOR JUZ</th>
+                                        <th class="col-nilai-simakan">NILAI SIMAKAN</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tahfidz-body">
+                           
+                                </tbody>
+                                <tfoot>
+                                    <tr class="ysq-row-summary">
+                                        <td class="label-summary">RATA-RATA SIMAKAN</td>
+                                        <td class="val-total" id="rata-simakan">00.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="ysq-row-summary ysq-row-uas">
+                            <div class="label-summary">
+                                <i class='bx bxs-award'></i> NILAI UJIAN AKHIR (UAS)
+                            </div>
+                            <div class="val-total" id="rata-akhir-tahfidz">00.00</div>
+                        </div>
+
+                        <div class="ysq-row-final-score">
+                            <div class="label-final">RATA-RATA AKHIR TOTAL</div>
+                            <strong class="text-p" id="predikat-tahfidz"></strong>
+                        </div>
+
+                        <div class="ysq-summary-predikat-v2">
+                            <span class="label-p">Predikat</span>
+                            <strong class="text-p">Jayyid Jiddan</strong>
+                            <div class="decoration-line"></div>
+                        </div>
+
+                        <div class="ysq-report-footer">
+                            <div class="ysq-status-info">
+                                <p class="ysq-text-status">Status Kelulusan: <strong>LULUS</strong></p>
+                                <p class="ysq-text-note">Data pencapaian hafalan yang telah diverifikasi sesuai standar resmi YSQ.</p>
+                            </div>
+                            <button class="ysq-btn-primary-download" onclick="downloadPDF('Tahfidz')">
+                                <i class='bx bxs-file-pdf'></i> Unduh Rapor Tahfidz (PDF)
+                            </button>
+                        </div>
+                    </section>
+                </div> 
+
+            </div> 
+        </div> 
+    </div> 
+
+    <script type="module" src="/js/raporsiswa.js"></script>
+</body>
+</html>

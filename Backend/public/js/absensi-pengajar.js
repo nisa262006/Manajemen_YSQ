@@ -201,19 +201,36 @@ async function loadAbsensiData() {
 }
 
 async function handleSimpanAbsenPengajar() {
-    const status = document.getElementById("statusAbsensiPengajar")?.value;
-    const tanggal = document.getElementById("tanggalAbsensiPengajar")?.value;
-    if (!status || !_jadwalUtama) return alert("Pilih status kehadiran dan Kelas.");
+    const statusEl = document.getElementById("statusAbsensiPengajar");
+    const tanggalEl = document.getElementById("tanggalAbsensiPengajar");
+    
+    const status = statusEl?.value;
+    const tanggal = tanggalEl?.value;
+
+    if (!status || !_jadwalUtama) {
+        return alert("Pilih status kehadiran dan pastikan Kelas sudah dipilih.");
+    }
 
     try {
         await fetchJSON(`${BASE_URL}/absensi/pengajar`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-            body: JSON.stringify({ id_jadwal: _jadwalUtama.id_jadwal, tanggal, status_absensi: status, catatan: "Absensi pengajar" })
+            headers: { 
+                "Content-Type": "application/json", 
+                "Authorization": `Bearer ${getToken()}` 
+            },
+            // PASTIKAN FIELD INI SAMA DENGAN BACKEND
+            body: JSON.stringify({ 
+                id_jadwal: _jadwalUtama.id_jadwal, 
+                tanggal: tanggal, 
+                status_absensi: status, // Pastikan namanya status_absensi
+                catatan: "Absensi pengajar: " + status 
+            })
         });
+        
         document.getElementById("absenPengajarInfo").textContent = "✓ Terkirim";
         alert("Absensi pengajar berhasil disimpan.");
     } catch (err) {
+        console.error("Detail Error:", err);
         alert(err.body?.message || "Gagal simpan absen pengajar");
     }
 }
