@@ -1698,6 +1698,27 @@ body {
 /* Utilitas */
 .ysq-is-hidden { display: none; }
 
+
+/*=================== TAMPILAN RAPOR PDF ===================*/
+@media print {
+    /* Sembunyikan navigasi dan tombol saat proses PDF */
+    .sub-nav, .ysq-header-tabs, .header, .ysq-btn-primary-download {
+        display: none !important;
+    }
+    
+    /* Pastikan card rapor tidak punya bayangan (shadow) agar bersih */
+    .ysq-content-card {
+        box-shadow: none !important;
+        border: 1px solid #eee;
+    }
+
+    /* Paksa background warna (biru dan hijau) muncul di PDF */
+    .ysq-row-final-score, .ysq-row-summary {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
 /* ========================================================= */
 /* BAGIAN 10 (2) : SECTION RAPOR TAHFIDZ (PREMIUM STYLE)     */
 /* ========================================================= */
@@ -1888,6 +1909,100 @@ body {
     font-weight: 900;
     font-size: 1.1rem;
     color: var(--ysq-green-dark);
+}
+
+/*===============================================================*/
+/* Container Utama A4 */
+.rapor-pdf-container {
+    width: 210mm;
+    height: 297mm;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+/* Memaksa background penuh 1 halaman, tidak mengulang */
+.pdf-background-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    object-fit: fill; 
+}
+
+/* Area Konten (Tabel & Info) */
+.pdf-overlay-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    /* Sesuaikan padding-top (80mm) agar tabel pas di kotak putih gambar */
+    padding: 80mm 25mm 20mm 25mm; 
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.pdf-student-info {
+    margin-bottom: 5mm;
+    font-size: 12pt;
+    font-weight: bold;
+    color: #1a4b84;
+}
+
+/* Agar tabel tidak melewati background */
+.pdf-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+    table-layout: fixed; /* Mengunci lebar tabel */
+}
+
+.pdf-table th {
+    background-color: #f8941d; /* Warna Oranye sesuai referensi */
+    color: white;
+    border: 1px solid #333;
+    padding: 8px;
+    font-size: 11pt;
+}
+
+.pdf-table td {
+    border: 1px solid #333;
+    padding: 7px;
+    text-align: center;
+    font-size: 10pt;
+    background-color: rgba(255, 255, 255, 0.5); /* Semi transparan */
+}
+
+/* Styling untuk area tanda tangan di PDF */
+.pdf-footer-signature {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end; /* Menggeser ke kanan sesuai gambar */
+    padding-right: 50px;
+}
+
+.sig-box {
+    text-align: center;
+    position: relative;
+    width: 200px; /* Sesuaikan lebar area ttd */
+}
+
+.signature-wrapper {
+    height: 80px; /* Ruang kosong untuk tanda tangan */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pdf-signature-img {
+    max-height: 70px; /* Agar tanda tangan tidak terlalu besar */
+    max-width: 150px;
+    object-fit: contain;
 }
 
 /* ========================================================= */

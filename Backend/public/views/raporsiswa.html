@@ -62,7 +62,7 @@
                                 <label class="ysq-label-minimal">Periode Belajar:</label>
                                 <div class="ysq-select-wrapper">
                                     <select class="ysq-select-minimal">
-                                        <option>Semester Genap 2025</option>
+                                        
                                     </select>
                                     <i class='bx bx-chevron-down'></i>
                                 </div>
@@ -93,12 +93,12 @@
                         </div>
                         <div class="ysq-report-footer">
                             <div class="ysq-status-info">
-                                <p class="ysq-text-status">Status: <strong>Naik Tingkat</strong></p>
+                                <p class="ysq-text-status">Status: <strong id="status-tahsin"></strong></p>
                                 <p class="ysq-text-note">Catatan: Selamat! Pertahankan kefasihan makhrajul huruf di level berikutnya.</p>
                             </div>
-                            <button class="ysq-btn-primary-download" onclick="downloadPDF('Tahsin')">
-                                <i class='bx bxs-file-pdf'></i> Unduh Rapor Tahsin (PDF) 
-                            </button>
+                            <button class="ysq-btn-primary-download" onclick="downloadRapor('tahsin')">
+                                <i class='bx bxs-file-pdf'></i> Unduh Rapor Tahsin (PDF)
+                              </button>                                                      
                         </div>
                     </section>
                 </div>
@@ -144,18 +144,18 @@
 
                         <div class="ysq-summary-predikat-v2">
                             <span class="label-p">Predikat</span>
-                            <strong class="text-p">Jayyid Jiddan</strong>
+                            <strong class="text-p"></strong>
                             <div class="decoration-line"></div>
                         </div>
 
                         <div class="ysq-report-footer">
                             <div class="ysq-status-info">
-                                <p class="ysq-text-status">Status Kelulusan: <strong>LULUS</strong></p>
+                                <p class="ysq-text-statusKelulusan">Status Kelulusan: <strong id="status-kelulusan-tahfidz"></strong></p>
                                 <p class="ysq-text-note">Data pencapaian hafalan yang telah diverifikasi sesuai standar resmi YSQ.</p>
                             </div>
-                            <button class="ysq-btn-primary-download" onclick="downloadPDF('Tahfidz')">
+                            <button class="ysq-btn-primary-download" onclick="downloadRapor('tahfidz')">
                                 <i class='bx bxs-file-pdf'></i> Unduh Rapor Tahfidz (PDF)
-                            </button>
+                              </button>                                                            
                         </div>
                     </section>
                 </div> 
@@ -163,7 +163,31 @@
             </div> 
         </div> 
     </div> 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>    
     <script type="module" src="/js/raporsiswa.js"></script>
 </body>
+<div id="pdf-render-area" style="position: absolute; left: -9999px;">
+    <div id="rapor-template-print" class="rapor-pdf-container">
+        <img src="/images/rapor.png" class="pdf-background-img">
+        <div class="pdf-overlay-content">
+            <div class="pdf-student-info">
+                <p>Nama : <span id="pdf-nama"></span></p>
+                <p>NIS  : <span id="pdf-nis"></span></p>
+                <p>Kelas: <span id="pdf-kelas"></span></p> </div>
+
+            <div id="pdf-content-table"></div>
+
+            <div class="pdf-footer-signature">
+                <div class="sig-box">
+                    <p>Pengajar</p>
+                    <div class="signature-wrapper">
+
+                    </div>
+                    <strong>( <span id="pdf-pengajar"></span> )</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </html>

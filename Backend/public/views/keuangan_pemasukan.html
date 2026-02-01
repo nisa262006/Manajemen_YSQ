@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Pemasukan - Sahabat Quran</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="logoYSQ.png" alt="Sahabat Quran" class="logo-img">
+            </div>
+            
+            <nav class="menu">
+                <a href="/dashboard/Admin" class="menu-item active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/dashboard/daftar-jadwal" class="menu-item"><i class="fas fa-calendar-alt"></i> Daftar Jadwal</a>
+                <a href="/dashboard/daftar-kelas" class="menu-item"><i class="fas fa-book"></i> Daftar Kelas</a>
+                <a href="/dashboard/daftar-santri" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+                <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+                <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+                <div class="ysq-nav-group">
+                    <div class="menu-item ysq-report-toggle" id="laporan-btn">
+                        <span><i class="fas fa-file-alt"></i> Laporan</span>
+                        <i class="fas fa-chevron-down ysq-report-chevron"></i>
+                    </div>
+                    
+                    <div id="laporan-submenu" class="ysq-report-submenu-wrapper ysq-active">
+                        <a href="keuangan-pemasukan.html" class="ysq-report-item-link">
+                            <i class="fas fa-arrow-circle-down"></i> Keuangan Pemasukan
+                        </a>
+                        <a href="keuangan-pengeluaran.html" class="ysq-report-item-link">
+                            <i class="fas fa-arrow-circle-up"></i> Keuangan Pengeluaran
+                        </a>
+                    </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="footer-buttons-wrapper"> 
+                    <a href="#" class="footer-btn setting"><i class="fas fa-cog"></i> Setting Profil</a>
+                    <a href="#" class="footer-btn logout"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header class-header-style">
+                <div class="header-left">
+                    <h1 class="header-title">Laporan Pemasukan Keuangan</h1>
+                    <p>Data real-time iuran santri, cicilan, dan infaq yayasan.</p>
+                </div>
+                
+                <div class="ysq-inc-actions" id="ysq-header-actions">
+                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('pdf')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('excel')">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                </div>
+            </header>
+
+            <section class="ysq-inc-card ysq-inc-filter-box">
+                <div class="ysq-inc-filter-grid">
+                    <div class="ysq-inc-form-group">
+                        <label for="ysq-date-start">Periode Awal:</label>
+                        <input type="date" id="ysq-date-start" class="ysq-inc-input">
+                    </div>
+                    <div class="ysq-inc-form-group">
+                        <label for="ysq-date-end">Periode Akhir:</label>
+                        <input type="date" id="ysq-date-end" class="ysq-inc-input">
+                    </div>
+                    <div class="ysq-inc-form-group">
+                        <label for="ysq-filter-cat">Kategori Pemasukan:</label>
+                        <select id="ysq-filter-cat" class="ysq-inc-input">
+                            <option value="all">Semua Pemasukan</option>
+                            <option value="iuran">Iuran Siswa (SPP)</option>
+                            <option value="infaq">Infaq & Donasi</option>
+                        </select>
+                    </div>
+                    <button class="ysq-inc-btn ysq-inc-btn-primary ysq-main-generate" onclick="generateIncomeReport()">
+                        <i class="fas fa-sync-alt"></i> Tampilkan Data
+                    </button>
+                </div>
+            </section>
+
+            <section class="ysq-inc-summary-grid">
+                <div class="ysq-inc-stat-card ysq-inc-border-iuran">
+                    <span class="ysq-inc-stat-label">Total Iuran Sintri</span>
+                    <h2 id="ysq-total-iuran">Rp 0</h2>
+                </div>
+                <div class="ysq-inc-stat-card ysq-inc-border-infaq">
+                    <span class="ysq-inc-stat-label">Total Infaq/Donasi</span>
+                    <h2 id="ysq-total-infaq">Rp 0</h2>
+                </div>
+                <div class="ysq-inc-stat-card ysq-inc-border-net">
+                    <span class="ysq-inc-stat-label">Total Pemasukan (Gross)</span>
+                    <h2 id="ysq-total-gross">Rp 0</h2>
+                </div>
+            </section>
+
+            <section class="ysq-inc-card ysq-inc-table-container">
+                <table class="ysq-inc-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nama Santri / Sumber</th>
+                            <th>Kelas</th>
+                            <th>Periode / Keterangan</th>
+                            <th>Kategori</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ysq-income-body">
+                        </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <div id="infaqModal" class="ysq-modal-overlay">
+        <div class="ysq-modal-content">
+            <div class="ysq-modal-header">
+                <h3><i class="fas fa-hand-holding-heart"></i> Input Infaq Dan Donasi</h3>
+                <span class="ysq-close-modal" onclick="closeInfaqModal()">&times;</span>
+            </div>
+            <div class="ysq-modal-body">
+                <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                    <label>Nama Donatur:</label>
+                    <input type="text" id="modal-nama" class="ysq-inc-input" placeholder="Nama Donatur/Hamba Allah...">
+                </div>
+                <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                    <label>Tanggal Diberi:</label>
+                    <input type="date" id="modal-tgl" class="ysq-inc-input">
+                </div>
+                <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                    <label>Nominal (Rp):</label>
+                    <input type="number" id="modal-nominal" class="ysq-inc-input" placeholder="Masukkan angka saja...">
+                </div>
+                <div class="ysq-inc-form-group">
+                    <label>Keterangan:</label>
+                    <textarea id="modal-ket" class="ysq-inc-input" style="height: 80px;" placeholder="Contoh: Sedekah pembangunan masjid"></textarea>
+                </div>
+            </div>
+            <div class="ysq-modal-footer">
+                <button class="ysq-inc-btn ysq-btn-secondary" onclick="closeInfaqModal()">Batal</button>
+                <button class="ysq-inc-btn ysq-inc-btn-primary" onclick="saveInfaqFromModal()">
+                    <i class="fas fa-save"></i> Simpan Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script src="keuangan-pemasukan.js"></script>
+</body>
+</html>

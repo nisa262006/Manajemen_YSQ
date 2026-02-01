@@ -85,7 +85,16 @@
 
                     <div id="section-tahsin">
                         <div class="form-container-rapor">
-                            <div class="form-section-title">Komponen Penilaian Tahsin</div>
+                            <div class="form-section-header">
+                                <div class="form-section-title">Komponen Penilaian Tahsin</div>
+                                <div class="periode-input-group">
+                                    <label>Periode:</label>
+                                    <select id="periode_tahsin" class="input-periode-style">
+                                        <option value="">-- Pilih Periode --</option>
+
+                                    </select>
+                                </div>
+                            </div>
                             
                             <div class="form-grid-rapor">
                                 <div class="form-group-rapor">
@@ -127,15 +136,24 @@
 
                     <div id="section-rapor-tahfidz" class="ysq-is-hidden">
                         <div class="form-container-rapor">
-                            <div class="form-section-title">Input Simakan & Ujian Akhir</div>
+                            <div class="form-section-header">
+                                <div class="form-section-title">Input Simakan & Ujian Akhir</div>
+                                <div class="periode-input-group">
+                                    <label>Periode:</label>
+                                    <select id="periode_tahfidz" class="input-periode-style">
+                                        <option value="">-- Pilih Periode --</option>
+                                        
+                                    </select>
+                                </div>
+                            </div>
                     
                             <div class="ysq-table-container-tahfidz">
                                 <table class="ysq-table-premium" style="margin-bottom: 0;">
                                     <thead>
                                         <tr>
-                                            <th style="width: 20%;">JUZ</th>
-                                            <th style="width: 60%;">NILAI SIMAKAN</th>
-                                            <th style="width: 20%;">AKSI</th>
+                                            <th>JUZ</th>
+                                            <th>NILAI SIMAKAN</th>
+                                            <th>AKSI</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -146,8 +164,8 @@
                                             <td>
                                                 <input type="number" id="quick_nilai" class="input-rapor-style-mini" placeholder="0-100">
                                             </td>
-                                            <td style="text-align: center;">
-                                                <button type="button" onclick="tambahKeDaftar()" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                            <td>
+                                                <button type="button" onclick="tambahKeDaftar()">
                                                     <i class="fas fa-plus"></i> Tambah
                                                 </button>
                                             </td>
@@ -182,6 +200,7 @@
                             <div class="ysq-row-final-score">
                                 <div class="label-final">RATA-RATA AKHIR</div>
                                 <div class="value-final" id="total_rata_tahfidz">0.00</div>
+                                <div class="predikat-final" id="predikat_tahfidz"></div> 
                             </div>
                     
                             <div class="form-actions-rapor">

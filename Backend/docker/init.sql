@@ -220,6 +220,9 @@ CREATE TABLE rapor_tahsin (
 
   catatan TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  predikat VARCHAR(20),
+  keterangan VARCHAR(50),
+  periode VARCHAR(50),
 
   UNIQUE (id_santri, periode),
   FOREIGN KEY (id_santri) REFERENCES santri(id_santri),
@@ -236,6 +239,9 @@ CREATE TABLE rapor_tahfidz (
   nilai_ujian_akhir DECIMAL(5,2),
   nilai_akhir DECIMAL(5,2),
 
+  predikat VARCHAR(20),
+  keterangan VARCHAR(50),
+  periode VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   UNIQUE (id_santri, periode),

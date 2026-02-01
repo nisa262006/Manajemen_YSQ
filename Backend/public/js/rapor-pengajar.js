@@ -11,6 +11,7 @@ let selectedSantri = null;
 document.addEventListener("DOMContentLoaded", () => {
   loadKelasPengajar();
   setTanggal();
+  generatePeriode(); // Fungsi periode otomatis yang sudah disesuaikan
 });
 
 function setTanggal() {
@@ -23,6 +24,51 @@ function setTanggal() {
       year: "numeric"
     });
   }
+}
+
+// UPDATE: Generate periode dengan fitur Auto-Select berdasarkan bulan
+function generatePeriode() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // 1-12
+
+  // Logika penentuan periode default (Juli-Desember = Ganjil)
+  let defaultPeriode = "";
+  if (currentMonth >= 7) {
+    defaultPeriode = `Ganjil ${currentYear}/${currentYear + 1}`;
+  } else {
+    defaultPeriode = `Genap ${currentYear - 1}/${currentYear}`;
+  }
+
+  const periodeOptions = [
+    { val: `Ganjil ${currentYear}/${currentYear + 1}`, label: `Ganjil ${currentYear}/${currentYear + 1}` },
+    { val: `Genap ${currentYear}/${currentYear + 1}`, label: `Genap ${currentYear}/${currentYear + 1}` },
+    { val: `Ganjil ${currentYear - 1}/${currentYear}`, label: `Ganjil ${currentYear - 1}/${currentYear}` },
+    { val: `Genap ${currentYear - 1}/${currentYear}`, label: `Genap ${currentYear - 1}/${currentYear}` },
+    { val: `${currentYear}`, label: `Tahun Tahunan ${currentYear}` }
+  ];
+
+  let htmlOptions = `<option value="">-- Pilih Periode --</option>`;
+  periodeOptions.forEach(opt => {
+    const isSelected = opt.val === defaultPeriode ? "selected" : "";
+    htmlOptions += `<option value="${opt.val}" ${isSelected}>${opt.label}</option>`;
+  });
+  
+  const pTahsin = document.getElementById("periode_tahsin");
+  const pTahfidz = document.getElementById("periode_tahfidz");
+  
+  if (pTahsin) pTahsin.innerHTML = htmlOptions;
+  if (pTahfidz) pTahfidz.innerHTML = htmlOptions;
+}
+
+/* ================= 2. FUNGSI LOGIKA PREDIKAT & WARNA ================= */
+function getPredikatDetail(nilai) {
+  const n = parseFloat(nilai);
+  if (n >= 90) return { teks: "Mumtaz", ket: "Istimewa", warna: "#EAB308", bg: "#fefce8" };
+  if (n >= 80) return { teks: "Jayyid Jiddan", ket: "Sangat Baik", warna: "#22c55e", bg: "#f0fdf4" };
+  if (n >= 70) return { teks: "Jayyid", ket: "Baik", warna: "#eab308", bg: "#fffbeb" };
+  if (n >= 60) return { teks: "Maqbul", ket: "Cukup", warna: "#f97316", bg: "#fff7ed" };
+  return { teks: "Dhaif", ket: "Kurang", warna: "#ef4444", bg: "#fef2f2" };
 }
 
 /* ================= LOAD KELAS & SANTRI ================= */
@@ -69,7 +115,7 @@ window.showTab = function (tab) {
   btns[1].classList.toggle("active", tab !== "tahsin");
 };
 
-/* ================= HITUNG TAHSIN ================= */
+/* ================= UPDATE FUNGSI HITUNG TAHSIN ================= */
 window.hitungRataTahsin = function () {
   const vals = document.querySelectorAll(".val-tahsin");
   let total = 0, count = 0;
@@ -81,8 +127,14 @@ window.hitungRataTahsin = function () {
     }
   });
 
-  document.getElementById("total_rata_tahsin").textContent =
-    count ? (total / count).toFixed(2) : "0.00";
+  const rata = count ? (total / count).toFixed(2) : "0.00";
+  const elTotal = document.getElementById("total_rata_tahsin");
+  
+  const detail = getPredikatDetail(rata);
+  const container = elTotal.closest('.ysq-row-final-score');
+  
+  elTotal.innerHTML = `${rata} <span style="font-size: 14px; margin-left: 10px; color: white;">(${detail.teks} - ${detail.ket})</span>`;
+  container.style.backgroundColor = detail.warna; 
 };
 
 /* ================= TAHFIDZ : TAMBAH JUZ ================= */
@@ -99,7 +151,6 @@ window.tambahKeDaftar = function () {
     return;
   }
 
-  // ❌ Cegah juz dobel
   const existing = [...listBody.querySelectorAll("tr")]
     .some(tr => tr.dataset?.juz === juz);
 
@@ -108,7 +159,6 @@ window.tambahKeDaftar = function () {
     return;
   }
 
-  // hapus row kosong
   const empty = document.getElementById("empty-row");
   if (empty) empty.remove();
 
@@ -127,11 +177,9 @@ window.tambahKeDaftar = function () {
   `;
 
   listBody.appendChild(tr);
-
   inputJuz.value = "";
   inputNilai.value = "";
   inputJuz.focus();
-
   hitungRataTahfidz();
 };
 
@@ -148,11 +196,10 @@ window.hapusBarisDaftar = function (btn) {
         </td>
       </tr>`;
   }
-
   hitungRataTahfidz();
 };
 
-/* ================= HITUNG TAHFIDZ ================= */
+/* ================= UPDATE FUNGSI HITUNG TAHFIDZ ================= */
 window.hitungRataTahfidz = function () {
   const nilaiEls = document.querySelectorAll(".nilai-simakan-hidden");
   const elRata = document.getElementById("rata_simakan");
@@ -165,19 +212,25 @@ window.hitungRataTahfidz = function () {
   const rataSimakan = nilaiEls.length ? total / nilaiEls.length : 0;
   elRata.textContent = rataSimakan.toFixed(2);
 
-  const nilaiAkhir =
-    nilaiEls.length && uas
-      ? (rataSimakan + uas) / 2
-      : rataSimakan;
-
-  elAkhir.textContent = nilaiAkhir.toFixed(2);
+  const nilaiAkhir = nilaiEls.length && uas ? (rataSimakan + uas) / 2 : rataSimakan;
+  const nilaiFixed = nilaiAkhir.toFixed(2);
+  
+  const detail = getPredikatDetail(nilaiFixed);
+  const container = elAkhir.closest('.ysq-row-final-score');
+  
+  elAkhir.innerHTML = `${nilaiFixed} <span style="font-size: 14px; margin-left: 10px; color: white;">(${detail.teks} - ${detail.ket})</span>`;
+  container.style.backgroundColor = detail.warna;
 };
 
 /* ================= SAVE TAHSIN ================= */
 async function saveTahsin() {
+  // UPDATE: Ambil periode dari dropdown yang dipilih pengajar
+  const periode = document.getElementById("periode_tahsin").value;
+  if (!periode) throw "Periode belum dipilih";
+
   const body = {
     id_santri: Number(selectedSantri),
-    periode: new Date().getFullYear().toString(),
+    periode: periode,
     nilai_pekanan: Number(document.getElementById("n_pekanan").value),
     ujian_tilawah: Number(document.getElementById("n_tilawah").value),
     nilai_teori: Number(document.getElementById("n_teori").value),
@@ -200,7 +253,9 @@ async function saveTahsin() {
 
 /* ================= SAVE TAHFIDZ ================= */
 window.saveTahfidz = async function () {
-  const periode = new Date().getFullYear().toString();
+  // UPDATE: Ambil periode dari dropdown yang dipilih pengajar
+  const periode = document.getElementById("periode_tahfidz").value;
+  if (!periode) throw "Periode belum dipilih";
 
   const headerRes = await fetch(`${API}/rapor/tahfidz`, {
     method: "POST",
@@ -231,7 +286,7 @@ window.saveTahfidz = async function () {
     });
   }
 
-  await fetch(`${API}/rapor/tahfidz/final`, {
+  const finalRes = await fetch(`${API}/rapor/tahfidz/final`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -242,6 +297,11 @@ window.saveTahfidz = async function () {
       nilai_ujian_akhir: Number(document.getElementById("n_uas_tahfidz").value)
     })
   });
+  
+  if (!finalRes.ok) {
+    const err = await finalRes.json();
+    throw err.message;
+  }
 };
 
 /* ================= SAVE DATA ================= */
