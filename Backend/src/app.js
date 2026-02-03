@@ -141,6 +141,17 @@ app.get("/dashboard/pengajar/laporan", (_, res) => {
   res.sendFile(view("laporan-pengajar.html"));
 });
 
+// ================= ADMIN - LAPORAN =================
+
+app.get("/dashboard/admin/laporan/keuangan-pemasukan", (_, res) => {
+  res.sendFile(view("keuangan_pemasukan.html"));
+});
+
+app.get("/dashboard/admin/laporan/keuangan-pengeluaran", (_, res) => {
+  res.sendFile(view("keuangan_pengeluaran.html"));
+});
+
+
 // ================= API ROUTES =================
 app.use("/api/auth", require("./routes/authroutes"));
 app.use("/api/pendaftar", require("./routes/registerroutes"));

@@ -182,6 +182,110 @@ async function loadRekapLaporan() {
 }
 
 // ================= EXPORT (OPSIONAL) =================
-window.exportToExcel = function () {
-  alert("Export Excel belum diimplementasikan");
-};
+// ================= EXPORT EXCEL =================
+window.exportToExcel = async function () {
+    try {
+      const params = new URLSearchParams();
+      if (filterState.periode) params.append("periode", filterState.periode);
+      if (filterState.id_kelas) params.append("id_kelas", filterState.id_kelas);
+      if (filterState.kategori) params.append("kategori", filterState.kategori);
+  
+      const res = await fetch(
+        `${API}/rapor/laporan/rekap-pengajar?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      const data = await res.json();
+      if (!data.list || data.list.length === 0) {
+        alert("Tidak ada data untuk diexport");
+        return;
+      }
+  
+      // ================= BUAT WORKBOOK =================
+      const wb = XLSX.utils.book_new();
+      const wsData = [];
+  
+      // ===== JUDUL =====
+      wsData.push(["LAPORAN MONITORING SANTRI"]);
+      wsData.push([]);
+  
+      // ===== INFO FILTER =====
+      wsData.push([
+        "Periode",
+        filterState.periode || "Semua",
+        "",
+        "Kategori",
+        filterState.kategori || "Semua",
+        "",
+        "Kelas",
+        document.querySelector("#filter-kelas option:checked")?.textContent || "Semua"
+      ]);
+  
+      wsData.push([]);
+  
+      // ===== GROUP BY KELAS =====
+      const grouped = {};
+      data.list.forEach(row => {
+        const kelas = row.nama_kelas || "-";
+        if (!grouped[kelas]) grouped[kelas] = [];
+        grouped[kelas].push(row);
+      });
+  
+      Object.keys(grouped).forEach(kelas => {
+        // Judul kelas
+        wsData.push([`KELAS: ${kelas.toUpperCase()}`]);
+        wsData.push([]);
+  
+        // Header tabel
+        wsData.push([
+          "No",
+          "Nama Santri",
+          "Tahsin",
+          "Tahfidz (Juz)",
+          "Kehadiran (%)",
+          "Status Rapor"
+        ]);
+  
+        grouped[kelas].forEach((row, i) => {
+          wsData.push([
+            i + 1,
+            row.nama_santri,
+            row.nilai_tahsin ?? 0,
+            row.juz_tahfidz ?? 0,
+            row.nilai_presensi ?? 0,
+            row.status_rapor
+          ]);
+        });
+  
+        wsData.push([]);
+      });
+  
+      // ================= CREATE SHEET =================
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+  
+      // Lebar kolom biar rapi
+      ws["!cols"] = [
+        { wch: 5 },
+        { wch: 25 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 15 },
+        { wch: 15 }
+      ];
+  
+      XLSX.utils.book_append_sheet(wb, ws, "Laporan");
+  
+      // ================= DOWNLOAD =================
+      const filename =
+        "Laporan_Monitoring_" +
+        (filterState.periode || "Semua_Periode").replace(/\s+/g, "_") +
+        ".xlsx";
+  
+      XLSX.writeFile(wb, filename);
+  
+    } catch (err) {
+      console.error(err);
+      alert("Gagal export laporan");
+    }
+  };
+  
