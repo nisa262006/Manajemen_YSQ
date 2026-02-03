@@ -29,36 +29,37 @@ function setTanggal() {
 // UPDATE: Generate periode dengan fitur Auto-Select berdasarkan bulan
 function generatePeriode() {
   const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // 1-12
+  const currentYear = now.getFullYear(); // 2026 (berdasarkan waktu sekarang)
 
-  // Logika penentuan periode default (Juli-Desember = Ganjil)
-  let defaultPeriode = "";
-  if (currentMonth >= 7) {
-    defaultPeriode = `Ganjil ${currentYear}/${currentYear + 1}`;
-  } else {
-    defaultPeriode = `Genap ${currentYear - 1}/${currentYear}`;
-  }
-
+  // Kita buat daftar periode yang mencakup data di DB Anda (2025/2026)
+  // dan tahun depan (2026/2027)
   const periodeOptions = [
-    { val: `Ganjil ${currentYear}/${currentYear + 1}`, label: `Ganjil ${currentYear}/${currentYear + 1}` },
-    { val: `Genap ${currentYear}/${currentYear + 1}`, label: `Genap ${currentYear}/${currentYear + 1}` },
-    { val: `Ganjil ${currentYear - 1}/${currentYear}`, label: `Ganjil ${currentYear - 1}/${currentYear}` },
-    { val: `Genap ${currentYear - 1}/${currentYear}`, label: `Genap ${currentYear - 1}/${currentYear}` },
-    { val: `${currentYear}`, label: `Tahun Tahunan ${currentYear}` }
+    { val: `Ganjil ${currentYear - 1}/${currentYear}`, label: `Ganjil ${currentYear - 1}/${currentYear}` }, // Ganjil 2025/2026
+    { val: `Genap ${currentYear - 1}/${currentYear}`, label: `Genap ${currentYear - 1}/${currentYear}` },   // Genap 2025/2026 (INI YANG ADA DI DB ANDA)
+    { val: `Ganjil ${currentYear}/${currentYear + 1}`, label: `Ganjil ${currentYear}/${currentYear + 1}` }, // Ganjil 2026/2027
+    { val: `Genap ${currentYear}/${currentYear + 1}`, label: `Genap ${currentYear}/${currentYear + 1}` }    // Genap 2026/2027
   ];
 
-  let htmlOptions = `<option value="">-- Pilih Periode --</option>`;
+  let htmlOptionsRapor = `<option value="">-- Pilih Periode --</option>`;
+  let htmlOptionsFilter = `<option value="">-- Semua Periode --</option>`;
+
   periodeOptions.forEach(opt => {
-    const isSelected = opt.val === defaultPeriode ? "selected" : "";
-    htmlOptions += `<option value="${opt.val}" ${isSelected}>${opt.label}</option>`;
+    const optHtml = `<option value="${opt.val}">${opt.label}</option>`;
+    htmlOptionsRapor += optHtml;
+    htmlOptionsFilter += optHtml;
   });
   
+  // 1. Update dropdown di Bagian Input Rapor
   const pTahsin = document.getElementById("periode_tahsin");
   const pTahfidz = document.getElementById("periode_tahfidz");
-  
-  if (pTahsin) pTahsin.innerHTML = htmlOptions;
-  if (pTahfidz) pTahfidz.innerHTML = htmlOptions;
+  if (pTahsin) pTahsin.innerHTML = htmlOptionsRapor;
+  if (pTahfidz) pTahfidz.innerHTML = htmlOptionsRapor;
+
+  // 2. Update dropdown di Bagian Filter Laporan (Ini kunci masalahnya!)
+  const pFilter = document.getElementById("filter-periode");
+  if (pFilter) {
+    pFilter.innerHTML = htmlOptionsFilter;
+  }
 }
 
 /* ================= 2. FUNGSI LOGIKA PREDIKAT & WARNA ================= */

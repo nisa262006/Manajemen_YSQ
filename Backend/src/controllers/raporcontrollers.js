@@ -224,6 +224,96 @@ exports.getRaporPengajar = async (req, res) => {
   }
 };
 
+
+exports.getRekapLaporan = async (req, res) => {
+  try {
+    const id_pengajar = await getIdPengajar(req.user.id_users);
+    const { periode, id_kelas, kategori } = req.query;
+
+    const queryText = `
+   SELECT
+  s.id_santri,
+  s.nama AS nama_santri,
+  k.nama_kelas,
+  k.kategori,
+
+  COALESCE(rt.nilai_akhir, 0) AS nilai_tahsin,
+  COALESCE(rt.nilai_presensi, 0) AS nilai_presensi,
+
+  CASE 
+    WHEN rt.id_rapor IS NOT NULL THEN 'Selesai'
+    ELSE 'Belum Dibuat'
+  END AS status_rapor,
+
+  CASE 
+    WHEN k.nama_kelas ILIKE '%tahfidz%' THEN (
+      SELECT COUNT(*)
+      FROM rapor_tahfidz rtf
+      JOIN tahfidz_simakan ts ON ts.id_rapor = rtf.id_rapor
+      WHERE rtf.id_santri = s.id_santri
+        AND ($1 = '' OR rtf.periode = $1)
+    )
+    ELSE 0
+  END AS juz_tahfidz
+
+FROM santri s
+JOIN santri_kelas sk ON s.id_santri = sk.id_santri
+JOIN kelas k ON sk.id_kelas = k.id_kelas
+
+LEFT JOIN rapor_tahsin rt
+  ON rt.id_santri = s.id_santri
+ AND ($1 = '' OR rt.periode = $1)
+
+WHERE k.id_pengajar = $2
+  AND (NULLIF($3,'') IS NULL OR k.id_kelas::text = $3)
+  AND (NULLIF($4,'') IS NULL OR TRIM(k.kategori) ILIKE TRIM($4))
+
+ORDER BY s.nama ASC;
+ `;
+
+    const values = [periode || '', id_pengajar, id_kelas || '', kategori || ''];
+    const result = await db.query(queryText, values);
+    
+    const total = result.rows.length;
+    const selesai = result.rows.filter(r => r.status_rapor === 'Selesai').length;
+
+    res.json({
+      success: true,
+      summary: { 
+        total_santri: total, 
+        selesai: selesai, 
+        belum_selesai: total - selesai 
+      },
+      list: result.rows
+    });
+  } catch (error) {
+    console.error("EROR REKAP LAPORAN:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+exports.getPeriodePengajar = async (req, res) => {
+  const id_pengajar = await getIdPengajar(req.user.id_users);
+
+  const q = await db.query(`
+    SELECT DISTINCT periode
+    FROM rapor_tahsin
+    WHERE id_pengajar = $1
+
+    UNION
+
+    SELECT DISTINCT periode
+    FROM rapor_tahfidz
+    WHERE id_pengajar = $1
+
+    ORDER BY periode DESC
+  `, [id_pengajar]);
+
+  res.json(q.rows.map(r => r.periode));
+};
+
+
 ///////////////////////////////////////////////////////
 exports.deleteRaporTahsin = async (req, res) => {
   const id_pengajar = await getIdPengajar(req.user.id_users);

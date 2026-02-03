@@ -6,7 +6,7 @@
     <title>Laporan Monitoring - Sahabat Quran</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/css/pengajar.css"> 
-    <link rel="stylesheet" href="laporan-pengajar.css"> <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="allow-scroll">
@@ -55,10 +55,9 @@
                 <header class="top-header">
                     <h1 class="page-title">Laporan Monitoring</h1>
                     <div class="user-profile">
-                        <span id="tanggal-otomatis" class="date-display-box">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span id="text-tanggal">Memuat...</span>
-                        </span>
+                        <div class="user-profile">
+                            <span id="tanggal-otomatis" class="date-display-box"></span>
+                        </div>
                     </div>
                 </header>
 
@@ -90,23 +89,27 @@
                     <div class="report-header">
                         <div class="header-left">
                             <h3>Rekapitulasi Capaian Santri</h3>
-                            <p class="subtitle" id="periode-info">Periode: -</p>
+                            <div class="filter-group">
+                                <label>PERIODE:</label>
+                                <select id="filter-periode" class="sqm-input-box-mini">
+                                </select>
+                              </div>                              
                         </div>
                         
                         <div class="report-controls-wrapper">
                             <div class="filter-group">
                                 <label>KATEGORI:</label>
-                                <select id="filter-kategori" class="sqm-input-box-mini" onchange="updatePeriode()">
-                                    <option value="Anak">Anak (Per 6 Bulan)</option>
-                                    <option value="Dewasa">Dewasa (Per 1 Tahun)</option>
-                                </select>
+                                <select id="filter-kategori" class="sqm-input-box-mini">
+                                    <option value="">Semua</option>
+                                    <option value="Dewasa">Dewasa</option>
+                                    <option value="Anak">Anak</option>
+                                  </select>                                  
                             </div>
                             <div class="filter-group">
                                 <label>KELAS:</label>
                                 <select id="filter-kelas" class="sqm-input-box-mini">
-                                    <option value="">-- Pilih Kelas --</option>
-                                    <option value="Tahsin 1">Tahsin 1</option>
-                                    <option value="Tahfidz A">Tahfidz A</option>
+                                    <option value="">-- Semua Kelas --</option>
+                                
                                 </select>
                             </div>
                             <button class="btn-export-excel" onclick="exportToExcel()" title="Export ke Excel">
@@ -132,9 +135,7 @@
                     </div>
                 </div>
             </div> </main>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
+    </div>    
     <script type="module" src="/js/laporan-pengajar.js"></script>
 </body>
 </html>

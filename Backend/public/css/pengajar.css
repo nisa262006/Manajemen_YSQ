@@ -2826,6 +2826,28 @@ button[onclick="tambahKeDaftar()"] {
   .ysq-laporan-module .status-done { background: var(--ysq-green-soft); color: var(--ysq-green-active); }
   .ysq-laporan-module .status-pending { background: #fef3c7; color: #d97706; }
 
+  .ysq-badge-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-done {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.table-wrapper {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
 /*============== MOBILE ATAU TAB =====================*/
 /* ================== RESPONSIVE STYLES ================= */
 
