@@ -4603,3 +4603,106 @@ select.ysq-inc-input {
     background-color: #f4f7f6; /* Warna background dashboard Anda */
     min-width: 0; 
 }
+
+/* ========================================================= */
+/* KHUSUS POPUP: TAMBAH SPP (IURAN SANTRI)                   */
+/* ========================================================= */
+
+/* Container Utama Overlay Modal */
+#sppModal.ysq-modal-overlay {
+    display: none; /* Muncul via JS (flex) */
+    position: fixed;
+    z-index: 2000; /* Di atas segalanya */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Latar belakang gelap */
+    backdrop-filter: blur(4px); /* Efek blur modern */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Kotak Konten Modal */
+#sppModal .ysq-modal-content {
+    background-color: #ffffff;
+    border-radius: 16px;
+    width: 95%;
+    max-width: 600px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: ysqSlideIn 0.3s ease-out;
+}
+
+/* Header Modal SPP */
+#sppModal .ysq-modal-header {
+    padding: 20px 25px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#sppModal .ysq-modal-header h3 {
+    margin: 0;
+    color: #0b4528; /* Hijau Khas Pemasukan */
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Body Modal (Area Input) */
+#sppModal .ysq-modal-body {
+    padding: 25px;
+}
+
+/* Footer Modal (Area Tombol Simpan/Batal) */
+#sppModal .ysq-modal-footer {
+    padding: 15px 25px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Elemen Input di Dalam Modal SPP */
+#sppModal .ysq-inc-input {
+    width: 100%;
+    height: 45px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#sppModal .ysq-inc-input:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    outline: none;
+}
+
+/* Animasi Masuk */
+@keyframes ysqSlideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/*//////////////////////////////*/
+.ysq-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+.status-lunas {
+    background-color: #d4edda;
+    color: #155724;
+}
+.status-tunggakan {
+    background-color: #f8d7da;
+    color: #721c24;
+}

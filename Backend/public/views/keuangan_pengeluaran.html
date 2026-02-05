@@ -59,8 +59,8 @@
                     <button class="ysq-inc-btn ysq-btn-out-primary" onclick="openModalPengeluaran()">
                         <i class="fas fa-plus-circle"></i> Tambah Pengeluaran
                     </button>
-                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('pdf')">
-                        <i class="fas fa-file-pdf"></i> Export PDF
+                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('excel')">
+                        <i class="fas fa-file-excel"></i> Export laporan
                     </button>
                 </div>
             </header>
@@ -75,16 +75,6 @@
                         </select>
                     </div>
 
-                    <div class="ysq-inc-form-group">
-                        <label>Kategori:</label>
-                        <select id="filter-kategori" class="ysq-inc-input" onchange="filterByCategory()">
-                            <option value="all">Semua Kategori</option>
-                            <option value="Operasional">Operasional (Listrik/Air)</option>
-                            <option value="Sarana">Sarana & Prasarana</option>
-                            <option value="Konsumsi">Konsumsi</option>
-                            <option value="Lainnya">Lain-lain</option>
-                        </select>
-                    </div>
 
                     <div class="ysq-inc-form-group">
                         <label>Cari Pengeluaran:</label>
@@ -130,7 +120,7 @@
                 </div>
                 <div class="ysq-inc-form-group">
                     <label>Nominal (Rp):</label>
-                    <input type="number" id="out-nominal" class="ysq-inc-input" placeholder="0">
+                    <input type="text" id="out-nominal" class="ysq-inc-input" placeholder="Contoh: 10.000" onkeyup="formatRupiah(this)">
                 </div>
                 <div class="ysq-inc-form-group">
                     <label>Keterangan Tambahan:</label>
@@ -145,8 +135,8 @@
             </div>
         </div>
     </div>
-
-    <script type="module" src="/js/admin_keuangan.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script type="module" src="/js/admin_pengeluaran.js"></script>
     <script type="module" src="/js/profileSetting.js"></script>
     <script type="module" src="/js/laporan.js"></script>
 </body>

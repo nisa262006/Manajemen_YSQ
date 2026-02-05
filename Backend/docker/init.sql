@@ -222,13 +222,13 @@ CREATE TABLE rapor_tahsin (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   predikat VARCHAR(20),
   keterangan VARCHAR(50),
-  periode VARCHAR(50),
 
   UNIQUE (id_santri, periode),
   FOREIGN KEY (id_santri) REFERENCES santri(id_santri),
   FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
 );
 
+--19
 CREATE TABLE rapor_tahfidz (
   id_rapor SERIAL PRIMARY KEY,
   id_santri INT NOT NULL,
@@ -249,6 +249,7 @@ CREATE TABLE rapor_tahfidz (
   FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
 );
 
+--20
 CREATE TABLE tahfidz_simakan (
   id_simakan SERIAL PRIMARY KEY,
   id_rapor INT NOT NULL,
@@ -259,54 +260,65 @@ CREATE TABLE tahfidz_simakan (
   FOREIGN KEY (id_rapor) REFERENCES rapor_tahfidz(id_rapor)
 );
 
---19 BILLING
+--21
+CREATE TABLE infaq (
+  id_infaq SERIAL PRIMARY KEY,
+  nama_pembayaran VARCHAR(100),
+  tanggal DATE NOT NULL,
+  nominal BIGINT NOT NULL,
+  keterangan TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+--21 BILLING
 CREATE TABLE billing_santri (
   id_billing SERIAL PRIMARY KEY,
-  id_santri INT NOT NULL,
-  jenis VARCHAR(50) NOT NULL,
-  nominal INT NOT NULL,
+  id_santri INT REFERENCES santri(id_santri),
+  jenis VARCHAR(100),
+  tipe VARCHAR(50) NOT NULL,
   periode VARCHAR(50),
-  status VARCHAR(20) DEFAULT 'belum bayar',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  CONSTRAINT fk_billing_santri
-    FOREIGN KEY (id_santri) REFERENCES santri(id_santri)
-);
-
-CREATE TABLE gaji_pengajar (
-  id_gaji SERIAL PRIMARY KEY,
-  id_pengajar INT NOT NULL,
-  periode VARCHAR(50) NOT NULL,
   nominal INT NOT NULL,
-  status VARCHAR(20) DEFAULT 'belum dibayar',
-  catatan TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  CONSTRAINT fk_gaji_pengajar
-    FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
+  sisa INT NOT NULL,
+  tanggal_mulai DATE,
+  tanggal_selesai DATE,
+  keterangan TEXT,
+  status VARCHAR(20) DEFAULT 'belum bayar',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---20 PEMBAYARAN
+ALTER TABLE billing_santri
+ADD CONSTRAINT unique_spp_periode
+UNIQUE (id_santri, jenis, periode);
+
+
+
+--22 PEMBAYARAN
 CREATE TABLE pembayaran (
   id_pembayaran SERIAL PRIMARY KEY,
-  id_billing INT NOT NULL,
-  tanggal_bayar DATE NOT NULL,
+  id_billing INT REFERENCES billing_santri(id_billing),
+  id_santri INT REFERENCES santri(id_santri),
+  tanggal_bayar DATE,
   jumlah_bayar INT NOT NULL,
-  metode VARCHAR(50), -- transfer, cash, dll
-  bukti_bayar TEXT,
+  metode VARCHAR(50),
+  kategori VARCHAR(50) NOT NULL,
+  jenis_pembayaran VARCHAR(50),
+  sumber VARCHAR(20),
   status VARCHAR(20) DEFAULT 'menunggu',
-
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  CONSTRAINT fk_billing
-    FOREIGN KEY (id_billing)
-    REFERENCES billing_santri(id_billing)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-UPDATE billing_santri
-SET status = 'belum bayar'
-WHERE status IS NULL
-   OR status = 'belum';
+
+--23
+CREATE TABLE pengeluaran (
+  id_pengeluaran SERIAL PRIMARY KEY,
+  tanggal DATE,
+  kategori VARCHAR(50),
+  nominal INT,
+  keterangan TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 
 -- insert

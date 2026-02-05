@@ -68,20 +68,23 @@
 
             <section class="ysq-inc-card ysq-inc-filter-box">
                 <div class="ysq-inc-filter-grid">
-                    <div class="ysq-inc-form-group">
-                        <label for="ysq-date-start">Periode Awal:</label>
-                        <input type="date" id="ysq-date-start" class="ysq-inc-input">
+                    <div id="ysq-filter-dynamic" style="display: flex; gap: 15px; flex: 2;">
+                        <div class="ysq-inc-form-group">
+                            <label for="ysq-date-start">Periode Awal:</label>
+                            <input type="date" id="ysq-date-start" class="ysq-inc-input">
+                        </div>
+                        <div class="ysq-inc-form-group">
+                            <label for="ysq-date-end">Periode Akhir:</label>
+                            <input type="date" id="ysq-date-end" class="ysq-inc-input">
+                        </div>
                     </div>
-                    <div class="ysq-inc-form-group">
-                        <label for="ysq-date-end">Periode Akhir:</label>
-                        <input type="date" id="ysq-date-end" class="ysq-inc-input">
-                    </div>
+            
                     <div class="ysq-inc-form-group">
                         <label for="ysq-filter-cat">Kategori Pemasukan:</label>
                         <select id="ysq-filter-cat" class="ysq-inc-input">
                             <option value="all">Semua Pemasukan</option>
                             <option value="iuran">Iuran Siswa (SPP)</option>
-                            <option value="infaq">Infaq & Donasi</option>
+                            <option value="infaq">pembayaran lainnya</option>
                         </select>
                     </div>
                     <button class="ysq-inc-btn ysq-inc-btn-primary ysq-main-generate" onclick="generateIncomeReport()">
@@ -127,13 +130,13 @@
     <div id="infaqModal" class="ysq-modal-overlay">
         <div class="ysq-modal-content">
             <div class="ysq-modal-header">
-                <h3><i class="fas fa-hand-holding-heart"></i> Input Infaq Dan Donasi</h3>
+                <h3><i class="fas fa-hand-holding-heart"></i> pembayaran lainnya</h3>
                 <span class="ysq-close-modal" onclick="closeInfaqModal()">&times;</span>
             </div>
             <div class="ysq-modal-body">
                 <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
-                    <label>Nama Donatur:</label>
-                    <input type="text" id="modal-nama" class="ysq-inc-input" placeholder="Nama Donatur/Hamba Allah...">
+                    <label>pembayaran:</label>
+                    <input type="text" id="modal-nama" class="ysq-inc-input" placeholder="nama pembayaran (infaq, donasi dan lainnya)">
                 </div>
                 <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
                     <label>Tanggal Diberi:</label>
@@ -141,7 +144,7 @@
                 </div>
                 <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
                     <label>Nominal (Rp):</label>
-                    <input type="number" id="modal-nominal" class="ysq-inc-input" placeholder="Masukkan angka saja...">
+                    <input type="text" id="modal-nominal" class="ysq-inc-input" placeholder="Contoh: 350.000" onkeyup="formatRupiah(this)">
                 </div>
                 <div class="ysq-inc-form-group">
                     <label>Keterangan:</label>
@@ -156,6 +159,81 @@
             </div>
         </div>
     </div>
+    <div id="sppModal" class="ysq-modal-overlay">
+    <div class="ysq-modal-content">
+        <div class="ysq-modal-header">
+            <h3><i class="fas fa-file-invoice-dollar"></i> Input Pembayaran SPP</h3>
+            <span class="ysq-close-modal" onclick="closeSPPModal()">&times;</span>
+        </div>
+        
+        <div class="ysq-modal-body">
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Kelas:</label>
+                    <select id="spp-kelas" class="ysq-inc-input">
+
+                    </select>
+                </div>
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Kategori Santri:</label>
+                    <select id="spp-kategori" class="ysq-inc-input">
+                        <option value="Dewasa">Dewasa</option>
+                        <option value="Anak">Anak-anak</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                <label>Nominal Pembayaran (Rp):</label>
+                <input type="text" id="spp-nominal" class="ysq-inc-input" placeholder="Contoh: 350.000" onkeyup="formatRupiah(this)">
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Tanggal Awal Periode:</label>
+                    <input type="date" id="spp-tgl-mulai" class="ysq-inc-input">
+                </div>
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Tanggal Selesai Periode:</label>
+                    <input type="date" id="spp-tgl-akhir" class="ysq-inc-input">
+                </div>
+            </div>
+            
+            <p style="font-size: 11px; color: #64748b; margin-top: 15px; font-style: italic;">
+                *Sistem akan menghitung selisih pembayaran sebagai tunggakan secara otomatis.
+            </p>
+        </div>
+
+        <div class="ysq-modal-footer">
+            <button class="ysq-inc-btn ysq-btn-secondary" onclick="closeSPPModal()">Batal</button>
+            <button class="ysq-inc-btn ysq-inc-btn-primary" onclick="saveSPPFromModal()">
+                <i class="fas fa-save"></i> Simpan Data
+            </button>
+        </div>
+    </div>
+</div>
+<div id="detailBillingModal" class="ysq-modal-overlay">
+    <div class="ysq-modal-content" style="max-width:700px">
+      <div class="ysq-modal-header">
+        <h3>Detail Pembayaran Santri</h3>
+        <span class="ysq-close-modal"
+          onclick="closeDetailBillingModal()">&times;</span>
+      </div>
+  
+      <div class="ysq-modal-body">
+        <table class="ysq-inc-table">
+          <thead>
+            <tr>
+              <th>Nama Santri</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="detail-billing-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
     <script type="module" src="/js/admin_keuangan.js"></script>
      <script type="module" src="/js/profileSetting.js"></script>

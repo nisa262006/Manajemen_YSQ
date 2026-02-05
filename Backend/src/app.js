@@ -166,8 +166,7 @@ app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
 app.use("/api/tugas-media", require("./routes/tugasmateriajarroutes"));
 app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
 app.use("/api/rapor", require("./routes/raporroutes"));
-app.use("/api/billing-santri", require("./routes/billingSantriRoutes"));
-app.use("/api/pembayaran", require("./routes/pembayaranroutes"));
+app.use("/api/keuangan", require("./routes/keuanganroutes"));
 
 // ================= START SERVER =================
 app.listen(PORT, () => {
