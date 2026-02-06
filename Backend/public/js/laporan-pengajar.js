@@ -289,3 +289,40 @@ window.exportToExcel = async function () {
     }
   };
   
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+  
+    if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+    }
+  
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutBtn = document.querySelector(".sidebar-footer li");
+  
+    if (logoutBtn) {
+      logoutBtn.style.cursor = "pointer";
+  
+      logoutBtn.addEventListener("click", () => {
+        // OPTIONAL: bersihkan session/localStorage kalau ada
+        localStorage.clear();
+        sessionStorage.clear();
+  
+        // redirect ke login
+        window.location.href = "/login";
+      });
+    }
+  });
+  

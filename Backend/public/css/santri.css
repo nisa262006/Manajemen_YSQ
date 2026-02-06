@@ -2727,3 +2727,93 @@ body {
  
   
   
+
+  @media screen and (max-width: 768px) {
+    /* Judul Detail Tagihan */
+    .ysq-section-title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    /* Container Utama Filter */
+    .ysq-filter-group {
+        display: flex;
+        flex-direction: column !important; /* Stack ke bawah */
+        gap: 12px;
+        width: 100%;
+    }
+
+    /* Row untuk Tahun dan Status agar tetap sejajar (opsional) atau stack */
+    #spp-filters-container {
+        display: flex;
+        flex-direction: column !important; /* Ubah ke column jika ingin 1 baris 1 dropdown */
+        gap: 12px;
+        width: 100%;
+    }
+
+    /* Mempercantik Dropdown */
+    .ysq-filter-item {
+        width: 100%;
+    }
+
+    .ysq-select-custom {
+        width: 100% !important; /* Lebar penuh */
+        height: 45px; /* Lebih mudah ditekan jari */
+        font-size: 14px;
+        padding: 0 10px;
+    }
+
+    .ysq-filter-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+}
+@media screen and (max-width: 768px) {
+    .ysq-bill-summary-grid {
+        grid-template-columns: 1fr; /* Satu kolom saja */
+    }
+
+    .ysq-bill-card.highlight {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Rata tengah di mobile */
+        text-align: center;
+    }
+
+    .ysq-bill-card.highlight h3 {
+        font-size: 1.8rem; /* Ukuran nominal diperbesar agar jelas */
+        margin: 10px 0;
+    }
+
+    .bill-card-icon {
+        margin-bottom: 10px;
+    }
+}
+@media screen and (max-width: 768px) {
+    /* Container Tabel */
+    .ysq-table-wrapper {
+        width: 100%;
+        overflow-x: auto; /* Aktifkan scroll kanan-kiri */
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    .ysq-grid-table {
+        min-width: 600px; /* Paksa lebar minimal agar data tidak berdesakan */
+    }
+
+    .grid-cell {
+        padding: 10px 5px;
+        font-size: 12px; /* Ukuran font sedikit dikecilkan */
+    }
+    
+    /* Tombol Bayar di dalam tabel */
+    .ysq-btn-submit-payment {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+}

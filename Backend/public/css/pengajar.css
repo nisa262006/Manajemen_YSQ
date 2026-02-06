@@ -3578,3 +3578,233 @@ button[onclick="tambahKeDaftar()"] {
         padding: 8px 12px;
     }
 }
+
+
+/* =========================================================
+   RESPONSIVE FIX: RAPOR PENGAJAR
+   ========================================================= */
+   @media screen and (max-width: 768px) {
+    /* 1. Header & Menu */
+    .top-header {
+        padding: 10px 15px !important;
+        height: 65px !important;
+    }
+
+    .mobile-menu-btn {
+        display: flex !important; /* Munculkan garis 3 */
+    }
+
+    .date-display-box {
+        display: none; /* Sembunyikan tanggal di HP agar tidak sesak */
+    }
+
+    /* 2. Filter & Tabs (Stacked) */
+    .ysq-action-bar {
+        flex-direction: column !important;
+        gap: 15px;
+    }
+
+    .ysq-filter-group-main {
+        flex-direction: column !important;
+        width: 100%;
+    }
+
+    .filter-item {
+        width: 100% !important;
+        border-left: none !important;
+        padding: 5px 0 !important;
+    }
+
+    .ysq-header-tabs-pengajar {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Tab bagi dua rata */
+    }
+
+    /* 3. Form Input Grid */
+    .form-grid-rapor {
+        grid-template-columns: 1fr !important; /* Satu kolom saja di HP */
+        gap: 10px !important;
+    }
+
+    .form-container-rapor {
+        padding: 15px !important;
+    }
+
+    .form-section-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+
+    /* 4. Tabel Input Tahfidz (Scroll Samping) */
+    .ysq-table-container-tahfidz {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ysq-table-premium {
+        min-width: 500px; /* Agar input tidak gepeng */
+    }
+
+    /* 5. Score & Buttons */
+    .ysq-row-final-score {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+        padding: 15px !important;
+    }
+
+    .form-actions-rapor {
+        flex-direction: column-reverse; /* Tombol simpan di atas */
+        gap: 10px;
+    }
+
+    .btn-rapor-simpan, .btn-rapor-batal {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE FIX: LAPORAN MONITORING
+   ========================================================= */
+   @media screen and (max-width: 768px) {
+    /* 1. Stat Cards (Grid menjadi 1 kolom atau 2 kolom kecil) */
+    .ysq-stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        margin-bottom: 20px;
+    }
+
+    .ysq-stat-card {
+        padding: 15px !important;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .stat-icon {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 1.2rem !important;
+    }
+
+    /* 2. Filter Laporan (Stacked) */
+    .report-header {
+        flex-direction: column !important;
+        gap: 15px;
+        align-items: flex-start !important;
+    }
+
+    .report-controls-wrapper {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap; /* Agar filter membungkus jika layar sangat sempit */
+        gap: 10px;
+    }
+
+    .filter-group {
+        flex: 1; /* Filter memanjang memenuhi ruang */
+        min-width: 120px;
+    }
+
+    .sqm-input-box-mini {
+        width: 100% !important;
+    }
+
+    .btn-export-excel {
+        width: 50px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 3. Tabel Laporan (Scroll Samping) */
+    .ysq-table-report {
+        min-width: 700px !important; /* Paksa lebar agar kolom tidak dempet */
+    }
+
+    .ysq-table-report th, 
+    .ysq-table-report td {
+        padding: 12px 10px !important;
+        font-size: 13px;
+        white-space: nowrap; /* Nama santri tidak turun ke bawah */
+    }
+
+    /* Indikator Swipe */
+    .table-responsive::before {
+        content: "⇆ Geser untuk lihat detail";
+        display: block;
+        font-size: 11px;
+        color: #999;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    /* 1. Memaksa pembungkus kontrol menjadi satu kolom (3 tingkat) */
+    .report-controls-wrapper {
+        display: flex !important;
+        flex-direction: column !important; /* Susun vertikal: Periode -> Kategori -> Kelas */
+        gap: 12px !important;
+        width: 100% !important;
+        align-items: stretch !important;
+    }
+
+    /* 2. Menyesuaikan setiap grup filter agar memenuhi lebar layar */
+    .filter-group {
+        display: flex !important;
+        flex-direction: column !important; /* Label di atas, Dropdown di bawah */
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* 3. Merapikan Label */
+    .filter-group label {
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        margin-bottom: 5px !important;
+        color: #475569 !important;
+        display: block !important;
+    }
+
+    /* 4. Memperbaiki ukuran dropdown agar seragam dan tidak meluber */
+    .sqm-input-box-mini, 
+    #filter-periode, 
+    #filter-kategori, 
+    #filter-kelas {
+        width: 100% !important;
+        height: 42px !important; /* Ukuran pas untuk jempol di HP */
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        border-radius: 8px !important;
+        border: 1px solid #cbd5e1 !important;
+        background-color: #ffffff !important;
+        -webkit-appearance: none; /* Menghilangkan style default browser */
+    }
+
+    /* 5. Khusus Header agar tidak memakan banyak tempat */
+    .report-header {
+        flex-direction: column !important;
+        padding: 15px !important;
+        gap: 15px !important;
+    }
+
+    .header-left {
+        width: 100% !important;
+    }
+
+    /* 6. Tombol Export ditaruh paling bawah sendiri */
+    .btn-export-excel {
+        width: 100% !important;
+        margin-top: 5px !important;
+        height: 42px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+}

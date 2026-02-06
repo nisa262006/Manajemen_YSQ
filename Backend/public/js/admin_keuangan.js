@@ -12,9 +12,14 @@ const cleanRupiah = (val) => parseInt(val.replace(/\D/g, "")) || 0;
    STATE
 ===================================================== */
 let rawData = [];
-let allClassData = []; // <--- TAMBAHKAN INI
+let allClassData = [];
 let filteredData = [];
 let currentMode = "all";
+
+let sppExportData = {};            // MODE 2 — SPP
+let billLainnyaExportData = {};    // ✅ MODE 3 — BILL LAINNYA
+let exportBuffer = [];
+
 
 /* =====================================================
    INIT
@@ -250,6 +255,16 @@ async function renderSPPView(keyword = "") {
           d.jenis === "SPP" &&
           d.id_santri !== null
         );
+        
+        // ===== SIMPAN UNTUK EXPORT =====
+        sppExportData = {};
+
+        data.forEach(d => {
+          if (!sppExportData[d.periode]) {
+            sppExportData[d.periode] = [];
+          }
+          sppExportData[d.periode].push(d);
+        });
 
   
       // 🔍 filter nama
@@ -365,17 +380,41 @@ async function renderInfaqView(keyword = "") {
   
     try {
       const billing = await apiGet("/keuangan/billing/all");
-  
-      // 🔥 GROUP BY (tipe + nominal + keterangan)
-      const map = {};
-      billing
-        .filter(b => b.jenis === "LAINNYA")
-        .forEach(b => {
-          const key = `${b.tipe}-${b.nominal}-${b.keterangan}`;
-          if (!map[key]) map[key] = b;
-        });
-  
-      let data = Object.values(map);
+
+// ===============================
+// 🔥 SIMPAN DATA UNTUK EXPORT
+// ===============================
+billLainnyaExportData = {};
+
+// ===============================
+// 🔥 DATA UNTUK TABEL
+// ===============================
+const map = {};
+
+billing
+  .filter(b => b.jenis === "LAINNYA")
+  .forEach(b => {
+
+    // --- UNTUK TABEL ---
+    const key = `${b.tipe}-${b.nominal}-${b.keterangan}`;
+    if (!map[key]) map[key] = b;
+
+    // --- UNTUK EXPORT ---
+    const billKey = b.tipe.toUpperCase();
+    if (!billLainnyaExportData[billKey]) {
+      billLainnyaExportData[billKey] = {
+        santri: []
+      };
+    }
+
+    billLainnyaExportData[billKey].santri.push({
+      nama: b.nama || "Santri",
+      jumlah_bayar: Number(b.nominal || 0),
+      status: b.status?.toLowerCase() === "lunas" ? "lunas" : "belum bayar"
+    });    
+  });
+
+let data = Object.values(map);
   
       if (keyword) {
         data = data.filter(b =>
@@ -748,4 +787,415 @@ window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
       tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data</td></tr>`;
     }
   };
+  
+
+  window.exportData = function (type) {
+
+    // MODE 1 — SEMUA PEMASUKAN
+    if (currentMode === "all") {
+      if (type === "excel") exportAllIncomeExcel();
+      if (type === "pdf") exportAllIncomePDF();
+      return;
+    }
+  
+    // MODE 2 — SPP
+    if (currentMode === "spp") {
+      if (type === "excel") exportSPPExcel();
+      if (type === "pdf") exportSPPPDF();
+      return;
+    }
+  
+    // MODE 3 — BILL LAINNYA
+    if (currentMode === "infaq") {
+      if (type === "excel") exportBillLainnyaExcel();
+      if (type === "pdf") exportBillLainnyaPDF();
+      return;
+    }
+  
+    alert("Mode export tidak dikenali");
+  };  
+
+  function exportAllIncomePDF() {
+    if (!filteredData.length) {
+      alert("Tidak ada data untuk diexport");
+      return;
+    }
+  
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+  
+    let totalSPP = 0;
+    let totalLainnya = 0;
+  
+    filteredData.forEach(d => {
+      if (d.kategori === "SPP") totalSPP += Number(d.nominal);
+      if (d.kategori === "LAINNYA") totalLainnya += Number(d.nominal);
+    });
+  
+    const totalGross = totalSPP + totalLainnya;
+  
+    // JUDUL
+    doc.setFontSize(14);
+    doc.text("LAPORAN PEMASUKAN KEUANGAN", 14, 15);
+  
+    doc.setFontSize(10);
+    doc.text(
+      `Periode: ${$("ysq-date-start").value} s/d ${$("ysq-date-end").value}`,
+      14,
+      22
+    );
+  
+    // RINGKASAN
+    doc.text(`Total SPP        : ${rupiah(totalSPP)}`, 14, 32);
+    doc.text(`Total Lainnya   : ${rupiah(totalLainnya)}`, 14, 38);
+    doc.text(`Total Gross     : ${rupiah(totalGross)}`, 14, 44);
+  
+    // TABEL
+    const tableData = filteredData.map(d => [
+      new Date(d.tanggal).toLocaleDateString("id-ID"),
+      d.nama || "Hamba Allah",
+      d.kelas || "-",
+      d.periode || d.keterangan || "-",
+      d.kategori,
+      rupiah(d.nominal)
+    ]);
+  
+    doc.autoTable({
+      startY: 55,
+      head: [[
+        "Tanggal",
+        "Nama",
+        "Kelas",
+        "Periode",
+        "Kategori",
+        "Nominal"
+      ]],
+      body: tableData
+    });
+  
+    doc.save(`laporan-pemasukan-${todayISO()}.pdf`);
+  }
+  
+  function exportAllIncomeExcel() {
+    if (!filteredData.length) {
+      alert("Tidak ada data untuk diexport");
+      return;
+    }
+  
+    // =============================
+    // HITUNG RINGKASAN
+    // =============================
+    let totalSPP = 0;
+    let totalLainnya = 0;
+  
+    filteredData.forEach(d => {
+      if (d.kategori === "SPP") totalSPP += Number(d.nominal);
+      if (d.kategori === "LAINNYA") totalLainnya += Number(d.nominal);
+    });
+  
+    const totalGross = totalSPP + totalLainnya;
+  
+    // =============================
+    // DATA EXCEL
+    // =============================
+    const rows = [
+      ["LAPORAN PEMASUKAN KEUANGAN"],
+      [`Periode: ${$("ysq-date-start").value} s/d ${$("ysq-date-end").value}`],
+      [],
+      ["Total SPP", totalSPP],
+      ["Total Bill Lainnya", totalLainnya],
+      ["Total Gross", totalGross],
+      [],
+      [
+        "Tanggal",
+        "Nama Santri / Sumber",
+        "Kelas",
+        "Periode / Keterangan",
+        "Kategori",
+        "Nominal"
+      ]
+    ];
+  
+    filteredData.forEach(d => {
+      rows.push([
+        new Date(d.tanggal).toLocaleDateString("id-ID"),
+        d.nama || "Hamba Allah",
+        d.kelas || "-",
+        d.periode || d.keterangan || "-",
+        d.kategori,
+        d.nominal
+      ]);
+    });
+  
+    // =============================
+    // BUAT FILE EXCEL
+    // =============================
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [
+      { wch: 14 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 15 }
+    ];
+  
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "DATA PEMASUKAN");
+  
+    XLSX.writeFile(
+      wb,
+      `laporan-pemasukan-${todayISO()}.xlsx`
+    );
+  }
+
+  
+
+  function exportSPPExcel() {
+    if (!sppExportData || Object.keys(sppExportData).length === 0) {
+      alert("Data SPP belum dimuat");
+      return;
+    }
+  
+    const wb = XLSX.utils.book_new();
+  
+    Object.keys(sppExportData).forEach(periode => {
+      const rows = [];
+  
+      rows.push([`LAPORAN SPP PERIODE ${periode}`]);
+      rows.push([]);
+  
+      const dataPeriode = sppExportData[periode];
+  
+      // GROUP BY KELAS
+      const byKelas = {};
+      dataPeriode.forEach(d => {
+        const key = `${d.nama_kelas} (${d.tipe})`;
+        if (!byKelas[key]) byKelas[key] = [];
+        byKelas[key].push(d);
+      });
+  
+      Object.keys(byKelas).forEach(kelas => {
+        rows.push([`Kelas: ${kelas}`]);
+        rows.push(["Nama Santri", "Nominal", "Tunggakan", "Status"]);
+  
+        let lunas = 0, nyicil = 0, belum = 0;
+  
+        byKelas[kelas].forEach(s => {
+          rows.push([
+            s.nama,
+            s.nominal,
+            s.sisa,
+            s.status.toUpperCase()
+          ]);
+  
+          if (s.status === "lunas") lunas += s.nominal;
+          else if (s.status === "nyicil") nyicil += s.nominal - s.sisa;
+          else belum += s.nominal;
+        });
+  
+        rows.push([]);
+        rows.push(["Subtotal Lunas", lunas]);
+        rows.push(["Subtotal Nyicil", nyicil]);
+        rows.push(["Subtotal Belum Bayar", belum]);
+        rows.push([]);
+      });
+  
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, `SPP-${periode}`);
+    });
+  
+    XLSX.writeFile(wb, "laporan-spp.xlsx");
+  }
+  function exportSPPPDF() {
+    if (!sppExportData || Object.keys(sppExportData).length === 0) {
+      alert("Data SPP belum tersedia untuk export");
+      return;
+    }
+  
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("p", "mm", "a4");
+  
+    let firstPage = true;
+  
+    Object.keys(sppExportData).forEach((periode) => {
+      if (!firstPage) doc.addPage();
+      firstPage = false;
+  
+      // ===== HEADER =====
+      doc.setFontSize(14);
+      doc.text(`LAPORAN SPP PERIODE ${periode}`, 14, 15);
+  
+      let yPos = 22;
+  
+      const data = sppExportData[periode];
+  
+      // GROUP BY KELAS + KATEGORI
+      const group = {};
+      data.forEach(d => {
+        const key = `${d.nama_kelas} (${d.tipe.toUpperCase()})`;
+        if (!group[key]) group[key] = [];
+        group[key].push(d);
+      });
+  
+      Object.keys(group).forEach((kelas) => {
+        doc.setFontSize(11);
+        doc.text(`Kelas: ${kelas}`, 14, yPos);
+        yPos += 4;
+  
+        const rows = [];
+        let lunas = 0, nyicil = 0, belum = 0;
+  
+        group[kelas].forEach(s => {
+          rows.push([
+            s.nama,
+            rupiah(s.nominal),
+            rupiah(s.sisa),
+            s.status.toUpperCase()
+          ]);
+  
+          if (s.status === "lunas") lunas += s.nominal;
+          else if (s.status === "nyicil") nyicil += (s.nominal - s.sisa);
+          else belum += s.nominal;
+        });
+  
+        doc.autoTable({
+          startY: yPos,
+          head: [["Nama Santri", "Nominal", "Tunggakan", "Status"]],
+          body: rows,
+          theme: "grid",
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [41, 128, 185] }
+        });
+  
+        yPos = doc.lastAutoTable.finalY + 4;
+  
+        // ===== RINGKASAN =====
+        doc.setFontSize(9);
+        doc.text(`Total Lunas        : ${rupiah(lunas)}`, 16, yPos);
+        doc.text(`Total Nyicil       : ${rupiah(nyicil)}`, 16, yPos + 4);
+        doc.text(`Total Belum Bayar  : ${rupiah(belum)}`, 16, yPos + 8);
+  
+        yPos += 14;
+  
+        // Cegah kepotong halaman
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+      });
+    });
+  
+    doc.save("laporan-spp.pdf");
+  }
+  
+
+  function exportBillLainnyaPDF() {
+    if (!Object.keys(billLainnyaExportData).length) {
+      alert("Data bill lainnya kosong");
+      return;
+    }
+  
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+  
+    let first = true;
+  
+    Object.keys(billLainnyaExportData).forEach((billName) => {
+      if (!first) doc.addPage();
+      first = false;
+  
+      doc.setFontSize(14);
+      doc.text(`LAPORAN BILL ${billName}`, 14, 15);
+  
+      const rows = [];
+      let lunas = 0;
+      let belum = 0;
+  
+      billLainnyaExportData[billName].santri.forEach(s => {
+        rows.push([
+          s.nama,
+          rupiah(s.jumlah_bayar),
+          s.status.toUpperCase()
+        ]);
+  
+        if (s.status === "lunas") lunas += s.jumlah_bayar;
+        else belum += s.jumlah_bayar;
+      });
+  
+      doc.autoTable({
+        startY: 25,
+        head: [["Nama Santri", "Jumlah Bayar", "Status"]],
+        body: rows,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [39, 174, 96] }
+      });
+  
+      const y = doc.lastAutoTable.finalY + 6;
+      doc.setFontSize(10);
+      doc.text(`Total Lunas       : ${rupiah(lunas)}`, 14, y);
+      doc.text(`Total Belum Bayar : ${rupiah(belum)}`, 14, y + 6);
+    });
+  
+    doc.save("laporan-bill-lainnya.pdf");
+  }
+
+  function exportBillLainnyaExcel() {
+    if (!Object.keys(billLainnyaExportData).length) {
+      alert("Data bill lainnya kosong");
+      return;
+    }
+  
+    const wb = XLSX.utils.book_new();
+  
+    Object.keys(billLainnyaExportData).forEach((billName) => {
+      const data = billLainnyaExportData[billName].santri;
+  
+      let totalLunas = 0;
+      let totalBelum = 0;
+  
+      const rows = [
+        [`LAPORAN BILL ${billName}`],
+        [],
+        ["Nama Santri", "Jumlah Bayar", "Status"]
+      ];
+  
+      data.forEach(s => {
+        const nominal = Number(s.jumlah_bayar || 0);
+        const status = (s.status || "").toLowerCase();
+  
+        // isi tabel
+        rows.push([
+          s.nama,
+          nominal,
+          status.toUpperCase()
+        ]);
+  
+        // hitung total
+        if (status === "lunas") {
+          totalLunas += nominal;
+        } else {
+          totalBelum += nominal;
+        }
+      });
+  
+      // ringkasan di atas
+      rows.unshift(
+        [`Total Lunas`, totalLunas],
+        [`Total Belum Bayar`, totalBelum],
+        []
+      );
+  
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws["!cols"] = [
+        { wch: 25 },
+        { wch: 20 },
+        { wch: 15 }
+      ];
+  
+      XLSX.utils.book_append_sheet(wb, ws, billName);
+    });
+  
+    XLSX.writeFile(wb, "laporan-bill-lainnya.xlsx");
+  }
   

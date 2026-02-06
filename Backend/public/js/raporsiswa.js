@@ -210,3 +210,5 @@ window.downloadRapor = async function (jenis) {
   pdf.addImage(canvas.toDataURL("image/jpeg"), "JPEG", 0, 0, 210, 297);
   pdf.save(`Rapor_${jenis}_${namaEl.textContent}.pdf`);
 };
+
+
