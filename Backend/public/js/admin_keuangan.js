@@ -225,7 +225,7 @@ window.generateIncomeReport = async function () {
 async function renderSPPView(keyword = "") {
     addHeaderButton("Tambah SPP", openSPPModal);
   
-    const statusFilter = $("ysq-filter-status")?.value || "all";
+    const statusFilter = ($("ysq-filter-status")?.value || "all").toLowerCase();
   
     const header = document.querySelector(".ysq-inc-table thead");
     header.innerHTML = `
@@ -260,11 +260,15 @@ async function renderSPPView(keyword = "") {
       }      
   
       // 🔍 filter status
+      // Cari bagian ini di kode Anda dan gabungkan menjadi satu:
       if (statusFilter !== "all") {
-        data = data.filter(d =>
-          d.status?.toLowerCase().trim() === statusFilter
-        );
-      }      
+        data = data.filter(d => {
+          const s = d.status?.toLowerCase().trim();
+          if (statusFilter === "lunas") return s === "lunas";
+          if (statusFilter === "belum bayar") return s === "belum bayar";
+          return true;
+        });
+      }
   
       tbody.innerHTML = "";
       if (data.length === 0) {
@@ -279,10 +283,10 @@ async function renderSPPView(keyword = "") {
         const actionBtn = isLunas
   ? `<span style="color: green">✓ Selesai</span>`
   : `<button
-       class="ysq-inc-btn ysq-inc-btn-primary"
+       class="ysq-inc-btn ysq-inc-btn-danger"
        onclick="openDetailBilling('${d.id_billing}')"
        style="padding:2px 8px;font-size:12px">
-       Lihat Pembayaran
+       Konfirmasi
      </button>`;
 
   
@@ -344,6 +348,7 @@ async function renderSPPView(keyword = "") {
 ===================================================== */
 async function renderInfaqView(keyword = "") {
     addHeaderButton("Tambah pembayaran", openInfaqModal);
+    
   
     const header = document.querySelector(".ysq-inc-table thead");
     header.innerHTML = `
@@ -390,11 +395,11 @@ async function renderInfaqView(keyword = "") {
           <td>${b.keterangan || "-"}</td>
           <td align="right">${rupiah(b.nominal)}</td>
           <td>
-            <button class="ysq-inc-btn ysq-inc-btn-primary"
-              onclick="openDetailBilling('${b.id_billing}')">
-              Lihat Pembayaran
-            </button>
-          </td>
+          <button class="ysq-inc-btn ysq-inc-btn-primary"
+            onclick="openDetailBilling('${b.id_billing}')">
+            Lihat Pembayaran
+          </button>
+        </td>
         </tr>
       `).join("");
   
@@ -593,70 +598,154 @@ window.saveInfaqFromModal = async function () {
       alert("Gagal menyimpan pembayaran lainnya");
     }
   };
-  
 
-  window.openDetailBilling = async function (idBilling) {
-    $("detailBillingModal").style.display = "flex";
-  
-    const tbody = $("detail-billing-body");
-    tbody.innerHTML = `<tr><td colspan="3">Memuat...</td></tr>`;
-  
-    try {
+/* =====================================================
+   SINKRONISASI MODAL DETAIL (FIXED)
+===================================================== */
+/* =====================================================
+   SINKRONISASI MODAL DETAIL (PERBAIKAN STATUS)
+===================================================== */
+window.openDetailBilling = async function (idBilling) {
+  const modal = $("detailBillingModal");
+  if(modal) modal.style.display = "flex";
+
+  const tbody = $("detail-billing-body");
+  tbody.innerHTML = `<tr><td colspan="4">Memuat data santri...</td></tr>`;
+
+  try {
       const res = await apiGet(`/keuangan/billing/${idBilling}/santri`);
       const data = res.data || res;
+
+      if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4">Tidak ada data santri aktif.</td></tr>`;
+          return;
+      }
+
+      tbody.innerHTML = data.map(p => {
+          // 🔥 KOREKSI 1: Pastikan mengambil status_pembayaran sesuai alias di Backend
+          const rawStatus = p.status; // ← ini dari billing_santri
+          const stat = rawStatus.toLowerCase();
+          
+          let aksi = "-";
+          let warna = "#333";
+          let teksStatus = "BELUM BAYAR";
+          
+          // 🔥 KOREKSI 2: Definisikan variabel jumlahBayar agar tidak error
+          let jumlahBayar = p.jumlah_bayar ? rupiah(p.jumlah_bayar) : "-";
+
+          // 🔥 KOREKSI 3: Logika penentuan label dan tombol konfirmasi
+          if (stat === "menunggu") {
+              teksStatus = "⏳ MENUNGGU";
+              warna = "orange";
+              aksi = `<button class="ysq-inc-btn ysq-inc-btn-primary" 
+                        onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${idBilling}')"
+                        style="padding: 4px 8px; font-size: 11px;">
+                        Konfirmasi
+                      </button>`;
+          } 
+          else if (stat === "lunas" || stat === "terverifikasi") {
+              teksStatus = "✅ LUNAS";
+              warna = "green";
+              aksi = `<i class="fas fa-check-circle" style="color:green"></i>`;
+          } 
+          else if (stat === "nyicil") {
+              teksStatus = "📝 NYICIL";
+              warna = "blue";
+              aksi = `<small>Belum Lunas</small>`;
+          } 
+          else { 
+              // Status 'belum bayar'
+              teksStatus = "❌ BELUM BAYAR";
+              warna = "red";
+              aksi = p.no_hp ? `
+                  <a href="https://wa.me/${p.no_hp.replace(/\D/g, '')}?text=Assalamu'alaikum, mengingatkan pembayaran SPP..." 
+                    target="_blank" class="ysq-inc-btn" style="background:#25D366; color:white; padding:4px 8px; font-size:11px; text-decoration:none; border-radius:4px;">
+                    WA Tagih
+                  </a>` : "-";
+          }
+
+          return `
+              <tr>
+                  <td>${p.nama}</td>
+                  <td align="right"><b>${jumlahBayar}</b></td>
+                  <td style="color:${warna}; font-weight:bold; font-size: 12px;">${teksStatus}</td>
+                  <td align="center">${aksi}</td>
+              </tr>`;
+      }).join("");
+
+  } catch (err) {
+      console.error("Error Detail Billing:", err);
+      tbody.innerHTML = `<tr><td colspan="4">Gagal memuat detail pembayaran.</td></tr>`;
+  }
+};
+
+window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
+  if (!idPembayaran || idPembayaran === 'undefined') {
+      return alert("ID Pembayaran tidak ditemukan! Pastikan santri sudah klik 'Bayar'.");
+  }
+
+  if (!confirm("Apakah Anda yakin ingin memverifikasi pembayaran ini?")) return;
+
+  try {
+      const res = await apiPut(`/keuangan/pembayaran/${idPembayaran}/konfirmasi`);
+      if (res.success) {
+          alert("Berhasil! Saldo dashboard akan diperbarui.");
+          // Refresh data
+          await openDetailBilling(idBilling);
+          await loadDashboardSummary();
+          if (typeof renderSPPView === "function") renderSPPView();
+      }
+  } catch (err) {
+      alert("Gagal konfirmasi: " + (err.message || "Error server"));
+  }
+};
+
+  window.closeDetailBillingModal = () =>
+    $("detailBillingModal").style.display = "none";
   
-      if (!data.length) {
-        tbody.innerHTML = `<tr><td colspan="3">Belum ada santri</td></tr>`;
+  
+  
+  
+  window.openDetailBillingLainnya = async function (tipe, periode) {
+    $("detailBillingModal").style.display = "flex";
+    const tbody = $("detail-billing-body");
+  
+    tbody.innerHTML = `<tr><td colspan="4">Memuat data santri...</td></tr>`;
+  
+    try {
+      const res = await apiGet(
+        `/keuangan/billing/lainnya/detail?tipe=${tipe}&periode=${periode}`
+      );
+  
+      if (!res.length) {
+        tbody.innerHTML = `<tr><td colspan="4">Tidak ada data santri</td></tr>`;
         return;
       }
   
-      tbody.innerHTML = data.map(p => {
+      tbody.innerHTML = res.map(p => {
+        let status = p.status.toUpperCase();
         let aksi = "-";
   
-        if (p.status === "menunggu" && p.id_pembayaran) {
+        if (p.status === "menunggu") {
           aksi = `
             <button class="ysq-inc-btn ysq-inc-btn-primary"
-              onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${idBilling}')">
+              onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${p.id_billing}')">
               Konfirmasi
             </button>`;
-        } else if (p.status === "lunas") {
-          aksi = `<span style="color:green;font-weight:bold">✓</span>`;
         }
   
         return `
           <tr>
             <td>${p.nama}</td>
-            <td>${p.status.toUpperCase()}</td>
+            <td align="right">${p.jumlah_bayar ? rupiah(p.jumlah_bayar) : "-"}</td>
+            <td>${status}</td>
             <td>${aksi}</td>
-          </tr>`;
+          </tr>
+        `;
       }).join("");
   
     } catch (err) {
-      console.error(err);
-      tbody.innerHTML = `<tr><td colspan="3">Gagal memuat data</td></tr>`;
-    }
-  };  
-  
-  
-  window.closeDetailBillingModal = () =>
-    $("detailBillingModal").style.display = "none";
-  
-  window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
-    if (!confirm("Konfirmasi pembayaran ini?")) return;
-  
-    try {
-      await apiPut(`/keuangan/pembayaran/${idPembayaran}/konfirmasi`);
-  
-      alert("Pembayaran berhasil dikonfirmasi");
-  
-      // refresh popup + dashboard
-      openDetailBilling(idBilling);
-      loadDashboardSummary();
-  
-    } catch (err) {
-      alert("Gagal konfirmasi pembayaran");
+      tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data</td></tr>`;
     }
   };
-  
-  
   

@@ -20,6 +20,12 @@ router.post(
    ctrl.tambahBillingLainnya
  );
  
+ router.get(
+   "/billing/lainnya/detail",
+   verifyToken,
+   onlyAdmin,
+   ctrl.getDetailBillingLainnya
+ );
 
 /* =========================
    PEMBAYARAN

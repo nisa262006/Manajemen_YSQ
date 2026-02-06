@@ -241,7 +241,6 @@ CREATE TABLE rapor_tahfidz (
 
   predikat VARCHAR(20),
   keterangan VARCHAR(50),
-  periode VARCHAR(50),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   UNIQUE (id_santri, periode),
@@ -290,7 +289,9 @@ CREATE TABLE billing_santri (
 ALTER TABLE billing_santri
 ADD CONSTRAINT unique_spp_periode
 UNIQUE (id_santri, jenis, periode);
-
+ALTER TABLE billing_santri 
+ADD CONSTRAINT unique_billing 
+UNIQUE (id_santri, tipe, tanggal_mulai);
 
 
 --22 PEMBAYARAN
@@ -308,6 +309,11 @@ CREATE TABLE pembayaran (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE billing_santri 
+ADD CONSTRAINT check_status_lower CHECK (status = LOWER(status));
+
+ALTER TABLE pembayaran 
+ADD CONSTRAINT check_pembayaran_status_lower CHECK (status = LOWER(status));
 
 --23
 CREATE TABLE pengeluaran (

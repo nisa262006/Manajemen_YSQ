@@ -119,6 +119,7 @@ window.searchPengeluaran = function () {
   const keyword = $("search-out").value.toLowerCase();
 
   filteredPengeluaran = pengeluaranData.filter(p =>
+    (p.kategori || "").toLowerCase().includes(keyword) ||
     (p.keterangan || "").toLowerCase().includes(keyword)
   );
 

@@ -59,22 +59,6 @@ exports.tambahBillingManual = async (req, res) => {
   }
 };
 
-/* =====================================================
-   SANTRI – LIHAT TAGIHAN
-===================================================== */
-exports.getBillingSantri = async (req, res) => {
-  const q = await db.query(`
-    SELECT *
-    FROM billing_santri
-    WHERE id_santri = (
-      SELECT id_santri FROM santri WHERE id_users=$1
-    )
-    ORDER BY created_at DESC
-  `, [req.user.id_users]);
-
-  res.json({ success: true, data: q.rows });
-};
-
 
 /* =====================================================
    ADMIN – SEMUA BILLING
@@ -92,39 +76,74 @@ ORDER BY b.created_at DESC
 
 
 /* =====================================================
-   SANTRI – PEMBAYARAN (SPP / CICIL / INFAQ)
+   SANTRI – LIHAT TAGIHAN
+===================================================== */
+exports.getBillingSantri = async (req, res) => {
+  const q = await db.query(`
+    SELECT 
+      b.*,
+      EXISTS (
+        SELECT 1 FROM pembayaran p
+        WHERE p.id_billing = b.id_billing
+          AND p.status = 'menunggu'
+      ) AS ada_menunggu
+    FROM billing_santri b
+    WHERE b.id_santri = (
+      SELECT id_santri FROM santri WHERE id_users = $1
+    )
+    ORDER BY b.created_at DESC
+  `, [req.user.id_users]);
+
+  res.json({ success: true, data: q.rows });
+};
+
+
+/* =====================================================
+   SANTRI – PEMBAYARAN (FIX ID_SANTRI & STATUS)
 ===================================================== */
 exports.createPembayaran = async (req, res) => {
-  const { id_billing, id_santri, jumlah_bayar, metode } = req.body;
+  const { id_billing, jumlah_bayar, metode } = req.body;
 
-  const b = await db.query(`
-    SELECT jenis, tipe, sisa
-    FROM billing_santri
-    WHERE id_billing=$1
-  `, [id_billing]);
+  try {
+    const b = await db.query(`
+      SELECT id_santri, sisa, jenis, tipe
+      FROM billing_santri
+      WHERE id_billing = $1
+    `, [id_billing]);
 
-  if (!b.rowCount) {
-    return res.status(400).json({ message: "Billing tidak ditemukan" });
+    if (!b.rowCount) {
+      return res.status(400).json({ message: "Billing tidak ditemukan" });
+    }
+
+    if (jumlah_bayar <= 0 || jumlah_bayar > b.rows[0].sisa) {
+      return res.status(400).json({ message: "Jumlah bayar tidak valid" });
+    }
+
+    // 1️⃣ Simpan pembayaran (LOG)
+    await db.query(`
+      INSERT INTO pembayaran
+      (id_billing, id_santri, tanggal_bayar, jumlah_bayar, metode, kategori, jenis_pembayaran, status)
+      VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, 'menunggu')
+    `, [
+      id_billing,
+      b.rows[0].id_santri,
+      jumlah_bayar,
+      metode,
+      b.rows[0].jenis,
+      b.rows[0].tipe
+    ]);
+
+    // 2️⃣ Billing jadi MENUNGGU
+    await db.query(`
+      UPDATE billing_santri
+      SET status = 'menunggu'
+      WHERE id_billing = $1 AND status != 'lunas'
+    `, [id_billing]);
+
+    res.json({ success: true, message: "Pembayaran terkirim, menunggu verifikasi admin" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-
-  if (jumlah_bayar > b.rows[0].sisa) {
-    return res.status(400).json({ message: "Jumlah melebihi sisa tagihan" });
-  }
-
-  await db.query(`
-    INSERT INTO pembayaran
-    (id_billing, id_santri, tanggal_bayar, jumlah_bayar, metode, kategori, jenis_pembayaran, status)
-    VALUES ($1,$2,CURRENT_DATE,$3,$4,$5,$6,'menunggu')
-  `, [
-    id_billing,
-    id_santri,          // ✅ WAJIB
-    jumlah_bayar,
-    metode,
-    b.rows[0].jenis,
-    b.rows[0].tipe
-  ]);  
-
-  res.json({ success: true, message: "Pembayaran dikirim, menunggu verifikasi" });
 };
 
 
@@ -370,85 +389,167 @@ exports.tambahBillingKelas = async (req, res) => {
 };
 
 
-exports.tambahBillingLainnya = async (req, res) => {
-  const { nama_pembayaran, nominal, tanggal_mulai, tanggal_selesai, keterangan } = req.body;
-
-  await db.query(`
-    INSERT INTO billing_santri
-    (id_santri, jenis, tipe, nominal, sisa, tanggal_mulai, tanggal_selesai, keterangan, status)
-    VALUES (NULL,'LAINNYA',$1,$2,$2,$3,$4,$5,'aktif')
-  `, [
-    nama_pembayaran,
-    nominal,
-    tanggal_mulai,
-    tanggal_selesai,
-    keterangan
-  ]);
-
-  res.json({ success: true, message: "Bill lainnya berhasil dibuat" });
-};
-
+/* =====================================================
+   ADMIN – BILLING LAINNYA (PERBAIKAN PERIODE NULL)
+===================================================== */
+  exports.tambahBillingLainnya = async (req, res) => {
+    const { nama_pembayaran, nominal, tanggal_mulai, keterangan } = req.body;
+  
+    try {
+      const santriAktif = await db.query(
+        `SELECT id_santri FROM santri WHERE status = 'aktif'`
+      );
+  
+      for (const s of santriAktif.rows) {
+        await db.query(`
+          INSERT INTO billing_santri
+          (id_santri, jenis, tipe, periode, nominal, sisa, tanggal_mulai, keterangan, status)
+          VALUES ($1, 'LAINNYA', $2, $3, $4, $4, $5, $6, 'belum bayar')
+        `, [
+          s.id_santri,
+          nama_pembayaran,          // $2 → tipe
+          tanggal_mulai,            // $3 → periode (TEXT OK)
+          nominal,                  // $4
+          tanggal_mulai,            // $5 → tanggal_mulai (DATE)
+          keterangan                // $6
+        ]);
+      }
+  
+      res.json({ success: true, message: "Billing lainnya berhasil dibuat" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: err.message });
+    }
+  };
+  
 
 // ADMIN – KONFIRMASI PEMBAYARAN SANTRI
 exports.konfirmasiPembayaranAdmin = async (req, res) => {
   const { id_pembayaran } = req.params;
 
-  const p = await db.query(`
-    SELECT p.id_billing, p.jumlah_bayar, b.jenis
-    FROM pembayaran p
-    JOIN billing_santri b ON p.id_billing=b.id_billing
-    WHERE p.id_pembayaran=$1 AND p.status='menunggu'
-  `, [id_pembayaran]);
+  try {
+    const p = await db.query(`
+      SELECT 
+        p.id_billing,
+        p.jumlah_bayar,
+        b.sisa
+      FROM pembayaran p
+      JOIN billing_santri b ON b.id_billing = p.id_billing
+      WHERE p.id_pembayaran = $1
+        AND p.status = 'menunggu'
+    `, [id_pembayaran]);
 
-  if (!p.rowCount) {
-    return res.status(400).json({ message: "Pembayaran tidak valid" });
+    if (!p.rowCount) {
+      return res.status(400).json({ message: "Pembayaran tidak valid" });
+    }
+
+    const { id_billing, jumlah_bayar, sisa } = p.rows[0];
+
+    const sisaBaru = sisa - jumlah_bayar;
+    const statusBaru = sisaBaru <= 0 ? 'lunas' : 'nyicil';
+
+    // 1️⃣ Update pembayaran (LOG)
+    await db.query(`
+      UPDATE pembayaran
+      SET status = 'lunas'
+      WHERE id_pembayaran = $1
+    `, [id_pembayaran]);
+
+    // 2️⃣ Update billing (STATUS RESMI)
+    await db.query(`
+      UPDATE billing_santri
+      SET sisa = $1, status = $2
+      WHERE id_billing = $3
+    `, [sisaBaru, statusBaru, id_billing]);
+
+    res.json({ success: true, message: "Pembayaran berhasil dikonfirmasi" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-
-  const { id_billing, jumlah_bayar, jenis } = p.rows[0];
-
-  // 1. Update pembayaran
-  await db.query(`
-    UPDATE pembayaran
-    SET status='lunas'
-    WHERE id_pembayaran=$1
-  `, [id_pembayaran]);
-
-  // 2. Update billing
-  await db.query(`
-    UPDATE billing_santri
-    SET sisa = sisa - $1
-    WHERE id_billing = $2
-  `, [jumlah_bayar, id_billing]);
-
-  // 3. Tutup billing jika lunas
-  await db.query(`
-    UPDATE billing_santri
-    SET status='lunas'
-    WHERE id_billing=$1 AND sisa <= 0
-  `, [id_billing]);
-
-  res.json({ success: true, message: "Pembayaran berhasil dikonfirmasi" });
 };
 
+
+
+/* =====================================================
+   ADMIN – LIHAT SEMUA STATUS SANTRI PER BILLING
+===================================================== */
 exports.getPembayaranPerBilling = async (req, res) => {
   const { id_billing } = req.params;
 
+  // 1️⃣ Ambil info billing sebagai anchor
+  const base = await db.query(`
+    SELECT jenis, tipe, periode
+    FROM billing_santri
+    WHERE id_billing = $1
+  `, [id_billing]);
+
+  if (!base.rowCount) {
+    return res.status(404).json({ message: "Billing tidak ditemukan" });
+  }
+
+  const { jenis, tipe, periode } = base.rows[0];
+
+  // 2️⃣ Jika SPP → tetap 1 santri
+  if (jenis === "SPP") {
+    const q = await db.query(`
+      SELECT 
+        s.id_santri,
+        s.nama,
+        p.id_pembayaran,
+        p.jumlah_bayar,
+        bs.status
+      FROM billing_santri bs
+      JOIN santri s ON bs.id_santri = s.id_santri
+      LEFT JOIN pembayaran p
+        ON p.id_billing = bs.id_billing
+      WHERE bs.id_billing = $1
+    `, [id_billing]);
+
+    return res.json(q.rows);
+  }
+
+  // 3️⃣ Jika LAINNYA → ambil SEMUA SANTRI
   const q = await db.query(`
-    SELECT
-      s.id_santri,
+    SELECT 
+      bs.id_billing,
       s.nama,
       p.id_pembayaran,
-      COALESCE(p.status, 'belum bayar') AS status,
-      COALESCE(p.jumlah_bayar, 0) AS jumlah_bayar
-    FROM santri s
+      p.jumlah_bayar,
+      bs.status
+    FROM billing_santri bs
+    JOIN santri s ON bs.id_santri = s.id_santri
     LEFT JOIN pembayaran p
-      ON p.id_santri = s.id_santri
-      AND p.id_billing = $1
-    WHERE s.status = 'aktif'
-    ORDER BY s.nama
-  `, [id_billing]);
+      ON p.id_billing = bs.id_billing
+    WHERE bs.jenis = 'LAINNYA'
+      AND bs.tipe = $1
+      AND bs.periode = $2
+    ORDER BY s.nama ASC
+  `, [tipe, periode]);
 
   res.json(q.rows);
 };
 
+// GET /api/keuangan/billing/lainnya/detail
+exports.getDetailBillingLainnya = async (req, res) => {
+  const { tipe, periode } = req.query;
 
+  const q = await db.query(`
+    SELECT 
+      b.id_billing,
+      s.nama,
+      p.id_pembayaran,
+      p.jumlah_bayar,
+      b.status
+    FROM billing_santri b
+    JOIN santri s ON b.id_santri = s.id_santri
+    LEFT JOIN pembayaran p
+      ON p.id_billing = b.id_billing
+      AND p.status = 'menunggu'
+    WHERE b.jenis = 'LAINNYA'
+      AND b.tipe = $1
+      AND b.periode = $2
+    ORDER BY s.nama ASC
+  `, [tipe, periode]);
+
+  res.json(q.rows);
+};
