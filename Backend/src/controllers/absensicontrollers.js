@@ -25,6 +25,21 @@ function getHariFromTanggal(tanggal) {
     .toLowerCase();
 }
 
+const exportAbsensi = async (req, res) => {
+  try {
+    const { kelas, tanggal } = req.query;
+
+    // TODO: sesuaikan query dengan struktur tabelmu
+    res.status(200).json({
+      success: true,
+      message: "Export absensi berhasil",
+      data: []
+    });
+  } catch (error) {
+    console.error("Export absensi error:", error);
+    res.status(500).json({ success: false, message: "Gagal export absensi" });
+  }
+};
 
 /* =========================================================
    CATAT ABSENSI SANTRI (PENGAJAR) - MODIFIED
@@ -71,7 +86,7 @@ exports.catatAbsensiSantri = async (req, res) => {
         message: "Santri tidak terdaftar pada kelas ini atau jadwal bukan milik Anda"
       });
 
-    // 🔓 LOGIKA CEK HARI DIHAPUS 
+    // 🔓 LOGIKA CEK HARI DIHAPUS
     // Pengajar sekarang bisa absen di tanggal mana saja (misal: kelas pengganti)
 
     // 🔒 CEK DUPLIKAT (Agar tidak absen 2x di hari & jadwal yang sama)
@@ -109,7 +124,7 @@ exports.catatAbsensiSantri = async (req, res) => {
 exports.getAllAbsensiSantri = async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT 
+      SELECT
         a.id_absensi,
         TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
         a.status_absensi,
@@ -161,7 +176,7 @@ exports.updateAbsensiSantri = async (req, res) => {
       return res.status(403).json({ message: "Tidak boleh mengubah absensi kelas lain" });
 
     await db.query(`
-      UPDATE absensi SET status_absensi = $1 
+      UPDATE absensi SET status_absensi = $1
       WHERE id_absensi = $2
     `, [status_absensi, id_absensi]);
 
@@ -185,7 +200,7 @@ exports.getAbsensiKelasPengajar = async (req, res) => {
     }
 
     const result = await db.query(`
-      SELECT 
+      SELECT
       a.id_absensi,
       TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
       a.status_absensi,
@@ -224,7 +239,7 @@ exports.getAbsensiSantri = async (req, res) => {
     const id_users = req.user.id_users;
 
     const result = await db.query(`
-      SELECT 
+      SELECT
         a.id_absensi,
         TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
         a.status_absensi,
@@ -259,7 +274,7 @@ exports.getAbsensiSantri = async (req, res) => {
 exports.catatAbsensiPengajar = async (req, res) => {
   try {
     const id_users = req.user.id_users;
-    
+
     // PERBAIKAN: Tambahkan fallback agar tidak mengirim undefined ke DB
     // Pastikan nama field status_absensi sesuai dengan yang dikirim Frontend (cek Inspect -> Network)
     let { id_jadwal, tanggal, status_absensi, catatan } = req.body;
@@ -307,10 +322,10 @@ exports.catatAbsensiPengajar = async (req, res) => {
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `, [
-        id_pengajar, 
-        id_jadwal, 
-        tanggalFinal, 
-        status_absensi, 
+        id_pengajar,
+        id_jadwal,
+        tanggalFinal,
+        status_absensi,
         catatan || null // Jika catatan undefined, kirim null asli ke DB
     ]);
 
@@ -338,8 +353,8 @@ exports.getAbsensiPengajar = async (req, res) => {
       return res.status(403).json({ message: "Anda bukan pengajar" });
 
     const result = await db.query(`
-      SELECT 
-        p.*, 
+      SELECT
+        p.*,
         k.nama_kelas,
         j.hari, j.jam_mulai
       FROM absensi_pengajar p
@@ -363,7 +378,7 @@ exports.getAbsensiPengajar = async (req, res) => {
 exports.getAllAbsensiPengajar = async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT 
+      SELECT
         ap.id_absensi_pengajar,
         ap.id_pengajar,
         ap.id_jadwal,
@@ -392,9 +407,9 @@ exports.getAllAbsensiPengajar = async (req, res) => {
 exports.getRekapAbsensiPengajar = async (req, res) => {
   try {
       const id_users = req.user.id_users;
-      
+
       // Logika query database kamu...
-      const result = await db.query(`SELECT 
+      const result = await db.query(`SELECT
               COUNT(*) FILTER (WHERE status = 'hadir') as total_hadir,
               COUNT(*) FILTER (WHERE status = 'izin') as total_izin,
               COUNT(*) FILTER (WHERE status = 'alfa') as total_alfa

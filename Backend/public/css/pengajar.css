@@ -3808,3 +3808,76 @@ button[onclick="tambahKeDaftar()"] {
         align-items: center !important;
     }
 }
+
+/* ================= MODAL RAPOR ================= */
+.rapor-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .rapor-modal-content {
+    background: #fff;
+    width: 600px;
+    max-width: 90%;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: fadeIn 0.2s ease-in-out;
+  }
+  
+  .rapor-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .rapor-modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2e7d32;
+  }
+  
+  .close-btn {
+    cursor: pointer;
+    font-size: 20px;
+  }
+  
+  .rapor-section {
+    margin-bottom: 20px;
+  }
+  
+  .rapor-section h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #1b5e20;
+  }
+  
+  .rapor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+    font-size: 14px;
+  }
+  
+  .rapor-highlight {
+    background: #f1f8f4;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  
+  @keyframes fadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  

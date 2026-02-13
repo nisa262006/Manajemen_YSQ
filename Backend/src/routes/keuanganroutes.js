@@ -76,4 +76,14 @@ router.get("/laporan/pengeluaran", verifyToken, onlyAdmin, ctrl.laporanPengeluar
 // (opsional)
 router.get("/laporan/ringkasan", verifyToken, onlyAdmin, ctrl.laporanRingkasan);
 
+/* =========================
+   NOTIF ADMIN
+========================= */
+router.get(
+   "/notifikasi/pembayaran",
+   verifyToken,
+   onlyAdmin,
+   ctrl.getNotifikasiPembayaran
+ );
+ 
 module.exports = router;

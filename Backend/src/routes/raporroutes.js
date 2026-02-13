@@ -12,7 +12,8 @@ const {
   deleteRaporTahsin,
   deleteRaporTahfidz,
   getRekapLaporan,
-  getRaporSantri
+  getRaporSantri,
+  getDetailRaporPengajar 
 } = require("../controllers/raporcontrollers");
 
 
@@ -37,6 +38,13 @@ router.get(
   verifyToken,
   onlyPengajar,
   getPeriodePengajar
+);
+
+router.get(
+  "/detail",
+  verifyToken,
+  onlyPengajar,
+  getDetailRaporPengajar
 );
 
 

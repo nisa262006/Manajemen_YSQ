@@ -162,10 +162,22 @@ async function loadRekapLaporan() {
           <td>${row.juz_tahfidz ?? 0}</td>
           <td>${row.nilai_presensi ?? 0}%</td>
           <td>
-            <span class="ysq-badge-status ${statusClass}">
-              ${row.status_rapor}
-            </span>
-          </td>
+  <span class="ysq-badge-status ${statusClass}">
+    ${row.status_rapor}
+  </span>
+</td>
+
+<td>
+${
+  row.status_rapor === "Selesai"
+    ? `<button class="btn-detail-rapor"
+        onclick="lihatDetailRapor('${row.id_santri}')">
+        Detail
+       </button>`
+    : "-"
+}
+</td>
+
         </tr>
       `;
     });
@@ -325,4 +337,99 @@ window.exportToExcel = async function () {
       });
     }
   });
+  
+
+  /* ================= DETAIL RAPOR ================= */
+  window.lihatDetailRapor = async function (idSantri) {
+    try {
+  
+      const periode = document.getElementById("filter-periode")?.value;
+  
+      if (!periode) {
+        alert("Pilih periode terlebih dahulu");
+        return;
+      }
+  
+      const res = await fetch(
+        `${API}/rapor/detail?id_santri=${idSantri}&periode=${encodeURIComponent(periode)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      if (!res.ok) {
+        throw new Error("Response error " + res.status);
+      }
+  
+      const data = await res.json();
+  
+      if (!data.success) {
+        alert("Detail tidak ditemukan");
+        return;
+      }
+  
+      document.getElementById("detailModal").style.display = "flex";
+  
+      const tahsin = data.rapor_tahsin;
+      const tahfidz = data.rapor_tahfidz;
+  
+      let html = "";
+
+// ===== TAHSIN =====
+if (tahsin) {
+  html += `
+    <div class="rapor-section">
+      <h3>📘 Rapor Tahsin</h3>
+      <div class="rapor-grid">
+        <div>Nilai Pekanan</div><div>${tahsin.nilai_pekanan}</div>
+        <div>Ujian Tilawah</div><div>${tahsin.ujian_tilawah}</div>
+        <div>Nilai Teori</div><div>${tahsin.nilai_teori}</div>
+        <div>Presensi</div><div>${tahsin.nilai_presensi}</div>
+      </div>
+
+      <div class="rapor-highlight">
+        Nilai Akhir: ${tahsin.nilai_akhir} <br/>
+        Predikat: ${tahsin.predikat}
+      </div>
+
+      <div style="margin-top:8px;">
+        <strong>Catatan:</strong> ${tahsin.catatan || "-"}
+      </div>
+    </div>
+  `;
+}
+
+// ===== TAHFIDZ =====
+if (tahfidz) {
+  html += `
+    <div class="rapor-section">
+      <h3>📖 Rapor Tahfidz</h3>
+  `;
+
+  if (tahfidz.simakan && tahfidz.simakan.length > 0) {
+    html += `<div class="rapor-grid">`;
+    tahfidz.simakan.forEach(s => {
+      html += `
+        <div>Juz ${s.juz}</div>
+        <div>${s.nilai}</div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  html += `
+      <div class="rapor-highlight">
+        Nilai Ujian Akhir: ${tahfidz.nilai_ujian_akhir || 0} <br/>
+        Nilai Akhir: ${tahfidz.nilai_akhir || 0} <br/>
+        Predikat: ${tahfidz.predikat || "-"}
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById("detail-content").innerHTML = html;
+  
+    } catch (err) {
+      console.error("DETAIL ERROR:", err);
+      alert("Gagal mengambil detail rapor");
+    }
+  };
   

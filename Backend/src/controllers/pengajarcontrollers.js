@@ -201,7 +201,9 @@ exports.updatePengajar = async (req, res) => {
       confirmPassword
     } = req.body;
 
+    // ===============================
     // Ambil data lama
+    // ===============================
     const check = await db.query(`
       SELECT p.*, u.email AS user_email, u.username 
       FROM pengajar p
@@ -219,7 +221,7 @@ exports.updatePengajar = async (req, res) => {
     let changes = {};
 
     // ===============================
-    // Update Password (opsional)
+    // UPDATE PASSWORD (opsional)
     // ===============================
     if (password || confirmPassword) {
       if (password !== confirmPassword) {
@@ -237,7 +239,34 @@ exports.updatePengajar = async (req, res) => {
     }
 
     // ===============================
-    // Data pengajar yang boleh diupdate
+    // UPDATE EMAIL USERS (sinkron)
+    // ===============================
+    if (email && email !== oldData.user_email) {
+      // cek email unik
+      const cekEmail = await db.query(
+        `SELECT id_users FROM users WHERE email=$1 AND id_users<>$2`,
+        [email, id_users]
+      );
+
+      if (cekEmail.rowCount > 0) {
+        return res.status(400).json({
+          message: "Email sudah digunakan akun lain"
+        });
+      }
+
+      await db.query(
+        `UPDATE users SET email=$1 WHERE id_users=$2`,
+        [email, id_users]
+      );
+
+      changes.user_email = {
+        old: oldData.user_email,
+        new: email
+      };
+    }
+
+    // ===============================
+    // TRACK PERUBAHAN DATA PENGAJAR
     // ===============================
     const updatePengajar = {
       nama,
@@ -250,18 +279,20 @@ exports.updatePengajar = async (req, res) => {
       status
     };
 
-    // Track perubahan
     for (let key in updatePengajar) {
       if (
         updatePengajar[key] !== undefined &&
         updatePengajar[key] !== oldData[key]
       ) {
-        changes[key] = { old: oldData[key], new: updatePengajar[key] };
+        changes[key] = {
+          old: oldData[key],
+          new: updatePengajar[key]
+        };
       }
     }
 
     // ===============================
-    // EKSEKUSI UPDATE
+    // UPDATE DATA PENGAJAR
     // ===============================
     await db.query(
       `UPDATE pengajar SET 
@@ -290,7 +321,7 @@ exports.updatePengajar = async (req, res) => {
     return res.json({
       message: "Pengajar berhasil diperbarui",
       id_pengajar,
-      nip: oldData.nip,   // ⬅ nip hanya dibaca, tidak membuat variabel baru!
+      nip: oldData.nip,
       updated_fields: changes
     });
 

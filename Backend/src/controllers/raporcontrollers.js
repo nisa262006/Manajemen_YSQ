@@ -414,3 +414,60 @@ exports.getRaporSantri = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+/* =====================================================
+   DETAIL RAPOR UNTUK PENGAJAR (PER SANTRI)
+===================================================== */
+exports.getDetailRaporPengajar = async (req, res) => {
+  try {
+    const id_pengajar = await getIdPengajar(req.user.id_users);
+    if (!id_pengajar)
+      return res.status(403).json({ message: "Bukan pengajar" });
+
+    const { id_santri, periode } = req.query;
+
+    if (!id_santri || !periode)
+      return res.status(400).json({ message: "Parameter tidak lengkap" });
+
+    // 🔹 Tahsin
+    const tahsin = await db.query(
+      `SELECT * FROM rapor_tahsin
+       WHERE id_santri = $1
+       AND periode = $2
+       AND id_pengajar = $3`,
+      [id_santri, periode, id_pengajar]
+    );
+
+    // 🔹 Tahfidz
+    const tahfidz = await db.query(
+      `SELECT * FROM rapor_tahfidz
+       WHERE id_santri = $1
+       AND periode = $2
+       AND id_pengajar = $3`,
+      [id_santri, periode, id_pengajar]
+    );
+
+    let raporTahfidz = tahfidz.rows[0] || null;
+
+    if (raporTahfidz) {
+      const simakan = await db.query(
+        `SELECT juz, nilai
+         FROM tahfidz_simakan
+         WHERE id_rapor = $1
+         ORDER BY juz`,
+        [raporTahfidz.id_rapor]
+      );
+      raporTahfidz.simakan = simakan.rows;
+    }
+
+    res.json({
+      success: true,
+      rapor_tahsin: tahsin.rows[0] || null,
+      rapor_tahfidz: raporTahfidz
+    });
+
+  } catch (err) {
+    console.error("DETAIL RAPOR ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -130,6 +130,7 @@
                                     <th>Tahfidz (Juz)</th>
                                     <th>Kehadiran</th>
                                     <th>Status Rapor</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="laporan-tbody">
@@ -138,7 +139,20 @@
                     </div>
                 </div>
             </div> </main>
-    </div>    
+    </div>  
+    <div id="detailModal" class="rapor-modal" style="display:none;">
+        <div class="rapor-modal-content">
+          <div class="rapor-modal-header">
+            <h2>Detail Rapor Santri</h2>
+            <span class="close-btn"
+              onclick="document.getElementById('detailModal').style.display='none'">
+              &times;
+            </span>
+          </div>
+          <div id="detail-content"></div>
+        </div>
+      </div>
+      
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script type="module" src="/js/laporan-pengajar.js"></script>
 </body>

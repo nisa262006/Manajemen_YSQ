@@ -1,8 +1,30 @@
 const db = require("../config/db");
 
-/* =====================================================
-   ADMIN – GENERATE SPP MASSAL
-===================================================== */
+require("dotenv").config();
+const nodemailer = require("nodemailer");
+
+console.log("EMAIL_SENDER:", process.env.EMAIL_SENDER);
+console.log("EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD ? "ADA" : "TIDAK ADA");
+
+// ✅ BUAT TRANSPORTER KHUSUS UNTUK VERIFY SAAT START
+const testTransporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_SENDER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
+// 🔎 Cek koneksi Gmail saat server start
+testTransporter.verify((error, success) => {
+  if (error) {
+    console.error("❌ GMAIL CONNECTION ERROR:", error);
+  } else {
+    console.log("✅ GMAIL READY - Siap kirim email");
+  }
+});
+
+
 exports.generateSPPMassal = async (req, res) => {
   try {
     // Ambil tanggal dari body (misal admin input tanggal mulai dan akhir untuk bulan tersebut)
@@ -30,7 +52,7 @@ exports.generateSPPMassal = async (req, res) => {
         AND b.periode = $1
       )
     `, [periode, nominal_dewasa, nominal_anak, tgl_mulai, tgl_selesai]);
-    
+
 
     res.json({ success: true, message: "SPP massal berhasil dibuat" });
   } catch (err) {
@@ -39,9 +61,7 @@ exports.generateSPPMassal = async (req, res) => {
 };
 
 
-/* =====================================================
-   ADMIN – BILLING MANUAL (DENGAN TANGGAL PERIODE)
-===================================================== */
+
 exports.tambahBillingManual = async (req, res) => {
   // Tambahkan tanggal_mulai dan tanggal_selesai di destructuring
   const { id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai } = req.body;
@@ -60,27 +80,32 @@ exports.tambahBillingManual = async (req, res) => {
 };
 
 
-/* =====================================================
-   ADMIN – SEMUA BILLING
-===================================================== */
-exports.getAllBilling = async (_, res) => {
-  const q = await db.query(`
-   SELECT b.*, s.nama
-FROM billing_santri b
-LEFT JOIN santri s ON b.id_santri=s.id_santri
-ORDER BY b.created_at DESC
-  `);
 
-  res.json({ success: true, data: q.rows });
+exports.getAllBilling = async (_, res) => {
+  try {
+    const q = await db.query(`
+      SELECT
+        b.*,
+        s.nama,
+        k.nama_kelas
+      FROM billing_santri b
+      LEFT JOIN santri s ON b.id_santri = s.id_santri
+      -- Tambahkan JOIN ke kelas melalui santri_kelas
+      LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
+      LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
+      ORDER BY b.created_at DESC
+    `);
+
+    res.json({ success: true, data: q.rows });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
 
 
-/* =====================================================
-   SANTRI – LIHAT TAGIHAN
-===================================================== */
 exports.getBillingSantri = async (req, res) => {
   const q = await db.query(`
-    SELECT 
+    SELECT
       b.*,
       EXISTS (
         SELECT 1 FROM pembayaran p
@@ -98,15 +123,12 @@ exports.getBillingSantri = async (req, res) => {
 };
 
 
-/* =====================================================
-   SANTRI – PEMBAYARAN (FIX ID_SANTRI & STATUS)
-===================================================== */
 exports.createPembayaran = async (req, res) => {
   const { id_billing, jumlah_bayar, metode } = req.body;
 
   try {
     const b = await db.query(`
-      SELECT id_santri, sisa, jenis, tipe
+      SELECT id_santri, sisa, jenis, tipe, nominal, periode
       FROM billing_santri
       WHERE id_billing = $1
     `, [id_billing]);
@@ -119,32 +141,93 @@ exports.createPembayaran = async (req, res) => {
       return res.status(400).json({ message: "Jumlah bayar tidak valid" });
     }
 
-    // 1️⃣ Simpan pembayaran (LOG)
+    const billing = b.rows[0];
+
+    // INSERT pembayaran
     await db.query(`
       INSERT INTO pembayaran
       (id_billing, id_santri, tanggal_bayar, jumlah_bayar, metode, kategori, jenis_pembayaran, status)
       VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, 'menunggu')
     `, [
       id_billing,
-      b.rows[0].id_santri,
+      billing.id_santri,
       jumlah_bayar,
       metode,
-      b.rows[0].jenis,
-      b.rows[0].tipe
+      billing.jenis,
+      billing.tipe
     ]);
 
-    // 2️⃣ Billing jadi MENUNGGU
     await db.query(`
       UPDATE billing_santri
       SET status = 'menunggu'
       WHERE id_billing = $1 AND status != 'lunas'
     `, [id_billing]);
 
-    res.json({ success: true, message: "Pembayaran terkirim, menunggu verifikasi admin" });
+    // ===============================
+    // 🔔 KIRIM EMAIL (SAMA POLA DENGAN RESET)
+    // ===============================
+
+    const detail = await db.query(`
+      SELECT s.nama, k.nama_kelas
+      FROM santri s
+      LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
+      LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
+      WHERE s.id_santri = $1
+    `, [billing.id_santri]);
+
+    const namaSantri = detail.rows[0]?.nama || "-";
+    const kelas = detail.rows[0]?.nama_kelas || "-";
+    const sisaBaru = billing.sisa - jumlah_bayar;
+
+    const admin = await db.query(`
+      SELECT email FROM users WHERE LOWER(role) = 'admin' LIMIT 1
+    `);
+
+    if (admin.rowCount > 0) {
+
+      // 🔥 BUAT TRANSPORTER DI DALAM FUNCTION (SAMA SEPERTI RESET)
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_SENDER,
+          pass: process.env.EMAIL_PASSWORD
+        }
+      });
+
+      await transporter.sendMail({
+        from: `"Sahabat Quran Bogor" <${process.env.EMAIL_SENDER}>`,
+        to: admin.rows[0].email,
+        subject: "Notifikasi Pembayaran Santri",
+        html: `
+          <h2>📥 Notifikasi Pembayaran Santri</h2>
+          <p><strong>Nama Santri:</strong> ${namaSantri}</p>
+          <p><strong>Kelas:</strong> ${kelas}</p>
+          <p><strong>Jenis Pembayaran:</strong> ${billing.jenis}</p>
+          <p><strong>Periode:</strong> ${billing.periode || billing.tipe}</p>
+          <p><strong>Nominal Bill:</strong> Rp ${new Intl.NumberFormat("id-ID").format(billing.nominal)}</p>
+          <p><strong>Jumlah Dibayar:</strong> Rp ${new Intl.NumberFormat("id-ID").format(jumlah_bayar)}</p>
+          <p><strong>Sisa Pembayaran:</strong> Rp ${new Intl.NumberFormat("id-ID").format(sisaBaru)}</p>
+          <br/>
+          <p style="color:red; font-weight:bold;">
+            Santri telah melakukan pembayaran, segera mengkonfirmasi pembayaran santri.
+          </p>
+        `
+      });
+
+      console.log("EMAIL NOTIF PEMBAYARAN TERKIRIM");
+    }
+
+    res.json({
+      success: true,
+      message: "Pembayaran terkirim, menunggu verifikasi admin"
+    });
+
   } catch (err) {
+    console.error("CREATE PEMBAYARAN ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 /* =====================================================
@@ -394,12 +477,12 @@ exports.tambahBillingKelas = async (req, res) => {
 ===================================================== */
   exports.tambahBillingLainnya = async (req, res) => {
     const { nama_pembayaran, nominal, tanggal_mulai, keterangan } = req.body;
-  
+
     try {
       const santriAktif = await db.query(
         `SELECT id_santri FROM santri WHERE status = 'aktif'`
       );
-  
+
       for (const s of santriAktif.rows) {
         await db.query(`
           INSERT INTO billing_santri
@@ -414,55 +497,75 @@ exports.tambahBillingKelas = async (req, res) => {
           keterangan                // $6
         ]);
       }
-  
+
       res.json({ success: true, message: "Billing lainnya berhasil dibuat" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: err.message });
     }
   };
-  
+
 
 // ADMIN – KONFIRMASI PEMBAYARAN SANTRI
 exports.konfirmasiPembayaranAdmin = async (req, res) => {
   const { id_pembayaran } = req.params;
 
   try {
+    // 1️⃣ Ambil id_billing dulu
     const p = await db.query(`
-      SELECT 
-        p.id_billing,
-        p.jumlah_bayar,
-        b.sisa
-      FROM pembayaran p
-      JOIN billing_santri b ON b.id_billing = p.id_billing
-      WHERE p.id_pembayaran = $1
-        AND p.status = 'menunggu'
+      SELECT id_billing, jumlah_bayar
+      FROM pembayaran
+      WHERE id_pembayaran = $1
+        AND status = 'menunggu'
     `, [id_pembayaran]);
 
     if (!p.rowCount) {
       return res.status(400).json({ message: "Pembayaran tidak valid" });
     }
 
-    const { id_billing, jumlah_bayar, sisa } = p.rows[0];
+    const { id_billing } = p.rows[0];
 
-    const sisaBaru = sisa - jumlah_bayar;
-    const statusBaru = sisaBaru <= 0 ? 'lunas' : 'nyicil';
-
-    // 1️⃣ Update pembayaran (LOG)
+    // 2️⃣ Konfirmasi pembayaran ini saja
     await db.query(`
       UPDATE pembayaran
       SET status = 'lunas'
       WHERE id_pembayaran = $1
     `, [id_pembayaran]);
 
-    // 2️⃣ Update billing (STATUS RESMI)
+    // 3️⃣ Hitung ulang TOTAL yang sudah lunas
+    const total = await db.query(`
+      SELECT COALESCE(SUM(jumlah_bayar),0) AS total
+      FROM pembayaran
+      WHERE id_billing = $1
+        AND status = 'lunas'
+    `, [id_billing]);
+
+    const totalBayar = Number(total.rows[0].total);
+
+    // 4️⃣ Ambil nominal asli billing
+    const billing = await db.query(`
+      SELECT nominal
+      FROM billing_santri
+      WHERE id_billing = $1
+    `, [id_billing]);
+
+    const nominal = Number(billing.rows[0].nominal);
+    const sisaBaru = nominal - totalBayar;
+
+    let statusBaru = "belum bayar";
+    if (sisaBaru <= 0) statusBaru = "lunas";
+    else if (totalBayar > 0) statusBaru = "nyicil";
+
+    // 5️⃣ Update billing berdasarkan hitungan ulang
     await db.query(`
       UPDATE billing_santri
-      SET sisa = $1, status = $2
+      SET sisa = $1,
+          status = $2
       WHERE id_billing = $3
     `, [sisaBaru, statusBaru, id_billing]);
 
     res.json({ success: true, message: "Pembayaran berhasil dikonfirmasi" });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -470,13 +573,10 @@ exports.konfirmasiPembayaranAdmin = async (req, res) => {
 
 
 
-/* =====================================================
-   ADMIN – LIHAT SEMUA STATUS SANTRI PER BILLING
-===================================================== */
 exports.getPembayaranPerBilling = async (req, res) => {
   const { id_billing } = req.params;
 
-  // 1️⃣ Ambil info billing sebagai anchor
+  // 1️⃣ Ambil info billing
   const base = await db.query(`
     SELECT jenis, tipe, periode
     FROM billing_santri
@@ -489,67 +589,118 @@ exports.getPembayaranPerBilling = async (req, res) => {
 
   const { jenis, tipe, periode } = base.rows[0];
 
-  // 2️⃣ Jika SPP → tetap 1 santri
   if (jenis === "SPP") {
     const q = await db.query(`
-      SELECT 
+      SELECT
         s.id_santri,
         s.nama,
         p.id_pembayaran,
         p.jumlah_bayar,
-        bs.status
+        p.status AS status_pembayaran,
+        bs.status AS status_billing
       FROM billing_santri bs
       JOIN santri s ON bs.id_santri = s.id_santri
       LEFT JOIN pembayaran p
         ON p.id_billing = bs.id_billing
       WHERE bs.id_billing = $1
+      ORDER BY p.created_at ASC
     `, [id_billing]);
 
-    return res.json(q.rows);
+    return res.json({ success: true, data: q.rows });
   }
 
-  // 3️⃣ Jika LAINNYA → ambil SEMUA SANTRI
   const q = await db.query(`
-    SELECT 
+    SELECT
       bs.id_billing,
       s.nama,
+      k.nama_kelas,
       p.id_pembayaran,
       p.jumlah_bayar,
-      bs.status
+      p.status AS status_pembayaran,
+      bs.status AS status_billing
     FROM billing_santri bs
     JOIN santri s ON bs.id_santri = s.id_santri
+    LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
+    LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
     LEFT JOIN pembayaran p
       ON p.id_billing = bs.id_billing
     WHERE bs.jenis = 'LAINNYA'
       AND bs.tipe = $1
       AND bs.periode = $2
-    ORDER BY s.nama ASC
+    ORDER BY s.nama ASC, p.created_at ASC
   `, [tipe, periode]);
 
-  res.json(q.rows);
+  res.json({ success: true, data: q.rows });
 };
+
 
 // GET /api/keuangan/billing/lainnya/detail
 exports.getDetailBillingLainnya = async (req, res) => {
   const { tipe, periode } = req.query;
 
-  const q = await db.query(`
-    SELECT 
-      b.id_billing,
-      s.nama,
-      p.id_pembayaran,
-      p.jumlah_bayar,
-      b.status
-    FROM billing_santri b
-    JOIN santri s ON b.id_santri = s.id_santri
-    LEFT JOIN pembayaran p
-      ON p.id_billing = b.id_billing
-      AND p.status = 'menunggu'
-    WHERE b.jenis = 'LAINNYA'
-      AND b.tipe = $1
-      AND b.periode = $2
-    ORDER BY s.nama ASC
-  `, [tipe, periode]);
+  try {
+    const q = await db.query(`
+      SELECT
+        b.id_billing,
+        s.nama,
+        p.id_pembayaran,
+        p.jumlah_bayar,
+        p.status AS status_pembayaran,
+        b.status AS status_billing
+      FROM billing_santri b
+      JOIN santri s ON b.id_santri = s.id_santri
+      LEFT JOIN pembayaran p
+        ON p.id_billing = b.id_billing
+      WHERE b.jenis = 'LAINNYA'
+        AND b.tipe = $1
+        AND b.periode = $2
+      ORDER BY s.nama ASC, p.created_at ASC
+    `, [tipe, periode]);
 
-  res.json(q.rows);
+    res.json({ success: true, data: q.rows });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/* =====================================================
+   ADMIN – NOTIF DETAIL PEMBAYARAN MENUNGGU
+===================================================== */
+exports.getNotifikasiPembayaran = async (req, res) => {
+  try {
+
+    const q = await db.query(`
+      SELECT
+        b.jenis,
+        COUNT(*) AS total
+      FROM pembayaran p
+      JOIN billing_santri b ON p.id_billing = b.id_billing
+      WHERE p.status = 'menunggu'
+      GROUP BY b.jenis
+    `);
+
+    let spp = 0;
+    let lainnya = 0;
+
+    q.rows.forEach(row => {
+      if (row.jenis === "SPP") {
+        spp = Number(row.total);
+      }
+      if (row.jenis === "LAINNYA") {
+        lainnya = Number(row.total);
+      }
+    });
+
+    res.json({
+      success: true,
+      spp,
+      lainnya,
+      total: spp + lainnya
+    });
+
+  } catch (err) {
+    console.error("NOTIF ERROR:", err);
+    res.status(500).json({ message: err.message });
+  }
 };

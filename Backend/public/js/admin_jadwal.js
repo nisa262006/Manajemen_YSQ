@@ -264,7 +264,8 @@ document.addEventListener("click", async (e) => {
 
         // --- INI PERBAIKAN UNTUK KATEGORI ---
         if ($("kategori-edit")) {
-            $("kategori-edit").value = jd.kategori; // Masukkan kategori dari database
+            // Memastikan data dari DB menjadi huruf kecil semua
+            $("kategori-edit").value = jd.kategori ? jd.kategori.toLowerCase() : ""; 
         }
 
         $("edit-hari").value = jd.hari;

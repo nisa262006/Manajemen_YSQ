@@ -43,7 +43,7 @@ function initAbsensiPengajar() {
     let filteredAbsensi = [];
 
     async function init() {
-        setDefaultDate(startDate, endDate); 
+        setDefaultDate(startDate, endDate);
         await Promise.all([loadPengajar(), loadAbsensi()]);
         applyFilter();
     }
@@ -63,8 +63,8 @@ function initAbsensiPengajar() {
     }
 
     function applyFilter() {
-        const startVal = startDate.value; 
-        const endVal = endDate.value;     
+        const startVal = startDate.value;
+        const endVal = endDate.value;
         const pengajarId = selectData.value;
 
         filteredAbsensi = allAbsensi.filter(a => {
@@ -79,29 +79,39 @@ function initAbsensiPengajar() {
         renderSummary();
     }
 
-    function renderTable() {
-        // Pastikan colspan 5 karena ada kolom: Tanggal, Nama, Kelas, Status, Catatan
-        tableBody.innerHTML = filteredAbsensi.length ? "" : `<tr><td colspan="5" align="center">Tidak ada data</td></tr>`;
-        const selectedPengajarName = selectData.options[selectData.selectedIndex].text;
-    
-        filteredAbsensi.sort((a, b) => fixDateDisplay(b.tanggal).localeCompare(fixDateDisplay(a.tanggal)));
-    
-        filteredAbsensi.forEach(a => {
-            let displayName = a.nama_pengajar || a.nama; 
-            if ((!displayName || displayName === "-") && selectData.value !== "") {
+function renderTable() {
+    tableBody.innerHTML = filteredAbsensi.length ? "" : `<tr><td colspan="5" align="center">Tidak ada data</td></tr>`;
+
+    // Ambil data pengajar dari select untuk fallback
+    const selectedPengajarName = selectData.options[selectData.selectedIndex].text;
+
+    filteredAbsensi.forEach(a => {
+        // PERBAIKAN DI SINI:
+        // 1. Cek nama_pengajar dari API absensi
+        // 2. Jika tidak ada, coba cari nama dari list pengajar (jika ada array global)
+        // 3. Jika sedang filter 1 pengajar, gunakan nama dari dropdown
+        let displayName = a.nama_pengajar;
+
+        if (!displayName || displayName === "-") {
+            if (selectData.value !== "") {
                 displayName = selectedPengajarName;
+            } else {
+                // Jika "Semua Pengajar", tapi API tidak kasi nama_pengajar,
+                // ini fallback terakhir (waspada jika a.nama berisi 'ngaji')
+                displayName = a.nama || "-";
             }
-    
-            tableBody.innerHTML += `
-                <tr>
-                    <td>${fixDateDisplay(a.tanggal)}</td>
-                    <td style="font-weight: bold;">${displayName || "-"}</td> 
-                    <td>${a.nama_kelas ?? "-"}</td>
-                    <td><span class="status-badge ${a.status_absensi?.toLowerCase()}">${a.status_absensi}</span></td>
-                    <td>${a.catatan ?? "-"}</td>
-                </tr>`;
-        });
-    }
+        }
+
+        tableBody.innerHTML += `
+            <tr>
+                <td>${fixDateDisplay(a.tanggal)}</td>
+                <td style="font-weight: bold;">${displayName}</td>
+                <td>${a.nama_kelas ?? "-"}</td>
+                <td><span class="status-badge ${a.status_absensi?.toLowerCase()}">${a.status_absensi}</span></td>
+                <td>${a.catatan ?? "-"}</td>
+            </tr>`;
+    });
+}
 
     function renderSummary() {
         sumHadir.textContent = filteredAbsensi.filter(a => a.status_absensi === "Hadir").length;
@@ -112,13 +122,13 @@ function initAbsensiPengajar() {
 
     function exportToExcel() {
         if (!filteredAbsensi.length) return alert("Data kosong");
-        
+
         const selectedOption = selectData.options[selectData.selectedIndex];
         const pengajarName = selectedOption.text;
         const isSemua = selectData.value === "";
         const rangeTanggal = `${startDate.value}_hingga_${endDate.value}`;
         const fileName = `Laporan_Absensi_Pengajar_${pengajarName.replace(/\s+/g, '_')}_${rangeTanggal}.xlsx`;
-    
+
         // 1. Header Laporan
         let wsData = [
             ["LAPORAN ABSENSI PENGAJAR"],
@@ -128,46 +138,46 @@ function initAbsensiPengajar() {
             ["DATA DETAIL KEHADIRAN"],
             ["No", "Tanggal", "Nama Pengajar", "Kelas", "Status", "Catatan"]
         ];
-    
+
         // 2. Masukkan Data Detail
         filteredAbsensi.forEach((a, i) => {
             const rowName = a.nama_pengajar || a.nama || (isSemua ? "-" : pengajarName);
             wsData.push([
-                i + 1, 
-                fixDateDisplay(a.tanggal), 
-                rowName, 
-                a.nama_kelas ?? "-", 
-                a.status_absensi, 
+                i + 1,
+                fixDateDisplay(a.tanggal),
+                rowName,
+                a.nama_kelas ?? "-",
+                a.status_absensi,
                 a.catatan ?? "-"
             ]);
         });
-    
+
         // 3. LOGIKA REKAP PER PENGAJAR (Ini bagian yang Anda minta)
         // Bagian ini akan muncul di bawah tabel detail
         wsData.push([], ["REKAPITULASI TOTAL PER PENGAJAR"], ["Nama Pengajar", "Hadir", "Izin", "Sakit", "Tidak Hadir (Alfa)"]);
-    
+
         // Mengelompokkan data berdasarkan nama pengajar
         const rekapPerPengajar = filteredAbsensi.reduce((acc, curr) => {
             const nama = curr.nama_pengajar || curr.nama || (isSemua ? "Tidak Diketahui" : pengajarName);
             if (!acc[nama]) {
                 acc[nama] = { hadir: 0, izin: 0, sakit: 0, alfa: 0 };
             }
-            
+
             const status = curr.status_absensi?.toLowerCase();
             if (status === "hadir") acc[nama].hadir++;
             else if (status === "izin") acc[nama].izin++;
             else if (status === "sakit") acc[nama].sakit++;
             else if (status === "alfa" || status === "tidak hadir") acc[nama].alfa++;
-            
+
             return acc;
         }, {});
-    
+
         // Masukkan hasil pengelompokan ke dalam array wsData
         Object.keys(rekapPerPengajar).forEach(nama => {
             const r = rekapPerPengajar[nama];
             wsData.push([nama, r.hadir, r.izin, r.sakit, r.alfa]);
         });
-    
+
         // 4. Generate File Excel
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
@@ -210,12 +220,12 @@ function initAbsensiSantri() {
     let filteredAbsensi = [];
 
     async function init() {
-        setDefaultDate(startDate, endDate); 
+        setDefaultDate(startDate, endDate);
         // PERBAIKAN: Menambahkan apiGet("/kelas") ke dalam array Promise
         const [absRes, santriRes, kelasRes] = await Promise.all([
             apiGet("/absensi/santri/all"),
             apiGet("/santri?limit=9999"),
-            apiGet("/kelas") 
+            apiGet("/kelas")
         ]);
 
         allAbsensi = absRes?.data ?? absRes ?? [];
@@ -267,7 +277,7 @@ function initAbsensiSantri() {
 
     function renderTable() {
         tableBody.innerHTML = filteredAbsensi.length ? "" : `<tr><td colspan="5" align="center">Tidak ada data</td></tr>`;
-        
+
         // Urutkan berdasarkan tanggal terbaru
         const sorted = [...filteredAbsensi].sort((a, b) => fixDateDisplay(b.tanggal).localeCompare(fixDateDisplay(a.tanggal)));
 
@@ -296,54 +306,58 @@ function initAbsensiSantri() {
 
     function exportToExcel() {
         if (!filteredAbsensi.length) return alert("Data kosong");
-    
-        // 1. Logika Penamaan File Dinamis
-        const kls = pilihKelas.value || "Semua_Kelas";
-        const snt = pilihSantri.value || "Semua_Santri";
-        const fileName = `Laporan_Absensi_${kls}_${snt}_${startDate.value}.xlsx`;
-    
-        // 2. Header Laporan
+
+        const rangeTanggal = `${startDate.value}_s_d_${endDate.value}`;
+        const fileName = `Laporan_Absensi_Santri_${rangeTanggal}.xlsx`;
+
+        // 1. Header Laporan
         let wsData = [
             ["LAPORAN ABSENSI SANTRI"],
-            ["Kelas:", kls],
-            ["Santri:", snt],
             ["Periode:", `${startDate.value} s/d ${endDate.value}`],
             [],
+            ["DATA DETAIL KEHADIRAN"],
             ["No", "Tanggal", "Nama Santri", "Kelas", "Status", "Catatan"]
         ];
-    
-        // 3. Masukkan Data Detail (Data Harian)
+
+        // 2. Masukkan Data Detail (Tabel Atas)
         filteredAbsensi.forEach((a, i) => {
-            wsData.push([i + 1, fixDateDisplay(a.tanggal), a.nama_santri, a.nama_kelas, a.status_absensi, a.catatan]);
+            wsData.push([
+                i + 1,
+                fixDateDisplay(a.tanggal),
+                a.nama_santri,
+                a.nama_kelas ?? "-",
+                a.status_absensi,
+                a.catatan ?? "-"
+            ]);
         });
-    
-        // 4. LOGIKA REKAP PER SANTRI (Grup berdasarkan Nama)
-        wsData.push([], ["REKAPITULASI KEHADIRAN PER SANTRI"], ["Nama Santri", "Hadir", "Izin", "Sakit", "Mustamiah", "Alfa"]);
-    
-        // Kelompokkan data berdasarkan nama santri
+
+        // 3. LOGIKA REKAPITULASI PER SANTRI (Agar mirip Gambar 1)
+        wsData.push([], ["REKAPITULASI TOTAL PER SANTRI"], ["Nama Santri", "Hadir", "Izin", "Sakit", "Mustami'ah", "Alfa/Tidak Hadir"]);
+
+        // Mengelompokkan data berdasarkan nama santri
         const rekapPerSantri = filteredAbsensi.reduce((acc, curr) => {
-            const nama = curr.nama_santri;
+            const nama = curr.nama_santri || "Tanpa Nama";
             if (!acc[nama]) {
                 acc[nama] = { hadir: 0, izin: 0, sakit: 0, mustamiah: 0, alfa: 0 };
             }
-            
+
             const status = curr.status_absensi?.toLowerCase();
             if (status === "hadir") acc[nama].hadir++;
             else if (status === "izin") acc[nama].izin++;
             else if (status === "sakit") acc[nama].sakit++;
             else if (status === "mustamiah") acc[nama].mustamiah++;
             else if (status === "alfa" || status === "tidak hadir") acc[nama].alfa++;
-            
+
             return acc;
         }, {});
-    
-        // Masukkan hasil pengelompokan ke dalam sheet
+
+        // Masukkan hasil rekap ke dalam array wsData
         Object.keys(rekapPerSantri).forEach(nama => {
             const r = rekapPerSantri[nama];
             wsData.push([nama, r.hadir, r.izin, r.sakit, r.mustamiah, r.alfa]);
         });
-    
-        // 5. Generate File
+
+        // 4. Generate & Download File Excel
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");

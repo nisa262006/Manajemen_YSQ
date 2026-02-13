@@ -232,6 +232,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("DOMContentLoaded", () => {
   if (document.body.classList.contains("page-dashboard")) {
     loadDashboard();
+    checkNotifPembayaran(); 
   }
 });
 
@@ -540,6 +541,35 @@ function initTambahPengajar() {
     });
 }
 
+
+/* =========================
+   NOTIF PEMBAYARAN ADMIN (DETAIL)
+========================= */
+async function checkNotifPembayaran() {
+    try {
+      const res = await apiGet("/keuangan/notifikasi/pembayaran");
+  
+      if (res.total > 0) {
+  
+        let pesan = "🔔 Pembayaran menunggu:\n";
+  
+        if (res.spp > 0) {
+          pesan += `• ${res.spp} SPP\n`;
+        }
+  
+        if (res.lainnya > 0) {
+          pesan += `• ${res.lainnya} Bill Lainnya\n`;
+        }
+  
+        showNotification(pesan, "warning");
+      }
+  
+    } catch (err) {
+      console.error("Gagal cek notif pembayaran:", err);
+    }
+  }  
+
+  
 /* =========================
    INIT FORM ADMIN
 ========================= */

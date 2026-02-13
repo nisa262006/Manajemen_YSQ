@@ -114,7 +114,7 @@ if (b.status === "lunas") {
   statusClass = "success";
 
 } else if (b.status === "nyicil") {
-  statusText = "MENICIL";
+  statusText = "MENYICIL";
   statusClass = "warning";
 
 } else if (b.status === "menunggu") {
@@ -196,7 +196,7 @@ function renderNonIuran() {
   statusClass = "success";
 
 } else if (b.status === "nyicil") {
-  statusText = "MENICIL";
+  statusText = "MENYICIL";
   statusClass = "warning";
 
 } else if (b.status === "menunggu") {

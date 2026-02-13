@@ -185,11 +185,18 @@ function renderFilterInputs(mode) {
     else if (mode === "infaq") {
       container.innerHTML = `
         <div class="ysq-inc-form-group" style="flex: 2;">
-          <label>Cari Nama Donatur:</label>
+          <label>Cari Jenis Biaya:</label>
           <input type="text" id="ysq-search-name" class="ysq-inc-input">
         </div>
       `;
-    }
+    
+      // 🔥 WAJIB: pasang listener
+      document
+        .getElementById("ysq-search-name")
+        ?.addEventListener("input", (e) => {
+          renderInfaqView(e.target.value.toLowerCase());
+        });
+    }    
   
     else {
       container.innerHTML = `
@@ -638,104 +645,79 @@ window.saveInfaqFromModal = async function () {
     }
   };
 
-/* =====================================================
-   SINKRONISASI MODAL DETAIL (FIXED)
-===================================================== */
+
 /* =====================================================
    SINKRONISASI MODAL DETAIL (PERBAIKAN STATUS)
 ===================================================== */
 window.openDetailBilling = async function (idBilling) {
   const modal = $("detailBillingModal");
-  if(modal) modal.style.display = "flex";
+  if (modal) modal.style.display = "flex";
 
   const tbody = $("detail-billing-body");
-  tbody.innerHTML = `<tr><td colspan="4">Memuat data santri...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="4">Memuat data...</td></tr>`;
 
   try {
-      const res = await apiGet(`/keuangan/billing/${idBilling}/santri`);
-      const data = res.data || res;
+    const res = await apiGet(`/keuangan/billing/${idBilling}/santri`);
+    const data = res.data || res;
 
-      if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4">Tidak ada data santri aktif.</td></tr>`;
-          return;
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4">Belum ada pembayaran</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(p => {
+
+      const statusPembayaran = p.status_pembayaran;
+      const statusBilling = p.status_billing;
+
+      let aksi = "-";
+      let teksStatus = "";
+      let warna = "#333";
+
+      const jumlahBayar = p.jumlah_bayar
+        ? rupiah(p.jumlah_bayar)
+        : "-";
+
+      /* ===============================
+         🔵 STATUS TRANSAKSI
+      ================================ */
+
+      if (statusPembayaran === "menunggu") {
+        teksStatus = "⏳ MENUNGGU VERIFIKASI";
+        warna = "orange";
+        aksi = `
+          <button class="ysq-inc-btn ysq-inc-btn-primary"
+            onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${idBilling}')">
+            Konfirmasi
+          </button>`;
       }
 
-      tbody.innerHTML = data.map(p => {
-          // 🔥 KOREKSI 1: Pastikan mengambil status_pembayaran sesuai alias di Backend
-          const rawStatus = p.status; // ← ini dari billing_santri
-          const stat = rawStatus.toLowerCase();
-          
-          let aksi = "-";
-          let warna = "#333";
-          let teksStatus = "BELUM BAYAR";
-          
-          // 🔥 KOREKSI 2: Definisikan variabel jumlahBayar agar tidak error
-          let jumlahBayar = p.jumlah_bayar ? rupiah(p.jumlah_bayar) : "-";
-
-          // 🔥 KOREKSI 3: Logika penentuan label dan tombol konfirmasi
-          if (stat === "menunggu") {
-              teksStatus = "⏳ MENUNGGU";
-              warna = "orange";
-              aksi = `<button class="ysq-inc-btn ysq-inc-btn-primary" 
-                        onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${idBilling}')"
-                        style="padding: 4px 8px; font-size: 11px;">
-                        Konfirmasi
-                      </button>`;
-          } 
-          else if (stat === "lunas" || stat === "terverifikasi") {
-              teksStatus = "✅ LUNAS";
-              warna = "green";
-              aksi = `<i class="fas fa-check-circle" style="color:green"></i>`;
-          } 
-          else if (stat === "nyicil") {
-              teksStatus = "📝 NYICIL";
-              warna = "blue";
-              aksi = `<small>Belum Lunas</small>`;
-          } 
-          else { 
-              // Status 'belum bayar'
-              teksStatus = "❌ BELUM BAYAR";
-              warna = "red";
-              aksi = p.no_hp ? `
-                  <a href="https://wa.me/${p.no_hp.replace(/\D/g, '')}?text=Assalamu'alaikum, mengingatkan pembayaran SPP..." 
-                    target="_blank" class="ysq-inc-btn" style="background:#25D366; color:white; padding:4px 8px; font-size:11px; text-decoration:none; border-radius:4px;">
-                    WA Tagih
-                  </a>` : "-";
-          }
-
-          return `
-              <tr>
-                  <td>${p.nama}</td>
-                  <td align="right"><b>${jumlahBayar}</b></td>
-                  <td style="color:${warna}; font-weight:bold; font-size: 12px;">${teksStatus}</td>
-                  <td align="center">${aksi}</td>
-              </tr>`;
-      }).join("");
-
-  } catch (err) {
-      console.error("Error Detail Billing:", err);
-      tbody.innerHTML = `<tr><td colspan="4">Gagal memuat detail pembayaran.</td></tr>`;
-  }
-};
-
-window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
-  if (!idPembayaran || idPembayaran === 'undefined') {
-      return alert("ID Pembayaran tidak ditemukan! Pastikan santri sudah klik 'Bayar'.");
-  }
-
-  if (!confirm("Apakah Anda yakin ingin memverifikasi pembayaran ini?")) return;
-
-  try {
-      const res = await apiPut(`/keuangan/pembayaran/${idPembayaran}/konfirmasi`);
-      if (res.success) {
-          alert("Berhasil! Saldo dashboard akan diperbarui.");
-          // Refresh data
-          await openDetailBilling(idBilling);
-          await loadDashboardSummary();
-          if (typeof renderSPPView === "function") renderSPPView();
+      else if (statusPembayaran === "lunas") {
+        teksStatus = "✅ TERKONFIRMASI";
+        warna = "green";
+        aksi = `<i class="fas fa-check-circle" style="color:green"></i>`;
       }
+
+      else {
+        teksStatus = "❌ BELUM ADA PEMBAYARAN";
+        warna = "red";
+      }
+
+      return `
+        <tr>
+          <td>${p.nama}</td>
+          <td align="right"><b>${jumlahBayar}</b></td>
+          <td style="color:${warna}; font-weight:bold;">
+            ${teksStatus}
+          </td>
+          <td align="center">${aksi}</td>
+        </tr>
+      `;
+    }).join("");
+
   } catch (err) {
-      alert("Gagal konfirmasi: " + (err.message || "Error server"));
+    console.error(err);
+    tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data</td></tr>`;
   }
 };
 
@@ -787,6 +769,57 @@ window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
       tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data</td></tr>`;
     }
   };
+
+
+/* =====================================================
+   KONFIRMASI PEMBAYARAN + AUTO PINDAH KE SEMUA PEMASUKAN
+===================================================== */
+function konfirmasiPembayaran(idPembayaran, idBilling) {
+
+  if (!idPembayaran || idPembayaran === "undefined") {
+    alert("ID Pembayaran tidak ditemukan!");
+    return;
+  }
+
+  if (!confirm("Apakah Anda yakin ingin memverifikasi pembayaran ini?")) {
+    return;
+  }
+
+  apiPut(`/keuangan/pembayaran/${idPembayaran}/konfirmasi`)
+    .then(async (res) => {
+
+      if (res.success) {
+
+        alert("Pembayaran berhasil dikonfirmasi!");
+
+        // 🔴 Tutup modal
+        closeDetailBillingModal();
+
+        // 🔵 Reset mode ke SEMUA PEMASUKAN
+        currentMode = "all";
+        $("ysq-filter-cat").value = "all";
+
+        // 🔵 Reset tampilan filter
+        renderFilterInputs("all");
+
+        // 🔵 Reload data global pemasukan
+        await loadGlobalPemasukan();
+
+        // 🔵 Update dashboard summary
+        await loadDashboardSummary();
+
+      } else {
+        alert("Gagal konfirmasi pembayaran");
+      }
+
+    })
+    .catch(err => {
+      console.error("Error konfirmasi:", err);
+      alert("Terjadi kesalahan server");
+    });
+}
+
+window.konfirmasiPembayaran = konfirmasiPembayaran;
   
 
   window.exportData = function (type) {
@@ -1022,23 +1055,31 @@ window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
       if (!firstPage) doc.addPage();
       firstPage = false;
   
-      // ===== HEADER =====
       doc.setFontSize(14);
       doc.text(`LAPORAN SPP PERIODE ${periode}`, 14, 15);
   
       let yPos = 22;
-  
       const data = sppExportData[periode];
   
       // GROUP BY KELAS + KATEGORI
       const group = {};
       data.forEach(d => {
-        const key = `${d.nama_kelas} (${d.tipe.toUpperCase()})`;
+        // --- PERBAIKAN DI SINI ---
+        const namaKelas = d.nama_kelas || d.kelas || d.id_kelas || "Tanpa Kelas";
+        const tipeSantri = (d.tipe || "").toUpperCase();
+        const key = `${namaKelas} (${tipeSantri})`;
+        
         if (!group[key]) group[key] = [];
         group[key].push(d);
       });
   
       Object.keys(group).forEach((kelas) => {
+        // Cek apakah yPos sudah mendekati akhir halaman
+        if (yPos > 240) {
+          doc.addPage();
+          yPos = 20;
+        }
+  
         doc.setFontSize(11);
         doc.text(`Kelas: ${kelas}`, 14, yPos);
         yPos += 4;
@@ -1051,12 +1092,12 @@ window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
             s.nama,
             rupiah(s.nominal),
             rupiah(s.sisa),
-            s.status.toUpperCase()
+            (s.status || "BELUM BAYAR").toUpperCase()
           ]);
   
-          if (s.status === "lunas") lunas += s.nominal;
-          else if (s.status === "nyicil") nyicil += (s.nominal - s.sisa);
-          else belum += s.nominal;
+          if (s.status === "lunas") lunas += Number(s.nominal);
+          else if (s.status === "nyicil") nyicil += (Number(s.nominal) - Number(s.sisa));
+          else belum += Number(s.sisa || s.nominal);
         });
   
         doc.autoTable({
@@ -1064,29 +1105,22 @@ window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
           head: [["Nama Santri", "Nominal", "Tunggakan", "Status"]],
           body: rows,
           theme: "grid",
-          styles: { fontSize: 9 },
+          styles: { fontSize: 8 },
           headStyles: { fillColor: [41, 128, 185] }
         });
   
-        yPos = doc.lastAutoTable.finalY + 4;
+        yPos = doc.lastAutoTable.finalY + 6;
   
-        // ===== RINGKASAN =====
         doc.setFontSize(9);
-        doc.text(`Total Lunas        : ${rupiah(lunas)}`, 16, yPos);
-        doc.text(`Total Nyicil       : ${rupiah(nyicil)}`, 16, yPos + 4);
-        doc.text(`Total Belum Bayar  : ${rupiah(belum)}`, 16, yPos + 8);
+        doc.text(`Total Lunas        : ${rupiah(lunas)}`, 14, yPos);
+        doc.text(`Total Nyicil       : ${rupiah(nyicil)}`, 14, yPos + 4);
+        doc.text(`Total Belum Bayar  : ${rupiah(belum)}`, 14, yPos + 8);
   
-        yPos += 14;
-  
-        // Cegah kepotong halaman
-        if (yPos > 250) {
-          doc.addPage();
-          yPos = 20;
-        }
+        yPos += 16;
       });
     });
   
-    doc.save("laporan-spp.pdf");
+    doc.save(`laporan-spp-${todayISO()}.pdf`);
   }
   
 
@@ -1198,4 +1232,7 @@ window.konfirmasiPembayaran = async function (idPembayaran, idBilling) {
   
     XLSX.writeFile(wb, "laporan-bill-lainnya.xlsx");
   }
+  
+
+
   
