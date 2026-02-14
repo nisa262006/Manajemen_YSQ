@@ -6,18 +6,176 @@
   <title>Yayasan Sahabat Qur'an</title>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/css/style.css" />
+    
+  <style>
+    /* --- CSS UTAMA (DESKTOP - Gambar 1) --- */
+    .footer-pill-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .footer-pill {
+      display: flex;
+      align-items: center;
+      flex-direction: row-reverse; /* Nexlix paling kanan */
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Pembungkus untuk memudahkan penyusunan di mobile */
+    .pill-content-wrapper {
+      display: flex;
+      align-items: center;
+      flex-direction: row-reverse;
+    }
+
+    .nexlix-label {
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #FFD700;
+      font-size: 14px;
+      margin-left: 12px;
+      user-select: none;
+    }
+
+    .contact-info {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+      white-space: nowrap;
+    }
+
+    .contact-info a { color: inherit; text-decoration: none; }
+    .sep { margin: 0 8px; color: rgba(255, 255, 255, 0.3); }
+
+    .dev-reveal {
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 12px;
+      color: #fff;
+      transition: all 0.5s ease;
+    }
+
+    /* State ACTIVE Desktop */
+    .footer-pill.active {
+      background: rgba(0, 0, 0, 0.85);
+      border-color: #FFD700;
+    }
+
+    .footer-pill.active .dev-reveal {
+      max-width: 600px;
+      opacity: 1;
+      margin-right: 15px;
+      padding-right: 15px;
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* --- MEDIA QUERIES (MOBILE - Menuju Gambar 2) --- */
+    @media (max-width: 768px) {
+      .footer-pill-container {
+        right: 15px;
+        bottom: 15px;
+      }
+
+      .footer-pill {
+        flex-direction: column; /* Menjadi bertingkat saat aktif */
+        align-items: flex-end;
+        padding: 8px 15px;
+        border-radius: 20px; /* Lebih kotak di sudut saat di HP */
+      }
+
+      .footer-pill.active {
+        align-items: flex-end;
+      }
+
+      /* Baris Nexlix dan Contact tetap sejajar horizontal */
+      .pill-content-wrapper {
+        flex-direction: row-reverse;
+      }
+
+      .contact-info {
+        font-size: 10px;
+      }
+
+      .nexlix-label {
+        font-size: 12px;
+        margin-left: 8px;
+      }
+
+      /* Teks Developer pindah ke bawah (Gambar 2) */
+      .dev-reveal {
+        text-align: right;
+        font-size: 10px;
+        max-height: 0; /* Gunakan max-height untuk animasi vertikal */
+        white-space: normal; /* Biarkan membungkus */
+        display: block;
+        width: 100%;
+      }
+
+      .footer-pill.active .dev-reveal {
+        max-width: 220px; 
+        max-height: 100px; 
+        opacity: 1;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1); /* Garis pembatas atas */
+        border-right: none; /* Hilangkan garis samping desktop */
+        margin-right: 0;
+        padding-right: 0;
+      }
+    }
+  </style>
 </head>
 <body>
+
   <div class="container">
     <div class="overlay">
       <img src="/images/LogoYSQ.png" alt="Logo YSQ">
       <h1>SELAMAT DATANG DI YAYASAN<br>SAHABAT QUR'AN</h1>
       <div class="buttons">
-        <!-- UBAH KE ROUTE -->
         <a href="/login" class="btn btn-gold">Login</a>
         <a href="/daftar" class="btn btn-dark">Pendaftaran Santri Baru</a>
       </div>
     </div>
+
+    <div class="footer-pill-container">
+      <div id="footer-trigger" class="footer-pill">
+        
+        <div class="pill-content-wrapper">
+            <span class="nexlix-label">NEXLIX</span>
+            <div class="contact-info">
+              <a href="https://sahabatquran.com/" target="_blank">sahabatquran.com</a>
+              <span class="sep">•</span>
+              <span>ysqbogormail@gmail.com</span>
+            </div>
+        </div>
+
+        <div class="dev-reveal">
+          By: Riska Sugiarto, Rahma Fitria Tunnisa, & Prameswari Kirana Jingga
+        </div>
+
+      </div>
+    </div>
   </div>
+
+  <script>
+    const pill = document.getElementById('footer-trigger');
+    pill.addEventListener('click', function() {
+      this.classList.toggle('active');
+    });
+  </script>
+
 </body>
 </html>
