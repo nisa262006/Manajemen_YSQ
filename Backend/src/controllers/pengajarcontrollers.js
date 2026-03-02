@@ -127,11 +127,11 @@ exports.getAllPengajar = async (req, res) => {
         p.no_kontak,
         p.status,
         p.mapel,
-        -- Menggabungkan banyak kelas menjadi satu string, jika tidak ada tampilkan '-'
-        COALESCE(STRING_AGG(k.nama_kelas, ', '), '-') AS nama_kelas
+        COALESCE(STRING_AGG(DISTINCT k.nama_kelas, ', '), '-') AS nama_kelas
       FROM pengajar p
-      LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
-      GROUP BY p.id_pengajar -- Wajib menggunakan GROUP BY karena ada STRING_AGG
+      LEFT JOIN jadwal j ON j.id_pengajar = p.id_pengajar
+      LEFT JOIN kelas k ON k.id_kelas = j.id_kelas
+      GROUP BY p.id_pengajar
       ORDER BY p.id_pengajar ASC
     `);
 
@@ -157,14 +157,14 @@ exports.getPengajarById = async (req, res) => {
         p.*,
         u.username,
         u.email AS user_email,
-    
-        k.id_kelas,
-        k.nama_kelas
+        COALESCE(STRING_AGG(DISTINCT k.nama_kelas, ', '), '-') AS nama_kelas
       FROM pengajar p
       LEFT JOIN users u ON p.id_users = u.id_users
-      LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
+      LEFT JOIN jadwal j ON j.id_pengajar = p.id_pengajar
+      LEFT JOIN kelas k ON k.id_kelas = j.id_kelas
       WHERE p.id_pengajar = $1
-    `, [id_pengajar]);    
+      GROUP BY p.id_pengajar, u.username, u.email
+    `, [id_pengajar]);   
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Pengajar tidak ditemukan" });
@@ -357,7 +357,7 @@ exports.deletePengajar = async (req, res) => {
     // 2. LEPASKAN pengajar dari tabel kelas (Set id_pengajar menjadi NULL)
     // Ini agar data kelas tidak ikut terhapus, tapi pengajarnya hilang
     await client.query(
-      `UPDATE kelas SET id_pengajar = NULL WHERE id_pengajar = $1`,
+      `UPDATE jadwal SET id_pengajar = NULL WHERE id_pengajar = $1`,
       [id_pengajar]
     );
 

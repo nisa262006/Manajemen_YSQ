@@ -154,13 +154,9 @@ function renderJadwal() {
     if (!tb) return;
 
     const fkelas = $("pilih_kelas")?.value;
-    const fkat = $("kategori")?.value;
-
     let list = [...window._jadwalList];
 
     if (fkelas) list = list.filter(j => j.id_kelas == fkelas);
-    // PERBAIKAN: Gunakan 'j' bukan 'k'
-    if (fkat) list = list.filter(j => j.kategori == fkat);
 
     tb.innerHTML = "";
 
@@ -177,16 +173,17 @@ function renderJadwal() {
             <td>${j.pengajar_nama}</td>
             <td>${j.hari}</td>
             <td>${formatJam(j.jam_mulai, j.jam_selesai)}</td>
-            <td>${j.kategori}</td> <td><span class="status-badge status-aktif">AKTIF</span></td>
-                <td class="action-icons">
-                    <button class="icon-btn edit-btn" data-id="${j.id_jadwal}">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <button class="icon-btn delete-btn" data-id="${j.id_jadwal}">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
+            <td>${j.kapasitas}</td>
+            <td><span class="status-badge status-aktif">AKTIF</span></td>
+            <td class="action-icons">
+                <button class="icon-btn edit-btn" data-id="${j.id_jadwal}">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="icon-btn delete-btn" data-id="${j.id_jadwal}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
         `;
     });
 }
@@ -215,7 +212,7 @@ if ($("form-tambah-jadwal")) {
             hari: $("hari-tambah").value,
             jam_mulai: $("waktu-mulai").value + ":00",
             jam_selesai: $("waktu-selesai").value + ":00",
-            kategori: $("kategori-jadwal").value
+            kapasitas: $("kapasitas-tambah").value
         };
 
         try {
@@ -252,7 +249,7 @@ document.addEventListener("click", async (e) => {
     try {
         // 1. Ambil Detail Jadwal & Detail Kelas
         const jd = await apiGet(`/jadwal/${id}`);
-        const resKelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
+        $("jumlah-siswa-maks").value = jd.kapasitas;
 
         // 2. Isi Data ke Form Modal
         $("edit-id-jadwal").value = id;
@@ -262,16 +259,11 @@ document.addEventListener("click", async (e) => {
         // PASTI KAN ID DROPDOWN SESUAI (Gunakan ID yang ada di HTML Modal Edit Anda)
         if ($("pengajar")) $("pengajar").value = jd.id_pengajar;
 
-        // --- INI PERBAIKAN UNTUK KATEGORI ---
-        if ($("kategori-edit")) {
-            // Memastikan data dari DB menjadi huruf kecil semua
-            $("kategori-edit").value = jd.kategori ? jd.kategori.toLowerCase() : ""; 
-        }
 
         $("edit-hari").value = jd.hari;
         $("edit-mulai").value = jd.jam_mulai.slice(0, 5);
         $("edit-selesai").value = jd.jam_selesai.slice(0, 5);
-        $("jumlah-siswa-maks").value = resKelas.kelas.kapasitas;
+        $("jumlah-siswa-maks").value = jd.kapasitas;
 
         // 3. Load Sesi Pengajar
         if (jd.id_pengajar) {
@@ -361,12 +353,11 @@ if ($("btn-edit-simpan")) {
         const idJadwal = $("edit-id-jadwal").value;
 
         const payload = {
-            id_kelas: $("edit-id-kelas").value, // Pastikan ID Kelas terkirim
-            kapasitas: $("jumlah-siswa-maks").value, // Kapasitas/Jumlah Maks
+            id_kelas: $("edit-id-kelas").value,
+            kapasitas: $("jumlah-siswa-maks").value,
             hari: $("edit-hari").value,
             jam_mulai: $("edit-mulai").value + ":00",
             jam_selesai: $("edit-selesai").value + ":00",
-            kategori: $("kategori-edit").value,
             id_pengajar: $("pengajar").value
         };
 
@@ -448,9 +439,9 @@ function renderKelas(data) {
             <tr>
                 <td>${i + 1}</td>
                 <td>${k.nama_kelas}</td>
-                <td>${k.kapasitas}</td>
                 <td>${k.kategori}</td>
-                <td>${k.nama_pengajar || "-"}</td>
+                <td>${k.jumlah_santri ?? 0}</td>
+                <td>${k.jumlah_sesi ?? 0}</td>
                 <td class="action-icons">
                     <button class="icon-btn view-details-btn" data-id="${k.id_kelas}">
                         <i class="fas fa-eye"></i>
@@ -516,17 +507,24 @@ document.addEventListener("click", async (e) => {
                 // 🔥 Ambil detail santri dari backend
                 let detail = await apiGet(`/santri/${s.id_santri}`);
 
-                const tanggalLahir = detail.data?.tanggal_lahir;
-                const status = detail.data?.status ?? "Aktif";
-                const usia = hitungUsia(tanggalLahir);
+                const usia = hitungUsia(s.tanggal_lahir);
+                const status = s.status ?? "Aktif";
 
                 tbody.innerHTML += `
+                <tr style="background:#f9f9f9">
+                    <td></td>
+                    <td colspan="3">
+                        ${s.hari} | 
+                        ${s.jam_mulai.slice(0,5)} - ${s.jam_selesai.slice(0,5)} |
+                        Pengajar: ${s.nama_pengajar}
+                    </td>
                     <tr>
-                        <td>${i + 1}</td>
-                        <td>${s.nama}</td>
-                        <td>${usia}</td>
-                        <td>${status}</td>
-                    </tr>
+                    <td>${i + 1}</td>
+                    <td>${s.nama}</td>
+                    <td>${hitungUsia(s.tanggal_lahir)}</td>
+                    <td>${s.status}</td>
+                </tr>
+                </tr>
                 `;
             }
         }
@@ -578,11 +576,6 @@ document.addEventListener("click", async (e) => {
 
 if ($("form-tambah-kelas")) {
 
-    $("btn-open-tambah-kelas").onclick = () => {
-        $("tambah-kelas-modal").style.display = "flex";
-        loadPengajarUntukTambahKelas(); // load list pengajar dari backend
-    };
-
     $("btn-close-tambah-kelas-x").onclick =
     $("btn-cancel-kelas").onclick = () => {
         $("tambah-kelas-modal").style.display = "none";
@@ -630,28 +623,28 @@ if ($("form-tambah-kelas")) {
     // ============================
     $("form-tambah-kelas").addEventListener("submit", async (e) => {
         e.preventDefault();
-
+    
+        const namaInput = $("input-nama-kelas");
+        const kategoriInput = $("input-kategori");
+    
+        if (!namaInput || !kategoriInput) {
+            console.error("Element tidak ditemukan");
+            return;
+        }
+    
         const payload = {
-            nama_kelas: $("input-kelas-tingkatan").value,
-            kapasitas: Number($("input-kapasitas").value),
-            kategori: $("input-kategori").value,
-            id_pengajar: Number($("select-pengajar-kelas").value),
-            waktu_mulai: $("input-waktu-mulai").value,
-            waktu_selesai: $("input-waktu-selesai").value
+            nama_kelas: namaInput.value,
+            kategori: kategoriInput.value
         };
-
-        console.log("PAYLOAD KIRIM KELAS:", payload);
-
+    
         try {
             await apiPost("/kelas", payload);
-
+    
             toast("Kelas berhasil ditambahkan!");
-
             $("tambah-kelas-modal").style.display = "none";
             $("form-tambah-kelas").reset();
-
-            loadKelasTable(); // refresh tabel kelas
-
+            loadKelasTable();
+    
         } catch (err) {
             console.error(err);
             toast("Gagal menambah kelas", "error");
@@ -722,7 +715,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadKelasTable();
 
     if ($("pilih_kelas")) $("pilih_kelas").onchange = renderJadwal;
-    if ($("kategori")) $("kategori").onchange = renderJadwal;
 });
 
 

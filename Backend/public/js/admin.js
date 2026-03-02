@@ -238,127 +238,171 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ===============================================================
-// 🔥 TAMBAH KELAS — ADMIN (FIX TOTAL)
+// 🔥 MASUKKAN SANTRI KE SESI — SISTEM YAYASAN
 // ===============================================================
 if (document.body.classList.contains("page-tambah-kelas")) {
 
     const selectKelas  = document.getElementById("id_kelas");
+    const selectSesi   = document.getElementById("id_jadwal"); // 🔥 BARU
     const filterSelect = document.getElementById("kelas");
     const tableBody    = document.querySelector(".data-table tbody");
     const selectAll    = document.querySelector(".select-all-checkbox");
     const btnSimpan    = document.getElementById("btn-simpan-kelas-selection");
   
-    /* ===============================================================
-       LOAD KELAS
-    =============================================================== */
-    /* ===============================================================
-   LOAD KELAS DENGAN INFO LENGKAP (NAMA, KATEGORI, PENGAJAR)
-=============================================================== */
-async function loadKelasYSQ() {
-    try {
-      const res = await apiGet("/kelas");
-      // Pastikan list mengambil data array dari respon
-      const list = Array.isArray(res) ? res : res?.data ?? [];
+    // ===============================================================
+    // LOAD KELAS
+    // ===============================================================
+    async function loadKelasYSQ() {
+      try {
+        const res = await apiGet("/kelas");
+        const list = Array.isArray(res) ? res : res?.data ?? [];
   
-      window._allKelasYSQ = list;
+        selectKelas.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
   
-      const selectKelas = document.getElementById("id_kelas");
-      if (!selectKelas) return;
+        list.forEach(k => {
+          selectKelas.innerHTML += `
+            <option value="${k.id_kelas}">
+              ${k.nama_kelas} | ${k.kategori}
+            </option>`;
+        });
   
-      selectKelas.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
-  
-      list.forEach(k => {
-        // Ambil nama pengajar, jika null tampilkan "-"
-        const pengajar = k.nama_pengajar ? k.nama_pengajar : "-";
-        
-        // Susun teks option: Nama Kelas - Kategori - Pengajar
-        const label = `${k.nama_kelas} | ${k.kategori} (${pengajar})`;
-  
-        selectKelas.innerHTML += `
-          <option value="${k.id_kelas}">
-            ${label}
-          </option>`;
-      });
-  
-    } catch (err) {
-      console.error(err);
-      showNotification("Gagal memuat kelas", "error");
+      } catch (err) {
+        console.error(err);
+        showNotification("Gagal memuat kelas", "error");
+      }
     }
-  }
   
-    /* ===============================================================
-       LOAD SANTRI
-    =============================================================== */
+    // ===============================================================
+    // LOAD SESI BERDASARKAN KELAS
+    // ===============================================================
+    async function loadSesiByKelas(idKelas) {
+      try {
+        const res = await apiGet("/jadwal");
+        const list = res?.data ?? res ?? [];
+  
+        const sesiList = list.filter(j => j.id_kelas == idKelas);
+  
+        selectSesi.innerHTML = `<option value="">-- Pilih Sesi --</option>`;
+  
+        sesiList.forEach(j => {
+          const label =
+            `${j.hari} | ${j.jam_mulai.slice(0,5)}-${j.jam_selesai.slice(0,5)} | ${j.nama_pengajar ?? '-'}`;
+  
+          selectSesi.innerHTML += `
+            <option value="${j.id_jadwal}">
+              ${label}
+            </option>`;
+        });
+  
+      } catch (err) {
+        console.error(err);
+        showNotification("Gagal memuat sesi", "error");
+      }
+    }
+  
+    // Saat pilih kelas → load sesi
+    selectKelas.addEventListener("change", () => {
+      if (selectKelas.value) {
+        loadSesiByKelas(selectKelas.value);
+      }
+    });
+  
+    // ===============================================================
+    // LOAD SANTRI
+    // ===============================================================
     async function loadSantri() {
       try {
         const res = await apiGet("/santri?page=1&limit=9999");
-        const list = res?.data ?? res ?? [];
-  
-        window._allSantri = list;
+        window._allSantri = res?.data ?? res ?? [];
         renderSantri(filterSelect.value || "semua");
-  
       } catch (err) {
         console.error(err);
         showNotification("Gagal memuat santri", "error");
       }
     }
   
-    /* ===============================================================
-       RENDER SANTRI
-    =============================================================== */
+    // ===============================================================
+    // RENDER SANTRI
+    // ===============================================================
     function renderSantri(filter) {
-      tableBody.innerHTML = "";
-  
-      let list = (window._allSantri || []).filter(s =>
-        String(s.status || "").toLowerCase() === "aktif"
-      );
-  
-      if (filter === "menunggu") list = list.filter(s => !s.id_kelas);
-      if (filter === "santri")   list = list.filter(s => s.id_kelas);
-  
-      if (!list.length) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="7" style="text-align:center">
-              Tidak ada santri
-            </td>
-          </tr>`;
-        return;
+        tableBody.innerHTML = "";
+      
+        let list = window._allSantri || [];
+      
+        // 🔥 FILTER BERDASARKAN id_jadwal
+        if (filter === "santri") {
+          list = list.filter(s => s.id_jadwal !== null);
+        }
+      
+        if (filter === "menunggu") {
+          list = list.filter(s => s.id_jadwal === null);
+        }
+      
+        if (!list.length) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align:center">
+                Tidak ada santri
+              </td>
+            </tr>`;
+          return;
+        }
+      
+        list.forEach(s => {
+      
+          const aktif = s.status === "aktif";
+          const sudahMasuk = s.id_jadwal !== null;
+      
+          tableBody.innerHTML += `
+            <tr data-id="${s.id_santri}">
+              <td>
+              ${aktif ? `<input type="checkbox" class="row-check">` : "-"}
+              </td>
+      
+              <td>${s.nis}</td>
+              <td>${s.nama}</td>
+      
+              <td>${
+                s.tanggal_lahir
+                  ? new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear()
+                  : "-"
+              }</td>
+      
+              <!-- STATUS AKTIF -->
+              <td>
+                <span class="status-badge ${
+                  aktif ? "status-santri" : "status-ditolak"
+                }">
+                  ${aktif ? "Aktif" : "Non Aktif"}
+                </span>
+              </td>
+      
+              <!-- KETERANGAN -->
+              <td>
+                ${
+                  sudahMasuk
+                    ? `<span class="status-badge status-santri">Sudah Ada Kelas</span>`
+                    : `<span class="status-badge status-menunggu">MENUNGGU</span>`
+                }
+              </td>
+            </tr>`;
+        });
       }
-  
-      list.forEach(s => {
-        tableBody.innerHTML += `
-          <tr data-id="${s.id_santri}">
-            <td><input type="checkbox" class="row-check"></td>
-            <td>${s.nis}</td>
-            <td>${s.nama}</td>
-            <td>${s.tanggal_lahir
-              ? new Date().getFullYear() - new Date(s.tanggal_lahir).getFullYear()
-              : "-"}</td>
-            <td><span class="status-badge status-aktif">Aktif</span></td>
-            <td>
-              <span class="status-badge ${
-                s.id_kelas ? "status-santri" : "status-menunggu"
-              }">
-                ${s.id_kelas ? "Sudah Kelas" : "Menunggu"}
-              </span>
-            </td>
-          </tr>`;
-      });
-    }
-  
-    /* ===============================================================
-       SIMPAN KE KELAS
-    =============================================================== */
+
+    // ===============================================================
+    // SIMPAN KE SESI (🔥 YAYASAN VERSION)
+    // ===============================================================
     btnSimpan.addEventListener("click", async () => {
   
-      const idKelas = Number(selectKelas.value);
-      if (!idKelas) {
-        showNotification("Pilih kelas terlebih dahulu", "error");
+      const idJadwal = Number(selectSesi.value);
+  
+      if (!idJadwal) {
+        showNotification("Pilih sesi terlebih dahulu", "error");
         return;
       }
   
       const checked = [...document.querySelectorAll(".row-check:checked")];
+  
       if (!checked.length) {
         showNotification("Pilih minimal satu santri", "error");
         return;
@@ -368,34 +412,30 @@ async function loadKelasYSQ() {
         for (const cb of checked) {
           const tr = cb.closest("tr");
           const idSantri = Number(tr.dataset.id);
-      
+  
           if (!idSantri) continue;
-      
-          const santri = window._allSantri.find(s => s.id_santri === idSantri);
-      
-          if (santri?.id_kelas) {
-            await apiPut(`/kelas/pindah/${idSantri}`, { id_kelas_baru: idKelas });
-          } else {
-            await apiPost(`/kelas/${idKelas}/santri`, { id_santri: idSantri });
-          }
+  
+          await apiPost(`/jadwal/${idJadwal}/santri`, {
+            id_santri: idSantri
+          });
         }
-      
-        showNotification("Santri berhasil dimasukkan ke kelas", "success");
+  
+        showNotification("Santri berhasil dimasukkan ke sesi", "success");
         await loadSantri();
-        await loadKelasYSQ();
-      
+  
       } catch (err) {
-        console.error("Error detail:", err);
-        
-        // TANGKAP PESAN ERROR DARI BACKEND DISINI
-        const errorMsg = err.response?.data?.message || err.message || "Gagal menyimpan kelas";
-        showNotification(errorMsg, "error"); // Ini akan memunculkan "Kapasitas kelas penuh"
+        console.error(err);
+        const errorMsg =
+          err.response?.data?.message ||
+          "Gagal memasukkan santri ke sesi";
+  
+        showNotification(errorMsg, "error");
       }
     });
   
-    /* ===============================================================
-       EVENT
-    =============================================================== */
+    // ===============================================================
+    // EVENT
+    // ===============================================================
     filterSelect.addEventListener("change", () =>
       renderSantri(filterSelect.value)
     );
@@ -405,13 +445,10 @@ async function loadKelasYSQ() {
         .forEach(cb => cb.checked = selectAll.checked);
     });
   
-    /* ===============================================================
-       INIT
-    =============================================================== */
+    // INIT
     loadKelasYSQ();
     loadSantri();
   }
-  
     
 /* ======================================================
     TAMBAH SANTRI (ADMIN)
@@ -547,28 +584,21 @@ function initTambahPengajar() {
 ========================= */
 async function checkNotifPembayaran() {
     try {
-      const res = await apiGet("/keuangan/notifikasi/pembayaran");
+      // Pastikan path ini sesuai dengan route di index.js / server.js backend Anda
+      const res = await apiGet("/keuangan/notifikasi-pembayaran");
   
-      if (res.total > 0) {
+      if (!res || !res.success || (!res.infaq_belajar && !res.infaq_lainnya)) return;
   
-        let pesan = "🔔 Pembayaran menunggu:\n";
+      let pesan = "🔔 Verifikasi Pembayaran:\n";
+      if (res.infaq_belajar > 0) pesan += `• ${res.infaq_belajar} Infaq Belajar\n`;
+      if (res.infaq_lainnya > 0) pesan += `• ${res.infaq_lainnya} Infaq Lainnya\n`;
   
-        if (res.spp > 0) {
-          pesan += `• ${res.spp} SPP\n`;
-        }
-  
-        if (res.lainnya > 0) {
-          pesan += `• ${res.lainnya} Bill Lainnya\n`;
-        }
-  
-        showNotification(pesan, "warning");
-      }
+      showNotification(pesan, "warning");
   
     } catch (err) {
       console.error("Gagal cek notif pembayaran:", err);
     }
-  }  
-
+}
   
 /* =========================
    INIT FORM ADMIN

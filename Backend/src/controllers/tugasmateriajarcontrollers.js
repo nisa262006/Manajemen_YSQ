@@ -19,30 +19,31 @@ async function getRoleSpecificId(id_users, role) {
 // ============================================================
 exports.uploadMateri = async (req, res) => {
   try {
-    // Tambahkan 'tanggal_manual' di destruktur body
-    const { id_kelas, judul, deskripsi, tipe_file, tipe_konten, link_url, tanggal_manual } = req.body;
-    
-    const id_pengajar = await getRoleSpecificId(req.user.id_users, "pengajar");
+    const { id_jadwal, judul, deskripsi, tipe_file, tipe_konten, link_url, tanggal_manual } = req.body;
 
-    if (!id_pengajar) {
-      return res.status(403).json({ error: "Hanya pengajar terdaftar yang bisa upload materi" });
-    }
+    if (!id_jadwal)
+      return res.status(400).json({ error: "id_jadwal wajib diisi" });
+
+    const id_pengajar = await getRoleSpecificId(req.user.id_users, "pengajar");
 
     let filePath = null;
     if (tipe_konten === "file") {
-      if (!req.file) return res.status(400).json({ error: "File wajib diunggah" });
+      if (!req.file)
+        return res.status(400).json({ error: "File wajib diunggah" });
       filePath = req.file.filename;
     }
 
-    // Jika pengajar memilih tanggal, gunakan itu. Jika tidak, gunakan waktu sekarang.
     const finalDate = tanggal_manual ? new Date(tanggal_manual) : new Date();
 
     await db.query(
       `INSERT INTO materi_ajar
-       (id_kelas, id_pengajar, judul, deskripsi, tipe_file, tipe_konten, file_path, link_url, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, // Tambah kolom created_at
+       (id_kelas, id_jadwal, id_pengajar, judul, deskripsi, tipe_file, tipe_konten, file_path, link_url, created_at)
+       VALUES (
+         (SELECT id_kelas FROM jadwal WHERE id_jadwal = $1),
+         $1,$2,$3,$4,$5,$6,$7,$8,$9
+       )`,
       [
-        id_kelas,
+        id_jadwal,
         id_pengajar,
         judul,
         deskripsi,
@@ -50,11 +51,12 @@ exports.uploadMateri = async (req, res) => {
         tipe_konten,
         filePath,
         link_url || null,
-        finalDate // Masukkan tanggal dari frontend ke sini
+        finalDate
       ]
     );
 
-    res.json({ success: true, message: "Materi berhasil disimpan sesuai tanggal pilihan" });
+    res.json({ success: true });
+
   } catch (err) {
     console.error("UPLOAD MATERI ERROR:", err);
     res.status(500).json({ error: err.message });
@@ -66,30 +68,28 @@ exports.uploadMateri = async (req, res) => {
 // ============================================================
 exports.createTugas = async (req, res) => {
   try {
-    const { id_kelas, id_materi, judul, deskripsi, deadline } = req.body;
+    const { id_jadwal, id_materi, deskripsi, deadline } = req.body;
 
-if (!id_materi)
-  return res.status(400).json({ message: "id_materi wajib" });
+    if (!id_jadwal)
+      return res.status(400).json({ error: "id_jadwal wajib" });
 
     const id_pengajar = await getRoleSpecificId(req.user.id_users, "pengajar");
-
-    if (!id_pengajar) {
-      return res.status(403).json({ error: "Pengajar tidak valid" });
-    }
 
     const filePath = req.file ? req.file.filename : null;
     const linkUrl = req.body.link_url || null;
 
     const result = await db.query(
       `INSERT INTO tugas
-       (id_kelas, id_materi, id_pengajar, judul, deskripsi, deadline, file_path, link_url)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+       (id_kelas, id_jadwal, id_materi, id_pengajar, deskripsi, deadline, file_path, link_url)
+       VALUES (
+         (SELECT id_kelas FROM jadwal WHERE id_jadwal = $1),
+         $1,$2,$3,$4,$5,$6,$7
+       )
        RETURNING *`,
       [
-        id_kelas,
+        id_jadwal,
         id_materi,
-        id_pengajar, // ✅ BENAR
-        judul,
+        id_pengajar,
         deskripsi,
         deadline,
         filePath,
@@ -97,10 +97,8 @@ if (!id_materi)
       ]
     );
 
-    res.status(201).json({
-      success: true,
-      data: result.rows[0]
-    });
+    res.status(201).json(result.rows[0]);
+
   } catch (err) {
     console.error("CREATE TUGAS ERROR:", err);
     res.status(500).json({ error: err.message });
@@ -117,8 +115,8 @@ exports.getTugasByMateri = async (req, res) => {
 
     const result = await db.query(
       `SELECT id_tugas, id_materi, deskripsi, deadline, file_path, link_url
-       FROM tugas
-       WHERE id_materi = $1
+FROM tugas
+WHERE id_materi = $1
        ORDER BY created_at DESC`,
       [id_materi]
     );
@@ -135,10 +133,11 @@ exports.getTugasByMateri = async (req, res) => {
 // PENGAJAR - LIHAT MATERI & TUGAS SENDIRI
 // ============================================================
 // Di tugasmateriajarcontrollers.js
-exports.getMateriByKelasPengajar = async (req, res) => {
-  const { id } = req.params; // ini id_kelas
+exports.getMateriByJadwalPengajar = async (req, res) => {
   try {
-    const query = `
+    const { id_jadwal } = req.params;
+
+    const result = await db.query(`
       SELECT DISTINCT ON (m.id_materi)
         m.id_materi,
         m.judul,
@@ -147,17 +146,17 @@ exports.getMateriByKelasPengajar = async (req, res) => {
         m.link_url,
         m.tipe_konten,
         m.created_at,
-        t.id_tugas  -- INI KUNCINYA: Harus ada id_tugas dari tabel tugas
+        t.id_tugas
       FROM materi_ajar m
       LEFT JOIN tugas t ON m.id_materi = t.id_materi
-      WHERE m.id_kelas = $1
+      WHERE m.id_jadwal = $1
       ORDER BY m.id_materi, m.created_at DESC
-    `;
-    const result = await db.query(query, [id]);
+    `, [id_jadwal]);
+
     res.json(result.rows);
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Gagal mengambil data materi" });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -329,36 +328,35 @@ await db.query(
 // ===============================
 // SANTRI - LIHAT / DOWNLOAD MATERI
 // ===============================
-exports.getMateriByKelasForSantri = async (req, res) => {
-  const { id_kelas } = req.params;
-
+exports.getMateriByJadwalForSantri = async (req, res) => {
   try {
-    const query = `
+    const { id_jadwal } = req.params;
+
+    const result = await db.query(`
       SELECT DISTINCT ON (m.id_materi)
         m.id_materi,
         m.judul,
-        m.deskripsi AS deskripsi_materi,
+        m.deskripsi,
         m.file_path,
         m.link_url,
         m.created_at,
 
         t.id_tugas,
         t.deskripsi AS instruksi_tugas,
-        t.deadline AS deadline_tugas,
+        t.deadline,
         t.file_path AS file_tugas,
         t.link_url AS link_tugas
+
       FROM materi_ajar m
       LEFT JOIN tugas t ON t.id_materi = m.id_materi
-      WHERE m.id_kelas = $1
+      WHERE m.id_jadwal = $1
       ORDER BY m.id_materi, t.created_at DESC
-    `;
+    `, [id_jadwal]);
 
-    const result = await db.query(query, [id_kelas]);
     res.json(result.rows);
 
   } catch (err) {
-    console.error("GET MATERI SANTRI ERROR:", err);
-    res.status(500).json({ message: "Gagal mengambil materi & tugas" });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -422,33 +420,45 @@ exports.getMySubmission = async (req, res) => {
 
 exports.getStatusPengumpulan = async (req, res) => {
   try {
-    const { id } = req.params; // id_tugas
+    const { id } = req.params;
 
-    // Query ini mengambil semua santri yang terdaftar di kelas tempat tugas tersebut berada
-    const result = await db.query(
-      `SELECT 
+    const tugasRes = await db.query(
+      `SELECT id_jadwal FROM tugas WHERE id_tugas = $1`,
+      [id]
+    );
+
+    if (!tugasRes.rowCount)
+      return res.status(404).json({ message: "Tugas tidak ditemukan" });
+
+    const id_jadwal = tugasRes.rows[0].id_jadwal;
+
+    const result = await db.query(`
+      SELECT 
+        s.id_santri,
         s.nama,
-        pt.submitted_at,
         pt.file_path,
         pt.link_url,
+        pt.submitted_at,
         CASE 
           WHEN pt.id_pengumpulan IS NOT NULL THEN 'Sudah Kirim'
           ELSE 'Belum Kirim'
         END AS status
-      FROM tugas t
-      JOIN santri_kelas sk ON t.id_kelas = sk.id_kelas
-      JOIN santri s ON sk.id_santri = s.id_santri
-      LEFT JOIN pengumpulan_tugas pt ON t.id_tugas = pt.id_tugas AND s.id_santri = pt.id_santri
-      WHERE t.id_tugas = $1`,
-      [id]
-    );
+      FROM santri_jadwal sj
+      JOIN santri s ON s.id_santri = sj.id_santri
+      LEFT JOIN pengumpulan_tugas pt 
+        ON pt.id_santri = s.id_santri 
+        AND pt.id_tugas = $1
+      WHERE sj.id_jadwal = $2
+      ORDER BY s.nama ASC
+    `, [id, id_jadwal]);
 
     res.json(result.rows);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("GET STATUS ERROR:", err);
+    res.status(500).json({ message: "Gagal mengambil status pengumpulan" });
   }
 };
-
 
 // Gunakan kata kunci 'function' agar bisa dipanggil dari baris mana pun
 function deletePhysicalFile(fileName, subFolder) {
@@ -463,3 +473,51 @@ function deletePhysicalFile(fileName, subFolder) {
     console.error(`❌ Gagal menghapus file fisik: ${error.message}`);
   }
 }
+
+exports.getMateriByJadwal = async (req, res) => {
+  try {
+    const { id_jadwal } = req.params;
+
+    // 1️⃣ Ambil id_kelas dari jadwal
+    const kelasRes = await db.query(
+      `SELECT id_kelas FROM jadwal WHERE id_jadwal = $1`,
+      [id_jadwal]
+    );
+
+    if (kelasRes.rowCount === 0) {
+      return res.status(404).json({ message: "Jadwal tidak ditemukan" });
+    }
+
+    const id_kelas = kelasRes.rows[0].id_kelas;
+
+    // 2️⃣ Ambil materi berdasarkan kelas
+    const materiRes = await db.query(`
+      SELECT 
+        m.id_materi,
+        m.judul,
+        m.deskripsi,
+        m.file_path,
+        m.link_url,
+        m.created_at,
+        k.nama_kelas,
+
+        t.id_tugas,
+        t.deskripsi AS instruksi_tugas,
+        t.deadline AS deadline_tugas,
+        t.file_path AS file_tugas,
+        t.link_url AS link_tugas
+
+      FROM materi_ajar m
+      JOIN kelas k ON m.id_kelas = k.id_kelas
+      LEFT JOIN tugas t ON t.id_materi = m.id_materi
+      WHERE m.id_kelas = $1
+      ORDER BY m.created_at DESC
+    `, [id_kelas]);
+
+    res.json(materiRes.rows);
+
+  } catch (err) {
+    console.error("GET MATERI BY JADWAL ERROR:", err);
+    res.status(500).json({ message: "Gagal mengambil materi" });
+  }
+};

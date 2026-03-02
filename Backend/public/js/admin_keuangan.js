@@ -19,27 +19,30 @@ let currentMode = "all";
 let sppExportData = {};            // MODE 2 — SPP
 let billLainnyaExportData = {};    // ✅ MODE 3 — BILL LAINNYA
 let exportBuffer = [];
-
+let selectedMetode = "all";
 
 /* =====================================================
    INIT
 ===================================================== */
 document.addEventListener("DOMContentLoaded", async () => {
-    initDefaultDate();
-    await loadDashboardSummary(); // <--- Tambahkan ini agar angka dashboard muncul saat buka page
-    await loadGlobalPemasukan();
-    await loadInitialClassData();// <--- GANTI loadSantriList dengan ini
+  initDefaultDate();
+  await loadDashboardSummary();
+  await loadGlobalPemasukan();
+  await loadInitialClassData();
+  await updateNotifUI();
 
   $("ysq-filter-cat").addEventListener("change", onKategoriChange);
 
-  // Listener untuk filter otomatis saat kategori di modal berubah
-  $("spp-kategori")?.addEventListener("change", filterClassByCategory);
+  // 🔥 TAMBAHKAN INI
+  $("ysq-date-start")?.addEventListener("change", applyFilter);
+  $("ysq-date-end")?.addEventListener("change", applyFilter);
 
   document.querySelector(".ysq-main-generate").addEventListener("click", (e) => {
     e.preventDefault();
     generateIncomeReport();
   });
 });
+
 
 function initDefaultDate() {
   const d = new Date();
@@ -124,8 +127,10 @@ async function loadInitialClassData() {
 ===================================================== */
 async function loadGlobalPemasukan() {
   try {
+    resetUI(); // 🔥 INI WAJIB
+
     const res = await apiGet("/keuangan/laporan/pemasukan/detail");
-    rawData = res.data || res || []; // Sesuaikan dengan struktur response backend
+    rawData = res.data || res || [];
     applyFilter();
   } catch (err) {
     console.error(err);
@@ -235,7 +240,7 @@ window.generateIncomeReport = async function () {
    MODE SPP (Admin - Manajemen Tagihan & Konfirmasi)
 ==================================================== */
 async function renderSPPView(keyword = "") {
-    addHeaderButton("Tambah SPP", openSPPModal);
+    addHeaderButton("Tambah Infaq Belajar", openSPPModal);
   
     const statusFilter = ($("ysq-filter-status")?.value || "all").toLowerCase();
   
@@ -259,8 +264,7 @@ async function renderSPPView(keyword = "") {
 
         // 🔒 KUNCI: SPP ONLY
         let data = res.filter(d =>
-          d.jenis === "SPP" &&
-          d.id_santri !== null
+          d.jenis && d.jenis.toString().toUpperCase().trim() === "INFAQ_BELAJAR"
         );
         
         // ===== SIMPAN UNTUK EXPORT =====
@@ -398,8 +402,7 @@ billLainnyaExportData = {};
 // ===============================
 const map = {};
 
-billing
-  .filter(b => b.jenis === "LAINNYA")
+billing.filter(b => b.jenis && b.jenis.toString().toUpperCase().trim() === "INFAQ_LAINNYA")
   .forEach(b => {
 
     // --- UNTUK TABEL ---
@@ -433,21 +436,27 @@ let data = Object.values(map);
         tbody.innerHTML = `<tr><td colspan="5">Tidak ada pembayaran lainnya</td></tr>`;
         return;
       }
-  
-      tbody.innerHTML = data.map(b => `
-        <tr>
-          <td>${new Date(b.created_at).toLocaleDateString("id-ID")}</td>
-          <td>${b.tipe}</td>
-          <td>${b.keterangan || "-"}</td>
-          <td align="right">${rupiah(b.nominal)}</td>
-          <td>
-          <button class="ysq-inc-btn ysq-inc-btn-primary"
-            onclick="openDetailBilling('${b.id_billing}')">
-            Lihat Pembayaran
-          </button>
-        </td>
-        </tr>
-      `).join("");
+
+tbody.innerHTML = data.map(b => {
+  // Logika: Jika ada keterangan (masjid/bangunan), tampilkan itu. 
+  // Jika tidak ada, baru pakai tipe.
+  const namaInfaq = b.keterangan ? `Infaq ${b.keterangan}` : `Infaq ${b.tipe}`;
+
+  return `
+    <tr>
+      <td>${new Date(b.created_at).toLocaleDateString("id-ID")}</td>
+      <td>${namaInfaq}</td> 
+      <td>${b.keterangan || "-"}</td>
+      <td align="right">${rupiah(b.nominal)}</td>
+      <td>
+        <button class="ysq-inc-btn ysq-inc-btn-primary"
+          onclick="openDetailBilling('${b.id_billing}')">
+          Lihat Pembayaran
+        </button>
+      </td>
+    </tr>
+  `;
+}).join("");
   
     } catch (err) {
       console.error(err);
@@ -516,7 +525,7 @@ window.saveSPPFromModal = async function () {
         await loadDashboardSummary();
       }
     } catch (err) {
-      alert("Gagal menyimpan SPP");
+      alert("Gagal menyimpan Infaq Belajar");
     }
   };
   
@@ -525,61 +534,92 @@ window.saveSPPFromModal = async function () {
    FILTER GLOBAL & SUMMARY (Untuk "Semua Pemasukan")
 ===================================================== */
 function applyFilter() {
+
   const start = $("ysq-date-start")?.value;
   const end = $("ysq-date-end")?.value;
 
-  filteredData = rawData.filter((d) => {
-    const tgl = d.tanggal?.slice(0, 10);
-    if (start && tgl < start) return false;
-    if (end && tgl > end) return false;
+  const startDate = start ? new Date(start) : null;
+  const endDate = end ? new Date(end) : null;
+
+  filteredData = rawData.filter(d => {
+
+    if (!d.tanggal) return false;
+
+    const dataDate = new Date(d.tanggal);
+
+    if (startDate && dataDate < startDate) return false;
+
+    if (endDate) {
+      const endPlus = new Date(endDate);
+      endPlus.setDate(endPlus.getDate() + 1);
+      if (dataDate >= endPlus) return false;
+    }
+// 🔥 FILTER METODE
+if (selectedMetode !== "all") {
+  const metodeDb = (d.metode_pembayaran || "").toLowerCase().trim();
+  if (metodeDb !== selectedMetode) return false;
+}
+
     return true;
   });
 
-  if (currentMode === "all") renderGlobalTable();
+  renderGlobalTable();
   renderSummary(filteredData);
 }
 
+
 function renderGlobalTable() {
-    const tbody = $("ysq-income-body");
-  
-    tbody.innerHTML = filteredData.map(d => {
-      const kelas =
-        d.nama_kelas ||
-        d.kelas ||
-        "-";
-  
-      const periode =
-        d.periode ||
-        (d.periode_awal && d.periode_akhir
-          ? `${d.periode_awal} s/d ${d.periode_akhir}`
-          : "-");
-  
-      return `
-        <tr>
-          <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
-          <td>${d.nama || "Hamba Allah"}</td>
-          <td>${kelas}</td>
-          <td>${periode}</td>
-          <td>${d.kategori.toUpperCase()}</td>
-          <td align="right">${rupiah(d.nominal)}</td>
-        </tr>
-      `;
-    }).join("");
+
+  const tbody = $("ysq-income-body");
+
+  if (!filteredData.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" align="center">
+          Tidak ada data pemasukan
+        </td>
+      </tr>`;
+    return;
   }
+
+  tbody.innerHTML = filteredData.map(d => {
+
+    const kelas = d.kelas || d.nama_kelas || "-";
+    const periode = d.periode || "-";
+    const kategori = d.kategori || "Infaq Lainnya";
+    const metode = d.metode_pembayaran || "-";
+
+    return `
+      <tr>
+        <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+        <td>${d.nama || "Hamba Allah"}</td>
+        <td>${kelas}</td>
+        <td>${periode}</td>
+        <td><b>${kategori}</b></td>
+        <td>${metode}</td>
+        <td align="right">${rupiah(d.nominal)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
   
-  
-  function renderSummary(data) {
-    let spp = 0, infaq = 0;
-  
-    data.forEach(d => {
-      if (d.kategori === "SPP") spp += Number(d.nominal);
-      if (d.kategori === "LAINNYA") infaq += Number(d.nominal);
-    });
-  
-    $("ysq-total-iuran").textContent = rupiah(spp);
-    $("ysq-total-infaq").textContent = rupiah(infaq);
-    $("ysq-total-gross").textContent = rupiah(spp + infaq);
-  }
+function renderSummary(data) {
+  let spp = 0, infaq = 0;
+
+  data.forEach(d => {
+    const kat = (d.kategori || "").toUpperCase().trim();
+    if (kat.includes("BELAJAR") || kat === "SPP") {
+      spp += Number(d.nominal || 0);
+    } else {
+      infaq += Number(d.nominal || 0);
+    }
+  });
+
+  if($("ysq-total-iuran")) $("ysq-total-iuran").textContent = rupiah(spp);
+  if($("ysq-total-infaq")) $("ysq-total-infaq").textContent = rupiah(infaq);
+  if($("ysq-total-gross")) $("ysq-total-gross").textContent = rupiah(spp + infaq);
+}
 
 /* =====================================================
    UI UTILS
@@ -598,16 +638,91 @@ function addHeaderButton(text, action) {
 function resetUI() {
   const dynamicBtn = document.querySelector(".btn-dynamic");
   if (dynamicBtn) dynamicBtn.remove();
-  
+
   document.querySelector(".ysq-inc-table thead").innerHTML = `
     <tr>
-      <th>Tanggal</th>
-      <th>Nama Santri / Sumber</th>
+      <th>Tanggal Pembayaran</th>
+      <th>Nama Santri</th>
       <th>Kelas</th>
-      <th>Periode / Keterangan</th>
+      <th>Periode</th>
       <th>Kategori</th>
+
+      <th style="position:relative;">
+        <div id="metode-dropdown-trigger"
+             style="cursor:pointer; user-select:none; display:inline-block;">
+          Semua Metode
+          <i class="fas fa-chevron-down" style="font-size:11px;"></i>
+        </div>
+
+        <div id="metode-dropdown-menu"
+             style="
+               display:none;
+               position:absolute;
+               top:30px;
+               left:0;
+               background:white;
+               border:1px solid #ddd;
+               border-radius:8px;
+               box-shadow:0 4px 12px rgba(0,0,0,0.1);
+               z-index:999;
+               min-width:140px;
+             ">
+        </div>
+      </th>
+
       <th>Nominal</th>
     </tr>`;
+    
+  initMetodeDropdownHeader(); // 🔥 penting
+}
+
+function initMetodeDropdownHeader() {
+
+  const trigger = document.getElementById("metode-dropdown-trigger");
+  const menu = document.getElementById("metode-dropdown-menu");
+
+  if (!trigger || !menu) return;
+
+  const metodeList = [
+    { label: "Semua Metode", value: "all" },
+    { label: "Tunai / Cash", value: "tunai" },
+    { label: "Bank", value: "bank" },
+    { label: "E-Wallet", value: "ewallet" }
+  ];
+
+  menu.innerHTML = metodeList.map(m => `
+    <div class="metode-option"
+         data-value="${m.value}"
+         style="padding:8px 12px; cursor:pointer;">
+      ${m.label}
+    </div>
+  `).join("");
+
+  trigger.onclick = (e) => {
+    e.stopPropagation();
+    menu.style.display =
+      menu.style.display === "block" ? "none" : "block";
+  };
+
+  document.querySelectorAll(".metode-option")
+    .forEach(opt => {
+      opt.onclick = function () {
+
+        selectedMetode = this.dataset.value;
+
+        trigger.innerHTML =
+          this.innerText +
+          ' <i class="fas fa-chevron-down" style="font-size:11px;"></i>';
+
+        menu.style.display = "none";
+
+        applyFilter();
+      };
+    });
+
+  document.addEventListener("click", () => {
+    menu.style.display = "none";
+  });
 }
 
 window.formatRupiah = function (input) {
@@ -647,79 +762,227 @@ window.saveInfaqFromModal = async function () {
 
 
 /* =====================================================
-   SINKRONISASI MODAL DETAIL (PERBAIKAN STATUS)
+   SINKRONISASI MODAL DETAIL (DENGAN TOTAL DANA MASUK)
 ===================================================== */
 window.openDetailBilling = async function (idBilling) {
+
   const modal = $("detailBillingModal");
   if (modal) modal.style.display = "flex";
 
   const tbody = $("detail-billing-body");
-  tbody.innerHTML = `<tr><td colspan="4">Memuat data...</td></tr>`;
+  const tableHead = modal.querySelector(".ysq-inc-table thead");
+
+  tbody.innerHTML = `<tr><td colspan="5">Memuat data...</td></tr>`;
 
   try {
     const res = await apiGet(`/keuangan/billing/${idBilling}/santri`);
     const data = res.data || res;
 
     if (!data || data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4">Belum ada pembayaran</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5">Belum ada data pembayaran</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = data.map(p => {
+    // ==========================================
+    // 🔥 AMBIL LIST KELAS UNIK
+    // ==========================================
+    const kelasList = [...new Set(
+      data.map(d => d.nama_kelas || d.kelas).filter(Boolean)
+    )];
 
-      const statusPembayaran = p.status_pembayaran;
-      const statusBilling = p.status_billing;
+    // ==========================================
+    // 🔥 HEADER TABLE + DROPDOWN CUSTOM
+    // ==========================================
+    tableHead.innerHTML = `
+      <tr>
+        <th>NAMA SANTRI</th>
+        <th style="position:relative;">
+          <div id="kelas-dropdown-trigger"
+               style="cursor:pointer; user-select:none; display:inline-block;">
+            Semua Kelas
+            <i class="fas fa-chevron-down" style="font-size:11px;"></i>
+          </div>
 
-      let aksi = "-";
-      let teksStatus = "";
-      let warna = "#333";
+          <div id="kelas-dropdown-menu"
+               style="
+                 display:none;
+                 position:absolute;
+                 top:30px;
+                 left:0;
+                 background:white;
+                 border:1px solid #ddd;
+                 border-radius:8px;
+                 box-shadow:0 4px 12px rgba(0,0,0,0.1);
+                 z-index:999;
+                 min-width:160px;
+               ">
+          </div>
+        </th>
+        <th>JUMLAH BAYAR</th>
+        <th>STATUS</th>
+        <th>AKSI</th>
+      </tr>
+    `;
 
-      const jumlahBayar = p.jumlah_bayar
-        ? rupiah(p.jumlah_bayar)
-        : "-";
+    // ==========================================
+    // 🔥 FUNCTION RENDER TABLE
+    // ==========================================
+    function renderTable(selectedKelas = "all") {
 
-      /* ===============================
-         🔵 STATUS TRANSAKSI
-      ================================ */
+      let filtered = data;
 
-      if (statusPembayaran === "menunggu") {
-        teksStatus = "⏳ MENUNGGU VERIFIKASI";
-        warna = "orange";
-        aksi = `
-          <button class="ysq-inc-btn ysq-inc-btn-primary"
-            onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${idBilling}')">
-            Konfirmasi
-          </button>`;
+      if (selectedKelas !== "all") {
+        filtered = data.filter(d =>
+          (d.nama_kelas || d.kelas) === selectedKelas
+        );
       }
 
-      else if (statusPembayaran === "lunas") {
-        teksStatus = "✅ TERKONFIRMASI";
-        warna = "green";
-        aksi = `<i class="fas fa-check-circle" style="color:green"></i>`;
+      // ==========================================
+      // 💰 HITUNG TOTAL LUNAS SESUAI FILTER
+      // ==========================================
+      let totalMasuk = 0;
+      filtered.forEach(p => {
+        if (p.status_pembayaran === "lunas") {
+          totalMasuk += Number(p.jumlah_bayar || 0);
+        }
+      });
+
+      // ==========================================
+      // 🔥 UPDATE BOX TOTAL DANA
+      // ==========================================
+      let box = modal.querySelector("#modal-info-dana-box");
+      if (!box) {
+        box = document.createElement("div");
+        box.id = "modal-info-dana-box";
+        modal.querySelector(".ysq-inc-table")
+          .parentNode
+          .insertBefore(box, modal.querySelector(".ysq-inc-table"));
       }
 
-      else {
-        teksStatus = "❌ BELUM ADA PEMBAYARAN";
-        warna = "red";
-      }
-
-      return `
-        <tr>
-          <td>${p.nama}</td>
-          <td align="right"><b>${jumlahBayar}</b></td>
-          <td style="color:${warna}; font-weight:bold;">
-            ${teksStatus}
-          </td>
-          <td align="center">${aksi}</td>
-        </tr>
+      box.innerHTML = `
+        <div style="
+          background:#e7f3ff;
+          padding:12px;
+          border-radius:8px;
+          margin-bottom:15px;
+          border-left:5px solid #2196F3;">
+          <span style="font-size:14px;color:#555;">
+            Total Dana Terkumpul (Lunas):
+          </span><br>
+          <strong style="font-size:20px;color:#0d47a1;">
+            ${rupiah(totalMasuk)}
+          </strong>
+        </div>
       `;
-    }).join("");
+
+      // ==========================================
+      // 🔥 RENDER ROW
+      // ==========================================
+      tbody.innerHTML = filtered.map(p => {
+
+        const kelas = p.nama_kelas || p.kelas || "-";
+        const jumlah = p.jumlah_bayar
+          ? rupiah(p.jumlah_bayar)
+          : "-";
+
+        let statusText = "";
+        let warna = "";
+        let aksi = "-";
+
+        if (p.status_pembayaran === "menunggu") {
+          statusText = "⏳ MENUNGGU";
+          warna = "orange";
+          aksi = `
+            <button class="ysq-inc-btn ysq-inc-btn-primary"
+              onclick="konfirmasiPembayaran('${p.id_pembayaran}', '${idBilling}')">
+              Konfirmasi
+            </button>`;
+        } 
+        else if (p.status_pembayaran === "lunas") {
+          statusText = "✅ TERKONFIRMASI";
+          warna = "green";
+          aksi = `<i class="fas fa-check-circle" style="color:green"></i>`;
+        } 
+        else {
+          statusText = "❌ BELUM BAYAR";
+          warna = "red";
+        }
+
+        return `
+          <tr>
+            <td>${p.nama}</td>
+            <td>${kelas}</td>
+            <td align="right"><b>${jumlah}</b></td>
+            <td style="color:${warna};font-weight:bold;">
+              ${statusText}
+            </td>
+            <td align="center">${aksi}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // 🔥 RENDER PERTAMA
+    // ==========================================
+    renderTable();
+
+    // ==========================================
+    // 🔥 SETUP DROPDOWN
+    // ==========================================
+    const dropdownMenu = document.getElementById("kelas-dropdown-menu");
+    const trigger = document.getElementById("kelas-dropdown-trigger");
+
+    dropdownMenu.innerHTML = `
+      <div class="kelas-option" data-value="all"
+           style="padding:8px 12px; cursor:pointer;">
+           Semua Kelas
+      </div>
+      ${kelasList.map(k => `
+        <div class="kelas-option" data-value="${k}"
+             style="padding:8px 12px; cursor:pointer;">
+             ${k}
+        </div>
+      `).join("")}
+    `;
+
+    // Buka / tutup
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdownMenu.style.display =
+        dropdownMenu.style.display === "block"
+          ? "none"
+          : "block";
+    });
+
+    // Klik option
+    document.querySelectorAll(".kelas-option")
+      .forEach(item => {
+        item.addEventListener("click", function () {
+
+          const value = this.dataset.value;
+
+          trigger.innerHTML =
+            this.innerText +
+            ' <i class="fas fa-chevron-down" style="font-size:11px;"></i>';
+
+          dropdownMenu.style.display = "none";
+
+          renderTable(value);
+        });
+      });
+
+    // Klik luar tutup dropdown
+    document.addEventListener("click", () => {
+      dropdownMenu.style.display = "none";
+    });
 
   } catch (err) {
     console.error(err);
-    tbody.innerHTML = `<tr><td colspan="4">Gagal memuat data</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5">Gagal memuat data</td></tr>`;
   }
 };
+
 
   window.closeDetailBillingModal = () =>
     $("detailBillingModal").style.display = "none";
@@ -812,6 +1075,11 @@ function konfirmasiPembayaran(idPembayaran, idBilling) {
         alert("Gagal konfirmasi pembayaran");
       }
 
+      await renderNotificationBanner(); 
+
+                // Refresh data di tabel
+                loadGlobalPemasukan();
+                
     })
     .catch(err => {
       console.error("Error konfirmasi:", err);
@@ -819,8 +1087,27 @@ function konfirmasiPembayaran(idPembayaran, idBilling) {
     });
 }
 
-window.konfirmasiPembayaran = konfirmasiPembayaran;
-  
+window.konfirmasiPembayaran = function(idPembayaran, idBilling) {
+  if (!confirm("Konfirmasi pembayaran ini?")) return;
+
+  apiPut(`/keuangan/pembayaran/${idPembayaran}/konfirmasi`)
+    .then(async (res) => {
+      if (res.success) {
+        alert("Pembayaran Berhasil!");
+        closeDetailBillingModal();
+
+        // 🔥 INI KUNCINYA: Update UI secara real-time
+        await updateNotifUI(); 
+
+        // Refresh data tabel
+        await loadGlobalPemasukan();
+        await loadDashboardSummary();
+        
+        // Jika sedang di mode SPP, refresh view-nya juga
+        if (currentMode === "spp") renderSPPView();
+      }
+    });
+};
 
   window.exportData = function (type) {
 
@@ -849,126 +1136,193 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
   };  
 
   function exportAllIncomePDF() {
+
     if (!filteredData.length) {
       alert("Tidak ada data untuk diexport");
       return;
     }
   
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF("p", "mm", "a4");
   
-    let totalSPP = 0;
-    let totalLainnya = 0;
+    const start = $("ysq-date-start").value;
+    const end = $("ysq-date-end").value;
   
-    filteredData.forEach(d => {
-      if (d.kategori === "SPP") totalSPP += Number(d.nominal);
-      if (d.kategori === "LAINNYA") totalLainnya += Number(d.nominal);
-    });
-  
-    const totalGross = totalSPP + totalLainnya;
-  
-    // JUDUL
     doc.setFontSize(14);
     doc.text("LAPORAN PEMASUKAN KEUANGAN", 14, 15);
   
     doc.setFontSize(10);
-    doc.text(
-      `Periode: ${$("ysq-date-start").value} s/d ${$("ysq-date-end").value}`,
-      14,
-      22
+    doc.text(`Periode: ${start} s/d ${end}`, 14, 22);
+  
+    let yPos = 30;
+  
+    const infaqBelajar = filteredData.filter(d =>
+      (d.kategori || "").toUpperCase().includes("BELAJAR")
     );
   
-    // RINGKASAN
-    doc.text(`Total SPP        : ${rupiah(totalSPP)}`, 14, 32);
-    doc.text(`Total Lainnya   : ${rupiah(totalLainnya)}`, 14, 38);
-    doc.text(`Total Gross     : ${rupiah(totalGross)}`, 14, 44);
+    const infaqLainnya = filteredData.filter(d =>
+      !(d.kategori || "").toUpperCase().includes("BELAJAR")
+    );
   
-    // TABEL
-    const tableData = filteredData.map(d => [
-      new Date(d.tanggal).toLocaleDateString("id-ID"),
-      d.nama || "Hamba Allah",
-      d.kelas || "-",
-      d.periode || d.keterangan || "-",
-      d.kategori,
-      rupiah(d.nominal)
-    ]);
+    let totalAll = 0;
   
-    doc.autoTable({
-      startY: 55,
-      head: [[
-        "Tanggal",
-        "Nama",
-        "Kelas",
-        "Periode",
-        "Kategori",
-        "Nominal"
-      ]],
-      body: tableData
-    });
+    // =============================
+    // 🔵 INFAQ BELAJAR
+    // =============================
+    if (infaqBelajar.length) {
+  
+      doc.setFontSize(12);
+      doc.text("INFAQ BELAJAR", 14, yPos);
+      yPos += 5;
+  
+      const rows = [];
+      let subtotalBelajar = 0;
+  
+      infaqBelajar.forEach(d => {
+        rows.push([
+          new Date(d.tanggal).toLocaleDateString("id-ID"),
+          d.nama || "Hamba Allah",
+          d.kelas || "-",
+          d.periode || "-",
+          d.metode_pembayaran || "-",
+          rupiah(d.nominal)
+        ]);
+  
+        subtotalBelajar += Number(d.nominal || 0);
+        totalAll += Number(d.nominal || 0);
+      });
+  
+      doc.autoTable({
+        startY: yPos,
+        head: [["Tanggal", "Nama", "Kelas", "Periode", "Metode", "Nominal"]],
+        body: rows,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [39, 174, 96] }
+      });
+  
+      yPos = doc.lastAutoTable.finalY + 5;
+  
+      doc.setFontSize(10);
+      doc.text(`Subtotal Infaq Belajar: ${rupiah(subtotalBelajar)}`, 14, yPos);
+      yPos += 12;
+    }
+  
+    // =============================
+    // 🟣 INFAQ LAINNYA
+    // =============================
+    if (infaqLainnya.length) {
+  
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+  
+      doc.setFontSize(12);
+      doc.text("INFAQ LAINNYA", 14, yPos);
+      yPos += 5;
+  
+      const rows = [];
+      let subtotalLainnya = 0;
+  
+      infaqLainnya.forEach(d => {
+        rows.push([
+          new Date(d.tanggal).toLocaleDateString("id-ID"),
+          d.nama || "Hamba Allah",
+          d.kategori || "-",
+          d.metode_pembayaran || "-",
+          rupiah(d.nominal)
+        ]);
+  
+        subtotalLainnya += Number(d.nominal || 0);
+        totalAll += Number(d.nominal || 0);
+      });
+  
+      doc.autoTable({
+        startY: yPos,
+        head: [["Tanggal", "Nama", "Kategori", "Metode", "Nominal"]],
+        body: rows,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [52, 152, 219] }
+      });
+  
+      yPos = doc.lastAutoTable.finalY + 5;
+  
+      doc.setFontSize(10);
+      doc.text(`Subtotal Infaq Lainnya: ${rupiah(subtotalLainnya)}`, 14, yPos);
+      yPos += 12;
+    }
+  
+    if (yPos > 260) {
+      doc.addPage();
+      yPos = 20;
+    }
+  
+    doc.setFontSize(12);
+    doc.text("======================================", 14, yPos);
+    yPos += 6;
+  
+    doc.text(`TOTAL KESELURUHAN: ${rupiah(totalAll)}`, 14, yPos);
   
     doc.save(`laporan-pemasukan-${todayISO()}.pdf`);
   }
   
   function exportAllIncomeExcel() {
+
     if (!filteredData.length) {
       alert("Tidak ada data untuk diexport");
       return;
     }
   
-    // =============================
-    // HITUNG RINGKASAN
-    // =============================
-    let totalSPP = 0;
+    let totalBelajar = 0;
     let totalLainnya = 0;
   
     filteredData.forEach(d => {
-      if (d.kategori === "SPP") totalSPP += Number(d.nominal);
-      if (d.kategori === "LAINNYA") totalLainnya += Number(d.nominal);
+      if ((d.kategori || "").toUpperCase().includes("BELAJAR")) {
+        totalBelajar += Number(d.nominal || 0);
+      } else {
+        totalLainnya += Number(d.nominal || 0);
+      }
     });
   
-    const totalGross = totalSPP + totalLainnya;
+    const totalGross = totalBelajar + totalLainnya;
   
-    // =============================
-    // DATA EXCEL
-    // =============================
     const rows = [
       ["LAPORAN PEMASUKAN KEUANGAN"],
       [`Periode: ${$("ysq-date-start").value} s/d ${$("ysq-date-end").value}`],
       [],
-      ["Total SPP", totalSPP],
-      ["Total Bill Lainnya", totalLainnya],
+      ["Total Infaq Belajar", totalBelajar],
+      ["Total Infaq Lainnya", totalLainnya],
       ["Total Gross", totalGross],
       [],
-      [
-        "Tanggal",
-        "Nama Santri / Sumber",
-        "Kelas",
-        "Periode / Keterangan",
-        "Kategori",
-        "Nominal"
-      ]
+      ["Tanggal","Nama","Kelas","Periode","Kategori","Metode","Nominal"]
     ];
+  
+    const headerRowIndex = rows.length;
   
     filteredData.forEach(d => {
       rows.push([
         new Date(d.tanggal).toLocaleDateString("id-ID"),
         d.nama || "Hamba Allah",
         d.kelas || "-",
-        d.periode || d.keterangan || "-",
-        d.kategori,
-        d.nominal
+        d.periode || "-",
+        d.kategori || "-",
+        d.metode_pembayaran || "-",
+        Number(d.nominal || 0)
       ]);
     });
   
-    // =============================
-    // BUAT FILE EXCEL
-    // =============================
     const ws = XLSX.utils.aoa_to_sheet(rows);
+  
+    ws["!autofilter"] = {
+      ref: `A${headerRowIndex}:G${headerRowIndex + filteredData.length}`
+    };
+  
     ws["!cols"] = [
       { wch: 14 },
       { wch: 25 },
       { wch: 15 },
-      { wch: 25 },
+      { wch: 20 },
+      { wch: 20 },
       { wch: 15 },
       { wch: 15 }
     ];
@@ -976,17 +1330,13 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "DATA PEMASUKAN");
   
-    XLSX.writeFile(
-      wb,
-      `laporan-pemasukan-${todayISO()}.xlsx`
-    );
+    XLSX.writeFile(wb, `laporan-pemasukan-${todayISO()}.xlsx`);
   }
-
   
-
+  
   function exportSPPExcel() {
     if (!sppExportData || Object.keys(sppExportData).length === 0) {
-      alert("Data SPP belum dimuat");
+      alert("Data Infaq Belajar belum dimuat");
       return;
     }
   
@@ -995,7 +1345,7 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
     Object.keys(sppExportData).forEach(periode => {
       const rows = [];
   
-      rows.push([`LAPORAN SPP PERIODE ${periode}`]);
+      rows.push([`LAPORAN Infaq Belajar PERIODE ${periode}`]);
       rows.push([]);
   
       const dataPeriode = sppExportData[periode];
@@ -1038,11 +1388,11 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
       XLSX.utils.book_append_sheet(wb, ws, `SPP-${periode}`);
     });
   
-    XLSX.writeFile(wb, "laporan-spp.xlsx");
+    XLSX.writeFile(wb, "laporan-Infaq Belajar.xlsx");
   }
   function exportSPPPDF() {
     if (!sppExportData || Object.keys(sppExportData).length === 0) {
-      alert("Data SPP belum tersedia untuk export");
+      alert("Data Infaq Belajar belum tersedia untuk export");
       return;
     }
   
@@ -1056,7 +1406,7 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
       firstPage = false;
   
       doc.setFontSize(14);
-      doc.text(`LAPORAN SPP PERIODE ${periode}`, 14, 15);
+      doc.text(`LAPORAN Infaq Belajar PERIODE ${periode}`, 14, 15);
   
       let yPos = 22;
       const data = sppExportData[periode];
@@ -1120,13 +1470,13 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
       });
     });
   
-    doc.save(`laporan-spp-${todayISO()}.pdf`);
+    doc.save(`laporan-Infaq Belajar-${todayISO()}.pdf`);
   }
   
 
   function exportBillLainnyaPDF() {
     if (!Object.keys(billLainnyaExportData).length) {
-      alert("Data bill lainnya kosong");
+      alert("Data Infaq Lainnya kosong");
       return;
     }
   
@@ -1176,7 +1526,7 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
 
   function exportBillLainnyaExcel() {
     if (!Object.keys(billLainnyaExportData).length) {
-      alert("Data bill lainnya kosong");
+      alert("Data Infaq Lainnya kosong");
       return;
     }
   
@@ -1232,7 +1582,134 @@ window.konfirmasiPembayaran = konfirmasiPembayaran;
   
     XLSX.writeFile(wb, "laporan-bill-lainnya.xlsx");
   }
-  
 
 
-  
+/* =====================================================
+   FUNGSI BANNER NOTIFIKASI OTOMATIS
+===================================================== */
+async function renderNotificationBanner() {
+  try {
+      // 1. Ambil data jumlah dari server
+      const res = await apiGet("/keuangan/notifikasi/pembayaran");
+      
+      // 2. Update Angka di Sidebar (Badge Merah)
+      const badgeSidebar = document.getElementById("badge-notif-pembayaran");
+      if (badgeSidebar) {
+          badgeSidebar.innerText = res.total || 0;
+          badgeSidebar.style.display = res.total > 0 ? "inline-block" : "none";
+      }
+
+      // 3. Cari tempat untuk naruh Banner (di bawah Header)
+      const header = document.querySelector(".dashboard-header");
+      if (!header) return;
+
+      // Hapus banner lama jika ada (agar tidak tumpuk saat update)
+      const oldBanner = document.getElementById("pemasukan-alert-banner");
+      if (oldBanner) oldBanner.remove();
+
+      // 4. Jika ada data menunggu, buat banner-nya
+      if (res.total > 0) {
+          const banner = document.createElement("div");
+          banner.id = "pemasukan-alert-banner";
+          banner.style = `
+              background: #fff3cd; 
+              border-left: 5px solid #ffc107; 
+              color: #856404; 
+              padding: 15px; 
+              margin: 20px; 
+              border-radius: 8px; 
+              display: flex; 
+              justify-content: space-between; 
+              align-items: center;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+              font-family: sans-serif;
+          `;
+
+          // Susun teks notif (Menunggu Infaq Belajar: 1, dll)
+          let teksNotif = "Ada Pembayaran Menunggu: ";
+          let detail = [];
+          
+          if (res.detail && res.detail.length > 0) {
+            res.detail.forEach(item => {
+              detail.push(`<b>${item.nama} (${item.total})</b>`);
+            });
+          }
+          
+          teksNotif += detail.join(" & ");
+          
+
+          // Isi kiri (teks notif)
+const leftDiv = document.createElement("div");
+leftDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="margin-right: 10px;"></i> ${teksNotif}`;
+
+// Tombol CEK DATA
+const btn = document.createElement("button");
+btn.innerText = "CEK DATA";
+btn.style = `
+  background:#856404;
+  color:white;
+  border:none;
+  padding:6px 15px;
+  border-radius:5px;
+  cursor:pointer;
+  font-size:12px;
+`;
+
+btn.onclick = async () => {
+  const select = document.getElementById("ysq-filter-cat");
+
+  if (res.detail && res.detail.length === 1) {
+    const nama = res.detail[0].nama.toLowerCase();
+
+    if (nama.includes("belajar")) {
+      select.value = "iuran";
+      currentMode = "spp";
+      renderFilterInputs("spp");
+      await renderSPPView();
+    } else {
+      select.value = "infaq";
+      currentMode = "infaq";
+      renderFilterInputs("infaq");
+      await renderInfaqView();
+    }
+  } else {
+    select.value = "all";
+    currentMode = "all";
+    renderFilterInputs("all");
+    await loadGlobalPemasukan();
+  }
+
+  banner.remove();
+};
+
+banner.appendChild(leftDiv);
+banner.appendChild(btn);
+header.after(banner);
+
+      }
+  } catch (err) {
+      console.error("Gagal memuat banner notif:", err);
+  }
+}
+
+async function updateNotifUI() {
+  try {
+    const res = await apiGet("/keuangan/notifikasi/pembayaran");
+
+    const badge = document.getElementById("badge-notif-pembayaran");
+
+    if (badge) {
+      if (res.total > 0) {
+        badge.innerText = res.total;
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    await renderNotificationBanner(); // update banner juga
+
+  } catch (err) {
+    console.error("Gagal update notif:", err);
+  }
+}

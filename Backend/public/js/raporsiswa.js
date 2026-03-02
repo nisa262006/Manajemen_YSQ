@@ -152,63 +152,129 @@ function renderTahfidz(r) {
 }
 
 /* ================= DOWNLOAD PDF (Sesuai Gambar Referensi) ================= */
+/* ================= DOWNLOAD PDF (VERSI LENGKAP & BENAR) ================= */
 window.downloadRapor = async function (jenis) {
-  const { jsPDF } = window.jspdf;
-  const dataRapor = (jenis === 'tahsin') ? currentRaporTahsin : currentRaporTahfidz;
-  
-  if (!dataRapor) {
-      alert("Data tidak tersedia!");
-      return;
-  }
+    const { jsPDF } = window.jspdf;
+    
+    // 1. Validasi Data
+    const dataRapor = (jenis === 'tahsin') ? currentRaporTahsin : currentRaporTahfidz;
+    if (!dataRapor) {
+        alert("Data rapor tidak ditemukan untuk periode ini!");
+        return;
+    }
 
-  // Identitas
-  document.getElementById("pdf-nama").textContent = namaEl.textContent;
-  document.getElementById("pdf-nis").textContent = nisEl.textContent;
-  document.getElementById("pdf-kelas").textContent = kelasEl.textContent; // Pastikan ID ini ada di HTML
-  document.getElementById("pdf-pengajar").textContent = pengajarEl.textContent;
+    try {
+        // Tampilkan loading jika perlu (optional)
+        console.log(`Memproses PDF ${jenis}...`);
 
-  const tableArea = document.getElementById("pdf-content-table");
-  const nilaiAkhir = Number(dataRapor.nilai_akhir);
-  const p = getPredikatUI(nilaiAkhir);
-  const statusTeks = nilaiAkhir >= 60 ? "LULUS" : "MENGULANG";
+        // 2. Isi Identitas Santri ke Template PDF
+        document.getElementById("pdf-nama").textContent = namaEl.textContent;
+        document.getElementById("pdf-nis").textContent = nisEl.textContent;
+        document.getElementById("pdf-kelas").textContent = kelasEl.textContent;
+        document.getElementById("pdf-pengajar").textContent = pengajarEl.textContent;
 
-  if (jenis === "tahsin") {
-      tableArea.innerHTML = `
-          <table class="pdf-table">
-              <thead><tr><th>KOMPONEN</th><th>NILAI</th></tr></thead>
-              <tbody>
-                  <tr><td>Nilai Pekanan</td><td>${dataRapor.nilai_pekanan}</td></tr>
-                  <tr><td>Ujian Tilawah</td><td>${dataRapor.ujian_tilawah}</td></tr>
-                  <tr><td>Nilai Teori</td><td>${dataRapor.nilai_teori}</td></tr>
-                  <tr><td>Presensi</td><td>${dataRapor.nilai_presensi}</td></tr>
-                  <tr class="row-highlight-orange"><td>RATA-RATA AKHIR</td><td>${nilaiAkhir.toFixed(2)}</td></tr>
-                  <tr class="row-highlight-blue"><td>PREDIKAT</td><td>${p.teks}</td></tr>
-                  <tr style="font-weight:bold"><td>STATUS</td><td>${statusTeks}</td></tr>
-              </tbody>
-          </table>`;
-  } else {
-      let rows = dataRapor.simakan.map(s => `<tr><td>Juz ${s.juz}</td><td>${s.nilai}</td></tr>`).join('');
-      tableArea.innerHTML = `
-          <table class="pdf-table">
-              <thead><tr class="row-highlight-orange"><th colspan="2">Nilai Simakan</th></tr>
-              <tr><th>JUZ</th><th>NILAI</th></tr></thead>
-              <tbody>
-                  ${rows}
-                  <tr class="row-highlight-orange"><td>Rata-rata Simakan</td><td>${Number(dataRapor.nilai_rata_simakan).toFixed(2)}</td></tr>
-                  <tr><td>Nilai Ujian Akhir</td><td>80</td></tr>
-                  <tr class="row-highlight-blue"><td>TOTAL AKHIR</td><td>${nilaiAkhir.toFixed(2)}</td></tr>
-                  <tr style="font-weight:bold; background:#eee"><td>PREDIKAT</td><td>${p.teks}</td></tr>
-                  <tr style="font-weight:bold"><td>STATUS</td><td>${statusTeks}</td></tr>
-              </tbody>
-          </table>`;
-  }
+        // 3. AMBIL PERIODE DARI DROPDOWN (PENTING)
+        const periodeSelect = document.querySelector(".ysq-select-minimal");
+        const teksPeriode = periodeSelect ? periodeSelect.options[periodeSelect.selectedIndex].text : "-";
+        const pdfPeriodeEl = document.getElementById("pdf-periode");
+        if (pdfPeriodeEl) pdfPeriodeEl.textContent = teksPeriode;
 
-  // Render ke PDF (sama seperti sebelumnya)
-  const element = document.getElementById("rapor-template-print");
-  const canvas = await html2canvas(element, { scale: 3, useCORS: true });
-  const pdf = new jsPDF("p", "mm", "a4");
-  pdf.addImage(canvas.toDataURL("image/jpeg"), "JPEG", 0, 0, 210, 297);
-  pdf.save(`Rapor_${jenis}_${namaEl.textContent}.pdf`);
+        // 4. Siapkan Area Tabel
+        const tableArea = document.getElementById("pdf-content-table");
+        const nilaiAkhir = Number(dataRapor.nilai_akhir || 0);
+        const p = getPredikatUI(nilaiAkhir);
+        const statusTeks = nilaiAkhir >= 60 ? "LULUS" : "MENGULANG";
+
+        // 5. Render HTML Tabel berdasarkan Jenis Rapor
+        if (jenis === "tahsin") {
+            tableArea.innerHTML = `
+                <table class="pdf-table">
+                    <thead>
+                        <tr><th>KOMPONEN PENILAIAN</th><th>NILAI</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Nilai Pekanan</td><td>${dataRapor.nilai_pekanan || 0}</td></tr>
+                        <tr><td>Ujian Tilawah (Lisan)</td><td>${dataRapor.ujian_tilawah || 0}</td></tr>
+                        <tr><td>Nilai Teori (G-Form)</td><td>${dataRapor.nilai_teori || 0}</td></tr>
+                        <tr><td>Presensi Kehadiran</td><td>${dataRapor.nilai_presensi || 0}</td></tr>
+                        <tr class="row-highlight-orange">
+                            <td style="font-weight:bold">NILAI AKHIR</td>
+                            <td style="font-weight:bold">${nilaiAkhir.toFixed(2)}</td>
+                        </tr>
+                        <tr class="row-highlight-blue">
+                            <td>PREDIKAT</td>
+                            <td style="font-weight:bold">${p.teks.toUpperCase()}</td>
+                        </tr>
+                        <tr style="font-weight:bold; background: #f9f9f9;">
+                            <td>STATUS KELULUSAN</td>
+                            <td style="color: ${nilaiAkhir >= 60 ? 'green' : 'red'}">${statusTeks}</td>
+                        </tr>
+                    </tbody>
+                </table>`;
+        } else {
+            // Untuk Tahfidz
+            let simakanRows = dataRapor.simakan && dataRapor.simakan.length > 0 
+                ? dataRapor.simakan.map(s => `<tr><td>Juz ${s.juz}</td><td>${s.nilai}</td></tr>`).join('')
+                : `<tr><td colspan="2">Tidak ada data simakan</td></tr>`;
+
+            tableArea.innerHTML = `
+                <table class="pdf-table">
+                    <thead>
+                        <tr class="row-highlight-orange"><th colspan="2">RINCIAN NILAI SIMAKAN</th></tr>
+                        <tr><th>NOMOR JUZ</th><th>NILAI</th></tr>
+                    </thead>
+                    <tbody>
+                        ${simakanRows}
+                        <tr class="row-highlight-orange">
+                            <td>Rata-rata Simakan</td>
+                            <td>${Number(dataRapor.nilai_rata_simakan || 0).toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td>Nilai Ujian Akhir (UAS)</td>
+                            <td>${Number(dataRapor.nilai_ujian_akhir || 0).toFixed(2)}</td>
+                        </tr>
+                        <tr class="row-highlight-blue">
+                            <td style="font-weight:bold">TOTAL AKHIR (PREDIKAT)</td>
+                            <td style="font-weight:bold">${nilaiAkhir.toFixed(2)}</td>
+                        </tr>
+                        <tr style="font-weight:bold; background:#eee">
+                            <td>PREDIKAT</td>
+                            <td>${p.teks.toUpperCase()}</td>
+                        </tr>
+                        <tr style="font-weight:bold">
+                            <td>STATUS KELULUSAN</td>
+                            <td style="color: ${nilaiAkhir >= 60 ? 'green' : 'red'}">${statusTeks}</td>
+                        </tr>
+                    </tbody>
+                </table>`;
+        }
+
+        // 6. Proses Konversi HTML ke Gambar (Canvas)
+        const element = document.getElementById("rapor-template-print");
+        
+        // Gunakan parameter scale tinggi agar PDF tidak pecah/blur
+        const canvas = await html2canvas(element, { 
+            scale: 3, 
+            useCORS: true,
+            logging: false,
+            allowTaint: true
+        });
+
+        // 7. Generate PDF
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+        const pdf = new jsPDF("p", "mm", "a4");
+        
+        // Ukuran A4 dalam mm adalah 210 x 297
+        pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+        
+        // Simpan dengan nama file yang informatif
+        const namaFile = `Rapor_${jenis}_${namaEl.textContent}_${teksPeriode.replace(/[/\\?%*:|"<>]/g, '-')}.pdf`;
+        pdf.save(namaFile);
+
+    } catch (error) {
+        console.error("Error saat download PDF:", error);
+        alert("Terjadi kesalahan saat membuat PDF. Silakan coba lagi.");
+    }
 };
 
 

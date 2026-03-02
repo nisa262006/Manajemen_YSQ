@@ -23,10 +23,26 @@
                 <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
                 <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
                 <div class="ysq-nav-group">
-                    <div class="menu-item ysq-report-toggle" id="laporan-btn">
+                    <div class="menu-item ysq-report-toggle" id="laporan-btn" style="position: relative;">
                         <span><i class="fas fa-file-alt"></i> Laporan</span>
+                        <span id="badge-notif-pembayaran" class="ysq-badge-notif">0</span> 
                         <i class="fas fa-chevron-down ysq-report-chevron"></i>
                     </div>
+                    <style>
+                        .ysq-badge-notif {
+                            background-color: #e74c3c; /* Warna merah */
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 6px;
+                            font-size: 10px;
+                            font-weight: bold;
+                            position: absolute;
+                            right: 35px; /* Sesuaikan posisi agar tidak menabrak panah */
+                            top: 50%;
+                            transform: translateY(-50%);
+                            display: none; /* Sembunyi secara default */
+                        }
+                        </style>
                     
                     <div id="laporan-submenu" class="ysq-report-submenu-wrapper ysq-active">
                         <a href="/dashboard/admin/laporan/keuangan-pemasukan">
@@ -53,7 +69,7 @@
             <header class="dashboard-header class-header-style">
                 <div class="header-left">
                     <h1 class="header-title">Laporan Pemasukan Keuangan</h1>
-                    <p>Data real-time iuran santri, cicilan, dan infaq yayasan.</p>
+                    <p>Data real-time Infaq Belajar, cicilan, dan Infaq lainnya.</p>
                 </div>
                 
                 <div class="ysq-inc-actions" id="ysq-header-actions">
@@ -83,8 +99,8 @@
                         <label for="ysq-filter-cat">Kategori Pemasukan:</label>
                         <select id="ysq-filter-cat" class="ysq-inc-input">
                             <option value="all">Semua Pemasukan</option>
-                            <option value="iuran">Iuran Siswa (SPP)</option>
-                            <option value="infaq">pembayaran lainnya</option>
+                            <option value="iuran">Infaq Belajar</option>
+                            <option value="infaq">Infaq lainnya</option>
                         </select>
                     </div>
                     <button class="ysq-inc-btn ysq-inc-btn-primary ysq-main-generate" onclick="generateIncomeReport()">
@@ -95,11 +111,11 @@
 
             <section class="ysq-inc-summary-grid">
                 <div class="ysq-inc-stat-card ysq-inc-border-iuran">
-                    <span class="ysq-inc-stat-label">Total Iuran Sintri</span>
+                    <span class="ysq-inc-stat-label">Total Infaq Belajar Sintri</span>
                     <h2 id="ysq-total-iuran">Rp 0</h2>
                 </div>
                 <div class="ysq-inc-stat-card ysq-inc-border-infaq">
-                    <span class="ysq-inc-stat-label">Total Infaq/Donasi</span>
+                    <span class="ysq-inc-stat-label">Total Infaq Lainnya</span>
                     <h2 id="ysq-total-infaq">Rp 0</h2>
                 </div>
                 <div class="ysq-inc-stat-card ysq-inc-border-net">
@@ -112,11 +128,12 @@
                 <table class="ysq-inc-table">
                     <thead>
                         <tr>
-                            <th>Tanggal</th>
-                            <th>Nama Santri / Sumber</th>
+                            <th>Tanggal Pembayaran</th>
+                            <th>Nama Santri</th>
                             <th>Kelas</th>
-                            <th>Periode / Keterangan</th>
+                            <th>Periode</th>
                             <th>Kategori</th>
+                            <th>Metode</th>
                             <th>Nominal</th>
                         </tr>
                     </thead>
@@ -162,7 +179,7 @@
     <div id="sppModal" class="ysq-modal-overlay">
     <div class="ysq-modal-content">
         <div class="ysq-modal-header">
-            <h3><i class="fas fa-file-invoice-dollar"></i> Input Pembayaran SPP</h3>
+            <h3><i class="fas fa-file-invoice-dollar"></i> Input Pembayaran Infaq Belajar</h3>
             <span class="ysq-close-modal" onclick="closeSPPModal()">&times;</span>
         </div>
         

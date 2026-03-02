@@ -10,7 +10,9 @@ const {
   jadwalPengajar,
   jadwalSantri,
   getJadwalByPengajar,
-  jadwalPengajarByHari
+  jadwalPengajarByHari,
+  tambahSantriKeJadwal,
+  getSantriByJadwal
 } = require("../controllers/jadwalcontrollers");
 
 const {
@@ -26,6 +28,12 @@ router.post("/", verifyToken, onlyAdmin, tambahJadwal);
 router.get("/", verifyToken, onlyAdmin, getAllJadwal);
 
 router.get("/pengajar-sesi/:id_pengajar", verifyToken, onlyAdmin, getJadwalByPengajar);
+router.post(
+  "/:id_jadwal/santri",
+  verifyToken,
+  onlyAdmin,
+  tambahSantriKeJadwal
+);
 
 // ===================== PENGAJAR =============================
 router.get("/pengajar/me", verifyToken, onlyPengajar, jadwalPengajar);
@@ -43,5 +51,12 @@ router.get("/santri/me", verifyToken, onlySantri, jadwalSantri);
 router.get("/:id_jadwal", verifyToken, onlyAdmin, getJadwalById);
 router.put("/:id_jadwal", verifyToken, onlyAdmin, updateJadwal);
 router.delete("/:id_jadwal", verifyToken, onlyAdmin, deleteJadwal);
+
+router.get(
+  "/:id_jadwal/santri",
+  verifyToken,
+  onlyPengajar,
+  getSantriByJadwal
+);
 
 module.exports = router;

@@ -11,7 +11,6 @@ let activeBilling = null;
 ============================ */
 document.addEventListener("DOMContentLoaded", async () => {
   await loadBillingSantri();
-  initPeriodeFilter();
 
   document
     .getElementById("main-filter")
@@ -52,6 +51,7 @@ async function loadBillingSantri() {
     const res = await apiGet("/keuangan/billing/me");
     allBilling = res.data || res;
 
+    initPeriodeFilter(); // Pindahkan ke sini agar dropdown tahun terisi
     renderSummary();
     renderSPP();
     renderNonIuran();
@@ -84,7 +84,9 @@ function renderSPP() {
   const statusVal =
     document.getElementById("status-filter")?.value || "all";
 
-  let spp = allBilling.filter((b) => b.jenis === "SPP");
+    let spp = allBilling.filter((b) => 
+      b.jenis && b.jenis.toString().toUpperCase().trim() === "INFAQ_BELAJAR"
+    );
 
   if (yearVal !== "all") {
     spp = spp.filter(b => b.periode?.startsWith(yearVal));
@@ -100,7 +102,7 @@ function renderSPP() {
 
   if (!spp.length) {
     container.innerHTML =
-      `<div class="grid-row"><div class="grid-cell">Tidak ada tagihan SPP</div></div>`;
+      `<div class="grid-row"><div class="grid-cell">Tidak ada tagihan Infaq Belajar</div></div>`;
     return;
   }
 
@@ -163,7 +165,9 @@ function renderNonIuran() {
   const statusVal =
     document.getElementById("status-filter")?.value || "all";
 
-  let non = allBilling.filter(b => b.jenis === "LAINNYA");
+  let non = allBilling.filter(b => 
+  b.jenis && b.jenis.toString().toUpperCase().trim() === "INFAQ_LAINNYA"
+);
 
   // 🔹 FILTER TAHUN
   if (yearVal !== "all") {

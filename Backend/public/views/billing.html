@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Bill - Sahabat Quran</title>
+    <title>Tagihan Santri - Sahabat Quran</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="/css/santri.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -24,14 +24,14 @@
     <div class="main-container">
         <div class="dashboard-card">
             <div class="main-header-row">
-                <h1>STUDENT BILL</h1>
+                <h1>Tagihan Santri</h1>
             </div>
 
             <div class="sub-nav scroll-x">
                 <a href="/dashboard/santri"><button class="nav-btn">Dashboard</button></a>
                 <a href="/dashboard/absensi-siswa"><button class="nav-btn">Riwayat Absen</button></a>
                 <a href="/dashboard/santri/rapor"><button class="nav-btn">Rapor</button></a>
-                <a href="/dashboard/billing"><button class="nav-btn active">Student Bill</button></a>
+                <a href="/dashboard/billing"><button class="nav-btn active">Tagihan Santri</button></a>
             </div>
 
             <section class="ysq-content-card">
@@ -39,7 +39,7 @@
                     <div class="ysq-bill-card highlight">
                         <div class="bill-card-icon"><i class='bx bx-wallet'></i></div>
                         <div class="bill-card-info">
-                            <span id="label-total-dinamis">Total Tagihan SPP Belum Lunas</span>
+                            <span id="label-total-dinamis">Total Tagihan Infaq belajar Belum Lunas</span>
                             <h3 id="nominal-tagihan-aktif">Rp </h3>
                             <div class="ysq-tunggakan-badge">
                                 <i class='bx bx-error-circle'></i> Ada tunggakan! 
@@ -54,8 +54,8 @@
                         <div class="ysq-filter-item">
                             <label class="ysq-filter-label">Kategori:</label>
                             <select id="main-filter" class="ysq-select-custom">
-                                <option value="spp">SPP (Iuran Bulanan)</option>
-                                <option value="non-iuran">Biaya Lainnya (Non-Iuran)</option>
+                                <option value="spp">Infaq Belajar (Iuran Bulanan)</option>
+                                <option value="non-iuran">Infaq Lainnya (Non-Iuran)</option>
                             </select>
                         </div>
 
@@ -80,7 +80,7 @@
                 </div>
 
                 <div id="section-spp-table" class="view-section">
-                    <h3 class="view-subtitle">Histori Pembayaran SPP Tahun <span id="display-year"></span></h3>
+                    <h3 class="view-subtitle">Histori Pembayaran Infaq belajar Tahun <span id="display-year"></span></h3>
                     <div class="ysq-table-wrapper">
                         <div class="ysq-grid-table">
                             <div class="grid-header grid-row">

@@ -13,7 +13,8 @@ const {
   deleteRaporTahfidz,
   getRekapLaporan,
   getRaporSantri,
-  getDetailRaporPengajar 
+  getDetailRaporPengajar,
+  getSantriByJadwal,
 } = require("../controllers/raporcontrollers");
 
 
@@ -50,5 +51,11 @@ router.get(
 
 /* ================= SANTRI ================= */
 router.get("/santri/me", verifyToken, onlySantri, getRaporSantri);
+router.get(
+  "/jadwal/:id_jadwal/santri",
+  verifyToken,
+  onlyPengajar,
+  getSantriByJadwal
+);
 
 module.exports = router;

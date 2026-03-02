@@ -23,10 +23,26 @@
                 <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
                 <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
                 <div class="ysq-nav-group">
-                    <div class="menu-item ysq-report-toggle" id="laporan-btn">
+                    <div class="menu-item ysq-report-toggle" id="laporan-btn" style="position: relative;">
                         <span><i class="fas fa-file-alt"></i> Laporan</span>
+                        <span id="badge-notif-pembayaran" class="ysq-badge-notif">0</span> 
                         <i class="fas fa-chevron-down ysq-report-chevron"></i>
                     </div>
+                    <style>
+                        .ysq-badge-notif {
+                            background-color: #e74c3c; /* Warna merah */
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 6px;
+                            font-size: 10px;
+                            font-weight: bold;
+                            position: absolute;
+                            right: 35px; /* Sesuaikan posisi agar tidak menabrak panah */
+                            top: 50%;
+                            transform: translateY(-50%);
+                            display: none; /* Sembunyi secara default */
+                        }
+                        </style>
                     
                     <div id="laporan-submenu" class="ysq-report-submenu-wrapper">
                         <a href="/dashboard/admin/laporan/keuangan-pemasukan">
@@ -97,7 +113,7 @@
                         <th>Pengajar</th>
                         <th>Hari</th>
                         <th>Jam</th>
-                        <th>Kategori</th>
+                        <th>Kapasitas</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
@@ -189,6 +205,13 @@
 
             </div>
 
+            <!-- KAPASITAS SESI -->
+            <div class="input-group-full">
+                <p class="input-section-title">Kapasitas Santri</p>
+                <label for="kapasitas-tambah">Jumlah Santri </label>
+                <input type="number" id="kapasitas-tambah" min="1" required>
+            </div>
+
             <!-- WAKTU MULAI & BERAKHIR -->
             <div class="form-row-tambah">
 
@@ -204,16 +227,6 @@
                     <input type="time" id="waktu-selesai" required>
                 </div>
 
-            </div>
-
-            <!-- KATEGORI -->
-            <div class="input-group-full">
-                <p class="input-section-title">Kategori Kelas</p>
-                <label for="kategori-jadwal">Kategori</label>
-                <select id="kategori-jadwal" required>
-                    <option value="dewasa">Dewasa</option>
-                    <option value="anak">Anak</option>
-                </select>
             </div>
 
             <div class="modal-footer-tambah">
@@ -251,7 +264,7 @@
             </div>
 
             <div class="input-group-edit">
-                <label for="jumlah-siswa-maks">Jumlah Santri Maks</label>
+                <label>Kapasitas Sesi</label>
                 <input type="number" id="jumlah-siswa-maks" min="1">
                 <input type="hidden" id="edit-id-kelas">
             </div>

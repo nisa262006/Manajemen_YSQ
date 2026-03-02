@@ -6,47 +6,18 @@ const db = require("../config/db");
 
 // ➤ Tambah Jadwal
 exports.tambahJadwal = async (req, res) => {
+  const { id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kapasitas } = req.body;
+
   try {
-    const { id_kelas, hari, jam_mulai, jam_selesai, kategori, id_pengajar } = req.body;
-
-    // 1. Validasi input wajib
-    if (!id_kelas || !hari || !jam_mulai || !jam_selesai || !kategori || !id_pengajar) {
-      return res.status(400).json({ message: "Lengkapi semua field jadwal" });
-    }
-
-    const bentrok = await db.query(
-      `SELECT j.*, k.nama_kelas 
-       FROM jadwal j
-       JOIN kelas k ON j.id_kelas = k.id_kelas
-       WHERE j.id_pengajar = $1 
-       AND LOWER(j.hari) = LOWER($2)
-       AND ($3 < j.jam_selesai AND $4 > j.jam_mulai)`,
-      [id_pengajar, hari, jam_mulai, jam_selesai]
-    );
-
-    if (bentrok.rowCount > 0) {
-      const b = bentrok.rows[0];
-      return res.status(400).json({ 
-        message: `Gagal! Pengajar sudah memiliki jadwal di hari ${hari} jam ${b.jam_mulai.slice(0,5)}-${b.jam_selesai.slice(0,5)} pada kelas ${b.nama_kelas}` 
-      });
-    }
-
-    // 3. Validasi pengajar aktif (logika lama Anda)
-    const cekPengajar = await db.query(`SELECT status FROM pengajar WHERE id_pengajar = $1`, [id_pengajar]);
-    if (cekPengajar.rowCount === 0 || cekPengajar.rows[0].status !== 'aktif') {
-      return res.status(400).json({ message: "Pengajar tidak ditemukan atau non-aktif" });
-    }
-
-    // 4. Jika lolos validasi, baru masukkan data
     await db.query(
-      `INSERT INTO jadwal(id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kategori)
-       VALUES($1, $2, $3, $4, $5, $6)`, 
-      [id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kategori] // kategori dimasukkan ke sini
+      `INSERT INTO jadwal
+       (id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kapasitas)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kapasitas]
     );
 
-    res.json({ success: true, message: "Jadwal berhasil ditambahkan" });
+    res.json({ message: "Jadwal berhasil ditambahkan" });
   } catch (err) {
-    console.error("ERR tambahJadwal:", err);
     res.status(500).json({ message: "Gagal menambah jadwal" });
   }
 };
@@ -59,10 +30,11 @@ exports.getAllJadwal = async (req, res) => {
     const result = await db.query(`
       SELECT 
         j.id_jadwal,
+        j.id_kelas,        -- 🔥 WAJIB TAMBAH INI
         j.hari,
         j.jam_mulai,
         j.jam_selesai,
-        j.kategori,
+        j.kapasitas,
         k.nama_kelas,
         p.nama AS nama_pengajar
       FROM jadwal j
@@ -81,8 +53,9 @@ exports.getAllJadwal = async (req, res) => {
     `);
 
     res.json({ success: true, data: result.rows });
+
   } catch (err) {
-    console.error("ERR getAllJadwal:", err);
+    console.error(err);
     res.status(500).json({ message: "Gagal mengambil data jadwal" });
   }
 };
@@ -118,28 +91,24 @@ exports.getJadwalById = async (req, res) => {
 exports.updateJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
-    const { hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_kelas, kapasitas } = req.body;
+    const { hari, jam_mulai, jam_selesai, id_pengajar, id_kelas, kapasitas } = req.body;
 
-    // 1. Update Tabel Jadwal (Pastikan kolom kategori sudah ada di DB)
     await db.query(
       `UPDATE jadwal 
-       SET hari=$1, jam_mulai=$2, jam_selesai=$3, kategori=$4, id_pengajar=$5, id_kelas=$6
+       SET hari=$1,
+           jam_mulai=$2,
+           jam_selesai=$3,
+           id_pengajar=$4,
+           id_kelas=$5,
+           kapasitas=$6
        WHERE id_jadwal=$7`,
-      [hari, jam_mulai, jam_selesai, kategori, id_pengajar, id_kelas, id_jadwal]
+      [hari, jam_mulai, jam_selesai, id_pengajar, id_kelas, kapasitas, id_jadwal]
     );
 
-    // 2. Update Kapasitas di Tabel Kelas (Jika ada input kapasitas)
-    if (id_kelas && kapasitas) {
-      await db.query(
-        `UPDATE kelas SET kapasitas = $1 WHERE id_kelas = $2`,
-        [kapasitas, id_kelas]
-      );
-    }
-
-    res.json({ success: true, message: "Perubahan jadwal berhasil disimpan!" });
+    res.json({ success: true, message: "Jadwal berhasil diupdate" });
   } catch (err) {
-    console.error("ERR updateJadwal:", err);
-    res.status(500).json({ message: "Gagal update jadwal: " + err.message });
+    console.error(err);
+    res.status(500).json({ message: "Gagal update jadwal" });
   }
 };
 
@@ -190,6 +159,33 @@ exports.getJadwalByPengajar = async (req, res) => {
   } catch (err) {
     console.error("ERR getJadwalByPengajar:", err);
     res.status(500).json({ message: "Gagal mengambil daftar sesi pengajar" });
+  }
+};
+
+
+exports.tambahSantriKeJadwal = async (req, res) => {
+  const { id_jadwal } = req.params;
+  const { id_santri } = req.body;
+
+  try {
+    // Hapus dari sesi lama (kalau ada)
+    await db.query(
+      `DELETE FROM santri_jadwal WHERE id_santri = $1`,
+      [id_santri]
+    );
+
+    // Masukkan ke sesi baru
+    await db.query(
+      `INSERT INTO santri_jadwal (id_santri, id_jadwal)
+       VALUES ($1, $2)`,
+      [id_santri, id_jadwal]
+    );
+
+    res.json({ message: "Santri berhasil dipindahkan ke sesi baru" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal memindahkan santri ke sesi" });
   }
 };
 
@@ -283,27 +279,70 @@ exports.jadwalPengajarByHari = async (req, res) => {
 // ➤ Ambil jadwal santri sendiri
 exports.jadwalSantri = async (req, res) => {
   try {
-    const { id_users } = req.user;
-
     const result = await db.query(`
       SELECT 
+        j.id_jadwal,
         j.hari,
         j.jam_mulai,
         j.jam_selesai,
+        j.kapasitas,
+
         k.nama_kelas,
-        p.nama AS nama_pengajar
-      FROM jadwal j
-      JOIN kelas k ON j.id_kelas = k.id_kelas
+        k.kategori,
+
+        p.nama AS nama_pengajar,
+
+        s.nama AS nama_santri,
+        s.nis,
+        s.kategori AS kategori_santri
+
+      FROM santri s
+      JOIN santri_jadwal sj ON sj.id_santri = s.id_santri
+      JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+      JOIN kelas k ON k.id_kelas = j.id_kelas
       LEFT JOIN pengajar p ON p.id_pengajar = j.id_pengajar
-      JOIN santri_kelas sk ON sk.id_kelas = k.id_kelas
-      JOIN santri s ON s.id_santri = sk.id_santri
+
       WHERE s.id_users = $1
-    `, [id_users]);
+
+      ORDER BY 
+        CASE 
+          WHEN j.hari='Senin' THEN 1
+          WHEN j.hari='Selasa' THEN 2
+          WHEN j.hari='Rabu' THEN 3
+          WHEN j.hari='Kamis' THEN 4
+          WHEN j.hari='Jumat' THEN 5
+          WHEN j.hari='Sabtu' THEN 6
+          WHEN j.hari='Minggu' THEN 7
+        END,
+        j.jam_mulai
+    `, [req.user.id_users]);
 
     res.json(result.rows);
 
   } catch (err) {
     console.error("ERR jadwalSantri:", err);
     res.status(500).json({ message: "Gagal mengambil jadwal santri" });
+  }
+};
+
+exports.getSantriByJadwal = async (req, res) => {
+  try {
+    const { id_jadwal } = req.params;
+
+    const result = await db.query(`
+      SELECT 
+        s.id_santri,
+        s.nama
+      FROM santri s
+      JOIN santri_jadwal sj ON sj.id_santri = s.id_santri
+      WHERE sj.id_jadwal = $1
+      ORDER BY s.nama ASC
+    `, [id_jadwal]);
+
+    res.json({ success: true, data: result.rows });
+
+  } catch (err) {
+    console.error("🔥 ERROR getSantriByJadwal:", err);
+    res.status(500).json({ message: "Gagal mengambil santri" });
   }
 };

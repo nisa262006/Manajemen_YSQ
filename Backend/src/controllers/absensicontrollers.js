@@ -25,16 +25,48 @@ function getHariFromTanggal(tanggal) {
     .toLowerCase();
 }
 
-const exportAbsensi = async (req, res) => {
+exports.exportAbsensi = async (req, res) => {
   try {
-    const { kelas, tanggal } = req.query;
+    const id_users = req.user.id_users;
+    const { id_kelas, tanggal_akhir } = req.query; 
 
-    // TODO: sesuaikan query dengan struktur tabelmu
-    res.status(200).json({
+    // Ambil ID Pengajar
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar) return res.status(403).json({ message: "Bukan pengajar" });
+
+    // --- LOGIKA 1 TAHUN KE BELAKANG ---
+    // Gunakan tanggal yang dipilih pengajar sebagai batas akhir
+    const endDate = tanggal_akhir || new Date().toISOString().split('T')[0];
+    
+    // Kurangi 1 tahun untuk mendapatkan batas awal
+    const d = new Date(endDate);
+    d.setFullYear(d.getFullYear() - 1);
+    const startDate = d.toISOString().split('T')[0];
+
+    // Query untuk mengambil riwayat absensi santri dalam rentang 1 tahun tersebut
+    const result = await db.query(`
+      SELECT 
+        s.nama AS nama_santri,
+        a.status_absensi,
+        TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+        k.nama_kelas,
+        a.catatan
+      FROM absensi a
+      JOIN santri s ON a.id_santri = s.id_santri
+      JOIN jadwal j ON a.id_jadwal = j.id_jadwal
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE j.id_pengajar = $1
+  AND ($2 = '' OR k.id_kelas::text = $2)
+  AND a.tanggal BETWEEN $3 AND $4
+      ORDER BY a.tanggal DESC, s.nama ASC
+    `, [id_pengajar, id_kelas || '', startDate, endDate]);
+
+    res.json({
       success: true,
-      message: "Export absensi berhasil",
-      data: []
+      message: `Berhasil mengambil data dari ${startDate} sampai ${endDate}`,
+      data: result.rows
     });
+
   } catch (error) {
     console.error("Export absensi error:", error);
     res.status(500).json({ success: false, message: "Gagal export absensi" });
@@ -49,8 +81,8 @@ exports.catatAbsensiSantri = async (req, res) => {
     const { id_santri, id_jadwal, tanggal, status_absensi, catatan } = req.body;
     const id_users = req.user.id_users;
 
-    // Gunakan tanggal hari ini jika tidak dikirim dari frontend
-    const tanggalFinal = tanggal || new Date().toISOString().split('T')[0];
+    const tanggalFinal =
+      tanggal || new Date().toISOString().split("T")[0];
 
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar)
@@ -70,26 +102,22 @@ exports.catatAbsensiSantri = async (req, res) => {
         message: "Santri nonaktif tidak bisa diabsen"
       });
 
-    // 🔒 CEK SANTRI TERDAFTAR DI KELAS + JADWAL
+    // 🔒 VALIDASI SANTRI TERDAFTAR DI SESI
     const cekTerdaftar = await db.query(`
-      SELECT j.id_jadwal
-      FROM santri_kelas sk
-      JOIN jadwal j ON sk.id_kelas = j.id_kelas
-      JOIN kelas k ON j.id_kelas = k.id_kelas
-      WHERE sk.id_santri = $1
-        AND j.id_jadwal = $2
-        AND k.id_pengajar = $3
+      SELECT 1
+      FROM santri_jadwal sj
+      JOIN jadwal j ON sj.id_jadwal = j.id_jadwal
+      WHERE sj.id_santri = $1
+        AND sj.id_jadwal = $2
+        AND j.id_pengajar = $3
     `, [id_santri, id_jadwal, id_pengajar]);
 
     if (cekTerdaftar.rowCount === 0)
       return res.status(400).json({
-        message: "Santri tidak terdaftar pada kelas ini atau jadwal bukan milik Anda"
+        message: "Santri tidak terdaftar pada sesi ini"
       });
 
-    // 🔓 LOGIKA CEK HARI DIHAPUS
-    // Pengajar sekarang bisa absen di tanggal mana saja (misal: kelas pengganti)
-
-    // 🔒 CEK DUPLIKAT (Agar tidak absen 2x di hari & jadwal yang sama)
+    // 🔒 CEK DUPLIKAT
     const duplikat = await db.query(`
       SELECT 1 FROM absensi
       WHERE id_santri=$1 AND id_jadwal=$2 AND tanggal=$3
@@ -97,10 +125,9 @@ exports.catatAbsensiSantri = async (req, res) => {
 
     if (duplikat.rowCount > 0)
       return res.status(400).json({
-        message: "Absensi santri sudah tercatat untuk tanggal ini"
+        message: "Absensi sudah tercatat untuk tanggal ini"
       });
 
-    // ✅ INSERT DATA
     await db.query(`
       INSERT INTO absensi
       (id_santri, id_jadwal, tanggal, status_absensi, catatan)
@@ -169,7 +196,8 @@ exports.updateAbsensiSantri = async (req, res) => {
       FROM absensi a
       JOIN jadwal j ON a.id_jadwal = j.id_jadwal
       JOIN kelas k ON j.id_kelas = k.id_kelas
-      WHERE a.id_absensi = $1 AND k.id_pengajar = $2
+      WHERE a.id_absensi = $1
+  AND j.id_pengajar = $2
     `, [id_absensi, id_pengajar]);
 
     if (cek.rowCount === 0)
@@ -216,7 +244,7 @@ exports.getAbsensiKelasPengajar = async (req, res) => {
     JOIN santri s ON a.id_santri = s.id_santri
     JOIN jadwal j ON a.id_jadwal = j.id_jadwal
     JOIN kelas k ON j.id_kelas = k.id_kelas
-    WHERE k.id_pengajar = $1
+    WHERE j.id_pengajar = $1
     ORDER BY a.tanggal DESC
     `, [id_pengajar]);
 
@@ -274,59 +302,55 @@ exports.getAbsensiSantri = async (req, res) => {
 exports.catatAbsensiPengajar = async (req, res) => {
   try {
     const id_users = req.user.id_users;
-
-    // PERBAIKAN: Tambahkan fallback agar tidak mengirim undefined ke DB
-    // Pastikan nama field status_absensi sesuai dengan yang dikirim Frontend (cek Inspect -> Network)
     let { id_jadwal, tanggal, status_absensi, catatan } = req.body;
 
-    // Jika frontend mengirimkan dengan nama "status", kita tangkap di sini
     if (!status_absensi && req.body.status) {
-        status_absensi = req.body.status;
+      status_absensi = req.body.status;
     }
 
-    const tanggalFinal = tanggal || new Date().toISOString().split('T')[0];
+    if (!status_absensi)
+      return res.status(400).json({ message: "Status absensi harus dipilih" });
+
+    const tanggalFinal =
+      tanggal || new Date().toISOString().split("T")[0];
 
     const id_pengajar = await getIdPengajar(id_users);
     if (!id_pengajar)
       return res.status(403).json({ message: "Anda bukan pengajar" });
 
-    // Validasi dasar: Jangan biarkan status_absensi kosong sebelum masuk ke Query
-    if (!status_absensi) {
-      return res.status(400).json({ message: "Status absensi harus dipilih" });
-    }
-
-    // 🔒 CEK JADWAL
+    // ✅ VALIDASI JADWAL MILIK PENGAJAR
     const cekJadwal = await db.query(`
-      SELECT j.id_jadwal
-      FROM jadwal j
-      JOIN kelas k ON j.id_kelas = k.id_kelas
-      WHERE j.id_jadwal = $1 AND k.id_pengajar = $2
+      SELECT 1
+      FROM jadwal
+      WHERE id_jadwal = $1
+        AND id_pengajar = $2
     `, [id_jadwal, id_pengajar]);
 
     if (cekJadwal.rowCount === 0)
       return res.status(403).json({ message: "Jadwal bukan milik Anda" });
 
-    // 🔒 CEK DUPLIKAT
+    // ✅ CEK DUPLIKAT
     const cekDuplikat = await db.query(`
       SELECT 1 FROM absensi_pengajar
       WHERE id_pengajar=$1 AND id_jadwal=$2 AND tanggal=$3
     `, [id_pengajar, id_jadwal, tanggalFinal]);
 
     if (cekDuplikat.rowCount > 0)
-      return res.status(400).json({ message: "Absensi pengajar sudah tercatat untuk tanggal ini" });
+      return res.status(400).json({
+        message: "Absensi pengajar sudah tercatat untuk tanggal ini"
+      });
 
-    // ✅ INSERT DATA - Pastikan menggunakan nilai default string kosong atau null yang valid
     const insert = await db.query(`
       INSERT INTO absensi_pengajar
       (id_pengajar, id_jadwal, tanggal, status_absensi, catatan)
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1,$2,$3,$4,$5)
       RETURNING *
     `, [
-        id_pengajar,
-        id_jadwal,
-        tanggalFinal,
-        status_absensi,
-        catatan || null // Jika catatan undefined, kirim null asli ke DB
+      id_pengajar,
+      id_jadwal,
+      tanggalFinal,
+      status_absensi,
+      catatan || null
     ]);
 
     res.json({
@@ -337,7 +361,7 @@ exports.catatAbsensiPengajar = async (req, res) => {
 
   } catch (err) {
     console.error("ABSENSI PENGAJAR ERROR:", err);
-    res.status(500).json({ message: "Server error: " + err.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 

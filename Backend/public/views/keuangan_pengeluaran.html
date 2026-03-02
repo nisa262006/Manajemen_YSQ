@@ -23,10 +23,26 @@
                 <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
                 <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
                 <div class="ysq-nav-group">
-                    <div class="menu-item ysq-report-toggle" id="laporan-btn">
+                    <div class="menu-item ysq-report-toggle" id="laporan-btn" style="position: relative;">
                         <span><i class="fas fa-file-alt"></i> Laporan</span>
+                        <span id="badge-notif-pembayaran" class="ysq-badge-notif">0</span> 
                         <i class="fas fa-chevron-down ysq-report-chevron"></i>
                     </div>
+                    <style>
+                        .ysq-badge-notif {
+                            background-color: #e74c3c; /* Warna merah */
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 6px;
+                            font-size: 10px;
+                            font-weight: bold;
+                            position: absolute;
+                            right: 35px; /* Sesuaikan posisi agar tidak menabrak panah */
+                            top: 50%;
+                            transform: translateY(-50%);
+                            display: none; /* Sembunyi secara default */
+                        }
+                        </style>
                     
                     <div id="laporan-submenu" class="ysq-report-submenu-wrapper ysq-active">
                         <a href="/dashboard/admin/laporan/keuangan-pemasukan">
@@ -53,36 +69,60 @@
             <header class="dashboard-header class-header-style">
                 <div class="header-left">
                     <h1 class="header-title">Laporan Pengeluaran Keuangan</h1>
-                    <p>Pantau semua biaya operasional dan pengeluaran yayasan secara transparan.</p>
+                    <p>Catatan transparan biaya operasional dan pengeluaran yayasan.</p>
                 </div>
                 <div class="ysq-inc-actions">
                     <button class="ysq-inc-btn ysq-btn-out-primary" onclick="openModalPengeluaran()">
                         <i class="fas fa-plus-circle"></i> Tambah Pengeluaran
                     </button>
+                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('pdf')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
                     <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('excel')">
-                        <i class="fas fa-file-excel"></i> Export laporan
+                        <i class="fas fa-file-excel"></i> Export Excel
                     </button>
                 </div>
             </header>
 
             <section class="ysq-inc-card ysq-inc-filter-box">
-                <div class="ysq-out-filter-row">
+                <div class="ysq-inc-filter-grid">
                     <div class="ysq-inc-form-group">
-                        <label>Urutan:</label>
-                        <select id="sort-pengeluaran" class="ysq-inc-input" onchange="sortDataPengeluaran()">
-                            <option value="desc">Terbaru ke Terlama</option>
-                            <option value="asc">Terlama ke Terbaru</option>
+                        <label for="ysq-out-date-start">Periode Awal:</label>
+                        <input type="date" id="ysq-out-date-start" class="ysq-inc-input">
+                    </div>
+                    <div class="ysq-inc-form-group">
+                        <label for="ysq-out-date-end">Periode Akhir:</label>
+                        <input type="date" id="ysq-out-date-end" class="ysq-inc-input">
+                    </div>
+                    <div class="ysq-inc-form-group">
+                        <label for="ysq-out-filter-cat">Kategori Pengeluaran:</label>
+                        <select id="ysq-out-filter-cat" class="ysq-inc-input">
+                            <option value="all">Semua Pengeluaran</option>
+                            <option value="Khafalah Guru">Khafalah Guru</option>
+                            <option value="Khafalah OB">Khafalah OB</option>
+                            <option value="Biaya Listrik">Biaya Listrik</option>
+                            <option value="Biaya WiFi">Biaya WiFi</option>
+                            <option value="Biaya Sewa Hosting/Sistem">Biaya Sewa Hosting/Sistem</option>
+                            <option value="Konsumsi">Konsumsi</option>
+                            <option value="Akomodasi/Transportasi">Akomodasi/Transportasi</option>
+                            <option value="Lainnya">Lain-lain (DLL)</option>
                         </select>
                     </div>
-
-
-                    <div class="ysq-inc-form-group">
-                        <label>Cari Pengeluaran:</label>
-                        <div class="ysq-search-wrapper">
-                            <input type="text" id="search-out" class="ysq-inc-input" placeholder="Cari keterangan..." onkeyup="searchPengeluaran()">
-                            <i class="fas fa-search ysq-search-icon"></i>
-                        </div>
+                    <div class="ysq-inc-form-group" style="min-width:250px;">
+                        <label>Pencarian:</label>
+                        <input type="text"
+                               id="ysq-search"
+                               class="ysq-inc-input"
+                               placeholder="Cari nama, kelas, kategori..."
+                        >
                     </div>
+                </div>
+            </section>
+
+            <section class="ysq-inc-summary-grid" style="grid-template-columns: 1fr;">
+                <div class="ysq-inc-stat-card ysq-inc-border-net" style="border-left-color: #e74c3c;">
+                    <span class="ysq-inc-stat-label">Total Pengeluaran Keseluruhan</span>
+                    <h2 id="ysq-total-pengeluaran">Rp 0</h2>
                 </div>
             </section>
 
@@ -91,7 +131,7 @@
                     <thead>
                         <tr>
                             <th>Tanggal</th>
-                            <th>Jenis Pengeluaran</th>
+                            <th>Kategori Pengeluaran</th>
                             <th>Keterangan</th>
                             <th>Nominal</th>
                         </tr>
@@ -111,26 +151,36 @@
             </div>
             <div class="ysq-modal-body">
                 <div class="ysq-inc-form-group">
-                    <label>Jenis Pengeluaran:</label>
-                    <input type="text" id="out-jenis" class="ysq-inc-input" placeholder="Gaji Guru, Operasional, dll">
+                    <label>Kategori Pengeluaran:</label>
+                    <select id="out-jenis" class="ysq-inc-input">
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Khafalah Guru">Khafalah Guru</option>
+                        <option value="Khafalah OB">Khafalah OB</option>
+                        <option value="Biaya Listrik">Biaya Listrik</option>
+                        <option value="Biaya WiFi">Biaya WiFi</option>
+                        <option value="Biaya Sewa Hosting/Sistem">Biaya Sewa Hosting/Sistem</option>
+                        <option value="Konsumsi">Konsumsi</option>
+                        <option value="Akomodasi/Transportasi">Akomodasi/Transportasi</option>
+                        <option value="Lainnya">Lain-lain (DLL)</option>
+                    </select>
                 </div>
                 <div class="ysq-inc-form-group">
-                    <label>Tanggal Keluar:</label>
+                    <label>Tanggal:</label>
                     <input type="date" id="out-tgl" class="ysq-inc-input">
                 </div>
                 <div class="ysq-inc-form-group">
                     <label>Nominal (Rp):</label>
-                    <input type="text" id="out-nominal" class="ysq-inc-input" placeholder="Contoh: 10.000" onkeyup="formatRupiah(this)">
+                    <input type="text" id="out-nominal" class="ysq-inc-input" placeholder="Contoh: 350.000" onkeyup="formatRupiah(this)">
                 </div>
                 <div class="ysq-inc-form-group">
                     <label>Keterangan Tambahan:</label>
-                    <textarea id="out-ket" class="ysq-inc-input" style="height: 60px;" placeholder="Opsional..."></textarea>
+                    <textarea id="out-ket" class="ysq-inc-input" style="height: 60px;" placeholder="Tulis rincian pengeluaran..."></textarea>
                 </div>
             </div>
             <div class="ysq-modal-footer">
                 <button class="ysq-inc-btn ysq-btn-secondary" onclick="closeModalPengeluaran()">Batal</button>
                 <button class="ysq-inc-btn ysq-btn-out-primary" onclick="savePengeluaran()">
-                    <i class="fas fa-save"></i> Simpan
+                    <i class="fas fa-save"></i> Simpan Pengeluaran
                 </button>
             </div>
         </div>
@@ -166,7 +216,11 @@
                 
             </div>
         </div>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
+        
+        <!-- TAMBAHKAN INI -->
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script type="module" src="/js/admin_pengeluaran.js"></script>
     <script type="module" src="/js/profileSetting.js"></script>
     <script type="module" src="/js/laporan.js"></script>

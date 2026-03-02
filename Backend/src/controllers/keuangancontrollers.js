@@ -6,8 +6,8 @@ const nodemailer = require("nodemailer");
 console.log("EMAIL_SENDER:", process.env.EMAIL_SENDER);
 console.log("EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD ? "ADA" : "TIDAK ADA");
 
-// ✅ BUAT TRANSPORTER KHUSUS UNTUK VERIFY SAAT START
-const testTransporter = nodemailer.createTransport({
+// ✅ TRANSPORTER GLOBAL (PAKAI SEKALI)
+const mailTransporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_SENDER,
@@ -15,15 +15,14 @@ const testTransporter = nodemailer.createTransport({
   }
 });
 
-// 🔎 Cek koneksi Gmail saat server start
-testTransporter.verify((error, success) => {
+// 🔎 VERIFY GMAIL SAAT SERVER START
+mailTransporter.verify((error, success) => {
   if (error) {
     console.error("❌ GMAIL CONNECTION ERROR:", error);
   } else {
     console.log("✅ GMAIL READY - Siap kirim email");
   }
 });
-
 
 exports.generateSPPMassal = async (req, res) => {
   try {
@@ -35,8 +34,8 @@ exports.generateSPPMassal = async (req, res) => {
       (id_santri, jenis, tipe, periode, nominal, sisa, status, tanggal_mulai, tanggal_selesai)
       SELECT
         s.id_santri,
-        'SPP',
-        'spp',
+        'INFAQ_BELAJAR',
+        'infaq_belajar',
         $1,
         CASE WHEN s.kategori='dewasa' THEN $2 ELSE $3 END,
         CASE WHEN s.kategori='dewasa' THEN $2 ELSE $3 END,
@@ -48,13 +47,13 @@ exports.generateSPPMassal = async (req, res) => {
       AND NOT EXISTS (
         SELECT 1 FROM billing_santri b
         WHERE b.id_santri = s.id_santri
-        AND b.jenis = 'SPP'
+        AND b.jenis = 'INFAQ_BELAJAR'
         AND b.periode = $1
       )
     `, [periode, nominal_dewasa, nominal_anak, tgl_mulai, tgl_selesai]);
 
 
-    res.json({ success: true, message: "SPP massal berhasil dibuat" });
+    res.json({ success: true, message: "Infaq Belajar massal berhasil dibuat" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -87,21 +86,24 @@ exports.getAllBilling = async (_, res) => {
       SELECT
         b.*,
         s.nama,
-        k.nama_kelas
+        COALESCE(
+          (SELECT k.nama_kelas 
+           FROM santri_jadwal sj 
+           JOIN jadwal j ON sj.id_jadwal = j.id_jadwal 
+           JOIN kelas k ON j.id_kelas = k.id_kelas 
+           WHERE sj.id_santri = s.id_santri 
+           LIMIT 1), 
+          '-'
+        ) AS nama_kelas
       FROM billing_santri b
       LEFT JOIN santri s ON b.id_santri = s.id_santri
-      -- Tambahkan JOIN ke kelas melalui santri_kelas
-      LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
-      LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
       ORDER BY b.created_at DESC
     `);
-
     res.json({ success: true, data: q.rows });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 exports.getBillingSantri = async (req, res) => {
   const q = await db.query(`
@@ -137,13 +139,23 @@ exports.createPembayaran = async (req, res) => {
       return res.status(400).json({ message: "Billing tidak ditemukan" });
     }
 
-    if (jumlah_bayar <= 0 || jumlah_bayar > b.rows[0].sisa) {
-      return res.status(400).json({ message: "Jumlah bayar tidak valid" });
-    }
-
     const billing = b.rows[0];
 
-    // INSERT pembayaran
+    const cekPending = await db.query(`
+      SELECT COALESCE(SUM(jumlah_bayar), 0) AS total_pending
+      FROM pembayaran
+      WHERE id_billing = $1 AND status = 'menunggu'
+    `, [id_billing]);
+
+    const totalPending = Number(cekPending.rows[0].total_pending);
+    const sisaEfektif = billing.sisa - totalPending;
+
+    if (jumlah_bayar <= 0 || jumlah_bayar > sisaEfektif) {
+      return res.status(400).json({
+        message: "Jumlah bayar tidak valid"
+      });
+    }
+
     await db.query(`
       INSERT INTO pembayaran
       (id_billing, id_santri, tanggal_bayar, jumlah_bayar, metode, kategori, jenis_pembayaran, status)
@@ -163,72 +175,64 @@ exports.createPembayaran = async (req, res) => {
       WHERE id_billing = $1 AND status != 'lunas'
     `, [id_billing]);
 
-    // ===============================
-    // 🔔 KIRIM EMAIL (SAMA POLA DENGAN RESET)
-    // ===============================
-
-    const detail = await db.query(`
-      SELECT s.nama, k.nama_kelas
-      FROM santri s
-      LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
-      LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
-      WHERE s.id_santri = $1
-    `, [billing.id_santri]);
-
-    const namaSantri = detail.rows[0]?.nama || "-";
-    const kelas = detail.rows[0]?.nama_kelas || "-";
-    const sisaBaru = billing.sisa - jumlah_bayar;
-
-    const admin = await db.query(`
-      SELECT email FROM users WHERE LOWER(role) = 'admin' LIMIT 1
-    `);
-
-    if (admin.rowCount > 0) {
-
-      // 🔥 BUAT TRANSPORTER DI DALAM FUNCTION (SAMA SEPERTI RESET)
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_SENDER,
-          pass: process.env.EMAIL_PASSWORD
-        }
-      });
-
-      await transporter.sendMail({
-        from: `"Sahabat Quran Bogor" <${process.env.EMAIL_SENDER}>`,
-        to: admin.rows[0].email,
-        subject: "Notifikasi Pembayaran Santri",
-        html: `
-          <h2>📥 Notifikasi Pembayaran Santri</h2>
-          <p><strong>Nama Santri:</strong> ${namaSantri}</p>
-          <p><strong>Kelas:</strong> ${kelas}</p>
-          <p><strong>Jenis Pembayaran:</strong> ${billing.jenis}</p>
-          <p><strong>Periode:</strong> ${billing.periode || billing.tipe}</p>
-          <p><strong>Nominal Bill:</strong> Rp ${new Intl.NumberFormat("id-ID").format(billing.nominal)}</p>
-          <p><strong>Jumlah Dibayar:</strong> Rp ${new Intl.NumberFormat("id-ID").format(jumlah_bayar)}</p>
-          <p><strong>Sisa Pembayaran:</strong> Rp ${new Intl.NumberFormat("id-ID").format(sisaBaru)}</p>
-          <br/>
-          <p style="color:red; font-weight:bold;">
-            Santri telah melakukan pembayaran, segera mengkonfirmasi pembayaran santri.
-          </p>
-        `
-      });
-
-      console.log("EMAIL NOTIF PEMBAYARAN TERKIRIM");
-    }
-
+    // 🔥 RESPONSE DIKIRIM DULU (BIAR CEPAT)
     res.json({
       success: true,
       message: "Pembayaran terkirim, menunggu verifikasi admin"
     });
+
+    // ===========================
+    // EMAIL JALAN DI BELAKANGAN
+    // ===========================
+    try {
+
+      const detail = await db.query(`
+        SELECT s.nama,
+               COALESCE(k.nama_kelas,'Tanpa Kelas') AS nama_kelas
+        FROM santri s
+        LEFT JOIN LATERAL (
+            SELECT k.nama_kelas
+            FROM santri_jadwal sj
+            JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+            JOIN kelas k ON k.id_kelas = j.id_kelas
+            WHERE sj.id_santri = s.id_santri
+            LIMIT 1
+        ) k ON TRUE
+        WHERE s.id_santri = $1
+      `, [billing.id_santri]);
+
+      const namaSantri = detail.rows[0]?.nama || "-";
+      const kelas = detail.rows[0]?.nama_kelas || "-";
+
+      const admin = await db.query(`
+        SELECT email FROM users
+        WHERE LOWER(role) = 'admin'
+        LIMIT 1
+      `);
+
+      if (admin.rowCount > 0) {
+        await mailTransporter.sendMail({
+          from: `"Sahabat Quran Bogor" <${process.env.EMAIL_SENDER}>`,
+          to: admin.rows[0].email,
+          subject: "Notifikasi Pembayaran Santri",
+          html: `
+            <h3>Pembayaran Baru</h3>
+            <p><b>Nama:</b> ${namaSantri}</p>
+            <p><b>Kelas:</b> ${kelas}</p>
+            <p><b>Jumlah:</b> Rp ${new Intl.NumberFormat("id-ID").format(jumlah_bayar)}</p>
+          `
+        });
+      }
+
+    } catch (emailErr) {
+      console.error("EMAIL ERROR:", emailErr);
+    }
 
   } catch (err) {
     console.error("CREATE PEMBAYARAN ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
-
-
 
 /* =====================================================
    SANTRI – RIWAYAT PEMBAYARAN
@@ -270,22 +274,44 @@ exports.getDetailPemasukan = async (req, res) => {
   try {
     const q = await db.query(`
       SELECT
-        p.tanggal_bayar AS tanggal,
+        TO_CHAR(p.tanggal_bayar, 'YYYY-MM-DD') AS tanggal,
         s.nama,
-        k.nama_kelas AS kelas,
+
+        -- 🔥 Ambil kelas dari jadwal aktif santri
+        COALESCE(k.nama_kelas, 'Tanpa Kelas') AS kelas,
+
         b.periode,
-        b.jenis AS kategori,
+
+        CASE 
+          WHEN b.jenis = 'INFAQ_BELAJAR' 
+            THEN 'Infaq Belajar'
+          WHEN b.jenis = 'INFAQ_LAINNYA' 
+            THEN 'Infaq ' || INITCAP(b.tipe)
+        END AS kategori,
+
+        p.metode AS metode_pembayaran,
         p.jumlah_bayar AS nominal
+
       FROM pembayaran p
       JOIN billing_santri b ON p.id_billing = b.id_billing
       JOIN santri s ON b.id_santri = s.id_santri
-      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
-      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
+
+      -- 🔥 AMBIL 1 KELAS SAJA (ANTI DUPLIKAT)
+      LEFT JOIN LATERAL (
+        SELECT k.nama_kelas
+        FROM santri_jadwal sj
+        JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+        JOIN kelas k ON k.id_kelas = j.id_kelas
+        WHERE sj.id_santri = s.id_santri
+        LIMIT 1
+      ) k ON TRUE
+
       WHERE p.status = 'lunas'
       ORDER BY p.tanggal_bayar DESC
     `);
 
     res.json({ success: true, data: q.rows });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -412,13 +438,15 @@ exports.getKeuanganSantriAdmin = async (req, res) => {
 ===================================================== */
 // Di keuangancontrollers.js
 exports.tambahBillingKelas = async (req, res) => {
-  const { id_kelas, jenis, tipe, periode_awal, periode_akhir, nominal } = req.body;
+  const { id_kelas, tipe, periode_awal, periode_akhir, nominal } = req.body;
 
   try {
-    const santriDiKelas = await db.query(
-      `SELECT id_santri FROM santri_kelas WHERE id_kelas = $1`,
-      [id_kelas]
-    );
+    const santriDiKelas = await db.query(`
+      SELECT DISTINCT sj.id_santri, sj.id_jadwal
+      FROM santri_jadwal sj
+      JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+      WHERE j.id_kelas = $1
+    `, [id_kelas]);
 
     if (!santriDiKelas.rowCount) {
       return res.status(400).json({ message: "Tidak ada santri di kelas ini" });
@@ -428,22 +456,26 @@ exports.tambahBillingKelas = async (req, res) => {
     let skipped = 0;
 
     for (const row of santriDiKelas.rows) {
+
       const cek = await db.query(`
         SELECT 1 FROM billing_santri
-        WHERE id_santri=$1 AND jenis='SPP' AND periode=$2
+        WHERE id_santri=$1 
+        AND jenis='INFAQ_BELAJAR' 
+        AND periode=$2
       `, [row.id_santri, periode_awal]);
 
       if (cek.rowCount > 0) {
         skipped++;
-        continue; // ⛔ STOP INSERT
+        continue;
       }
 
       await db.query(`
         INSERT INTO billing_santri
-        (id_santri, jenis, tipe, periode, nominal, sisa, tanggal_mulai, tanggal_selesai, status)
-        VALUES ($1,'SPP',$2,$3,$4,$4,$5,$6,'belum bayar')
+        (id_santri, id_jadwal, jenis, tipe, periode, nominal, sisa, tanggal_mulai, tanggal_selesai, status)
+        VALUES ($1, $2, 'INFAQ_BELAJAR', $3, $4, $5, $5, $6, $7, 'belum bayar')
       `, [
         row.id_santri,
+        row.id_jadwal,   // 🔥 WAJIB
         tipe,
         periode_awal,
         nominal,
@@ -456,17 +488,11 @@ exports.tambahBillingKelas = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Berhasil: ${success}, Dilewati (sudah ada): ${skipped}`
+      message: `Berhasil: ${success}, Dilewati: ${skipped}`
     });
 
   } catch (err) {
-    // Tangkap error UNIQUE constraint
-    if (err.code === "23505") {
-      return res.status(400).json({
-        message: "SPP periode ini sudah pernah dibuat"
-      });
-    }
-
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -487,7 +513,7 @@ exports.tambahBillingKelas = async (req, res) => {
         await db.query(`
           INSERT INTO billing_santri
           (id_santri, jenis, tipe, periode, nominal, sisa, tanggal_mulai, keterangan, status)
-          VALUES ($1, 'LAINNYA', $2, $3, $4, $4, $5, $6, 'belum bayar')
+          VALUES ($1, 'INFAQ_LAINNYA', $2, $3, $4, $4, $5, $6, 'belum bayar')
         `, [
           s.id_santri,
           nama_pembayaran,          // $2 → tipe
@@ -511,7 +537,7 @@ exports.konfirmasiPembayaranAdmin = async (req, res) => {
   const { id_pembayaran } = req.params;
 
   try {
-    // 1️⃣ Ambil id_billing dulu
+    // 1️⃣ Ambil pembayaran yang masih menunggu
     const p = await db.query(`
       SELECT id_billing, jumlah_bayar
       FROM pembayaran
@@ -520,146 +546,228 @@ exports.konfirmasiPembayaranAdmin = async (req, res) => {
     `, [id_pembayaran]);
 
     if (!p.rowCount) {
-      return res.status(400).json({ message: "Pembayaran tidak valid" });
+      return res.status(400).json({
+        message: "Pembayaran tidak valid atau sudah dikonfirmasi"
+      });
     }
 
     const { id_billing } = p.rows[0];
 
-    // 2️⃣ Konfirmasi pembayaran ini saja
+    // 2️⃣ Ubah pembayaran ini menjadi LUNAS
     await db.query(`
       UPDATE pembayaran
       SET status = 'lunas'
       WHERE id_pembayaran = $1
     `, [id_pembayaran]);
 
-    // 3️⃣ Hitung ulang TOTAL yang sudah lunas
+    // 3️⃣ 🔥 HAPUS / BATALKAN semua pembayaran lain yang masih menunggu untuk billing ini
+    await db.query(`
+      UPDATE pembayaran
+      SET status = 'dibatalkan'
+      WHERE id_billing = $1
+        AND status = 'menunggu'
+    `, [id_billing]);
+
+    // 4️⃣ Hitung total lunas
     const total = await db.query(`
-      SELECT COALESCE(SUM(jumlah_bayar),0) AS total
+      SELECT COALESCE(SUM(jumlah_bayar),0) AS total_lunas
       FROM pembayaran
       WHERE id_billing = $1
         AND status = 'lunas'
     `, [id_billing]);
 
-    const totalBayar = Number(total.rows[0].total);
+    const totalBayarLunas = Number(total.rows[0].total_lunas);
 
-    // 4️⃣ Ambil nominal asli billing
+    // 5️⃣ Ambil nominal asli billing
     const billing = await db.query(`
       SELECT nominal
       FROM billing_santri
       WHERE id_billing = $1
     `, [id_billing]);
 
-    const nominal = Number(billing.rows[0].nominal);
-    const sisaBaru = nominal - totalBayar;
+    const nominalAsli = Number(billing.rows[0].nominal);
+
+    // 6️⃣ Hitung sisa
+    const sisaHitung = nominalAsli - totalBayarLunas;
+    const sisaFinal = Math.max(0, sisaHitung);
 
     let statusBaru = "belum bayar";
-    if (sisaBaru <= 0) statusBaru = "lunas";
-    else if (totalBayar > 0) statusBaru = "nyicil";
 
-    // 5️⃣ Update billing berdasarkan hitungan ulang
+    if (sisaFinal <= 0) {
+      statusBaru = "lunas";
+    } else if (totalBayarLunas > 0) {
+      statusBaru = "nyicil";
+    }
+
+    // 7️⃣ Update billing
     await db.query(`
       UPDATE billing_santri
       SET sisa = $1,
           status = $2
       WHERE id_billing = $3
-    `, [sisaBaru, statusBaru, id_billing]);
+    `, [sisaFinal, statusBaru, id_billing]);
 
-    res.json({ success: true, message: "Pembayaran berhasil dikonfirmasi" });
+    res.json({
+      success: true,
+      message: "Pembayaran berhasil dikonfirmasi"
+    });
 
   } catch (err) {
+    console.error("KONFIRMASI ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
 
-
 exports.getPembayaranPerBilling = async (req, res) => {
   const { id_billing } = req.params;
 
-  // 1️⃣ Ambil info billing
-  const base = await db.query(`
-    SELECT jenis, tipe, periode
-    FROM billing_santri
-    WHERE id_billing = $1
-  `, [id_billing]);
+  try {
 
-  if (!base.rowCount) {
-    return res.status(404).json({ message: "Billing tidak ditemukan" });
-  }
+    const base = await db.query(`
+      SELECT jenis, tipe, periode
+      FROM billing_santri
+      WHERE id_billing = $1
+    `, [id_billing]);
 
-  const { jenis, tipe, periode } = base.rows[0];
+    if (!base.rowCount) {
+      return res.status(404).json({ message: "Billing tidak ditemukan" });
+    }
 
-  if (jenis === "SPP") {
+    const { jenis, tipe, periode } = base.rows[0];
+
+    // ======================================================
+    // 🔵 INFAQ BELAJAR
+    // ======================================================
+    if (jenis === "INFAQ_BELAJAR") {
+
+      const q = await db.query(`
+        SELECT
+          bs.id_billing,
+          s.id_santri,
+          s.nama,
+
+          COALESCE(k.nama_kelas, 'Tanpa Kelas') AS nama_kelas,
+
+          p.id_pembayaran,
+          p.jumlah_bayar,
+          p.status AS status_pembayaran,
+          bs.status AS status_billing
+
+        FROM billing_santri bs
+        JOIN santri s ON bs.id_santri = s.id_santri
+
+        LEFT JOIN LATERAL (
+            SELECT k.nama_kelas
+            FROM santri_jadwal sj
+            JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+            JOIN kelas k ON k.id_kelas = j.id_kelas
+            WHERE sj.id_santri = s.id_santri
+            LIMIT 1
+        ) k ON TRUE
+
+        LEFT JOIN pembayaran p
+          ON p.id_billing = bs.id_billing
+
+        WHERE bs.id_billing = $1
+        ORDER BY s.nama ASC, p.created_at ASC
+      `, [id_billing]);
+
+      return res.json({ success: true, data: q.rows });
+    }
+
+    // ======================================================
+    // 🟣 INFAQ LAINNYA
+    // ======================================================
     const q = await db.query(`
       SELECT
+        bs.id_billing,
         s.id_santri,
         s.nama,
+
+        COALESCE(k.nama_kelas, 'Tanpa Kelas') AS nama_kelas,
+
         p.id_pembayaran,
         p.jumlah_bayar,
         p.status AS status_pembayaran,
         bs.status AS status_billing
+
       FROM billing_santri bs
       JOIN santri s ON bs.id_santri = s.id_santri
+
+      LEFT JOIN LATERAL (
+          SELECT k.nama_kelas
+          FROM santri_jadwal sj
+          JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+          JOIN kelas k ON k.id_kelas = j.id_kelas
+          WHERE sj.id_santri = s.id_santri
+          LIMIT 1
+      ) k ON TRUE
+
       LEFT JOIN pembayaran p
         ON p.id_billing = bs.id_billing
-      WHERE bs.id_billing = $1
-      ORDER BY p.created_at ASC
-    `, [id_billing]);
 
-    return res.json({ success: true, data: q.rows });
-  }
+      WHERE bs.jenis = 'INFAQ_LAINNYA'
+        AND bs.tipe = $1
+        AND bs.periode = $2
 
-  const q = await db.query(`
-    SELECT
-      bs.id_billing,
-      s.nama,
-      k.nama_kelas,
-      p.id_pembayaran,
-      p.jumlah_bayar,
-      p.status AS status_pembayaran,
-      bs.status AS status_billing
-    FROM billing_santri bs
-    JOIN santri s ON bs.id_santri = s.id_santri
-    LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
-    LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
-    LEFT JOIN pembayaran p
-      ON p.id_billing = bs.id_billing
-    WHERE bs.jenis = 'LAINNYA'
-      AND bs.tipe = $1
-      AND bs.periode = $2
-    ORDER BY s.nama ASC, p.created_at ASC
-  `, [tipe, periode]);
-
-  res.json({ success: true, data: q.rows });
-};
-
-
-// GET /api/keuangan/billing/lainnya/detail
-exports.getDetailBillingLainnya = async (req, res) => {
-  const { tipe, periode } = req.query;
-
-  try {
-    const q = await db.query(`
-      SELECT
-        b.id_billing,
-        s.nama,
-        p.id_pembayaran,
-        p.jumlah_bayar,
-        p.status AS status_pembayaran,
-        b.status AS status_billing
-      FROM billing_santri b
-      JOIN santri s ON b.id_santri = s.id_santri
-      LEFT JOIN pembayaran p
-        ON p.id_billing = b.id_billing
-      WHERE b.jenis = 'LAINNYA'
-        AND b.tipe = $1
-        AND b.periode = $2
       ORDER BY s.nama ASC, p.created_at ASC
     `, [tipe, periode]);
 
     res.json({ success: true, data: q.rows });
 
   } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /api/keuangan/billing/lainnya/detail
+// GET /api/keuangan/billing/lainnya/detail
+exports.getDetailBillingLainnya = async (req, res) => {
+  const { tipe, periode } = req.query;
+
+  try {
+
+    const q = await db.query(`
+      SELECT 
+        b.id_billing,
+        s.nama,
+
+        COALESCE(k.nama_kelas, 'Tanpa Kelas') AS nama_kelas,
+
+        p.id_pembayaran,
+        p.jumlah_bayar,
+        p.status AS status_pembayaran,
+        b.status AS status_billing,
+        b.nominal AS total_tagihan
+
+      FROM billing_santri b
+      JOIN santri s ON b.id_santri = s.id_santri
+
+      LEFT JOIN LATERAL (
+          SELECT k.nama_kelas
+          FROM santri_jadwal sj
+          JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+          JOIN kelas k ON k.id_kelas = j.id_kelas
+          WHERE sj.id_santri = s.id_santri
+          LIMIT 1
+      ) k ON TRUE
+
+      LEFT JOIN pembayaran p 
+        ON p.id_billing = b.id_billing
+
+      WHERE b.jenis = 'INFAQ_LAINNYA'
+        AND b.tipe = $1
+        AND b.periode = $2
+
+      ORDER BY s.nama ASC, p.created_at ASC
+    `, [tipe, periode]);
+
+    res.json({ success: true, data: q.rows });
+
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -669,38 +777,50 @@ exports.getDetailBillingLainnya = async (req, res) => {
 ===================================================== */
 exports.getNotifikasiPembayaran = async (req, res) => {
   try {
-
     const q = await db.query(`
-      SELECT
+      SELECT 
         b.jenis,
-        COUNT(*) AS total
-      FROM pembayaran p
-      JOIN billing_santri b ON p.id_billing = b.id_billing
+        b.tipe,
+        COUNT(p.id_pembayaran) AS total
+      FROM billing_santri b
+      JOIN pembayaran p 
+        ON p.id_billing = b.id_billing
       WHERE p.status = 'menunggu'
-      GROUP BY b.jenis
+        AND b.status != 'lunas'
+      GROUP BY b.jenis, b.tipe
     `);
 
-    let spp = 0;
-    let lainnya = 0;
+    const result = [];
+    let totalAll = 0;
 
     q.rows.forEach(row => {
-      if (row.jenis === "SPP") {
-        spp = Number(row.total);
-      }
-      if (row.jenis === "LAINNYA") {
-        lainnya = Number(row.total);
+      const total = parseInt(row.total);
+      totalAll += total;
+
+      if (row.jenis === "INFAQ_BELAJAR") {
+        result.push({
+          nama: "Infaq Belajar",
+          total
+        });
+      } else {
+        result.push({
+          nama: `Infaq ${row.tipe}`,
+          total
+        });
       }
     });
 
     res.json({
       success: true,
-      spp,
-      lainnya,
-      total: spp + lainnya
+      total: totalAll,
+      detail: result
     });
 
   } catch (err) {
     console.error("NOTIF ERROR:", err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 };

@@ -6,7 +6,7 @@ const token = localStorage.getItem("token");
 let filterState = {
   kategori: "",
   id_kelas: "",
-  periode: ""
+  periode: "ALL" // default semua periode
 };
 
 // ================= ON LOAD =================
@@ -40,19 +40,34 @@ function generatePeriodeFilter() {
   if (!select) return;
 
   const now = new Date();
-  const y = now.getFullYear();
+  const month = now.getMonth() + 1; // 1-12
+  const year = now.getFullYear();
+  
+  // Tentukan Periode Berjalan
+  // Ganjil: Juli (7) - Desember (12)
+  // Genap: Januari (1) - Juni (6)
+  let currentPeriode = "";
+  if (month >= 7 && month <= 12) {
+    currentPeriode = `Ganjil ${year}/${year + 1}`;
+  } else {
+    currentPeriode = `Genap ${year - 1}/${year}`;
+  }
 
-  const list = [
-    `Ganjil ${y - 1}/${y}`,
-    `Genap ${y - 1}/${y}`,
-    `Ganjil ${y}/${y + 1}`,
-    `Genap ${y}/${y + 1}`
-  ];
+  // Update State agar saat pertama kali load, filter ini yang dipakai
+  filterState.periode = currentPeriode;
 
-  select.innerHTML = `<option value="">-- Semua Periode --</option>`;
-  list.forEach(p => {
-    select.innerHTML += `<option value="${p}">${p}</option>`;
-  });
+  let options = `<option value="ALL">-- Semua Periode --</option>`;
+  
+  // Buat list dinamis (3 tahun ke belakang sampai 1 tahun ke depan)
+  for (let i = year - 2; i <= year + 1; i++) {
+    const pGanjil = `Ganjil ${i}/${i + 1}`;
+    const pGenap = `Genap ${i}/${i + 1}`;
+    
+    options += `<option value="${pGanjil}" ${pGanjil === currentPeriode ? 'selected' : ''}>${pGanjil}</option>`;
+    options += `<option value="${pGenap}" ${pGenap === currentPeriode ? 'selected' : ''}>${pGenap}</option>`;
+  }
+
+  select.innerHTML = options;
 }
 
 // ambil periode real dari server (rapor yg sudah ada)
@@ -64,15 +79,19 @@ async function loadPeriodeLaporan() {
     const res = await fetch(`${API}/rapor/laporan/periode`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    const data = await res.json();
+    const data = await res.json(); // Ini akan memanggil getPeriodePengajar di backend
 
     data.forEach(p => {
+      // Cek jika periode dari DB belum ada di dropdown, maka tambahkan
       if (![...select.options].some(o => o.value === p)) {
-        select.innerHTML += `<option value="${p}">${p}</option>`;
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        select.appendChild(opt);
       }
     });
   } catch (err) {
-    console.error("Gagal load periode:", err);
+    console.error("Gagal load periode database:", err);
   }
 }
 
@@ -112,15 +131,25 @@ async function loadRekapLaporan() {
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="5" style="text-align:center;">Memuat data...</td>
+      <td colspan="6" style="text-align:center;">Memuat data...</td>
     </tr>
   `;
 
   try {
     const params = new URLSearchParams();
-    if (filterState.periode) params.append("periode", filterState.periode);
-    if (filterState.id_kelas) params.append("id_kelas", filterState.id_kelas);
-    if (filterState.kategori) params.append("kategori", filterState.kategori);
+
+    // 🔥 HANYA kirim periode kalau bukan ALL
+    if (filterState.periode && filterState.periode !== "ALL") {
+      params.append("periode", filterState.periode);
+    }
+
+    if (filterState.id_kelas) {
+      params.append("id_kelas", filterState.id_kelas);
+    }
+
+    if (filterState.kategori) {
+      params.append("kategori", filterState.kategori);
+    }
 
     const res = await fetch(
       `${API}/rapor/laporan/rekap-pengajar?${params.toString()}`,
@@ -142,50 +171,33 @@ async function loadRekapLaporan() {
     // ====== TABEL ======
     tbody.innerHTML = "";
 
-    if (!data.list || data.list.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" style="text-align:center;">Data tidak ditemukan</td>
-        </tr>
-      `;
-      return;
-    }
-
     data.list.forEach(row => {
-      const statusClass =
-        row.status_rapor === "Selesai" ? "status-done" : "status-pending";
-
+      const statusClass = row.status_rapor === "Selesai" ? "status-done" : "status-pending";
+    
       tbody.innerHTML += `
         <tr>
           <td style="text-align:left;">${row.nama_santri}</td>
-          <td>${row.nilai_tahsin ?? 0}</td>
-          <td>${row.juz_tahfidz ?? 0}</td>
-          <td>${row.nilai_presensi ?? 0}%</td>
+          <td>${row.nilai_tahsin}</td>
+          <td>${row.nilai_tahfidz}</td> <td>${row.nilai_presensi}%</td>
           <td>
-  <span class="ysq-badge-status ${statusClass}">
-    ${row.status_rapor}
-  </span>
-</td>
-
-<td>
-${
-  row.status_rapor === "Selesai"
-    ? `<button class="btn-detail-rapor"
-        onclick="lihatDetailRapor('${row.id_santri}')">
-        Detail
-       </button>`
-    : "-"
-}
-</td>
-
+            <span class="ysq-badge-status ${statusClass}">
+              ${row.status_rapor}
+            </span>
+          </td>
+          <td>
+            <button class="btn-detail-rapor" onclick="lihatDetailRapor('${row.id_santri}')">
+              Detail
+            </button>
+          </td>
         </tr>
       `;
     });
+
   } catch (err) {
     console.error("Gagal load laporan:", err);
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center;color:red;">
+        <td colspan="6" style="text-align:center;color:red;">
           Terjadi kesalahan memuat data
         </td>
       </tr>
@@ -263,7 +275,7 @@ window.exportToExcel = async function () {
             i + 1,
             row.nama_santri,
             row.nilai_tahsin ?? 0,
-            row.juz_tahfidz ?? 0,
+            row.nilai_tahfidz ?? 0, // Gunakan nilai_tahfidz
             row.nilai_presensi ?? 0,
             row.status_rapor
           ]);
@@ -345,8 +357,8 @@ window.exportToExcel = async function () {
   
       const periode = document.getElementById("filter-periode")?.value;
   
-      if (!periode) {
-        alert("Pilih periode terlebih dahulu");
+      if (!periode || periode === "ALL") {
+        alert("Pilih periode spesifik untuk melihat detail");
         return;
       }
   

@@ -147,7 +147,8 @@ async function loadDashboardData() {
             const detail = await fetchJSON(`${BASE_URL}/kelas/pengajar/detail/${k.id_kelas}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            document.querySelectorAll(".jumlah_santri").forEach(el => el.textContent = `${detail?.santri?.length || 0} Santri`);
+            document.querySelectorAll(".jumlah_santri")
+  .forEach(el => el.textContent = `${detail?.data?.length || 0} Santri`);
         }
 
         const jadwalRes = await fetchJSON(`${BASE_URL}/jadwal/pengajar/me`, {
