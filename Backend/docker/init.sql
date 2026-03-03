@@ -303,6 +303,18 @@ WHERE status IS NULL
    OR status = 'belum';
 
 
+CREATE SCHEMA IF NOT EXISTS warehouse;
+
+CREATE TABLE IF NOT EXISTS warehouse.rekap_keuangan_bulanan (
+    bulan VARCHAR(7),
+    total_pemasukan BIGINT,
+    total_pengeluaran BIGINT,
+    total_infaq BIGINT,
+    laba_bersih BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 -- insert
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin1@ysq.com', '$2a$12$a8YvFLJ3dhQJaPCdHgeY7Og62137S9KOqbImtWBMipqCzaIf3VRM.', 'admin', 'aktif', 'admin1');
