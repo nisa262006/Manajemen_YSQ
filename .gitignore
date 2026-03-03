@@ -18,6 +18,10 @@ pgdata/
 # Logs
 npm-debug.log*
 
+# Database Backup
+backup/
+*.sql
+
 # ========================================
 #  UPLOADS (Hanya simpan struktur & file awal klien)
 # ========================================
