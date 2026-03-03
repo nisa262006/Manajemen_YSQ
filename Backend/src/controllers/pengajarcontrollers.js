@@ -127,11 +127,11 @@ exports.getAllPengajar = async (req, res) => {
         p.no_kontak,
         p.status,
         p.mapel,
-        -- Menggabungkan banyak kelas menjadi satu string, jika tidak ada tampilkan '-'
-        COALESCE(STRING_AGG(k.nama_kelas, ', '), '-') AS nama_kelas
+        COALESCE(STRING_AGG(DISTINCT k.nama_kelas, ', '), '-') AS nama_kelas
       FROM pengajar p
-      LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
-      GROUP BY p.id_pengajar -- Wajib menggunakan GROUP BY karena ada STRING_AGG
+      LEFT JOIN jadwal j ON j.id_pengajar = p.id_pengajar
+      LEFT JOIN kelas k ON k.id_kelas = j.id_kelas
+      GROUP BY p.id_pengajar
       ORDER BY p.id_pengajar ASC
     `);
 
@@ -157,14 +157,14 @@ exports.getPengajarById = async (req, res) => {
         p.*,
         u.username,
         u.email AS user_email,
-    
-        k.id_kelas,
-        k.nama_kelas
+        COALESCE(STRING_AGG(DISTINCT k.nama_kelas, ', '), '-') AS nama_kelas
       FROM pengajar p
       LEFT JOIN users u ON p.id_users = u.id_users
-      LEFT JOIN kelas k ON k.id_pengajar = p.id_pengajar
+      LEFT JOIN jadwal j ON j.id_pengajar = p.id_pengajar
+      LEFT JOIN kelas k ON k.id_kelas = j.id_kelas
       WHERE p.id_pengajar = $1
-    `, [id_pengajar]);    
+      GROUP BY p.id_pengajar, u.username, u.email
+    `, [id_pengajar]);   
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: "Pengajar tidak ditemukan" });
@@ -201,7 +201,9 @@ exports.updatePengajar = async (req, res) => {
       confirmPassword
     } = req.body;
 
+    // ===============================
     // Ambil data lama
+    // ===============================
     const check = await db.query(`
       SELECT p.*, u.email AS user_email, u.username 
       FROM pengajar p
@@ -219,7 +221,7 @@ exports.updatePengajar = async (req, res) => {
     let changes = {};
 
     // ===============================
-    // Update Password (opsional)
+    // UPDATE PASSWORD (opsional)
     // ===============================
     if (password || confirmPassword) {
       if (password !== confirmPassword) {
@@ -237,7 +239,34 @@ exports.updatePengajar = async (req, res) => {
     }
 
     // ===============================
-    // Data pengajar yang boleh diupdate
+    // UPDATE EMAIL USERS (sinkron)
+    // ===============================
+    if (email && email !== oldData.user_email) {
+      // cek email unik
+      const cekEmail = await db.query(
+        `SELECT id_users FROM users WHERE email=$1 AND id_users<>$2`,
+        [email, id_users]
+      );
+
+      if (cekEmail.rowCount > 0) {
+        return res.status(400).json({
+          message: "Email sudah digunakan akun lain"
+        });
+      }
+
+      await db.query(
+        `UPDATE users SET email=$1 WHERE id_users=$2`,
+        [email, id_users]
+      );
+
+      changes.user_email = {
+        old: oldData.user_email,
+        new: email
+      };
+    }
+
+    // ===============================
+    // TRACK PERUBAHAN DATA PENGAJAR
     // ===============================
     const updatePengajar = {
       nama,
@@ -250,18 +279,20 @@ exports.updatePengajar = async (req, res) => {
       status
     };
 
-    // Track perubahan
     for (let key in updatePengajar) {
       if (
         updatePengajar[key] !== undefined &&
         updatePengajar[key] !== oldData[key]
       ) {
-        changes[key] = { old: oldData[key], new: updatePengajar[key] };
+        changes[key] = {
+          old: oldData[key],
+          new: updatePengajar[key]
+        };
       }
     }
 
     // ===============================
-    // EKSEKUSI UPDATE
+    // UPDATE DATA PENGAJAR
     // ===============================
     await db.query(
       `UPDATE pengajar SET 
@@ -290,7 +321,7 @@ exports.updatePengajar = async (req, res) => {
     return res.json({
       message: "Pengajar berhasil diperbarui",
       id_pengajar,
-      nip: oldData.nip,   // ⬅ nip hanya dibaca, tidak membuat variabel baru!
+      nip: oldData.nip,
       updated_fields: changes
     });
 
@@ -326,7 +357,7 @@ exports.deletePengajar = async (req, res) => {
     // 2. LEPASKAN pengajar dari tabel kelas (Set id_pengajar menjadi NULL)
     // Ini agar data kelas tidak ikut terhapus, tapi pengajarnya hilang
     await client.query(
-      `UPDATE kelas SET id_pengajar = NULL WHERE id_pengajar = $1`,
+      `UPDATE jadwal SET id_pengajar = NULL WHERE id_pengajar = $1`,
       [id_pengajar]
     );
 

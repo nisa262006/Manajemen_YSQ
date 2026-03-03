@@ -2,7 +2,7 @@
    CONFIG & STATE
 ===================================================== */
 const BASE_URL = "/api";
-let selectedKelas = null;
+let selectedJadwal = null;
 let userRole = null;
 
 // State Management
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // GANTI MENJADI INI
     initElements();
-    await loadDaftarSemuaKelas(); // Fungsi baru untuk ambil semua kelas
+    await loadDaftarSemuaJadwal(); // Fungsi baru untuk ambil semua kelas
   } catch (err) {
     alert(err.message || "Akses ditolak");
     window.location.href = "/login";
@@ -66,7 +66,7 @@ function initElements() {
   setToday(); 
   
   kelasSelect?.addEventListener("change", () => {
-    selectedKelas = kelasSelect.value;
+    selectedJadwal = kelasSelect.value;
     loadMateri();
   });
 
@@ -94,54 +94,46 @@ function validateFileSize(file, maxMb = 10) {
 /* =====================================================
    LOGIKA JADWAL & TABEL
 ===================================================== */
-async function loadDaftarSemuaKelas() {
+async function loadDaftarSemuaJadwal() {
   if (!kelasSelect) return;
-  
-  kelasSelect.innerHTML = `<option value="">-- Pilih Kelas --</option>`;
+
+  kelasSelect.innerHTML = `<option value="">-- Pilih Sesi --</option>`;
 
   try {
-    const jadwal = await fetchWithAuth("/jadwal/pengajar/me");
+    const jadwalList = await fetchWithAuth("/jadwal/pengajar/me");
 
-    const uniqueKelas = [];
-    const map = new Map();
-    for (const item of jadwal) {
-      if(!map.has(item.id_kelas)){
-          map.set(item.id_kelas, true);
-          uniqueKelas.push(item);
-      }
-    }
-
-    if (!uniqueKelas.length) {
-      tableBody.innerHTML = `<tr><td colspan="6" align="center">Anda belum memiliki kelas</td></tr>`;
+    if (!jadwalList.length) {
+      tableBody.innerHTML = `<tr><td colspan="6" align="center">Anda belum memiliki sesi</td></tr>`;
       return;
     }
 
-    uniqueKelas.forEach(k => {
+    jadwalList.forEach(j => {
       const opt = document.createElement("option");
-      opt.value = k.id_kelas;
-      opt.textContent = k.nama_kelas; 
+      opt.value = j.id_jadwal;
+      opt.textContent = `${j.nama_kelas} - ${j.hari} (${j.jam_mulai} - ${j.jam_selesai})`;
       kelasSelect.appendChild(opt);
     });
 
-    if (uniqueKelas.length > 0) {
-        // Otomatis pilih kelas pertama agar tabel tidak kosong
-        kelasSelect.value = uniqueKelas[0].id_kelas;
-        selectedKelas = uniqueKelas[0].id_kelas;
-        loadMateri(); 
-    }
+    // auto select first sesi
+    kelasSelect.value = jadwalList[0].id_jadwal;
+    selectedJadwal = jadwalList[0].id_jadwal;
+    loadMateri();
 
   } catch (err) {
-    console.error("Gagal memuat daftar kelas:", err);
+    console.error("Gagal load jadwal:", err);
   }
 }
 
 // Di materi-ajar.js
 async function loadMateri() {
-  if (!selectedKelas || !tableBody) return;
+  if (!selectedJadwal || !tableBody) return;
+
   tableBody.innerHTML = `<tr><td colspan="6" align="center">Memuat materi...</td></tr>`;
 
   try {
-    const materi = await fetchWithAuth(`/tugas-media/materi/kelas/${selectedKelas}/pengajar`);
+    const materi = await fetchWithAuth(
+      `/tugas-media/materi/jadwal/${selectedJadwal}/pengajar`
+    );
     console.log("Data Materi dari Server:", materi); // CEK DI CONSOLE F12
     window.currentMateriList = materi; 
 
@@ -236,7 +228,9 @@ window.lihatDetail = async (idMateri) => {
 
   let tugasRes = [];
   try {
-    tugasRes = await fetchWithAuth(`/tugas-media/tugas/materi/${activeMateriId}`);
+    tugasRes = await fetchWithAuth(
+      `/tugas-media/tugas/materi/${activeMateriId}`
+    );
   } catch (err) {
     console.warn("Info: Materi ini belum memiliki tugas.");
     tugasRes = []; // Set array kosong agar renderTugasInfo tahu tugas memang tidak ada
@@ -433,7 +427,7 @@ window.handleKirimTugas = async () => {
 
   isSubmittingTugas = true;
   const formData = new FormData();
-  formData.append("id_kelas", selectedKelas);
+  formData.append("id_jadwal", selectedJadwal);
   formData.append("id_materi", activeMateriId);
   formData.append("deskripsi", desc);
   
@@ -492,7 +486,7 @@ await lihatDetail(activeMateriId)
    MODAL CONTROLS
 ===================================================== */
 window.openMateriModal = () => {
-  if (!selectedKelas) return alert("Pilih kelas terlebih dahulu");
+  if (!selectedJadwal) return alert("Pilih sesi terlebih dahulu");
   document.getElementById("modalMateri").style.display = "flex";
 };
 window.closeMateriModal = () => {
@@ -582,7 +576,7 @@ document.getElementById("formMateri").addEventListener("submit", async (e) => {
     formData.append("tanggal_manual", tglInput.value);
   }
 
-  formData.append("id_kelas", selectedKelas);
+  formData.append("id_jadwal", selectedJadwal);
   formData.append("judul", document.getElementById("judulMateri").value);
   formData.append("deskripsi", document.getElementById("deskripsiMateri").value);
   formData.append("tipe_konten", tipeKontenValue);

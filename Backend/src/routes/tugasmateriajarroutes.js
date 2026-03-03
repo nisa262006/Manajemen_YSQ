@@ -6,7 +6,11 @@ const ctrl = require("../controllers/tugasmateriajarcontrollers");
 
 // --- MATERI ---
 router.post("/materi", verifyToken, onlyPengajar, upload.single("file"), ctrl.uploadMateri);
-router.get("/materi/kelas/:id/pengajar", verifyToken, onlyPengajar, ctrl.getMateriByKelasPengajar);
+router.get("/materi/jadwal/:id_jadwal/pengajar",
+  verifyToken,
+  onlyPengajar,
+  ctrl.getMateriByJadwalPengajar
+);
 
 // Perbaikan PUT Materi (Tambahkan upload.single jika ingin bisa ganti file saat edit)
 router.put("/materi/:id", verifyToken, onlyPengajar, upload.single("file"), ctrl.updateMateri);
@@ -26,11 +30,12 @@ router.get(
 
 // --- SANTRI ---
 router.get(
-  "/materi/kelas/:id_kelas",
+  "/materi/jadwal/:id_jadwal",
   verifyToken,
   onlySantri,
-  ctrl.getMateriByKelasForSantri
+  ctrl.getMateriByJadwalForSantri
 );
+
 router.get("/tugas/kelas/:id", verifyToken, onlySantri, ctrl.getTugasByKelas);
 router.post(
   "/tugas/submit",
@@ -45,6 +50,13 @@ router.get(
   verifyToken,
   onlySantri,
   ctrl.getMySubmission
+);
+
+router.get(
+  "/materi/jadwal/:id_jadwal",
+  verifyToken,
+  onlySantri,
+  ctrl.getMateriByJadwal
 );
 
 module.exports = router;

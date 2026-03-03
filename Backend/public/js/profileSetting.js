@@ -257,3 +257,67 @@ window.handleSimpanProfil = async function() {
 
 // Jalankan saat halaman pertama kali dimuat
 document.addEventListener("DOMContentLoaded", loadProfileData);
+
+
+/* ============================================================
+   GLOBAL NOTIFIKASI PEMBAYARAN (FIXED)
+============================================================ */
+async function checkGlobalNotifPembayaran() {
+    try {
+        // SESUAIKAN: Jika apiService Anda otomatis menambah /api, 
+        // maka gunakan path lengkap setelah /api. 
+        // Contoh: /keuangan/notifikasi/pembayaran
+        const res = await apiGet("/keuangan/notifikasi/pembayaran");
+
+        if (res && res.success) {
+            const total = res.total || 0;
+            const badge = document.getElementById("badge-notif-pembayaran");
+
+            if (badge) {
+                if (total > 0) {
+                    badge.innerText = total;
+                    badge.style.display = "flex"; // Munculkan angka
+                } else {
+                    badge.style.display = "none"; // Sembunyikan jika 0
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Gagal mengambil notifikasi:", err);
+    }
+}
+
+// Tambahkan pemanggilan ini di dalam DOMContentLoaded profileSetting.js
+document.addEventListener("DOMContentLoaded", () => {
+    // Fungsi load profile yang sudah ada...
+    loadProfileData(); 
+    
+    // Panggil notifikasi
+    checkGlobalNotifPembayaran();
+    
+    // Cek ulang setiap 1 menit agar data tetap update (real-time kecil)
+    setInterval(checkGlobalNotifPembayaran, 60000);
+});
+
+/* ============================================================
+   FUNGSI GLOBAL UNTUK UPDATE BADGE (BISA DIPANGGIL MANUAL)
+============================================================ */
+export async function refreshNotifBadge() {
+    try {
+        // Gunakan path yang sesuai dengan router Anda
+        const res = await apiGet("/keuangan/notifikasi/pembayaran");
+        const badge = document.getElementById("badge-notif-pembayaran");
+        
+        if (res && res.success && badge) {
+            const total = res.total || 0;
+            if (total > 0) {
+                badge.innerText = total;
+                badge.style.display = "flex";
+            } else {
+                badge.style.display = "none";
+            }
+        }
+    } catch (err) {
+        console.error("Gagal refresh badge:", err);
+    }
+}

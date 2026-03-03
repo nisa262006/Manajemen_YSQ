@@ -25,8 +25,37 @@
       <a href="/dashboard/daftar-santri" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
       <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
       <a href="/dashboard/riwayat-absensi" class="menu-item active"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
-      <a href="#" class="menu-item" data-dev="true"><i class="fas fa-scroll"></i> Rapor</a>
-      <a href="#" class="menu-item" data-dev="true"><i class="fas fa-file-alt"></i> Laporan</a>
+      <div class="ysq-nav-group">
+        <div class="menu-item ysq-report-toggle" id="laporan-btn" style="position: relative;">
+          <span><i class="fas fa-file-alt"></i> Laporan</span>
+          <span id="badge-notif-pembayaran" class="ysq-badge-notif">0</span> 
+          <i class="fas fa-chevron-down ysq-report-chevron"></i>
+      </div>
+      <style>
+          .ysq-badge-notif {
+              background-color: #e74c3c; /* Warna merah */
+              color: white;
+              border-radius: 50%;
+              padding: 2px 6px;
+              font-size: 10px;
+              font-weight: bold;
+              position: absolute;
+              right: 35px; /* Sesuaikan posisi agar tidak menabrak panah */
+              top: 50%;
+              transform: translateY(-50%);
+              display: none; /* Sembunyi secara default */
+          }
+          </style>
+        
+        <div id="laporan-submenu" class="ysq-report-submenu-wrapper">
+          <a href="/dashboard/admin/laporan/keuangan-pemasukan">
+            <i class="fas fa-arrow-circle-down"></i> Keuangan Pemasukan
+          </a>
+          
+          <a href="/dashboard/admin/laporan/keuangan-pengeluaran">
+            <i class="fas fa-arrow-circle-up"></i> Keuangan Pengeluaran
+          </a>          
+        </div>
   </nav>
   <div class="sidebar-footer">
       <div class="footer-buttons-wrapper"> 
@@ -143,5 +172,6 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script type="module" src="/js/admin_laporan.js"></script>
 <script type="module" src="/js/profileSetting.js"></script>
+<script type="module" src="/js/laporan.js"></script>
 </body>
 </html>

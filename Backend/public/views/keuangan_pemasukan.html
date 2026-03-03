@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Pemasukan - Sahabat Quran</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="/images/LogoYSQ.png" alt="Sahabat Quran" class="logo-img">
+            </div>
+            
+            <nav class="menu">
+                <a href="/dashboard/Admin" class="menu-item"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="/dashboard/daftar-jadwal" class="menu-item"><i class="fas fa-calendar-alt"></i> Daftar Jadwal</a>
+                <a href="/dashboard/daftar-kelas" class="menu-item"><i class="fas fa-book"></i> Daftar Kelas</a>
+                <a href="/dashboard/daftar-santri" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
+                <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
+                <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
+                <div class="ysq-nav-group">
+                    <div class="menu-item ysq-report-toggle" id="laporan-btn" style="position: relative;">
+                        <span><i class="fas fa-file-alt"></i> Laporan</span>
+                        <span id="badge-notif-pembayaran" class="ysq-badge-notif">0</span> 
+                        <i class="fas fa-chevron-down ysq-report-chevron"></i>
+                    </div>
+                    <style>
+                        .ysq-badge-notif {
+                            background-color: #e74c3c; /* Warna merah */
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 6px;
+                            font-size: 10px;
+                            font-weight: bold;
+                            position: absolute;
+                            right: 35px; /* Sesuaikan posisi agar tidak menabrak panah */
+                            top: 50%;
+                            transform: translateY(-50%);
+                            display: none; /* Sembunyi secara default */
+                        }
+                        </style>
+                    
+                    <div id="laporan-submenu" class="ysq-report-submenu-wrapper ysq-active">
+                        <a href="/dashboard/admin/laporan/keuangan-pemasukan">
+                            <i class="fas fa-arrow-circle-down"></i> Keuangan Pemasukan
+                          </a>
+                          
+                          <a href="/dashboard/admin/laporan/keuangan-pengeluaran">
+                            <i class="fas fa-arrow-circle-up"></i> Keuangan Pengeluaran
+                          </a>                          
+                    </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="footer-buttons-wrapper"> 
+                    <button type="button" class="footer-btn setting" id="btn-open-profil">
+                        <i class="fas fa-cog"></i> Setting Profil
+                        </button>
+                    <a href="/login" class="footer-btn logout"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header class-header-style">
+                <div class="header-left">
+                    <h1 class="header-title">Laporan Pemasukan Keuangan</h1>
+                    <p>Data real-time Infaq Belajar, cicilan, dan Infaq lainnya.</p>
+                </div>
+                
+                <div class="ysq-inc-actions" id="ysq-header-actions">
+                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('pdf')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                    <button class="ysq-inc-btn ysq-inc-btn-export" onclick="exportData('excel')">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                </div>
+            </header>
+
+            <section class="ysq-inc-card ysq-inc-filter-box">
+                <div class="ysq-inc-filter-grid">
+                    <div id="ysq-filter-dynamic" style="display: flex; gap: 15px; flex: 2;">
+                        <div class="ysq-inc-form-group">
+                            <label for="ysq-date-start">Periode Awal:</label>
+                            <input type="date" id="ysq-date-start" class="ysq-inc-input">
+                        </div>
+                        <div class="ysq-inc-form-group">
+                            <label for="ysq-date-end">Periode Akhir:</label>
+                            <input type="date" id="ysq-date-end" class="ysq-inc-input">
+                        </div>
+                    </div>
+            
+                    <div class="ysq-inc-form-group">
+                        <label for="ysq-filter-cat">Kategori Pemasukan:</label>
+                        <select id="ysq-filter-cat" class="ysq-inc-input">
+                            <option value="all">Semua Pemasukan</option>
+                            <option value="iuran">Infaq Belajar</option>
+                            <option value="infaq">Infaq lainnya</option>
+                        </select>
+                    </div>
+                    <button class="ysq-inc-btn ysq-inc-btn-primary ysq-main-generate" onclick="generateIncomeReport()">
+                        <i class="fas fa-sync-alt"></i> Tampilkan Data
+                    </button>
+                </div>
+            </section>
+
+            <section class="ysq-inc-summary-grid">
+                <div class="ysq-inc-stat-card ysq-inc-border-iuran">
+                    <span class="ysq-inc-stat-label">Total Infaq Belajar Sintri</span>
+                    <h2 id="ysq-total-iuran">Rp 0</h2>
+                </div>
+                <div class="ysq-inc-stat-card ysq-inc-border-infaq">
+                    <span class="ysq-inc-stat-label">Total Infaq Lainnya</span>
+                    <h2 id="ysq-total-infaq">Rp 0</h2>
+                </div>
+                <div class="ysq-inc-stat-card ysq-inc-border-net">
+                    <span class="ysq-inc-stat-label">Total Pemasukan (Gross)</span>
+                    <h2 id="ysq-total-gross">Rp 0</h2>
+                </div>
+            </section>
+
+            <section class="ysq-inc-card ysq-inc-table-container">
+                <table class="ysq-inc-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal Pembayaran</th>
+                            <th>Nama Santri</th>
+                            <th>Kelas</th>
+                            <th>Periode</th>
+                            <th>Kategori</th>
+                            <th>Metode</th>
+                            <th>Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ysq-income-body">
+                        </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <div id="infaqModal" class="ysq-modal-overlay">
+        <div class="ysq-modal-content">
+            <div class="ysq-modal-header">
+                <h3><i class="fas fa-hand-holding-heart"></i> pembayaran lainnya</h3>
+                <span class="ysq-close-modal" onclick="closeInfaqModal()">&times;</span>
+            </div>
+            <div class="ysq-modal-body">
+                <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                    <label>pembayaran:</label>
+                    <input type="text" id="modal-nama" class="ysq-inc-input" placeholder="nama pembayaran (infaq, donasi dan lainnya)">
+                </div>
+                <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                    <label>Tanggal:</label>
+                    <input type="date" id="modal-tgl" class="ysq-inc-input">
+                </div>
+                <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                    <label>Nominal (Rp):</label>
+                    <input type="text" id="modal-nominal" class="ysq-inc-input" placeholder="Contoh: 350.000" onkeyup="formatRupiah(this)">
+                </div>
+                <div class="ysq-inc-form-group">
+                    <label>Keterangan:</label>
+                    <textarea id="modal-ket" class="ysq-inc-input" style="height: 80px;" placeholder="Contoh: Sedekah pembangunan masjid"></textarea>
+                </div>
+            </div>
+            <div class="ysq-modal-footer">
+                <button class="ysq-inc-btn ysq-btn-secondary" onclick="closeInfaqModal()">Batal</button>
+                <button class="ysq-inc-btn ysq-inc-btn-primary" onclick="saveInfaqFromModal()">
+                    <i class="fas fa-save"></i> Simpan Data
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="sppModal" class="ysq-modal-overlay">
+    <div class="ysq-modal-content">
+        <div class="ysq-modal-header">
+            <h3><i class="fas fa-file-invoice-dollar"></i> Input Pembayaran Infaq Belajar</h3>
+            <span class="ysq-close-modal" onclick="closeSPPModal()">&times;</span>
+        </div>
+        
+        <div class="ysq-modal-body">
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Kelas:</label>
+                    <select id="spp-kelas" class="ysq-inc-input">
+
+                    </select>
+                </div>
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Kategori Santri:</label>
+                    <select id="spp-kategori" class="ysq-inc-input">
+                        <option value="Dewasa">Dewasa</option>
+                        <option value="Anak">Anak-anak</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ysq-inc-form-group" style="margin-bottom: 15px;">
+                <label>Nominal Pembayaran (Rp):</label>
+                <input type="text" id="spp-nominal" class="ysq-inc-input" placeholder="Contoh: 350.000" onkeyup="formatRupiah(this)">
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Tanggal Awal Periode:</label>
+                    <input type="date" id="spp-tgl-mulai" class="ysq-inc-input">
+                </div>
+                <div class="ysq-inc-form-group" style="flex: 1;">
+                    <label>Tanggal Selesai Periode:</label>
+                    <input type="date" id="spp-tgl-akhir" class="ysq-inc-input">
+                </div>
+            </div>
+            
+            <p style="font-size: 11px; color: #64748b; margin-top: 15px; font-style: italic;">
+                *Sistem akan menghitung selisih pembayaran sebagai tunggakan secara otomatis.
+            </p>
+        </div>
+
+        <div class="ysq-modal-footer">
+            <button class="ysq-inc-btn ysq-btn-secondary" onclick="closeSPPModal()">Batal</button>
+            <button class="ysq-inc-btn ysq-inc-btn-primary" onclick="saveSPPFromModal()">
+                <i class="fas fa-save"></i> Simpan Data
+            </button>
+        </div>
+    </div>
+</div>
+<div id="detailBillingModal" class="ysq-modal-overlay">
+    <div class="ysq-modal-content" style="max-width:700px">
+      <div class="ysq-modal-header">
+        <h3>Detail Pembayaran Santri</h3>
+        <span class="ysq-close-modal"
+          onclick="closeDetailBillingModal()">&times;</span>
+      </div>
+  
+      <div class="ysq-modal-body">
+        <table class="ysq-inc-table">
+          <thead>
+            <tr>
+              <th>Nama Santri</th>
+              <th>Jumlah Bayar</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="detail-billing-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div id="notification-toast" class="toast-notification"></div>
+  <div id="popup-profile-setting" class="modal-overlay">
+      <div class="profile-setting-content">
+          <button class="close-btn" id="btn-close-profil-x">
+              &times;
+          </button>
+          <div class="profile-avatar-large">R</div>
+          
+          <div class="profile-field-group">
+              <div>
+                  <label>Nama</label> :
+                  <input type="text" id="profile-name-input" class="profile-input" placeholder="" />
+              </div>
+              <div>
+                  <label>Email</label> :
+                  <input type="email" id="profile-email-input" class="profile-input" placeholder="" />
+              </div>
+              <div>
+                  <label>No. Telepon</label> :
+                  <input type="tel" id="profile-phone-input" class="profile-input" placeholder="" />
+              </div>
+          </div>
+          
+          <div class="profile-actions">
+              <button type="button" class="profile-action-btn profile-cancel-btn" id="btn-cancel-profil">Batal</button>
+              <button type="button" class="profile-action-btn profile-save-btn" id="btn-simpan-profil">
+                  Simpan
+              </button>
+              
+          </div>
+      </div>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.25/dist/jspdf.plugin.autotable.min.js"></script>  
+    <script type="module" src="/js/admin_keuangan.js"></script>
+     <script type="module" src="/js/profileSetting.js"></script>
+</body>
+</html>

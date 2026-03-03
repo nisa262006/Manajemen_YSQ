@@ -86,42 +86,57 @@ document.addEventListener("DOMContentLoaded", () => {
 ====================================================== */
 async function initDashboardSantri() {
     try {
-        const data = await apiGet("/kelas/santri/me");
-        if (!data || !data.santri) return;
+        const jadwal = await apiGet("/jadwal/santri/me");
 
-        setText("namaSantri", data.santri.nama);
-        setText("nisSantri", data.santri.nis);
-        setText("kategori-santri", data.santri.kategori);
-        setText("kelas-santri", data.santri.nama_kelas);
+        if (!jadwal || jadwal.length === 0) {
+            document.getElementById("jadwal-body").innerHTML =
+                `<tr><td colspan="6" align="center">Belum ada jadwal</td></tr>`;
+            return;
+        }
 
-        renderJadwalSantri(data.santri, data.jadwal ?? []);
+        // Ambil data santri dari item pertama
+        const first = jadwal[0];
+
+        setText("namaSantri", first.nama_santri || "-");
+        setText("nisSantri", first.nis || "-");
+        setText("kategori-santri", first.kategori || "-");
+        setText("kelas-santri", first.nama_kelas || "-");
+
+        setText(
+        "jadwal-santri",
+        first.hari
+            ? `${first.hari} (${first.jam_mulai} - ${first.jam_selesai})`
+            : "-"
+        );
+        renderJadwalSantri(jadwal);
+
     } catch (error) {
         console.error("DASHBOARD SANTRI ERROR:", error);
     }
 }
 
-function renderJadwalSantri(santri, jadwal) {
+function renderJadwalSantri(jadwal) {
     const tbody = document.getElementById("jadwal-body");
     if (!tbody) return;
 
     tbody.innerHTML = "";
+
     if (jadwal.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" align="center">Belum ada jadwal kelas</td></tr>`;
+        tbody.innerHTML =
+            `<tr><td colspan="6" align="center">Belum ada jadwal</td></tr>`;
         return;
     }
-
-    setText("jadwal-santri", [...new Set(jadwal.map(j => j.hari))].join(", "));
 
     jadwal.forEach((item, i) => {
         tbody.insertAdjacentHTML("beforeend", `
             <tr>
                 <td>${i + 1}</td>
-                <td>${santri.nama_kelas}</td>
-                <td>${item.hari}</td>
+                <td>${item.nama_kelas || '-'}</td>
+                <td>${item.hari || '-'}</td>
                 <td>${item.jam_mulai} - ${item.jam_selesai}</td>
-                <td>${item.pengajar}</td>
+                <td>${item.nama_pengajar || '-'}</td>
                 <td align="center">
-                    <a href="/dashboard/materi-santri?id_kelas=${santri.id_kelas}">
+                    <a href="/dashboard/materi-santri?id_jadwal=${item.id_jadwal}">
                         <i class='bx bx-task' style="font-size: 22px; color: #2d5a3f;"></i>
                     </a>
                 </td>
@@ -134,21 +149,37 @@ function renderJadwalSantri(santri, jadwal) {
     2. LIST MATERI AJAR & TUGAS
 ====================================================== */
 async function initListMateriSantri() {
-  const id_kelas = getUrlParam("id_kelas");
-  if (!id_kelas || id_kelas === "undefined") {
-      alert("ID Kelas tidak terdeteksi.");
-      window.location.href = "/dashboard/santri";
-      return;
-  }
+    const id_jadwal = getUrlParam("id_jadwal");
 
-  try {
-      const response = await apiGet(`/tugas-media/materi/kelas/${id_kelas}`);
-      materiCache = response;
-      setText("nama-kelas-header", `Kelas: ${response[0]?.nama_kelas || "Aktif"}`);
-      renderTableMateri(response);
-  } catch (err) {
-      console.error("Gagal muat materi:", err);
-  }
+    if (!id_jadwal || id_jadwal === "undefined") {
+        alert("ID Jadwal tidak terdeteksi.");
+        window.location.href = "/dashboard/santri";
+        return;
+    }
+
+    try {
+        const response = await apiGet(`/tugas-media/materi/jadwal/${id_jadwal}`);
+
+        if (!response || response.length === 0) {
+            document.getElementById("materi-table-body").innerHTML =
+                `<tr><td colspan="6" align="center">Belum ada materi untuk sesi ini.</td></tr>`;
+            return;
+        }
+
+        materiCache = response;
+
+        setText(
+            "nama-kelas-header",
+            `Kelas: ${response[0]?.nama_kelas || "Aktif"}`
+        );
+
+        renderTableMateri(response);
+
+    } catch (err) {
+        console.error("Gagal muat materi:", err);
+        document.getElementById("materi-table-body").innerHTML =
+            `<tr><td colspan="6" align="center">Gagal memuat materi</td></tr>`;
+    }
 }
 
 function renderTableMateri(data) {

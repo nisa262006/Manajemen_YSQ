@@ -16,6 +16,9 @@ exports.getAllSantri = async (req, res) => {
     let params = [];
     let i = 1;
 
+    // =============================
+    // FILTER
+    // =============================
     if (q) {
       where.push(`(LOWER(s.nama) LIKE LOWER($${i}) OR LOWER(s.nis) LIKE LOWER($${i}))`);
       params.push(`%${q}%`);
@@ -36,38 +39,74 @@ exports.getAllSantri = async (req, res) => {
 
     const whereSQL = where.length ? "WHERE " + where.join(" AND ") : "";
 
+    // ======================================================
+    // 🔥 QUERY BARU SISTEM YAYASAN
+    // ======================================================
     const santriQuery = await db.query(
       `
-      SELECT 
-        s.id_santri,
-        s.nis,
-        s.nama,
-        s.kategori,
-        s.no_wa,
-        s.email,
-        s.tempat_lahir,
-        s.tanggal_lahir,
-        s.status,
-        s.alamat,
-        s.tanggal_terdaftar,
+      SELECT DISTINCT ON (s.id_santri)
 
-        u.username,
-        u.email AS user_email,
+  -- 🔹 SEMUA DATA SANTRI
+  s.id_santri,
+  s.id_users,
+  s.nis,
+  s.nama,
+  s.kategori,
+  s.no_wa,
+  s.email,
+  s.tempat_lahir,
+  s.tanggal_lahir,
+  s.status,
+  s.alamat,
+  s.tanggal_terdaftar,
 
-        sk.id_kelas,
-        COALESCE(k.nama_kelas, '-') AS nama_kelas
+  -- 🔹 DATA USER (AKUN)
+  u.username,
+  u.email AS user_email,
+  u.status_user,
 
-      FROM santri s
-      LEFT JOIN users u ON s.id_users = u.id_users
-      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
-      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
-      ${whereSQL}
-      ORDER BY s.id_santri ASC
-      LIMIT $${i} OFFSET $${i + 1}
+  -- 🔹 DATA SESI (JIKA ADA)
+  sj.id_jadwal,
+  j.hari,
+  j.jam_mulai,
+  j.jam_selesai,
+  j.kapasitas,
+
+  -- 🔹 DATA KELAS
+  k.id_kelas,
+  k.nama_kelas,
+
+  -- 🔹 DATA PENGAJAR
+  p.nama AS nama_pengajar
+
+FROM santri s
+
+LEFT JOIN users u 
+  ON u.id_users = s.id_users
+
+LEFT JOIN santri_jadwal sj 
+  ON sj.id_santri = s.id_santri
+
+LEFT JOIN jadwal j 
+  ON j.id_jadwal = sj.id_jadwal
+
+LEFT JOIN kelas k 
+  ON k.id_kelas = j.id_kelas
+
+LEFT JOIN pengajar p 
+  ON p.id_pengajar = j.id_pengajar
+
+${whereSQL}
+
+ORDER BY s.id_santri, sj.id_jadwal DESC
+LIMIT $${i} OFFSET $${i + 1}
       `,
       [...params, limit, offset]
     );
 
+    // =============================
+    // COUNT
+    // =============================
     const countQuery = await db.query(
       `SELECT COUNT(*) FROM santri s ${whereSQL}`,
       params
@@ -167,10 +206,12 @@ exports.updateSantri = async (req, res) => {
 
     await client.query("BEGIN");
 
-    // 🔎 CEK SANTRI
+    // =========================
+    // CEK DATA LAMA
+    // =========================
     const check = await client.query(
       `
-      SELECT s.*, u.id_users, u.email AS user_email, u.status_user
+      SELECT s.*, u.id_users, u.email AS user_email
       FROM santri s
       JOIN users u ON s.id_users = u.id_users
       WHERE s.id_santri = $1
@@ -185,9 +226,9 @@ exports.updateSantri = async (req, res) => {
     const old = check.rows[0];
     const id_users = old.id_users;
 
-    /* =========================
-       UPDATE EMAIL USER
-    ========================= */
+    // =========================
+    // UPDATE EMAIL USER (JIKA BERUBAH)
+    // =========================
     const oldEmail = (old.user_email || "").toLowerCase().trim();
     const newEmail = (user_email || email || "").toLowerCase().trim();
 
@@ -207,9 +248,9 @@ exports.updateSantri = async (req, res) => {
       );
     }
 
-    /* =========================
-       UPDATE STATUS USER ❗
-    ========================= */
+    // =========================
+    // STATUS USER
+    // =========================
     const finalStatus = status ?? old.status;
 
     await client.query(
@@ -217,9 +258,33 @@ exports.updateSantri = async (req, res) => {
       [finalStatus, id_users]
     );
 
-    /* =========================
-       UPDATE DATA SANTRI
-    ========================= */
+    // =========================
+    // AUTO HITUNG UMUR
+    // =========================
+    function hitungUmur(tgl) {
+      if (!tgl) return null;
+      const today = new Date();
+      const birth = new Date(tgl);
+      let umur = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        umur--;
+      }
+      return umur;
+    }
+
+    let finalKategori = kategori ?? old.kategori;
+
+    if (!kategori && tanggal_lahir) {
+      const umur = hitungUmur(tanggal_lahir);
+      if (umur !== null) {
+        finalKategori = umur >= 14 ? "dewasa" : "anak";
+      }
+    }
+
+    // =========================
+    // UPDATE SANTRI
+    // =========================
     await client.query(
       `
       UPDATE santri SET
@@ -234,14 +299,14 @@ exports.updateSantri = async (req, res) => {
       WHERE id_santri=$9
       `,
       [
-        nama,
-        kategori,
-        no_wa,
-        email,
-        tempat_lahir,
-        tanggal_lahir,
+        nama ?? old.nama,
+        finalKategori,
+        no_wa ?? old.no_wa,
+        email ?? old.email,
+        tempat_lahir ?? old.tempat_lahir,
+        tanggal_lahir ?? old.tanggal_lahir,
         finalStatus,
-        alamat,
+        alamat ?? old.alamat,
         id_santri
       ]
     );
@@ -253,8 +318,8 @@ exports.updateSantri = async (req, res) => {
       message: "Data santri berhasil diperbarui",
       data: {
         id_santri,
-        nama,
-        kategori,
+        nama: nama ?? old.nama,
+        kategori: finalKategori,
         status: finalStatus
       }
     });

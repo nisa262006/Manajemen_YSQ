@@ -22,8 +22,38 @@
                 <a href="/dashboard/daftar-santri" class="menu-item"><i class="fas fa-user-graduate"></i> Daftar Santri</a>
                 <a href="/dashboard/daftar-pengajar" class="menu-item"><i class="fas fa-chalkboard-teacher"></i> Daftar Pengajar</a>
                 <a href="/dashboard/riwayat-absensi" class="menu-item"><i class="fas fa-clipboard-list"></i> Riwayat Absensi</a>
-                <a href="#" class="menu-item" data-dev="true"><i class="fas fa-scroll"></i> Rapor</a>
-                <a href="#" class="menu-item" data-dev="true"><i class="fas fa-file-alt"></i> Laporan</a>                
+                <div class="ysq-nav-group">
+                    <div class="menu-item ysq-report-toggle" id="laporan-btn" style="position: relative;">
+                        <span><i class="fas fa-file-alt"></i> Laporan</span>
+                        <span id="badge-notif-pembayaran" class="ysq-badge-notif">0</span> 
+                        <i class="fas fa-chevron-down ysq-report-chevron"></i>
+                    </div>
+                    <style>
+                        .ysq-badge-notif {
+                            background-color: #e74c3c; /* Warna merah */
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 6px;
+                            font-size: 10px;
+                            font-weight: bold;
+                            position: absolute;
+                            right: 35px; /* Sesuaikan posisi agar tidak menabrak panah */
+                            top: 50%;
+                            transform: translateY(-50%);
+                            display: none; /* Sembunyi secara default */
+                        }
+                        </style>
+                    
+                    <div id="laporan-submenu" class="ysq-report-submenu-wrapper">
+                        <a href="/dashboard/admin/laporan/keuangan-pemasukan">
+                            <i class="fas fa-arrow-circle-down"></i> Keuangan Pemasukan
+                          </a>
+                          
+                          <a href="/dashboard/admin/laporan/keuangan-pengeluaran">
+                            <i class="fas fa-arrow-circle-up"></i> Keuangan Pengeluaran
+                          </a>
+                          
+                    </div>           
             </nav>
 
             <div class="sidebar-footer">
@@ -67,9 +97,9 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Kelas</th>
-                                <th>Kapasitas</th>
                                 <th>Kategori</th>
-                                <th>Pengajar</th>
+                                <th>Jumlah Santri</th>
+                                <th>Jumlah Sesi</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -124,48 +154,35 @@
         <h2 class="modal-title-tambah-kelas">Tambah Kelas</h2>
 
         <form id="form-tambah-kelas">
-            <div class="input-group-full" style="margin-bottom: 15px;">
-                <label for="input-kelas-tingkatan" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Nama Kelas / Tingkatan</label>
-                <input type="text" id="input-kelas-tingkatan" placeholder="Contoh: Tahsin" required>
-            </div>
-            
-            <div class="form-row-tambah" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                <div class="input-group-tambah" style="flex: 1;">
-                    <label for="select-pengajar-kelas" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Pilih Pengajar</label>
-                    <select id="select-pengajar-kelas" required style="width: 100%;">
-                        <option value="">Pilih Pengajar</option>
-                    </select>
-                </div>
-                <div class="input-group-tambah" style="flex: 1;">
-                    <label for="input-kapasitas" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Kapasitas Siswa</label>
-                    <input type="number" id="input-kapasitas" placeholder="Contoh: 15" required style="width: 100%;">
-                </div>
-            </div>
 
             <div class="input-group-full" style="margin-bottom: 15px;">
-                <label for="input-kategori" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Kategori</label>
-                <select id="input-kategori" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                <label for="input-nama-kelas" 
+                       style="display:block; margin-bottom:5px; font-weight:600;">
+                    Nama Kelas
+                </label>
+                <input type="text" 
+                       id="input-nama-kelas" 
+                       placeholder="Contoh: Tahsin A" 
+                       required>
+            </div>
+        
+            <div class="input-group-full" style="margin-bottom: 20px;">
+                <label for="input-kategori" 
+                       style="display:block; margin-bottom:5px; font-weight:600;">
+                    Kategori
+                </label>
+                <select id="input-kategori" required>
                     <option value="">Pilih Kategori</option>
-                    <option value="Dewasa">Dewasa</option>
-                    <option value="Anak">Anak</option>
+                    <option value="dewasa">Dewasa</option>
+                    <option value="anak">Anak</option>
                 </select>
             </div>
-            
-            <div class="form-row-tambah" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                <div class="input-group-tambah" style="flex: 1;">
-                    <label for="input-waktu-mulai" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Waktu Awal Periode</label>
-                    <input type="date" id="input-waktu-mulai" required style="width: 100%;">
-                </div>
-                <div class="input-group-tambah" style="flex: 1;">
-                    <label for="input-waktu-selesai" style="display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #333;">Waktu Selesai Periode</label>
-                    <input type="date" id="input-waktu-selesai" required style="width: 100%;">
-                </div>
-            </div>
-
+        
             <div class="modal-footer-tambah-kelas" style="margin-top: 20px;">
-                 <button type="button" class="action-btn-form cancel-btn-kelas" id="btn-cancel-kelas">Batalkan</button>
-                <button type="submit" class="action-btn-form save-btn-kelas" id="btn-simpan-kelas">Simpan</button>
-            </div>
+                <button type="button" class="action-btn-form cancel-btn-kelas" id="btn-cancel-kelas">Batalkan</button>
+               <button type="submit" class="action-btn-form save-btn-kelas" id="btn-simpan-kelas">Simpan</button>
+           </div>
+        
         </form>
     </div>
 </div>
@@ -192,5 +209,6 @@
 </div>
 <script type="module" src="/js/admin_jadwal.js"></script>
 <script type="module" src="/js/profileSetting.js"></script>
+<script type="module" src="/js/laporan.js"></script>
 </body>
 </html>

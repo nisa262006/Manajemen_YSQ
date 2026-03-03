@@ -7,10 +7,14 @@ const {
   inputSimakan,
   finalisasiTahfidz,
   getRaporPengajar,
+  getPeriodePengajar,
   updateRaporTahsin,
   deleteRaporTahsin,
   deleteRaporTahfidz,
-  getRaporSantri
+  getRekapLaporan,
+  getRaporSantri,
+  getDetailRaporPengajar,
+  getSantriByJadwal,
 } = require("../controllers/raporcontrollers");
 
 
@@ -29,9 +33,29 @@ router.get("/pengajar/me", verifyToken, onlyPengajar, getRaporPengajar);
 router.put("/tahsin/:id", verifyToken, onlyPengajar, updateRaporTahsin);
 router.delete("/tahsin/:id", verifyToken, onlyPengajar, deleteRaporTahsin);
 router.delete("/tahfidz/:id", verifyToken, onlyPengajar, deleteRaporTahfidz);
+router.get("/laporan/rekap-pengajar", verifyToken, onlyPengajar, getRekapLaporan);
+router.get(
+  "/laporan/periode",
+  verifyToken,
+  onlyPengajar,
+  getPeriodePengajar
+);
+
+router.get(
+  "/detail",
+  verifyToken,
+  onlyPengajar,
+  getDetailRaporPengajar
+);
 
 
 /* ================= SANTRI ================= */
 router.get("/santri/me", verifyToken, onlySantri, getRaporSantri);
+router.get(
+  "/jadwal/:id_jadwal/santri",
+  verifyToken,
+  onlyPengajar,
+  getSantriByJadwal
+);
 
 module.exports = router;

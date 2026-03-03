@@ -4,25 +4,13 @@ const db = require("../config/db");
 
 // Tambah kelas
 exports.tambahKelas = async (req, res) => {
-  const { nama_kelas, kapasitas, id_pengajar, id_program, kategori } = req.body;
+  const { nama_kelas, id_program, kategori } = req.body;
 
   try {
-    // Cek apakah pengajar aktif sebelum insert
-    const cekStatus = await db.query(
-        "SELECT status FROM pengajar WHERE id_pengajar = $1", 
-        [id_pengajar]
-    );
-
-    if (cekStatus.rowCount > 0 && cekStatus.rows[0].status !== 'aktif') {
-      return res.status(400).json({ 
-        message: "Gagal: Pengajar ini sudah tidak aktif dan tidak bisa memegang kelas baru." 
-      });
-    }
-
     await db.query(
-      `INSERT INTO kelas (nama_kelas, kapasitas, id_pengajar, id_program, kategori)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [nama_kelas, kapasitas, id_pengajar, id_program, kategori]
+      `INSERT INTO kelas (nama_kelas, id_program, kategori)
+       VALUES ($1, $2, $3)`,
+      [nama_kelas, id_program, kategori]
     );
 
     res.json({ message: "Kelas berhasil ditambahkan" });
@@ -33,25 +21,36 @@ exports.tambahKelas = async (req, res) => {
 };
 
 // List kelas
-// List kelas (Hanya menampilkan kelas unik)
-// List kelas (Menampilkan semua kelas dengan informasi pengajar)
+
 exports.getAllKelas = async (req, res) => {
   try {
     const result = await db.query(`
       SELECT 
-        k.id_kelas, 
-        k.nama_kelas, 
-        k.kapasitas, 
+        k.id_kelas,
+        k.nama_kelas,
         k.kategori,
-        p.nama AS nama_pengajar,
-        pr.nama_program
+        pr.nama_program,
+
+        COUNT(DISTINCT sj.id_santri) AS jumlah_santri,
+        COUNT(DISTINCT j.id_jadwal) AS jumlah_sesi
+
       FROM kelas k
-      LEFT JOIN pengajar p ON k.id_pengajar = p.id_pengajar
-      LEFT JOIN program pr ON k.id_program = pr.id_program
-      ORDER BY k.nama_kelas ASC, p.nama ASC
+
+      LEFT JOIN program pr 
+        ON k.id_program = pr.id_program
+
+      LEFT JOIN jadwal j 
+        ON j.id_kelas = k.id_kelas
+
+      LEFT JOIN santri_jadwal sj 
+        ON sj.id_jadwal = j.id_jadwal
+
+      GROUP BY k.id_kelas, pr.nama_program
+      ORDER BY k.nama_kelas ASC
     `);
 
     res.json(result.rows);
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gagal mengambil daftar kelas" });
@@ -62,51 +61,68 @@ exports.getAllKelas = async (req, res) => {
 exports.getDetailKelas = async (req, res) => {
   const { id_kelas } = req.params;
 
-  const kelas = await db.query(
-    "SELECT * FROM kelas WHERE id_kelas = $1",
-    [id_kelas]
-  );
+  try {
 
-  if (kelas.rowCount === 0)
-    return res.status(404).json({ message: "Kelas tidak ditemukan" });
+    const kelas = await db.query(
+      `SELECT * FROM kelas WHERE id_kelas = $1`,
+      [id_kelas]
+    );
 
-  const santri = await db.query(`
-    SELECT s.id_santri, s.nama, s.nis
-    FROM santri_kelas sk
-    JOIN santri s ON s.id_santri = sk.id_santri
-    WHERE sk.id_kelas = $1
-     AND s.status = 'aktif'
-  `, [id_kelas]);
+    if (kelas.rowCount === 0)
+      return res.status(404).json({ message: "Kelas tidak ditemukan" });
 
-  const jadwal = await db.query(
-    "SELECT * FROM jadwal WHERE id_kelas = $1",
-    [id_kelas]
-  );
+    // 🔥 FIX DI SINI — ambil dari jadwal + santri_jadwal
+    const santri = await db.query(`
+      SELECT DISTINCT
+        s.id_santri,
+        s.nama,
+        s.nis,
+        s.tanggal_lahir,
+        s.status,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        p.nama AS nama_pengajar
+      FROM jadwal j
+      LEFT JOIN santri_jadwal sj ON sj.id_jadwal = j.id_jadwal
+      LEFT JOIN santri s ON s.id_santri = sj.id_santri
+      LEFT JOIN pengajar p ON p.id_pengajar = j.id_pengajar
+      WHERE j.id_kelas = $1
+      AND s.status = 'aktif'
+      ORDER BY j.hari, j.jam_mulai
+    `, [id_kelas]);
 
-  res.json({
-    kelas: kelas.rows[0],
-    santri: santri.rows,
-    jadwal: jadwal.rows
-  });
+    res.json({
+      kelas: kelas.rows[0],
+      santri: santri.rows
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal mengambil detail kelas" });
+  }
 };
+
 
 // Update kelas
 exports.updateKelas = async (req, res) => {
   const { id_kelas } = req.params;
-  const { nama_kelas, kapasitas, id_pengajar, id_program, kategori } = req.body;
+  const { nama_kelas, id_program, kategori } = req.body;
 
-  await db.query(
-    `UPDATE kelas SET
-      nama_kelas = COALESCE($1, nama_kelas),
-      kapasitas = COALESCE($2, kapasitas),
-      id_pengajar = COALESCE($3, id_pengajar),
-      id_program = COALESCE($4, id_program),
-      kategori = COALESCE($5, kategori)
-     WHERE id_kelas = $6`,
-    [nama_kelas, kapasitas, id_pengajar, id_program, kategori, id_kelas]
-  );
+  try {
+    await db.query(
+      `UPDATE kelas
+       SET nama_kelas = COALESCE($1, nama_kelas),
+           id_program = COALESCE($2, id_program),
+           kategori = COALESCE($3, kategori)
+       WHERE id_kelas = $4`,
+      [nama_kelas, id_program, kategori, id_kelas]
+    );
 
-  res.json({ message: "Kelas berhasil diupdate" });
+    res.json({ message: "Kelas berhasil diupdate" });
+  } catch (err) {
+    res.status(500).json({ message: "Gagal update kelas" });
+  }
 };
 
 // Delete kelas
@@ -120,71 +136,30 @@ exports.deleteKelas = async (req, res) => {
 
 // Tambah santri ke kelas
 exports.tambahSantriKeKelas = async (req, res) => {
-  const client = await db.connect();
+  const { id_kelas } = req.params;
+  const { id_santri } = req.body;
 
   try {
-    const { id_kelas } = req.params;
-    const { id_santri } = req.body;
-
-    await client.query("BEGIN");
-
-    // 1. Cek santri
-    const cekSantri = await client.query(
-      `SELECT status FROM santri WHERE id_santri = $1`,
+    // Hapus dulu dari kelas lama
+    await db.query(
+      `DELETE FROM santri_kelas WHERE id_santri = $1`,
       [id_santri]
     );
 
-    if (cekSantri.rowCount === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ message: "Santri tidak ditemukan" });
-    }
-
-    if (cekSantri.rows[0].status !== "aktif") {
-      await client.query("ROLLBACK");
-      return res.status(400).json({
-        message: "Santri nonaktif tidak boleh dimasukkan ke kelas"
-      });
-    }
-
-    // 2. Cek kapasitas kelas
-    const kapasitas = await client.query(
-      `SELECT kapasitas,
-        (SELECT COUNT(*) FROM santri_kelas WHERE id_kelas = $1) AS terisi
-       FROM kelas WHERE id_kelas = $1`,
-      [id_kelas]
-    );
-
-    if (kapasitas.rowCount === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ message: "Kelas tidak ditemukan" });
-    }
-
-    if (parseInt(kapasitas.rows[0].terisi) >= kapasitas.rows[0].kapasitas) {
-      await client.query("ROLLBACK");
-      return res.status(400).json({ message: "Kapasitas kelas penuh" });
-    }
-
-    // 3. Insert relasi
-    await client.query(
+    // Masukkan ke kelas baru
+    await db.query(
       `INSERT INTO santri_kelas (id_santri, id_kelas)
-       VALUES ($1, $2)
-       ON CONFLICT DO NOTHING`,
+       VALUES ($1, $2)`,
       [id_santri, id_kelas]
     );
 
-    await client.query("COMMIT");
-
-    res.json({ message: "Santri berhasil ditambahkan ke kelas" });
+    res.json({ message: "Santri berhasil dipindahkan ke kelas baru" });
 
   } catch (err) {
-    await client.query("ROLLBACK");
-    console.error("TAMBAH SANTRI KELAS ERROR:", err);
-    res.status(500).json({ message: "Gagal menambahkan santri ke kelas" });
-  } finally {
-    client.release();
+    console.error(err);
+    res.status(500).json({ message: "Gagal memindahkan santri" });
   }
 };
-
 
 // Pindah santri antar kelas
 exports.pindahSantriKelas = async (req, res) => {
@@ -236,15 +211,19 @@ exports.pindahSantriKelas = async (req, res) => {
 
 // Ambil kelas yang diajar pengajar login
 exports.kelasPengajar = async (req, res) => {
-  const result = await db.query(
-    `SELECT k.*
-     FROM kelas k
-     JOIN pengajar p ON p.id_pengajar = k.id_pengajar
-     WHERE p.id_users = $1`,
-     [req.user.id_users]
-  );
+  try {
+    const result = await db.query(`
+      SELECT DISTINCT k.*
+      FROM jadwal j
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      JOIN pengajar p ON j.id_pengajar = p.id_pengajar
+      WHERE p.id_users = $1
+    `, [req.user.id_users]);
 
-  res.json(result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ message: "Gagal mengambil kelas pengajar" });
+  }
 };
 
 
@@ -254,49 +233,48 @@ exports.getDetailKelasPengajar = async (req, res) => {
   const { id_kelas } = req.params;
   const id_users = req.user.id_users;
 
-
   try {
-    // 1. Pastikan kelas ini memang diajar oleh pengajar yang login
-    const kelas = await db.query(
-      `SELECT k.*, pg.id_pengajar
-       FROM kelas k
-       JOIN pengajar pg ON pg.id_pengajar = k.id_pengajar
-       WHERE k.id_kelas = $1 AND pg.id_users = $2`,
-      [id_kelas, id_users]
-    );
+    // 1️⃣ Validasi pengajar memang punya sesi di kelas ini
+    const cek = await db.query(`
+      SELECT DISTINCT k.*
+      FROM jadwal j
+      JOIN kelas k ON k.id_kelas = j.id_kelas
+      JOIN pengajar p ON p.id_pengajar = j.id_pengajar
+      WHERE k.id_kelas = $1 AND p.id_users = $2
+    `, [id_kelas, id_users]);
 
-    if (kelas.rowCount === 0) {
+    if (cek.rowCount === 0) {
       return res.status(403).json({ message: "Kelas ini bukan milik pengajar" });
     }
 
-    const id_pengajar = kelas.rows[0].id_pengajar;
+    // 2️⃣ Ambil sesi + santri
+    const result = await db.query(`
+      SELECT 
+        j.id_jadwal,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai,
+        j.kapasitas,
+        s.id_santri,
+        s.nama,
+        s.nis,
+        s.status
+      FROM jadwal j
+      LEFT JOIN santri_jadwal sj ON sj.id_jadwal = j.id_jadwal
+      LEFT JOIN santri s ON s.id_santri = sj.id_santri
+      JOIN pengajar p ON p.id_pengajar = j.id_pengajar
+      WHERE j.id_kelas = $1
+        AND p.id_users = $2
+      ORDER BY j.hari, j.jam_mulai
+    `, [id_kelas, id_users]);
 
-    // 2. Ambil santri dalam kelas
-    const santri = await db.query(
-      `SELECT s.id_santri, s.nama, s.nis, s.status
-        FROM santri_kelas sk
-        JOIN santri s ON s.id_santri = sk.id_santri
-        WHERE sk.id_kelas = $1
-          AND s.status = 'aktif'
-        `,[id_kelas]
-    );
-
-    // 3. Ambil jadwal kelas
-    const jadwal = await db.query(
-      `SELECT *
-       FROM jadwal
-       WHERE id_kelas = $1 AND id_pengajar = $2`,
-      [id_kelas, id_pengajar]
-    );
-
-    return res.json({
-      kelas: kelas.rows[0],
-      santri: santri.rows,
-      jadwal: jadwal.rows
+    res.json({
+      kelas: cek.rows[0],
+      data: result.rows
     });
 
   } catch (err) {
-    console.error("ERROR DETAIL KELAS PENGAJAR:", err);
+    console.error(err);
     res.status(500).json({ message: "Gagal mengambil detail kelas pengajar" });
   }
 };
@@ -307,74 +285,44 @@ exports.kelasSantriMe = async (req, res) => {
   try {
     const id_users = req.user.id_users;
 
-    // 1. Ambil data santri (BOLEH BELUM PUNYA KELAS)
+    // 1️⃣ Ambil data santri
     const santriRes = await db.query(`
-      SELECT 
-        s.id_santri,
-        s.nis,
-        s.nama,
-        s.kategori,
-        s.status,
-        k.id_kelas,
-        k.nama_kelas
-      FROM santri s
-      LEFT JOIN santri_kelas sk ON sk.id_santri = s.id_santri
-      LEFT JOIN kelas k ON k.id_kelas = sk.id_kelas
-      WHERE s.id_users = $1
+      SELECT id_santri, nama, nis, status
+      FROM santri
+      WHERE id_users = $1
       LIMIT 1
     `, [id_users]);
 
     if (santriRes.rowCount === 0) {
-      return res.status(404).json({
-        message: "Data santri tidak ditemukan"
-      });
+      return res.status(404).json({ message: "Data santri tidak ditemukan" });
     }
 
     const santri = santriRes.rows[0];
 
-    // 2. JIKA BELUM PUNYA KELAS → JADWAL KOSONG (BUKAN ERROR)
-    if (!santri.id_kelas) {
-      return res.json({
-        santri,
-        jadwal: []
-      });
-    }
-
-    // 3. Ambil jadwal kalau sudah punya kelas
+    // 2️⃣ Ambil jadwal berdasarkan sesi yang dia ikuti
     const jadwalRes = await db.query(`
       SELECT 
         j.id_jadwal,
         j.hari,
         j.jam_mulai,
         j.jam_selesai,
-        u.username AS pengajar
-      FROM jadwal j
-      JOIN kelas k ON j.id_kelas = k.id_kelas
-      JOIN pengajar p ON k.id_pengajar = p.id_pengajar
-      JOIN users u ON p.id_users = u.id_users
-      WHERE k.id_kelas = $1
-      ORDER BY 
-        CASE 
-          WHEN j.hari='Senin' THEN 1
-          WHEN j.hari='Selasa' THEN 2
-          WHEN j.hari='Rabu' THEN 3
-          WHEN j.hari='Kamis' THEN 4
-          WHEN j.hari='Jumat' THEN 5
-          WHEN j.hari='Sabtu' THEN 6
-          WHEN j.hari='Minggu' THEN 7
-        END,
-        j.jam_mulai
-    `, [santri.id_kelas]);
+        k.nama_kelas,
+        p.nama AS nama_pengajar
+      FROM santri_jadwal sj
+      JOIN jadwal j ON j.id_jadwal = sj.id_jadwal
+      JOIN kelas k ON k.id_kelas = j.id_kelas
+      LEFT JOIN pengajar p ON p.id_pengajar = j.id_pengajar
+      WHERE sj.id_santri = $1
+      ORDER BY j.hari, j.jam_mulai
+    `, [santri.id_santri]);
 
-    return res.json({
+    res.json({
       santri,
       jadwal: jadwalRes.rows
     });
 
   } catch (err) {
     console.error("KELAS SANTRI ERROR:", err);
-    return res.status(500).json({
-      message: "Gagal memuat dashboard santri"
-    });
+    res.status(500).json({ message: "Gagal memuat dashboard santri" });
   }
 };

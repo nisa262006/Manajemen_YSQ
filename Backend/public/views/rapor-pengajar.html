@@ -52,9 +52,16 @@
 
         <main class="main-content">
             <header class="top-header">
-                <h1 class="page-title">Rapor Santri</h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Rapor Santri</h1>
+                </div>
+            
                 <div class="user-profile">
                     <span id="tanggal-otomatis" class="date-display-box"></span>
+                    <i class="fas fa-user-circle" style="font-size: 24px; margin-left: 10px; color: var(--primary-green);"></i>
                 </div>
             </header>
             
@@ -63,18 +70,21 @@
                     
                     <div class="ysq-action-bar">
                         <div class="ysq-filter-group-main">
+
                             <div class="filter-item">
                                 <label>Pilih Kelas:</label>
                                 <select id="selectKelas" class="ysq-select-custom">
                                     <option value="">--- Pilih Kelas ---</option>
-                                  </select>
+                                </select>
                             </div>
+                        
                             <div class="filter-item">
                                 <label>Pilih Santri:</label>
                                 <select id="selectSantri" class="ysq-select-custom">
                                     <option value="">--- Pilih Santri ---</option>
-                                  </select>
+                                </select>
                             </div>
+                        
                         </div>
 
                         <div class="ysq-header-tabs-pengajar">
@@ -85,30 +95,42 @@
 
                     <div id="section-tahsin">
                         <div class="form-container-rapor">
-                            <div class="form-section-title">Komponen Penilaian Tahsin</div>
+                            <div class="form-section-header">
+                                <div class="form-section-title">Komponen Penilaian Tahsin</div>
+                                <div class="periode-input-group">
+                                    <label>Periode:</label>
+                                    <select id="periode_tahsin" class="input-periode-style">
+                                        <option value="">-- Pilih Periode --</option>
+
+                                    </select>
+                                </div>
+                            </div>
                             
                             <div class="form-grid-rapor">
                                 <div class="form-group-rapor">
                                     <label>Nilai Pekanan</label>
-                                    <input type="number" class="input-rapor-style val-tahsin" id="n_pekanan" placeholder="0-100" oninput="hitungRataTahsin()">
+                                    <input type="number" class="input-rapor-style val-tahsin" id="n_pekanan" placeholder="0-100">
                                 </div>
                                 <div class="form-group-rapor">
                                     <label>Ujian Tilawah (Lisan)</label>
-                                    <input type="number" class="input-rapor-style val-tahsin" id="n_tilawah" placeholder="0-100" oninput="hitungRataTahsin()">
+                                    <input type="number" class="input-rapor-style val-tahsin" id="n_tilawah" placeholder="0-100">
                                 </div>
                                 <div class="form-group-rapor">
                                     <label>Nilai Teori (G-Form)</label>
-                                    <input type="number" class="input-rapor-style val-tahsin" id="n_teori" placeholder="0-100" oninput="hitungRataTahsin()">
+                                    <input type="number" class="input-rapor-style val-tahsin" id="n_teori" placeholder="0-100">
                                 </div>
                                 <div class="form-group-rapor">
                                     <label>Presensi (%)</label>
-                                    <input type="number" class="input-rapor-style val-tahsin" id="n_absen" placeholder="0-100" oninput="hitungRataTahsin()">
+                                    <input type="number" class="input-rapor-style val-tahsin" id="n_absen" placeholder="0-100">
                                 </div>
                             </div>
 
-                            <div class="ysq-row-final-score">
-                                <div class="label-final">RATA-RATA AKHIR</div>
-                                <div class="value-final" id="total_rata_tahsin">0.00</div>
+                            <div class="ysq-row-final-score" style="display: flex; align-items: center; justify-content: space-between; background: #2e7d32; padding: 15px; border-radius: 10px; color: white;">
+                                <div class="label-final" style="font-weight: bold;">NILAI AKHIR (INPUT MANUAL)</div>
+                                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                                    <input type="number" id="total_rata_tahsin" placeholder="0">
+                                    <div id="status_predikat_tahsin" style="font-size: 14px; margin-top: 5px; font-weight: 600;"></div>
+                                </div>
                             </div>
 
                             <div class="form-group-rapor form-group-full">
@@ -127,15 +149,24 @@
 
                     <div id="section-rapor-tahfidz" class="ysq-is-hidden">
                         <div class="form-container-rapor">
-                            <div class="form-section-title">Input Simakan & Ujian Akhir</div>
+                            <div class="form-section-header">
+                                <div class="form-section-title">Input Simakan & Ujian Akhir</div>
+                                <div class="periode-input-group">
+                                    <label>Periode:</label>
+                                    <select id="periode_tahfidz" class="input-periode-style">
+                                        <option value="">-- Pilih Periode --</option>
+                                        
+                                    </select>
+                                </div>
+                            </div>
                     
                             <div class="ysq-table-container-tahfidz">
                                 <table class="ysq-table-premium" style="margin-bottom: 0;">
                                     <thead>
                                         <tr>
-                                            <th style="width: 20%;">JUZ</th>
-                                            <th style="width: 60%;">NILAI SIMAKAN</th>
-                                            <th style="width: 20%;">AKSI</th>
+                                            <th>JUZ</th>
+                                            <th>NILAI SIMAKAN</th>
+                                            <th>AKSI</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -146,8 +177,8 @@
                                             <td>
                                                 <input type="number" id="quick_nilai" class="input-rapor-style-mini" placeholder="0-100">
                                             </td>
-                                            <td style="text-align: center;">
-                                                <button type="button" onclick="tambahKeDaftar()" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                                            <td>
+                                                <button type="button" onclick="tambahKeDaftar()">
                                                     <i class="fas fa-plus"></i> Tambah
                                                 </button>
                                             </td>
@@ -175,13 +206,14 @@
                                 </div>
                                 <div class="info-row value-side">
                                     <span>Nilai Ujian Akhir:</span>
-                                    <input type="number" class="input-rapor-style-mini" id="n_uas_tahfidz" placeholder="0" oninput="hitungRataTahfidz()">
+                                    <input type="number" id="n_uas_tahfidz" placeholder="0">
                                 </div>
                             </div>
                     
                             <div class="ysq-row-final-score">
                                 <div class="label-final">RATA-RATA AKHIR</div>
                                 <div class="value-final" id="total_rata_tahfidz">0.00</div>
+                                <div class="predikat-final" id="predikat_tahfidz"></div> 
                             </div>
                     
                             <div class="form-actions-rapor">

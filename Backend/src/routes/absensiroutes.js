@@ -13,7 +13,8 @@ const {
   catatAbsensiPengajar,
   getAbsensiPengajar,
   getAllAbsensiPengajar,
-  getRekapAbsensiPengajar
+  getRekapAbsensiPengajar,
+  exportAbsensi
 } = require("../controllers/absensicontrollers");
 
 const {
@@ -51,6 +52,8 @@ router.get("/pengajar/me", verifyToken, onlyPengajar, getAbsensiPengajar);
 
 router.get("/pengajar/rekap", verifyToken, onlyPengajar, getRekapAbsensiPengajar);
 
+// Route untuk export data 1 tahun ke belakang
+router.get("/export", verifyToken, onlyPengajar, exportAbsensi);
 // ============================================================
 //                         SANTRI
 // ============================================================

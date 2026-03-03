@@ -141,6 +141,17 @@ app.get("/dashboard/pengajar/laporan", (_, res) => {
   res.sendFile(view("laporan-pengajar.html"));
 });
 
+// ================= ADMIN - LAPORAN =================
+
+app.get("/dashboard/admin/laporan/keuangan-pemasukan", (_, res) => {
+  res.sendFile(view("keuangan_pemasukan.html"));
+});
+
+app.get("/dashboard/admin/laporan/keuangan-pengeluaran", (_, res) => {
+  res.sendFile(view("keuangan_pengeluaran.html"));
+});
+
+
 // ================= API ROUTES =================
 app.use("/api/auth", require("./routes/authroutes"));
 app.use("/api/pendaftar", require("./routes/registerroutes"));
@@ -155,8 +166,7 @@ app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
 app.use("/api/tugas-media", require("./routes/tugasmateriajarroutes"));
 app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
 app.use("/api/rapor", require("./routes/raporroutes"));
-app.use("/api/billing-santri", require("./routes/billingSantriRoutes"));
-app.use("/api/pembayaran", require("./routes/pembayaranroutes"));
+app.use("/api/keuangan", require("./routes/keuanganroutes"));
 
 // ================= START SERVER =================
 app.listen(PORT, () => {

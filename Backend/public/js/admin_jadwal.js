@@ -3,7 +3,7 @@ import { apiGet, apiPost, apiPut, apiDelete } from "./apiService.js";
 const $ = (id) => document.getElementById(id);
 
 
-// Buka popup profile 
+// Buka popup profile
 if ($("menu-profile")) {
     $("menu-profile").onclick = () => {
         const popup = $("popup-profile-setting");
@@ -154,13 +154,9 @@ function renderJadwal() {
     if (!tb) return;
 
     const fkelas = $("pilih_kelas")?.value;
-    const fkat = $("kategori")?.value;
-
     let list = [...window._jadwalList];
 
     if (fkelas) list = list.filter(j => j.id_kelas == fkelas);
-    // PERBAIKAN: Gunakan 'j' bukan 'k'
-    if (fkat) list = list.filter(j => j.kategori == fkat); 
 
     tb.innerHTML = "";
 
@@ -177,16 +173,17 @@ function renderJadwal() {
             <td>${j.pengajar_nama}</td>
             <td>${j.hari}</td>
             <td>${formatJam(j.jam_mulai, j.jam_selesai)}</td>
-            <td>${j.kategori}</td> <td><span class="status-badge status-aktif">AKTIF</span></td>
-                <td class="action-icons">
-                    <button class="icon-btn edit-btn" data-id="${j.id_jadwal}">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <button class="icon-btn delete-btn" data-id="${j.id_jadwal}">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
-            </tr>
+            <td>${j.kapasitas}</td>
+            <td><span class="status-badge status-aktif">AKTIF</span></td>
+            <td class="action-icons">
+                <button class="icon-btn edit-btn" data-id="${j.id_jadwal}">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="icon-btn delete-btn" data-id="${j.id_jadwal}">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
         `;
     });
 }
@@ -215,13 +212,13 @@ if ($("form-tambah-jadwal")) {
             hari: $("hari-tambah").value,
             jam_mulai: $("waktu-mulai").value + ":00",
             jam_selesai: $("waktu-selesai").value + ":00",
-            kategori: $("kategori-jadwal").value
+            kapasitas: $("kapasitas-tambah").value
         };
 
         try {
             // Mengirim data ke backend
             const response = await apiPost("/jadwal", payload);
-            
+
             // Jika berhasil
             toast("Jadwal berhasil ditambahkan!");
             $("tambah-jadwal-modal").style.display = "none";
@@ -230,10 +227,10 @@ if ($("form-tambah-jadwal")) {
 
         } catch (err) {
             console.error("Error Tambah Jadwal:", err);
-            
+
             // MENGAMBIL PESAN ERROR DARI BACKEND (Termasuk pesan "Jadwal Bentrok")
             const pesanError = err.response?.data?.message || "Gagal menambah jadwal";
-            
+
             // Tampilkan pesan error di toast dengan tipe 'error' (merah)
             toast(pesanError, "error");
         }
@@ -241,7 +238,7 @@ if ($("form-tambah-jadwal")) {
 }
 
 /* ============================================================
-   PERBAIKAN: EDIT JADWAL 
+   PERBAIKAN: EDIT JADWAL
 ============================================================ */
 document.addEventListener("click", async (e) => {
     const btn = e.target.closest(".edit-btn");
@@ -252,25 +249,21 @@ document.addEventListener("click", async (e) => {
     try {
         // 1. Ambil Detail Jadwal & Detail Kelas
         const jd = await apiGet(`/jadwal/${id}`);
-        const resKelas = await apiGet(`/kelas/detail/${jd.id_kelas}`);
+        $("jumlah-siswa-maks").value = jd.kapasitas;
 
         // 2. Isi Data ke Form Modal
         $("edit-id-jadwal").value = id;
         $("edit-id-kelas").value = jd.id_kelas;
         $("kelas-nama-edit").innerText = jd.nama_kelas;
-        
+
         // PASTI KAN ID DROPDOWN SESUAI (Gunakan ID yang ada di HTML Modal Edit Anda)
         if ($("pengajar")) $("pengajar").value = jd.id_pengajar;
-        
-        // --- INI PERBAIKAN UNTUK KATEGORI ---
-        if ($("kategori-edit")) {
-            $("kategori-edit").value = jd.kategori; // Masukkan kategori dari database
-        }
+
 
         $("edit-hari").value = jd.hari;
         $("edit-mulai").value = jd.jam_mulai.slice(0, 5);
         $("edit-selesai").value = jd.jam_selesai.slice(0, 5);
-        $("jumlah-siswa-maks").value = resKelas.kelas.kapasitas;
+        $("jumlah-siswa-maks").value = jd.kapasitas;
 
         // 3. Load Sesi Pengajar
         if (jd.id_pengajar) {
@@ -293,8 +286,8 @@ async function loadDaftarSesiPengajar(idPengajar) {
 
     try {
         const listSesi = await apiGet(`/jadwal/pengajar-sesi/${idPengajar}`);
-        
-        sesiBody.innerHTML = listSesi.length 
+
+        sesiBody.innerHTML = listSesi.length
             ? listSesi.map((s, i) => `
                 <tr>
                     <td>${i + 1}</td>
@@ -333,7 +326,7 @@ document.addEventListener("click", async (e) => {
     try {
         // Gunakan endpoint delete yang sudah ada di jadwalroutes.js
         await apiDelete(`/jadwal/${idJadwal}`);
-        
+
         toast("Sesi berhasil dihapus!");
 
         // 1. Refresh tabel kecil di dalam modal
@@ -358,25 +351,24 @@ document.addEventListener("click", async (e) => {
 if ($("btn-edit-simpan")) {
     $("btn-edit-simpan").onclick = async () => {
         const idJadwal = $("edit-id-jadwal").value;
-        
+
         const payload = {
-            id_kelas: $("edit-id-kelas").value, // Pastikan ID Kelas terkirim
-            kapasitas: $("jumlah-siswa-maks").value, // Kapasitas/Jumlah Maks
+            id_kelas: $("edit-id-kelas").value,
+            kapasitas: $("jumlah-siswa-maks").value,
             hari: $("edit-hari").value,
             jam_mulai: $("edit-mulai").value + ":00",
             jam_selesai: $("edit-selesai").value + ":00",
-            kategori: $("kategori-edit").value,
             id_pengajar: $("pengajar").value
         };
 
         try {
             await apiPut(`/jadwal/${idJadwal}`, payload);
             toast("Perubahan jadwal berhasil disimpan!");
-            
+
             $("edit-jadwal-modal").style.display = "none";
-            
+
             // PAKSA REFRESH DATA
-            await loadJadwal(); 
+            await loadJadwal();
         } catch (err) {
             console.error(err);
             toast("Gagal memperbarui jadwal", "error");
@@ -447,9 +439,9 @@ function renderKelas(data) {
             <tr>
                 <td>${i + 1}</td>
                 <td>${k.nama_kelas}</td>
-                <td>${k.kapasitas}</td>
                 <td>${k.kategori}</td>
-                <td>${k.nama_pengajar || "-"}</td>
+                <td>${k.jumlah_santri ?? 0}</td>
+                <td>${k.jumlah_sesi ?? 0}</td>
                 <td class="action-icons">
                     <button class="icon-btn view-details-btn" data-id="${k.id_kelas}">
                         <i class="fas fa-eye"></i>
@@ -515,17 +507,24 @@ document.addEventListener("click", async (e) => {
                 // 🔥 Ambil detail santri dari backend
                 let detail = await apiGet(`/santri/${s.id_santri}`);
 
-                const tanggalLahir = detail.data?.tanggal_lahir;
-                const status = detail.data?.status ?? "Aktif";
-                const usia = hitungUsia(tanggalLahir);
+                const usia = hitungUsia(s.tanggal_lahir);
+                const status = s.status ?? "Aktif";
 
                 tbody.innerHTML += `
+                <tr style="background:#f9f9f9">
+                    <td></td>
+                    <td colspan="3">
+                        ${s.hari} | 
+                        ${s.jam_mulai.slice(0,5)} - ${s.jam_selesai.slice(0,5)} |
+                        Pengajar: ${s.nama_pengajar}
+                    </td>
                     <tr>
-                        <td>${i + 1}</td>
-                        <td>${s.nama}</td>
-                        <td>${usia}</td>
-                        <td>${status}</td>
-                    </tr>
+                    <td>${i + 1}</td>
+                    <td>${s.nama}</td>
+                    <td>${hitungUsia(s.tanggal_lahir)}</td>
+                    <td>${s.status}</td>
+                </tr>
+                </tr>
                 `;
             }
         }
@@ -577,11 +576,6 @@ document.addEventListener("click", async (e) => {
 
 if ($("form-tambah-kelas")) {
 
-    $("btn-open-tambah-kelas").onclick = () => {
-        $("tambah-kelas-modal").style.display = "flex";
-        loadPengajarUntukTambahKelas(); // load list pengajar dari backend
-    };
-
     $("btn-close-tambah-kelas-x").onclick =
     $("btn-cancel-kelas").onclick = () => {
         $("tambah-kelas-modal").style.display = "none";
@@ -595,29 +589,29 @@ if ($("form-tambah-kelas")) {
         try {
             const res = await apiGet("/pengajar");
             const list = Array.isArray(res) ? res : res.data ?? [];
-    
+
             const dropdown = $("select-pengajar-kelas");
             if (!dropdown) return;
-    
+
             dropdown.innerHTML = `<option value="">Pilih Pengajar</option>`;
-    
+
             // FILTER: Hanya ambil yang aktif
             const activeOnly = list.filter(p => p.status === 'aktif');
-    
+
             const uniquePengajar = [];
             const seenIds = new Set();
-    
+
             activeOnly.forEach(p => {
                 if (!seenIds.has(p.id_pengajar)) {
                     seenIds.add(p.id_pengajar);
                     uniquePengajar.push(p);
                 }
             });
-    
+
             uniquePengajar.forEach(p => {
                 dropdown.innerHTML += `<option value="${p.id_pengajar}">${p.nama}</option>`;
             });
-    
+
         } catch (err) {
             console.error(err);
             toast("Gagal memuat daftar pengajar", "error");
@@ -629,28 +623,28 @@ if ($("form-tambah-kelas")) {
     // ============================
     $("form-tambah-kelas").addEventListener("submit", async (e) => {
         e.preventDefault();
-
+    
+        const namaInput = $("input-nama-kelas");
+        const kategoriInput = $("input-kategori");
+    
+        if (!namaInput || !kategoriInput) {
+            console.error("Element tidak ditemukan");
+            return;
+        }
+    
         const payload = {
-            nama_kelas: $("input-kelas-tingkatan").value,
-            kapasitas: Number($("input-kapasitas").value),
-            kategori: $("input-kategori").value,
-            id_pengajar: Number($("select-pengajar-kelas").value),
-            waktu_mulai: $("input-waktu-mulai").value,
-            waktu_selesai: $("input-waktu-selesai").value
+            nama_kelas: namaInput.value,
+            kategori: kategoriInput.value
         };
-
-        console.log("PAYLOAD KIRIM KELAS:", payload);
-
+    
         try {
             await apiPost("/kelas", payload);
-
+    
             toast("Kelas berhasil ditambahkan!");
-
             $("tambah-kelas-modal").style.display = "none";
             $("form-tambah-kelas").reset();
-
-            loadKelasTable(); // refresh tabel kelas
-
+            loadKelasTable();
+    
         } catch (err) {
             console.error(err);
             toast("Gagal menambah kelas", "error");
@@ -721,8 +715,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadKelasTable();
 
     if ($("pilih_kelas")) $("pilih_kelas").onchange = renderJadwal;
-    if ($("kategori")) $("kategori").onchange = renderJadwal;
 });
+
 
 
 // ===================================================
@@ -732,7 +726,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 function showToast(message, type) {
     // 🔣 TANDA: Fungsi Toast Notification
     const toast = document.getElementById('notification-toast');
-    
+
     if (!toast) {
         console.error('Elemen Toast dengan ID "notification-toast" tidak ditemukan.');
         return;
@@ -741,12 +735,12 @@ function showToast(message, type) {
     toast.textContent = message;
     toast.classList.remove('success', 'cancel', 'show'); // Reset kelas lama
     toast.classList.add(type);
-    
+
     // Tampilkan Toast
     toast.classList.add('show');
     setTimeout(() => {
         toast.classList.remove('show');
-    }, 3000); 
+    }, 3000);
 }
 
 // =======================================================
@@ -762,13 +756,13 @@ function showToast(message, type) {
  */
 async function fetchSantriData(kelasId) {
     console.log(`[AJAX LOG] Meminta data santri untuk Kelas ID: ${kelasId} ke server...`);
-    
+
 
     // Sementara API belum diisi: Beri jeda 500ms dan kembalikan array kosong (tanpa data dummy)
     return new Promise(resolve => {
         setTimeout(() => {
             resolve([]);
-        }, 500); 
+        }, 500);
     });
 }
 
@@ -778,15 +772,15 @@ async function fetchSantriData(kelasId) {
 // ===================================================
 
 window.onload = function() {
-    
+
     // ----------------------------------------------------
     // I. DEKLARASI VARIABEL DOM
     // ----------------------------------------------------
-    
+
     // 🏷️ TAG: Variabel MODAL PROFILE SETTING
     const modalSetting = document.getElementById('popup-profile-setting');
-    const btnOpenSetting = document.getElementById('btn-open-profil'); 
-    const btnCloseXSetting = document.getElementById('btn-close-profil-x'); 
+    const btnOpenSetting = document.getElementById('btn-open-profil');
+    const btnCloseXSetting = document.getElementById('btn-close-profil-x');
     const btnBatalProfil = document.getElementById('btn-cancel-profil');
     const btnSimpanProfil = document.getElementById('btn-simpan-profil');
 
@@ -800,31 +794,31 @@ window.onload = function() {
     const miniName = document.getElementById('mini-card-name');
     const miniEmail = document.getElementById('mini-card-email');
     const miniPhone = document.querySelector('#popup-profile-mini .profile-info-mini span:last-child');
-    
+
     // 🏷️ TAG: Variabel FILTER
-    const statusFilter = document.getElementById('kelas'); 
-    
+    const statusFilter = document.getElementById('kelas');
+
     // 🏷️ TAG: Variabel MINI PROFILE TOGGLE
-    const adminIcon = document.getElementById('dashboard-admin-icon'); 
+    const adminIcon = document.getElementById('dashboard-admin-icon');
     const miniPopup = document.getElementById('popup-profile-mini');
 
     // 🏷️ TAG: Variabel MODAL DETAIL PENDAFTAR (DASHBOARD)
-    const detailModal = document.getElementById("detail-pendaftar-modal"); 
+    const detailModal = document.getElementById("detail-pendaftar-modal");
     const detailCloseButton = detailModal ? detailModal.querySelector(".close-button") : null;
     const detailTerimaButton = detailModal ? detailModal.querySelector(".diterima") : null;
     const detailTolakButton = detailModal ? detailModal.querySelector(".ditolak") : null;
 
     // Selektor tabel yang benar: tabel dengan class 'dashboard-pendaftar-table'
     const pendaftarTableBody = document.querySelector('.dashboard-pendaftar-table tbody');
-    
+
         // Selektor untuk tabel di halaman Daftar Registrasi
     const registrasiTableBody = document.querySelector('.class-list-table tbody');
-    
+
     // Variabel untuk menyimpan data baris pendaftar yang sedang aktif
     let activeRowData = null;
 
     // 🏷️ TAG: Variabel RESET MODAL
-    const btnOpenReset = document.querySelector('.reset-btn'); 
+    const btnOpenReset = document.querySelector('.reset-btn');
     const resetModal = document.getElementById('konfirmasi-reset-modal');
     const btnResetConfirm = document.getElementById('btn-reset-confirm');
     const btnResetCancel = document.getElementById('btn-reset-cancel');
@@ -833,7 +827,7 @@ window.onload = function() {
     const editJadwalModal = document.getElementById('edit-jadwal-modal');
     const btnCloseEditX = document.getElementById('btn-close-edit-x');
     const btnEditCancel = document.getElementById('btn-edit-cancel');
-    const btnEditSimpan = document.getElementById('btn-edit-simpan'); 
+    const btnEditSimpan = document.getElementById('btn-edit-simpan');
     const jadwalTableBody = document.querySelector('.schedule-list-table tbody');
 
     // 🏷️ TAG: Variabel MODAL TAMBAH JADWAL
@@ -855,7 +849,7 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
     const santriModal = document.getElementById('santri-modal');
     const santriCloseBtn = santriModal ? santriModal.querySelector('.close-btn') : null;
     // Semua tombol ikon mata di tabel Daftar Kelas
-    const viewSantriBtns = document.querySelectorAll('.view-santri-btn'); 
+    const viewSantriBtns = document.querySelectorAll('.view-santri-btn');
     const santriTableBody = document.querySelector('#santri-table tbody');
     const santriModalTitle = document.getElementById('modal-title');
     const daftarKelasTableBody = document.querySelector('.class-list-table tbody'); // Selektor tbody di tabel Daftar Kelas
@@ -875,7 +869,7 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
     // Ambil elemen DOM secara lokal (alternatif deklarasi global)
     const tambahJadwalModal = document.getElementById('tambah-jadwal-modal');
     const formTambahJadwal = document.getElementById('form-tambah-jadwal');
-    
+
     if (tambahJadwalModal) tambahJadwalModal.style.display = 'none';
     if (formTambahJadwal) formTambahJadwal.reset();
 
@@ -885,17 +879,17 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
         if (tambahKelasModal) tambahKelasModal.style.display = 'none';
         if (formTambahKelas) formTambahKelas.reset();
     }
-    
+
 }
 
     /** 🏷️ TAG: 2. FUNGSI SINKRONISASI REAL-TIME */
     function syncProfileData() {
         if (!nameInput) return;
-        
+
         const currentName = nameInput.value.trim();
         let firstLetter = '';
         if (currentName.length > 0) { firstLetter = currentName.charAt(0).toUpperCase(); }
-        
+
         // Update Output Display
         if(avatarLarge) avatarLarge.textContent = firstLetter;
         if(miniAvatar) miniAvatar.textContent = firstLetter;
@@ -907,11 +901,11 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
         if(miniEmail && emailInput) miniEmail.textContent = emailInput.value.trim();
         if(miniPhone && phoneInput) miniPhone.textContent = phoneInput.value.trim();
     }
-    
+
     /** 🏷️ TAG: 3. FUNGSI FILTER STATUS */
     function initStatusFilter() {
         const tableBody = document.querySelector('.class-list-table tbody');
-        
+
         if (!statusFilter || !tableBody) return;
 
         const applyFilter = () => {
@@ -921,26 +915,26 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const statusCell = row.cells[6]; // Kolom ke-7: Keterangan/Status
-                
+
                 if (statusCell) {
-                    const badgeText = statusCell.textContent.trim().toLowerCase(); 
+                    const badgeText = statusCell.textContent.trim().toLowerCase();
                     let shouldShow = false;
-                    
+
                     if (selectedValue === 'semua') {
                         shouldShow = true;
                     } else if (selectedValue === 'menunggu') {
-                        shouldShow = badgeText === 'menunggu'; 
+                        shouldShow = badgeText === 'menunggu';
                     } else if (selectedValue === 'santri') {
                         shouldShow = badgeText === 'santri';
                     }
-                    
+
                     row.style.display = shouldShow ? '' : 'none';
                 }
             }
         };
 
         statusFilter.addEventListener('change', applyFilter);
-        applyFilter(); 
+        applyFilter();
     }
 
     /** 🏷️ TAG: FUNGSI CHECKBOX ALL (Toggle semua checkbox) */
@@ -954,7 +948,7 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
                     checkbox.checked = selectAllCheckbox.checked;
                 });
             });
-            
+
             // Opsional: Listener pada item checkbox untuk membatalkan 'select all'
             itemCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
@@ -970,7 +964,7 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
     function updateRealTimeDate() {
     // 1. Dapatkan elemen display tanggal
     const dateDisplayElement = document.getElementById('current-date-display');
-    
+
     if (!dateDisplayElement) {
         // Jika ID tidak ditemukan (misal di halaman yang berbeda), keluar dari fungsi
         return;
@@ -978,15 +972,15 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
 
     // 2. Logika untuk mendapatkan tanggal hari ini
     const now = new Date();
-    
+
     // Opsi format untuk Hari, Tanggal, Bulan, Tahun
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     };
-    
+
     // Format tanggal ke bahasa Indonesia
     const formattedDate = now.toLocaleDateString('id-ID', options);
 
@@ -995,7 +989,7 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
 
     // 4. Atur timer: Perbarui setiap 60 detik (untuk menghemat sumber daya)
     // Walaupun hari hanya berubah sekali sehari, timer memastikan tanggal selalu segar.
-    setTimeout(updateRealTimeDate, 60000); 
+    setTimeout(updateRealTimeDate, 60000);
 }
 
 /* 🏷️ TAG: 5. FUNGSI DETAIL PENDAFTAR (FRONTEND MURNI) */
@@ -1010,15 +1004,15 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
         safeSetText("pendaftar-tanggal", data.tanggal_lahir);
         safeSetText("pendaftar-status", data.status);
     }
-    
+
 
     /** Fungsi untuk memuat detail pendaftar dari BARIS TABEL (DOM). */
     function loadPendaftarDetail(row) {
         // Ambil data dari sel (cell) di baris yang diklik
         // Struktur tabel: [0: No, 1: Nama Lengkap, 2: Tempat Lahir, 3: Tanggal Lahir, 4: Nomor WhatsApp, 5: Status Button]
-        
+
         const dataForModal = {
-        id: row.cells[5].querySelector('.btn-lihat-detail') ? row.cells[5].querySelector('.btn-lihat-detail').getAttribute('data-id') : 'N/A', 
+        id: row.cells[5].querySelector('.btn-lihat-detail') ? row.cells[5].querySelector('.btn-lihat-detail').getAttribute('data-id') : 'N/A',
         namaLengkap: row.cells[1] ? row.cells[1].textContent.trim() : 'Nama tidak ditemukan',
         tempatLahir: row.cells[2] ? row.cells[2].textContent.trim() : 'Tempat tidak ditemukan',
         tanggalLahir: row.cells[3] ? row.cells[3].textContent.trim() : 'Tanggal tidak ditemukan',
@@ -1031,7 +1025,7 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
         ...dataForModal, // Salin semua properti data
         rowElement: row // TAMBAHKAN REFERENSI ELEMEN BARIS DI SINI
     };
-    
+
     fillModalData(dataForModal); // Tampilkan data ke modal
     if (detailModal) detailModal.style.display = "flex"; // Buka modal
     }
@@ -1042,18 +1036,18 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
             showToast("Gagal memproses. Data pendaftar tidak ditemukan.", "cancel");
             return;
         }
-        
+
         // Ambil elemen baris yang sedang aktif dan sel status (Kolom ke-5 / indeks 4 di array cells)
         const row = activeRowData.rowElement;
-        const statusCell = row.cells[5]; 
-        
+        const statusCell = row.cells[5];
+
         // 1. Buat tombol status baru
         const newButton = document.createElement('button');
         newButton.classList.add('btn-lihat-detail');
         newButton.setAttribute('data-id', activeRowData.id);
-        
+
         let statusClass = '';
-        
+
         if (status === 'Diterima') {
             statusClass = 'status-diterima';
             newButton.textContent = 'Diterima';
@@ -1061,23 +1055,23 @@ const formTambahJadwal = document.getElementById('form-tambah-jadwal');
             statusClass = 'status-ditolak';
             newButton.textContent = 'Ditolak';
         } else {
-            statusClass = 'status-detail'; 
+            statusClass = 'status-detail';
             newButton.textContent = 'Lihat Detail';
         }
-        
+
         newButton.classList.add(statusClass);
-        
+
         // 2. Ganti konten di sel Status
         if (statusCell) {
             statusCell.innerHTML = '';
             statusCell.appendChild(newButton);
         }
-        
+
         // 3. Tampilkan Notifikasi dan Tutup Modal
         showToast(`Pendaftar ${activeRowData.namaLengkap} di-status: ${status}.`, "success");
         if (detailModal) detailModal.style.display = "none";
     }
-    
+
 
 // 🏷️ TAG: 6. LOGIKA MODAL TAMBAH KELAS (BARU)
 
@@ -1091,7 +1085,7 @@ const KelasModalHandler = {
     init: function() {
         // Mendapatkan referensi elemen DOM
         // Asumsi: Tombol "Tambah Kelas" menggunakan kelas yang sama dengan Tambah Pengajar: .add-teacher-btn
-        this.btnOpen = document.querySelector('.add-teacher-btn'); 
+        this.btnOpen = document.querySelector('.add-teacher-btn');
         this.modal = document.getElementById('modalTambahKelas');
         this.btnBatal = document.getElementById('btnBatal');
         this.form = document.getElementById('formTambahKelas');
@@ -1130,18 +1124,18 @@ const KelasModalHandler = {
 
     handleSubmit: function(e) {
         e.preventDefault();
-        
+
         // --- LOGIKA PENGUMPULAN DATA ---
         const kelas = document.getElementById('kelas-tingkatan').value;
         // ... (ambil semua data input lainnya di sini) ...
-        
+
         console.log(`Mengirim data kelas ${kelas} ke server...`);
         showToast(`Mengirim data kelas ${kelas} ke server...`, "success");
-        
+
         // **********************************************
         // * Lakukan FUNGSI BACKEND (Fetch API/AJAX) di sini *
         // **********************************************
-        
+
         // Tutup modal setelah submit
         this.modal.style.display = 'none';
         this.form.reset();
@@ -1149,7 +1143,7 @@ const KelasModalHandler = {
     }
 };
 
-    
+
     // 🏷️ TAG: 7. LOGIKA MODAL DAFTAR SANTRI (BARU)
 
     /**
@@ -1159,7 +1153,7 @@ const KelasModalHandler = {
      */
     function populateSantriModalContent(santriList, namaKelas) {
         if (santriModalTitle) santriModalTitle.textContent = `Daftar Santri Kelas: ${namaKelas}`;
-        if (santriTableBody) santriTableBody.innerHTML = ''; 
+        if (santriTableBody) santriTableBody.innerHTML = '';
 
         if (!santriList || santriList.length === 0) {
             if (santriTableBody) santriTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Tidak ada santri di kelas ini.</td></tr>';
@@ -1174,21 +1168,21 @@ const KelasModalHandler = {
             row.insertCell().textContent = s.status;
         });
     }
-   
+
 
     // ----------------------------------------------------
     // III. IMPLEMENTASI EVENT LISTENERS
     // ----------------------------------------------------
-    
+
     // --- SINKRONISASI INPUT (REAL-TIME) ---
     if (nameInput) { nameInput.addEventListener('input', syncProfileData); }
     if (emailInput) { emailInput.addEventListener('input', syncProfileData); }
     if (phoneInput) { phoneInput.addEventListener('input', syncProfileData); }
-    syncProfileData(); 
-    
-    
+    syncProfileData();
+
+
     // 🏷️ TAG: A. LOGIKA MODAL PROFILE SETTING
-    
+
     // BUKA MODAL (GLOBAL)
     document.addEventListener('click', function(e) {
         const targetBtn = e.target.closest('.footer-btn.setting');
@@ -1200,25 +1194,25 @@ const KelasModalHandler = {
 
     if (btnCloseXSetting) {
         btnCloseXSetting.addEventListener('click', function() {
-            showToast("Pengaturan profil dibatalkan.", "cancel"); 
-            hideProfileModal(); 
+            showToast("Pengaturan profil dibatalkan.", "cancel");
+            hideProfileModal();
         });
     }
-    
+
     if (btnBatalProfil) {
         btnBatalProfil.addEventListener('click', function() {
-            showToast("Pengaturan profil dibatalkan.", "cancel"); 
-            hideProfileModal(); 
+            showToast("Pengaturan profil dibatalkan.", "cancel");
+            hideProfileModal();
         });
     }
 
     if (btnSimpanProfil) {
         btnSimpanProfil.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            let saveSuccess = true; 
+            e.preventDefault();
+            let saveSuccess = true;
             if (saveSuccess) {
                 showToast("Profil berhasil diperbarui!", "success");
-                hideProfileModal(); 
+                hideProfileModal();
             }
         });
     }
@@ -1231,10 +1225,10 @@ if (registrasiTableBody) {
     registrasiTableBody.addEventListener('click', (e) => {
         // Cek apakah elemen yang diklik adalah tombol Lihat Detail
         // (Ini akan menangkap tombol 'Ditolak', 'Diterima', dan 'Lihat Detail')
-        if (e.target.tagName === 'BUTTON') { 
-            
-            const row = e.target.closest('tr'); 
-            
+        if (e.target.tagName === 'BUTTON') {
+
+            const row = e.target.closest('tr');
+
             if (row) {
                 // Panggil fungsi yang memuat data dari baris dan membuka modal
                 loadPendaftarDetail(row);
@@ -1249,10 +1243,10 @@ if (registrasiTableBody) {
         pendaftarTableBody.addEventListener('click', (e) => {
             // Cek apakah elemen yang diklik adalah tombol Lihat Detail dengan class 'btn-lihat-detail'
             if (e.target.classList.contains('btn-lihat-detail')) {
-                
+
                 // Ambil baris tabel (<tr>) terdekat dari tombol yang diklik
-                const row = e.target.closest('tr'); 
-                
+                const row = e.target.closest('tr');
+
                 if (row) {
                     loadPendaftarDetail(row);
                 } else {
@@ -1279,12 +1273,12 @@ if (registrasiTableBody) {
     }
 
     // TUTUP MODAL DETAIL PENDAFTAR JIKA KLIK DI LUAR
-    if (detailModal && event.target === detailModal) { 
+    if (detailModal && event.target === detailModal) {
         detailModal.style.display = "none"; // Pastikan ini tetap 'none'
     }
-    
+
     // 🏷️ TAG: C. LOGIKA TOGGLE MINI PROFILE & OVERLAY UMUM
-    
+
     if (adminIcon && miniPopup) {
         adminIcon.addEventListener('click', function() {
             if (miniPopup.style.display === 'flex') {
@@ -1316,10 +1310,10 @@ if (btnResetCancel) {
 if (btnResetConfirm) {
     btnResetConfirm.addEventListener('click', function() {
         // Logika Reset Data Tahunan (Backend akan dipanggil di sini)
-        
+
         if (resetModal) resetModal.style.display = 'none';
         showToast("Seluruh data pendaftaran berhasil di-reset!", "success");
-        
+
         // TODO: Tambahkan kode untuk me-reload/memperbarui tabel data di sini
     });
 }
@@ -1330,19 +1324,19 @@ if (jadwalTableBody) {
         e.preventDefault();
         // Cek apakah yang diklik adalah ikon pensil (edit)
         // Asumsi: Ikon pensil berada di dalam <a> atau <button> dengan class 'edit-btn'
-        const editButton = e.target.closest('.edit-btn'); 
-        
+        const editButton = e.target.closest('.edit-btn');
+
         if (editButton || e.target.classList.contains('fa-pen-to-square')) {
             e.preventDefault();
             const row = e.target.closest('tr');
-            
+
             if (row) {
                 // Ambil data dasar dari baris (NO, Kelas, Pengajar, dst.)
                 const kelasNama = row.cells[1].textContent.trim();
-                
+
                 // Isi data ke modal (minimal nama kelas)
                 document.getElementById('kelas-nama-edit').textContent = kelasNama;
-                
+
                 // Tampilkan modal
                 if (editJadwalModal) editJadwalModal.style.display = 'flex';
             }
@@ -1353,17 +1347,17 @@ if (jadwalTableBody) {
 if (btnEditSimpan) {
     btnEditSimpan.addEventListener('click', function(e) {
         e.preventDefault(); // Mencegah form submit default jika ada
-        
+
         // Logika Simpan data (nanti diimplementasikan dengan backend)
         let saveSuccess = true;
-        
+
         if (saveSuccess) {
             // Tutup Modal
             if (editJadwalModal) editJadwalModal.style.display = 'none';
-            
+
             // Tampilkan Toast Sukses
             showToast("Perubahan jadwal berhasil disimpan!", "success");
-            
+
             // TODO: Tambahkan kode untuk me-reload/memperbarui tabel data di sini
         }
     });
@@ -1417,7 +1411,7 @@ if (formTambahJadwal) {
 
         // Tutup Modal
         closeTambahJadwalModal();
-        
+
         // Notifikasi ke user bahwa data sedang diproses
         showToast("Mengirim data jadwal baru ke server...", "success");
 
@@ -1456,10 +1450,10 @@ if (btnCancelKelas) {
 // 4. Aksi Simpan (Submit Form)
 if (formTambahKelas) {
     formTambahKelas.addEventListener('submit', function(e) {
-        e.preventDefault(); 
-        
+        e.preventDefault();
+
         // Logika Simpan ke Backend di sini
-        
+
         if (tambahKelasModal) tambahKelasModal.style.display = 'none'; // Langsung tutup
         if (formTambahKelas) formTambahKelas.reset();
 
@@ -1470,14 +1464,14 @@ if (formTambahKelas) {
 // 🏷️ TAG: H. LOGIKA LINK DETAIL PENGAJAR DARI TABEL
 if (pengajarTableBody) {
     pengajarTableBody.addEventListener('click', (e) => {
-        const editLink = e.target.closest('.edit-pengajar-link'); 
-        
+        const editLink = e.target.closest('.edit-pengajar-link');
+
         if (editLink) {
-            e.preventDefault(); 
-            
+            e.preventDefault();
+
             const pengajarId = editLink.getAttribute('data-pengajar-id');
-            const targetPage = editLink.getAttribute('href'); 
-            
+            const targetPage = editLink.getAttribute('href');
+
             if (pengajarId && targetPage) {
                 // Buat URL baru dengan Query Parameter
                 const newUrl = `${targetPage}?id=${pengajarId}`;
@@ -1491,24 +1485,24 @@ if (pengajarTableBody) {
 
     if (daftarKelasTableBody && santriModal) {
         daftarKelasTableBody.addEventListener('click', async (e) => {
-            const viewButton = e.target.closest('.view-santri-btn'); 
-            
+            const viewButton = e.target.closest('.view-santri-btn');
+
             if (viewButton) {
                 const kelasId = viewButton.getAttribute('data-kelas-id');
                 const row = viewButton.closest('tr');
-                
+
                 if (!kelasId || !row) return;
 
                 const namaKelas = row.cells[1] ? row.cells[1].textContent.trim() : 'Tidak Diketahui';
 
                 try {
                     // Tampilkan status 'Loading'
-                    populateSantriModalContent(null, namaKelas); 
+                    populateSantriModalContent(null, namaKelas);
                     santriModal.style.display = 'block';
-                    
+
                     // Panggil fungsi Backend (ini yang perlu diisi teman Anda)
                     const santriData = await fetchSantriData(kelasId);
-                    
+
                     // Isi modal dengan data yang diterima
                     populateSantriModalContent(santriData, namaKelas);
 
@@ -1534,7 +1528,7 @@ if (pengajarTableBody) {
 
     window.addEventListener('click', (event) => {
         if (event.target === modalSetting) { hideProfileModal(); }
-        
+
         // TUTUP MINI POPUP JIKA KLIK DI LUAR
         if (miniPopup && event.target !== adminIcon && !adminIcon.contains(event.target) && !miniPopup.contains(event.target)) {
             miniPopup.style.display = 'none';
@@ -1560,20 +1554,20 @@ if (pengajarTableBody) {
     if (santriModal && event.target === santriModal) { santriModal.style.display = "none"; }
 
 });
-    
+
 
     // --- D. EKSEKUSI AKHIR ---
-    
+
     // Panggil Filter Status Kelas
     initStatusFilter();
-    
+
     // Panggil Checkbox All Toggle
-    initSelectAllCheckbox(); 
-    
+    initSelectAllCheckbox();
+
     // JAMINAN MODAL TERTUTUP SAAT AWAL LOAD
     hideProfileModal();
 
     // PANGGILAN FUNGSI TANGGAL REAL-TIME
     updateRealTimeDate();
 
-}; // Akhir dari window.onload
+};

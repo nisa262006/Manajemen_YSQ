@@ -167,3 +167,115 @@ SAHABAT-QURAN-WEB/
 
 ## 🙏 Penutup
 Repository ini dikelola sebagai bagian dari implementasi sistem manajemen modern untuk Yayasan Sahabat Qur’an Bogor. Proyek ini dibangun dengan tujuan meningkatkan efisiensi, akurasi, dan profesionalitas dalam pengelolaan operasional yayasan.
+
+
+
+server {
+    server_name akademik.sahabatquran.com;
+
+        client_max_body_size 11M;
+
+    # 1. Menangani Aset Statis (CSS, JS, Gambar)
+    # Gunakan 'alias' agar Nginx langsung mengambil file tanpa lewat Node.js
+    location /css/ {
+        alias /var/www/akademik/Backend/public/css/;
+    }
+    location /js/ {
+        alias /var/www/akademik/Backend/public/js/;
+    }
+    location /images/ {
+        alias /var/www/akademik/Backend/public/images/;
+    }
+location /uploads/ {
+    root /var/www/akademik/Backend/src/public;
+    autoindex off;
+}
+
+    # 2. Menangani Semua URL (Login, Dashboard, API, dll)
+    # Semua permintaan akan dilempar ke Node.js di port 8000
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_buffering off;
+    proxy_read_timeout 300;
+    proxy_connect_timeout 300;
+    proxy_send_timeout 300;
+    }
+
+    # Bagian SSL (JANGAN DIUBAH, biarkan aslinya)
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/akademik.sahabatquran.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/akademik.sahabatquran.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = akademik.sahabatquran.com) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name akademik.sahabatquran.com;
+    return 404;
+}
+root@akademik:~# cat sudo nano /etc/nginx/sites-available/akademik
+cat: sudo: No such file or directory
+cat: nano: No such file or directory
+server {
+    server_name akademik.sahabatquran.com;
+
+        client_max_body_size 11M;
+
+    # 1. Menangani Aset Statis (CSS, JS, Gambar)
+    # Gunakan 'alias' agar Nginx langsung mengambil file tanpa lewat Node.js
+    location /css/ {
+        alias /var/www/akademik/Backend/public/css/;
+    }
+    location /js/ {
+        alias /var/www/akademik/Backend/public/js/;
+    }
+    location /images/ {
+        alias /var/www/akademik/Backend/public/images/;
+    }
+location /uploads/ {
+    root /var/www/akademik/Backend/src/public;
+    autoindex off;
+}
+
+    # 2. Menangani Semua URL (Login, Dashboard, API, dll)
+    # Semua permintaan akan dilempar ke Node.js di port 8000
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+
+        proxy_buffering off;
+    proxy_read_timeout 300;
+    proxy_connect_timeout 300;
+    proxy_send_timeout 300;
+    }
+
+    # Bagian SSL (JANGAN DIUBAH, biarkan aslinya)
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/akademik.sahabatquran.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/akademik.sahabatquran.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = akademik.sahabatquran.com) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name akademik.sahabatquran.com;
+    return 404;
+}

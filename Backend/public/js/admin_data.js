@@ -70,7 +70,7 @@ function initDaftarSantri() {
 santriTableBody.addEventListener("click", async (e) => {
     // Cek apakah yang diklik adalah tombol delete atau icon sampah
     const deleteBtn = e.target.closest(".delete-btn");
-    
+
     if (deleteBtn) {
         const id = deleteBtn.dataset.id;
         if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
@@ -85,13 +85,16 @@ santriTableBody.addEventListener("click", async (e) => {
     }
 });
 
-    function renderKelas() {
-        if (!kelasSelect) return;
-        kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
-        KELAS.forEach(k => {
-            kelasSelect.innerHTML += `<option value="${k.id_kelas}">${k.nama_kelas}</option>`;
-        });
-    }
+function renderKelas() {
+    if (!kelasSelect) return;
+    kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+    
+    KELAS.forEach(k => {
+        // Gabungkan nama kelas dan nama pengajar agar admin tidak bingung
+        const pengajar = k.nama_pengajar ? ` - ${k.nama_pengajar}` : "";
+        kelasSelect.innerHTML += `<option value="${k.id_kelas}">${esc(k.nama_kelas)}${esc(pengajar)}</option>`;
+    });
+}
 
     function renderTable(list) {
         santriTableBody.innerHTML = "";
@@ -99,22 +102,27 @@ santriTableBody.addEventListener("click", async (e) => {
             santriTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center">Tidak ada data</td></tr>`;
             return;
         }
-        list.forEach((s, i) => {
-            santriTableBody.innerHTML += `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td>${esc(s.nis)}</td>
-                    <td>${esc(s.nama)}</td>
-                    <td>${esc(s.nama_kelas ?? "-")}</td>
-                    <td>${esc(s.user_email ?? s.email ?? "-")}</td>
-                    <td>${esc(s.kategori)}</td>
-                    <td><span class="status-badge ${s.status === "aktif" ? "status-aktif" : "status-nonaktif"}">${esc(s.status)}</span></td>
-                    <td class="action-icons">
-                        <a href="/dashboard/detail-santri?id=${s.id_santri}" class="icon-btn edit-btn"><i class="fas fa-pen"></i></a>
-                        <button class="icon-btn delete-btn" data-id="${s.id_santri}"><i class="fas fa-trash-alt"></i></button>
-                    </td>
-                </tr>`;
-        });
+        // Di dalam list.forEach pada fungsi renderTable(list)
+// Ubah bagian baris tabel menjadi seperti ini:
+list.forEach((s, i) => {
+    santriTableBody.innerHTML += `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${esc(s.nis)}</td>
+            <td>${esc(s.nama)}</td>
+            <td>
+                <strong>${esc(s.nama_kelas ?? "-")}</strong><br>
+                <small style="color: #666;">${esc(s.nama_pengajar ?? "Tanpa Pengajar")}</small>
+            </td>
+            <td>${esc(s.user_email ?? s.email ?? "-")}</td>
+            <td>${esc(s.kategori)}</td>
+            <td><span class="status-badge ${s.status === "aktif" ? "status-aktif" : "status-nonaktif"}">${esc(s.status)}</span></td>
+            <td class="action-icons">
+                <a href="/dashboard/detail-santri?id=${s.id_santri}" class="icon-btn edit-btn"><i class="fas fa-pen"></i></a>
+                <button class="icon-btn delete-btn" data-id="${s.id_santri}"><i class="fas fa-trash-alt"></i></button>
+            </td>
+        </tr>`;
+});
     }
 
     function applyFilter() {
@@ -131,16 +139,21 @@ santriTableBody.addEventListener("click", async (e) => {
     if (exportBtn) {
         exportBtn.onclick = () => {
             const kat = kategoriSelect?.value || "Semua";
-            const fileName = `Daftar-Santri-${kat}.xls`; // Gunakan .xls agar format terbaca Excel
+            const fileName = `Daftar-Santri-${kat}.xls`;
     
-            // 1. Kelompokkan data berdasarkan Nama Kelas
+            // 1. Kelompokkan data berdasarkan Kelas dan simpan info Pengajarnya
             const kelompokKelas = {};
             SANTRI.forEach(s => {
                 const namaKelas = s.nama_kelas || "Tanpa Kelas";
+                const namaPengajar = s.nama_pengajar || "Tanpa Pengajar";
+                
                 if (!kelompokKelas[namaKelas]) {
-                    kelompokKelas[namaKelas] = [];
+                    kelompokKelas[namaKelas] = {
+                        pengajar: namaPengajar,
+                        data: []
+                    };
                 }
-                kelompokKelas[namaKelas].push(s);
+                kelompokKelas[namaKelas].data.push(s);
             });
     
             // 2. Bangun Struktur HTML untuk Excel
@@ -148,47 +161,55 @@ santriTableBody.addEventListener("click", async (e) => {
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
                 <head><meta charset="UTF-8"></head>
                 <body>
+                    <h2 style="text-align:center;">LAPORAN DAFTAR SANTRI - ${kat.toUpperCase()}</h2>
             `;
     
             for (const kelas in kelompokKelas) {
+                const info = kelompokKelas[kelas];
+                
                 htmlKonten += `
-                    <h3>KELAS: ${kelas.toUpperCase()}</h3>
+                    <table border="0">
+                        <tr>
+                            <td colspan="3"><strong>KELAS: ${kelas.toUpperCase()}</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><strong>PENGAJAR: ${info.pengajar.toUpperCase()}</strong></td>
+                        </tr>
+                    </table>
                     <table border="1">
                         <thead>
-                            <tr style="background-color: #f2f2f2; font-weight: bold;">
-                                <th>No</th>
-                                <th>NIS</th>
-                                <th>Nama</th>
-                                <th>Tanggal Lahir</th>
-                                <th>Alamat</th>
-                                <th>Email</th>
-                                <th>No HP</th>
-                                <th>Kelas</th>
-                                <th>Kategori</th>
-                                <th>Status</th>
+                            <tr style="background-color: #007bff; color: white; font-weight: bold;">
+                                <th width="30">No</th>
+                                <th width="100">NIS</th>
+                                <th width="200">Nama</th>
+                                <th width="100">Tanggal Lahir</th>
+                                <th width="250">Alamat</th>
+                                <th width="150">Email</th>
+                                <th width="120">No HP</th>
+                                <th width="100">Kategori</th>
+                                <th width="80">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
     
-                kelompokKelas[kelas].forEach((s, i) => {
+                info.data.forEach((s, i) => {
                     htmlKonten += `
                         <tr>
-                            <td>${i + 1}</td>
+                            <td align="center">${i + 1}</td>
                             <td style="mso-number-format:'\\@'">${s.nis || '-'}</td>
                             <td>${s.nama || '-'}</td>
                             <td>${s.tanggal_lahir ? s.tanggal_lahir.split('T')[0] : '-'}</td>
                             <td>${s.alamat || '-'}</td>
                             <td>${s.user_email || s.email || '-'}</td>
                             <td style="mso-number-format:'\\@'">${s.no_wa || '-'}</td>
-                            <td>${s.nama_kelas || '-'}</td>
                             <td>${s.kategori || '-'}</td>
-                            <td>${s.status || '-'}</td>
+                            <td align="center">${s.status || '-'}</td>
                         </tr>
                     `;
                 });
     
-                htmlKonten += `</tbody></table><br>`; // Jarak antar tabel kelas
+                htmlKonten += `</tbody></table><br><br>`; // Jarak antar tabel kelas
             }
     
             htmlKonten += `</body></html>`;
@@ -202,7 +223,7 @@ santriTableBody.addEventListener("click", async (e) => {
             link.click();
         };
     }
-    
+
     if (searchInput) searchInput.onkeyup = applyFilter;
     if (kategoriSelect) kategoriSelect.onchange = applyFilter;
     if (kelasSelect) kelasSelect.onchange = applyFilter;
@@ -229,23 +250,23 @@ function initDaftarPengajar() {
             console.error("Gagal load data pengajar:", err);
         }
     }
-    
+
     // Tambahkan listener pada body tabel pengajar
 pengajarTableBody.addEventListener("click", async (e) => {
     // Mencari elemen tombol delete terdekat yang diklik
     const deleteBtn = e.target.closest(".delete-btn");
-    
+
     if (deleteBtn) {
         const id = deleteBtn.dataset.id;
-        
+
         // Konfirmasi sebelum menghapus
         if (confirm("Apakah Anda yakin ingin menghapus data pengajar ini?")) {
             try {
                 // Memanggil fungsi apiDelete dari apiService.js
                 await apiDelete(`/pengajar/${id}`);
-                
+
                 // Panggil kembali fungsi load untuk memperbarui tampilan tabel
-                load(); 
+                load();
             } catch (err) {
                 console.error("Gagal menghapus pengajar:", err);
                 alert("Gagal menghapus data: " + (err.message || "Terjadi kesalahan server"));
@@ -258,7 +279,7 @@ pengajarTableBody.addEventListener("click", async (e) => {
         const key = searchInput?.value.toLowerCase() || "";
         const uniqueData = [];
         const map = new Map();
-        
+
         DATA.forEach(item => {
             if (!map.has(item.id_pengajar)) {
                 map.set(item.id_pengajar, true);
@@ -321,50 +342,53 @@ function initDetailSantri() {
         try {
             const res = await apiGet(`/santri/${id}`);
             const s = res.data ?? res;
-    
+
             f.nis.value = s.nis ?? "";
             f.nama.value = s.nama ?? "";
             f.alamat.value = s.alamat ?? "";
             f.tempat.value = s.tempat_lahir ?? "";
             f.tanggal.value = s.tanggal_lahir?.split("T")[0] ?? "";
             f.wa.value = s.no_wa ?? "";
-            f.kategori.value = s.kategori ?? "";
+            
+            // FIX: Paksa ke huruf kecil agar cocok dengan value="anak"/"dewasa" di HTML
+            if (s.kategori) {
+                f.kategori.value = s.kategori.trim();
+            }
+
             f.username.value = s.username ?? "-";
             f.email.value = s.user_email ?? s.email ?? "";
             f.status.value = s.status ?? "nonaktif";
-    
-            // ✅ Aman: jika tanggal_terdaftar null
+
             function formatDateForInput(dateString) {
                 if (!dateString) return "";
                 const d = new Date(dateString);
-                // Tambahan cek valid date
                 if (isNaN(d.getTime())) return "";
                 const yyyy = d.getFullYear();
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
                 const dd = String(d.getDate()).padStart(2, '0');
                 return `${yyyy}-${mm}-${dd}`;
             }
-            
-            f.daftar.value = formatDateForInput(s.tanggal_terdaftar);            
-    
+
+            f.daftar.value = formatDateForInput(s.tanggal_terdaftar);
+
         } catch (err) {
             console.error("Gagal memuat data santri", err);
             alert("Gagal memuat data santri");
         }
     }
-    
 
     btnEdit.onclick = () => setDisabled(false);
 
     btnSave.onclick = async () => {
         try {
+
             await apiPut(`/santri/${id}`, {
                 nama: f.nama.value,
                 alamat: f.alamat.value,
                 tempat_lahir: f.tempat.value,
                 tanggal_lahir: f.tanggal.value || null,
                 no_wa: f.wa.value,
-                kategori: f.kategori.value,
+                kategori: f.kategori.value, // Mengirim "anak" atau "dewasa"
                 email: f.email.value,
                 status: f.status.value
             });
@@ -430,23 +454,33 @@ function initDetailPengajar() {
 
     btnSave.onclick = async () => {
         try {
-            await apiPut(`/pengajar/${id}`, {
+    
+            const payload = {
                 nama: f.nama.value,
                 alamat: f.alamat.value,
+                tempat_lahir: f.tempat.value,
                 tanggal_lahir: f.tanggal.value || null,
-                no_kontak: f.telp.value,
+                no_wa: f.wa.value,
                 email: f.email.value,
                 status: f.status.value
-            });
-            alert("Data pengajar diperbarui");
-            location.href = "/dashboard/daftar-pengajar";
+            };
+    
+            // hanya kirim kategori jika admin memang pilih
+            if (f.kategori.value) {
+                payload.kategori = f.kategori.value;
+            }
+    
+            await apiPut(`/santri/${id}`, payload);
+    
+            alert("Data santri diperbarui");
+            location.href = "/dashboard/daftar-santri";
+    
         } catch (err) {
-            console.error("Update pengajar error:", err);
-            alert("Gagal memperbarui data pengajar");
+            console.error("Update santri error:", err);
+            alert("Gagal memperbarui data santri");
         }
     };
 
     setDisabled(true);
     load();
 }
-
