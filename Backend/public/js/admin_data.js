@@ -68,19 +68,77 @@ function initDaftarSantri() {
 
     // Tambahkan listener pada container tabel (Event Delegation)
 santriTableBody.addEventListener("click", async (e) => {
-    // Cek apakah yang diklik adalah tombol delete atau icon sampah
     const deleteBtn = e.target.closest(".delete-btn");
+    if (!deleteBtn) return;
 
-    if (deleteBtn) {
-        const id = deleteBtn.dataset.id;
-        if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-            try {
-                await apiDelete(`/santri/${id}`);
-                loadAll(); // Refresh data tabel
-            } catch (err) {
-                console.error("Gagal menghapus:", err);
-                alert("Gagal menghapus data");
+    const id = deleteBtn.dataset.id;
+    
+    // TAHAP 1: Konfirmasi Awal
+    if (!confirm("Apakah Anda yakin ingin menghapus data santri ini secara permanen?")) return;
+
+    try {
+        // PERCOBAAN PERTAMA: Cek Tunggakan & Backup ke Backend
+        // Kita kirim request kosong dulu untuk memancing validasi backend
+        let response = await apiDelete(`/santri/${id}`, {});
+
+    } catch (err) {
+        // TAHAP 2: MENANGANI VALIDASI DARI BACKEND (ERROR 400)
+        
+        // 1. Jika ada tunggakan
+        if (err.type === "VALIDATION_TUNGGAKAN") {
+            if (confirm(err.message)) { // Pesan: "Santri punya utang Rp..., tetap hapus?"
+                // Lanjut ke tahap berikutnya dengan membawa flag tunggakan
+                return prosesHapusFinal(id, { confirm_tunggakan: true });
             }
+            return;
+        }
+
+        // 2. Jika perlu konfirmasi backup
+        if (err.type === "VALIDATION_BACKUP") {
+            if (confirm("Peringatan: Data akan dihapus selamanya. Apakah Anda sudah memastikan data sudah di-eksport (Backup) ke Excel?")) {
+                // Lanjut ke tahap final dengan semua flag
+                return prosesHapusFinal(id, { confirm_tunggakan: true, confirm_backup: true });
+            }
+            return;
+        }
+
+        console.error("Gagal menghapus:", err);
+        alert(err.message || "Gagal menghapus data");
+    }
+
+    // Fungsi Pembantu untuk mengirim request dengan body
+    async function prosesHapusFinal(targetId, flags) {
+        try {
+            // Karena apiDelete biasanya tidak menerima body di banyak library, 
+            // pastikan apiService.js kamu mendukung parameter kedua sebagai body.
+            // Jika tidak, kamu bisa modifikasi apiDelete atau gunakan fetch langsung:
+            
+            const finalRes = await fetch(`/api/santri/${targetId}`, {
+                method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem("token")}` 
+                },
+                body: JSON.stringify(flags)
+            });
+
+            const result = await finalRes.json();
+
+            if (finalRes.ok) {
+                alert(result.message);
+                loadAll(); // Refresh tabel
+            } else {
+                // Jika masih butuh validasi selanjutnya (misal dari tunggakan lanjut ke backup)
+                if (result.type === "VALIDATION_BACKUP") {
+                    if (confirm(result.message)) {
+                        return prosesHapusFinal(targetId, { ...flags, confirm_backup: true });
+                    }
+                } else {
+                    alert(result.message);
+                }
+            }
+        } catch (error) {
+            alert("Terjadi kesalahan sistem");
         }
     }
 });

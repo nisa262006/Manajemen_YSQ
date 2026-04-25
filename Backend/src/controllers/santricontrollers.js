@@ -335,40 +335,85 @@ exports.updateSantri = async (req, res) => {
 
 
 /* ============================================================
-    4. DELETE SANTRI + USERNYA (PERBAIKAN)
+    4. DELETE SANTRI (PERBAIKAN FINAL - CLEANING ALL TABLES)
 ============================================================ */
 exports.deleteSantri = async (req, res) => {
   const client = await db.connect();
   try {
     const { id_santri } = req.params;
-    await client.query("BEGIN");
+    const { confirm_tunggakan, confirm_backup } = req.body;
 
-    // 1. Ambil id_users dan email dari tabel santri
-    const check = await client.query(
-      `SELECT id_users, email FROM santri WHERE id_santri=$1`,
+    // 1. Cek Detail Tunggakan (Infaq Belajar / Lainnya)
+    const checkBilling = await client.query(
+      `SELECT jenis, COUNT(*) as jml 
+       FROM billing_santri 
+       WHERE id_santri = $1 AND status = 'belum bayar'
+       GROUP BY jenis`,
       [id_santri]
     );
 
-    if (check.rowCount === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ message: "Santri tidak ditemukan" });
+    if (checkBilling.rowCount > 0 && !confirm_tunggakan) {
+      // Susun pesan otomatis berdasarkan data di database
+      // Hasilnya nanti: "Infaq Belajar (2), Infaq Lainnya (1)"
+      const detailTunggakan = checkBilling.rows
+        .map(item => `${item.jenis} (${item.jml})`)
+        .join(", ");
+
+      return res.status(400).json({ 
+        type: "VALIDATION_TUNGGAKAN", 
+        message: `Santri memiliki tunggakan: ${detailTunggakan}. Tetap hapus data ini?` 
+      });
     }
 
-    const { id_users, email } = check.rows[0];
+    // 2. Cek Backup
+    if (!confirm_backup) {
+      return res.status(400).json({ 
+        type: "VALIDATION_BACKUP", 
+        message: "Konfirmasi: Apakah Anda sudah melakukan ekspor data (Backup) ke Excel?" 
+      });
+    }
 
-    // 2. HAPUS dari tabel pendaftar (Agar email bisa dipakai lagi)
-    await client.query(`DELETE FROM pendaftar WHERE email = $1`, [email]);
+    await client.query("BEGIN");
 
-    // 3. HAPUS dari tabel users
-    // Otomatis menghapus data di tabel santri karena ON DELETE CASCADE
-    await client.query(`DELETE FROM users WHERE id_users = $1`, [id_users]);
+    // Ambil info email & id_users sebelum data dihapus
+    const checkUser = await client.query(`SELECT id_users, email FROM santri WHERE id_santri = $1`, [id_santri]);
+    if (checkUser.rowCount === 0) throw new Error("Santri tidak ditemukan");
+    const { id_users, email } = checkUser.rows[0];
+
+    // --- PROSES PEMBERSIHAN BERDASARKAN SKEMA TABEL ---
+
+    // A. Hapus Detail Rapor & Tugas (Level Cucu)
+    await client.query(`DELETE FROM tahfidz_simakan WHERE id_rapor IN (SELECT id_rapor FROM rapor_tahfidz WHERE id_santri = $1)`, [id_santri]);
+    await client.query(`DELETE FROM pengumpulan_tugas WHERE id_santri = $1`, [id_santri]);
+
+    // B. Hapus Rapor & Progres (Level Anak)
+    await client.query(`DELETE FROM rapor_tahfidz WHERE id_santri = $1`, [id_santri]);
+    await client.query(`DELETE FROM rapor_tahsin WHERE id_santri = $1`, [id_santri]);
+    await client.query(`DELETE FROM progres_pembelajaran WHERE id_santri = $1`, [id_santri]);
+
+    // C. Hapus Keuangan (Pembayaran & Billing)
+    await client.query(`DELETE FROM pembayaran WHERE id_santri = $1`, [id_santri]);
+    await client.query(`DELETE FROM billing_santri WHERE id_santri = $1`, [id_santri]);
+
+    // D. Hapus Pendaftar (Agar email bisa digunakan kembali)
+    if (email) await client.query(`DELETE FROM pendaftar WHERE email = $1`, [email]);
+
+    // E. EKSEKUSI FINAL (Hapus User)
+    // Karena tabel 'santri', 'santri_kelas', dan 'absensi' sudah pakai ON DELETE CASCADE ke users,
+    // maka kita cukup hapus di tabel users saja.
+    if (id_users) {
+      await client.query(`DELETE FROM users WHERE id_users = $1`, [id_users]);
+    } else {
+      await client.query(`DELETE FROM santri WHERE id_santri = $1`, [id_santri]);
+    }
 
     await client.query("COMMIT");
-    res.json({ message: "Data santri, akun, dan pendaftaran berhasil dihapus sepenuhnya" });
+    res.json({ success: true, message: "Seluruh data santri berhasil dibersihkan dari sistem." });
 
   } catch (err) {
     await client.query("ROLLBACK");
-    res.status(500).json({ message: "Gagal menghapus data" });
+    console.error("DELETE ERROR:", err.message);
+    res.status(500).json({ success: false, message: "Gagal: " + err.message });
   } finally {
     client.release();
   }
