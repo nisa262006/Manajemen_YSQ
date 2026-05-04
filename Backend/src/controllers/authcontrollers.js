@@ -90,11 +90,11 @@ if (user.role === 'santri' && user.status_konfirmasi_santri && user.status_konfi
 // ==================== GET ME ====================
 exports.getMe = async (req, res) => {
   try {
-    const userId = req.users.id_users;
+    const userId = req.user.id_users;
 
     const result = await db.query(
       `
-      SELECT id_users, username, nama_users, email, role, status_user
+      SELECT id_users, username, email, role, status_user
       FROM users
       WHERE id_users = $1
       `,
@@ -105,7 +105,10 @@ exports.getMe = async (req, res) => {
       return res.status(404).json({ message: "User tidak ditemukan" });
     }
 
-    return res.json(result.rows[0]);
+    return res.json({
+      success: true,
+      profile: result.rows[0]
+    });
 
   } catch (err) {
     console.error("GETME ERROR:", err);

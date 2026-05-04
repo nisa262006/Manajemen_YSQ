@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### liat data me
-GET http://localhost:5000/me
+GET http://localhost:8000/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
 
 ### reser password

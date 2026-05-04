@@ -8,19 +8,34 @@ node_modules/
 
 # Environment Variables
 Backend/.env
+.env
 
 # Database Data
 pgdata/
 
 # Editor Settings
 .vscode/
+.idea/
+*.swp
 
 # Logs
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
 
 # Database Backup
 backup/
 *.sql
+
+# Testing & Coverage
+Backend/coverage/
+coverage/
+.nyc_output/
+
+# System Files
+.DS_Store
+Thumbs.db
 
 # ========================================
 #  UPLOADS (Hanya simpan struktur & file awal klien)
@@ -31,7 +46,6 @@ Backend/public/uploads/tugas/*
 Backend/public/uploads/submit/*
 
 # JANGAN abaikan file permintaan klien (misal: formatnya .pdf atau .png)
-# atau cukup jangan abaikan file .gitkeep jika kamu menggunakannya nanti
 !Backend/public/uploads/submit/*.docx
 !Backend/public/uploads/materi/*.doc
 !Backend/public/uploads/materi/*.docx

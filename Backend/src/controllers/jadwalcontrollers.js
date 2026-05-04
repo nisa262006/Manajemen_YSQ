@@ -8,16 +8,25 @@ const db = require("../config/db");
 exports.tambahJadwal = async (req, res) => {
   const { id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kapasitas } = req.body;
 
+  if (!id_kelas || !hari || !jam_mulai || !jam_selesai) {
+    return res.status(400).json({ message: "id_kelas, hari, jam_mulai, dan jam_selesai wajib diisi" });
+  }
+
   try {
-    await db.query(
+    const result = await db.query(
       `INSERT INTO jadwal
        (id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kapasitas)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id_kelas, hari, jam_mulai, jam_selesai, id_pengajar, kapasitas]
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id_jadwal`,
+      [id_kelas, hari, jam_mulai, jam_selesai, id_pengajar || null, kapasitas || null]
     );
 
-    res.json({ message: "Jadwal berhasil ditambahkan" });
+    res.status(201).json({
+      message: "Jadwal berhasil ditambahkan",
+      jadwal: result.rows[0]
+    });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Gagal menambah jadwal" });
   }
 };
@@ -93,17 +102,22 @@ exports.updateJadwal = async (req, res) => {
     const { id_jadwal } = req.params;
     const { hari, jam_mulai, jam_selesai, id_pengajar, id_kelas, kapasitas } = req.body;
 
-    await db.query(
+    const result = await db.query(
       `UPDATE jadwal 
-       SET hari=$1,
-           jam_mulai=$2,
-           jam_selesai=$3,
-           id_pengajar=$4,
-           id_kelas=$5,
-           kapasitas=$6
-       WHERE id_jadwal=$7`,
-      [hari, jam_mulai, jam_selesai, id_pengajar, id_kelas, kapasitas, id_jadwal]
+       SET hari=COALESCE($1, hari),
+           jam_mulai=COALESCE($2, jam_mulai),
+           jam_selesai=COALESCE($3, jam_selesai),
+           id_pengajar=COALESCE($4, id_pengajar),
+           id_kelas=COALESCE($5, id_kelas),
+           kapasitas=COALESCE($6, kapasitas)
+       WHERE id_jadwal=$7
+       RETURNING id_jadwal`,
+      [hari || null, jam_mulai || null, jam_selesai || null, id_pengajar || null, id_kelas || null, kapasitas || null, id_jadwal]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Jadwal tidak ditemukan" });
+    }
 
     res.json({ success: true, message: "Jadwal berhasil diupdate" });
   } catch (err) {
@@ -118,7 +132,14 @@ exports.deleteJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
 
-    await db.query("DELETE FROM jadwal WHERE id_jadwal = $1", [id_jadwal]);
+    const result = await db.query(
+      "DELETE FROM jadwal WHERE id_jadwal = $1 RETURNING id_jadwal",
+      [id_jadwal]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Jadwal tidak ditemukan" });
+    }
 
     res.json({ message: "Jadwal berhasil dihapus" });
   } catch (err) {

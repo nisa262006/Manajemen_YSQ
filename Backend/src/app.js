@@ -168,11 +168,6 @@ app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
 app.use("/api/rapor", require("./routes/raporroutes"));
 app.use("/api/keuangan", require("./routes/keuanganroutes"));
 
-// ================= START SERVER =================
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
-});
-
 //================ UPLOAD =========================
 const multer = require("multer");
 
@@ -186,3 +181,13 @@ app.use((err, req, res, next) => {
   }
   next(err);
 });
+
+// ================= START SERVER =================
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running at http://localhost:${PORT}`);
+  });
+}
+
+// ================= EXPORT =================
+module.exports = app;

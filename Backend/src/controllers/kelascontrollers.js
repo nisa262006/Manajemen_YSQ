@@ -6,14 +6,26 @@ const db = require("../config/db");
 exports.tambahKelas = async (req, res) => {
   const { nama_kelas, id_program, kategori } = req.body;
 
+  if (!nama_kelas || nama_kelas.trim() === '') {
+    return res.status(400).json({ message: "nama_kelas wajib diisi" });
+  }
+
+  if (!kategori || kategori.trim() === '') {
+    return res.status(400).json({ message: "kategori wajib diisi" });
+  }
+
   try {
-    await db.query(
+    const result = await db.query(
       `INSERT INTO kelas (nama_kelas, id_program, kategori)
-       VALUES ($1, $2, $3)`,
-      [nama_kelas, id_program, kategori]
+       VALUES ($1, $2, $3)
+       RETURNING id_kelas, nama_kelas, kategori`,
+      [nama_kelas.trim(), id_program || null, kategori.trim()]
     );
 
-    res.json({ message: "Kelas berhasil ditambahkan" });
+    res.status(201).json({
+      message: "Kelas berhasil ditambahkan",
+      kelas: result.rows[0]
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gagal menambah kelas" });
@@ -110,17 +122,23 @@ exports.updateKelas = async (req, res) => {
   const { nama_kelas, id_program, kategori } = req.body;
 
   try {
-    await db.query(
+    const result = await db.query(
       `UPDATE kelas
        SET nama_kelas = COALESCE($1, nama_kelas),
            id_program = COALESCE($2, id_program),
            kategori = COALESCE($3, kategori)
-       WHERE id_kelas = $4`,
-      [nama_kelas, id_program, kategori, id_kelas]
+       WHERE id_kelas = $4
+       RETURNING id_kelas`,
+      [nama_kelas || null, id_program || null, kategori || null, id_kelas]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Kelas tidak ditemukan" });
+    }
 
     res.json({ message: "Kelas berhasil diupdate" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Gagal update kelas" });
   }
 };
@@ -129,9 +147,21 @@ exports.updateKelas = async (req, res) => {
 exports.deleteKelas = async (req, res) => {
   const { id_kelas } = req.params;
 
-  await db.query("DELETE FROM kelas WHERE id_kelas = $1", [id_kelas]);
+  try {
+    const result = await db.query(
+      "DELETE FROM kelas WHERE id_kelas = $1 RETURNING id_kelas",
+      [id_kelas]
+    );
 
-  res.json({ message: "Kelas berhasil dihapus" });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Kelas tidak ditemukan" });
+    }
+
+    res.json({ message: "Kelas berhasil dihapus" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Gagal menghapus kelas" });
+  }
 };
 
 // Tambah santri ke kelas

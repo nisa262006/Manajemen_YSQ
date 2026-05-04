@@ -26,7 +26,7 @@ const verifyToken = async (req, res, next) => {
 
     const user = userRes.rows[0];
 
-    if (user.role !== "santri" && user.status_user !== "aktif") {
+    if (user.status_user !== "aktif") {
       return res.status(403).json({ message: "Account inactive" });
     }
 

@@ -3,10 +3,12 @@ const db = require("../config/db");
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-console.log("EMAIL_SENDER:", process.env.EMAIL_SENDER);
-console.log("EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD ? "ADA" : "TIDAK ADA");
+// ❗ matikan semua log saat test
+if (process.env.NODE_ENV !== 'test') {
+  console.log("EMAIL_SENDER:", process.env.EMAIL_SENDER);
+  console.log("EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD ? "ADA" : "TIDAK ADA");
+}
 
-// ✅ TRANSPORTER GLOBAL (PAKAI SEKALI)
 const mailTransporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -15,14 +17,16 @@ const mailTransporter = nodemailer.createTransport({
   }
 });
 
-// 🔎 VERIFY GMAIL SAAT SERVER START
-mailTransporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ GMAIL CONNECTION ERROR:", error);
-  } else {
-    console.log("✅ GMAIL READY - Siap kirim email");
-  }
-});
+// ❗ matikan verify saat test
+if (process.env.NODE_ENV !== 'test') {
+  mailTransporter.verify((error) => {
+    if (error) {
+      console.error("❌ GMAIL CONNECTION ERROR:", error);
+    } else {
+      console.log("✅ GMAIL READY - Siap kirim email");
+    }
+  });
+}
 
 exports.generateSPPMassal = async (req, res) => {
   try {
