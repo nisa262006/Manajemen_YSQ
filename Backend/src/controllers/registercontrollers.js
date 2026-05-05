@@ -210,8 +210,8 @@ exports.terimaPendaftar = async (req, res) => {
 
     // 8️⃣ Update pendaftar
     await client.query(
-      `UPDATE pendaftar SET status='diterima', id_users=$1 WHERE id_pendaftar=$2`,
-      [id_users, id_pendaftar]
+      `UPDATE pendaftar SET status='diterima' WHERE id_pendaftar=$1`,
+      [id_pendaftar]
     );
 
     await client.query("COMMIT");
