@@ -1,42 +1,193 @@
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-
-console.log("JWT Secret Status:", process.env.JWT_SECRET ? "LOADED" : "FAILED TO LOAD");
-console.log("PORT Status:", process.env.PORT);
+require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const app = express();
 
+const app = express();
+const PORT = process.env.PORT || 8000;
+process.env.TZ = "Asia/Jakarta";
+
+// ================= MIDDLEWARE =================
 app.use(cors());
 
-// Log request
+app.use(express.json({ limit: '10mb' })); 
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+// ================= LOG REQUEST =================
 app.use((req, res, next) => {
-  console.log("REQUEST MASUK:", req.method, req.url);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
-// Middleware JSON
-app.use(express.json());
+// ================= STATIC FILES & PATHS =================
+// Definisikan publicPath terlebih dahulu agar tidak ReferenceError
+const publicPath = path.join(__dirname, "../public");
 
-// ======================= R O U T E S  ===========================
-const authRoutes = require("./routes/authroutes");
-const registerRoutes = require("./routes/registerroutes");
-const kelasRoutes = require("./routes/kelasroutes");
+// 1. Sajikan folder public secara umum
+app.use(express.static(publicPath));
 
-app.use("/auth", authRoutes);
-app.use("/pendaftar", registerRoutes);
-app.use("/kelas", kelasRoutes);
+// 2. Definisi path untuk Uploads
+const internalUploadPath = path.join(publicPath, "uploads");
+app.use("/uploads", express.static(internalUploadPath));
 
-// ======================= STATIC FILE (PINDAHKAN KE BAWAH) =======
-app.use(express.static(path.join(__dirname, "../../Frontend/Public")));
+// 3. Definisi path untuk Views (HTML)
+const viewsPath = path.join(publicPath, "views");
+const view = (file) => path.join(viewsPath, file);
 
-app.get("/", (req, res) => {
-  res.send("API Sahabat Quran berjalan");
+// ================= HALAMAN UMUM =================
+app.get("/", (_, res) => res.sendFile(view("index.html")));
+app.get("/login", (_, res) => res.sendFile(view("login.html")));
+app.get("/daftar", (_, res) => res.sendFile(view("daftar.html")));
+app.get("/reset-password", (_, res) => res.sendFile(view("reset_password.html")));
+app.get("/berhasil", (_, res) => res.sendFile(view("berhasil.html")));
+
+// ================= DASHBOARD =================
+app.get("/dashboard/admin", (_, res) => res.sendFile(view("Admin.html")));
+app.get("/dashboard/pengajar", (_, res) => res.sendFile(view("dashboard-pengajar.html")));
+app.get("/dashboard/santri", (_, res) => res.sendFile(view("dashboardsantri.html")));
+
+app.get("/dashboard/riwayat-absensi", (_, res) =>
+  res.sendFile(view("riwayat_absensi.html"))
+);
+
+app.get("/dashboard/riwayat-absensi-santri", (_, res) =>
+  res.sendFile(view("riwayat_absensi_santri.html"))
+);
+
+app.get("/dashboard/daftar-kelas", (_, res) =>
+  res.sendFile(view("daftar_kelas.html"))
+);
+
+app.get("/dashboard/tambah-kelas", (_, res) =>
+  res.sendFile(view("tambah_kelas.html"))
+);
+
+app.get("/dashboard/daftar-pengajar", (_, res) =>
+  res.sendFile(view("daftar_pengajar.html"))
+);
+
+app.get("/dashboard/tambah-pengajar", (_, res) =>
+  res.sendFile(view("tambah_pengajar.html"))
+);
+
+app.get("/dashboard/daftar-santri", (_, res) =>
+  res.sendFile(view("daftar_santri.html"))
+);
+
+app.get("/dashboard/tambah-siswa", (_, res) =>
+  res.sendFile(view("tambah_siswa.html"))
+);
+
+app.get("/dashboard/daftar-jadwal", (_, res) =>
+  res.sendFile(view("daftar_jadwal.html"))
+);
+
+app.get("/dashboard/detail-pengajar", (_, res) =>
+  res.sendFile(view("detail_pengajar.html"))
+);
+
+app.get("/dashboard/detail-santri", (_, res) =>
+  res.sendFile(view("detail_santri.html"))
+);
+
+app.get("/dashboard/absensi-siswa", (_, res) =>
+  res.sendFile(view("absensisiswa.html"))
+);
+
+app.get("/dashboard/daftar-registrasi", (_, res) =>
+  res.sendFile(view("daftar_registrasi.html"))
+);
+
+app.get("/dashboard/pengajar/jadwal", (_, res) => {
+  res.sendFile(view("jadwal-kelas-pengajar.html"));
 });
 
-// ======================= START SERVER ===========================
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.get("/dashboard/pengajar/absensi", (_, res) => {
+  res.sendFile(view("absensi-pengajar.html"));
 });
+
+app.get("/dashboard/pengajar/riwayat-absensi", (_, res) => {
+  res.sendFile(view("riwayat-absensi.html"));
+});
+
+app.get("/dashboard/pengajar/materi-ajar", (_, res) => {
+  res.sendFile(view("materi-ajar.html"));
+});
+
+app.get("/dashboard/materi-santri", (_, res) => {
+  res.sendFile(view("detail-materi-santri.html"));
+});
+
+app.get("/dashboard/santri/rapor", (_, res) => {
+  res.sendFile(view("raporsiswa.html"));
+});
+
+// ================= KEUANGAN =================
+app.get("/dashboard/billing", (_, res) =>
+  res.sendFile(view("billing.html"))
+);
+
+app.get("/dashboard/pembayaran", (_, res) =>
+  res.sendFile(view("pembayaran.html"))
+);
+
+// Tambahkan ini di bawah rute pengajar lainnya
+app.get("/dashboard/pengajar/rapor", (_, res) => {
+  res.sendFile(view("rapor-pengajar.html"));
+});
+
+app.get("/dashboard/pengajar/laporan", (_, res) => {
+  res.sendFile(view("laporan-pengajar.html"));
+});
+
+// ================= ADMIN - LAPORAN =================
+
+app.get("/dashboard/admin/laporan/keuangan-pemasukan", (_, res) => {
+  res.sendFile(view("keuangan_pemasukan.html"));
+});
+
+app.get("/dashboard/admin/laporan/keuangan-pengeluaran", (_, res) => {
+  res.sendFile(view("keuangan_pengeluaran.html"));
+});
+
+
+// ================= API ROUTES =================
+app.use("/api/auth", require("./routes/authroutes"));
+app.use("/api/pendaftar", require("./routes/registerroutes"));
+app.use("/api/kelas", require("./routes/kelasroutes"));
+app.use("/api/jadwal", require("./routes/jadwalroutes"));
+app.use("/api/absensi", require("./routes/absensiroutes"));
+app.use("/api/santri", require("./routes/santriroutes"));
+app.use("/api/pengajar", require("./routes/pengajarroutes"));
+app.use("/api/admin", require("./routes/adminroutes"));
+app.use("/api/me", require("./routes/meroutes"));
+app.use("/api/santridashboard", require("./routes/santridashboardroutes"));
+app.use("/api/tugas-media", require("./routes/tugasmateriajarroutes"));
+app.use("/api/nilai-progres", require("./routes/nilaidanprogresroutes"));
+app.use("/api/rapor", require("./routes/raporroutes"));
+app.use("/api/keuangan", require("./routes/keuanganroutes"));
+
+//================ UPLOAD =========================
+const multer = require("multer");
+
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        error: "Ukuran file terlalu besar (maks 10MB)"
+      });
+    }
+  }
+  next(err);
+});
+
+// ================= START SERVER =================
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running at http://localhost:${PORT}`);
+  });
+}
+
+// ================= EXPORT =================
+module.exports = app;

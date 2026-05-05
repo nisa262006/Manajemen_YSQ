@@ -12,8 +12,8 @@ const {
 
 router.post("/register", registerSantri);
 
-router.get("/", auth, allow('admin','staf'), getSantriList);
+router.get("/", auth, allow('admin', 'staf'), getSantriList);
 
-router.put("/verifikasi/:id", auth, allow('admin','staf'), verifikasiSantri);
+router.put("/verifikasi/:id", auth, allow('admin', 'staf'), verifikasiSantri);
 
 module.exports = router;

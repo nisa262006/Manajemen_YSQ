@@ -2,18 +2,22 @@ const request = require('supertest');
 const app = require('../../src/app');
 const db = require('../../src/config/db');
 
+// ✅ MOCK DATABASE
 jest.mock('../../src/config/db', () => ({
   query: jest.fn()
 }));
 
+// ✅ MOCK AUTH MIDDLEWARE
 jest.mock('../../src/middleware/auth', () => ({
   verifyToken: (req, res, next) => {
-    req.user = { id_users: 1, role: req.headers['x-role'] || 'admin' };
+    const role = req.headers['x-role'] || 'admin';
+    const id_users = Number(req.headers['x-id-users'] || '1');
+    req.user = { id_users, role };
     next();
   },
-  onlyAdmin: (req, res, next) => next(),
-  onlyPengajar: (req, res, next) => next(),
-  onlySantri: (req, res, next) => next(),
+  onlyAdmin:   (req, res, next) => next(),
+  onlySantri:  (req, res, next) => next(),
+  onlyPengajar:(req, res, next) => next(),
 }));
 
 describe('JADWAL API TEST (MOCKED)', () => {

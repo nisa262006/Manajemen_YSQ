@@ -232,8 +232,7 @@ CREATE TABLE rapor_tahsin (
   keterangan VARCHAR(50),
 
   UNIQUE (id_santri, periode),
-  unique_rapor_tahsin_sesi
-UNIQUE (id_santri, id_jadwal, periode),
+  CONSTRAINT unique_rapor_tahsin_sesi UNIQUE (id_santri, id_jadwal, periode),
   FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
 );
 
@@ -254,8 +253,7 @@ CREATE TABLE rapor_tahfidz (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   UNIQUE (id_santri, periode),
-  unique_rapor_tahfidz_sesi
-  UNIQUE (id_santri, id_jadwal, periode),
+  CONSTRAINT unique_rapor_tahfidz_sesi UNIQUE (id_santri, id_jadwal, periode),
   FOREIGN KEY (id_pengajar) REFERENCES pengajar(id_pengajar)
 );
 
