@@ -2,7 +2,7 @@ const db = require("../config/db");
 
 exports.getDashboardSantri = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const id_users = req.user.id_users;
 
     // 1. Ambil data santri
     const santriResult = await db.query(`

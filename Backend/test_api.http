@@ -1,31 +1,20 @@
 ### LOGIN TEST
-POST http://localhost:8000/api/auth/login
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "admin1",
-  "password": "admin1"
+  "email": "admin@ysq.com",
+  "password": "123456"
 }
 
 ### LOGIN PENGAJAR
-POST http://localhost:8000/api/auth/login
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "pengajar1@ysq.com",
-  "password": "riska"
+  "email": "Maya.pengajar@ysq.com",
+  "password": "123456"
 }
-
-
-### LOGIN SANTRI
-POST http://localhost:8000/api/auth/login
-Content-Type: application/json
-
-{
-  "identifier": "santri1@ysq.com",
-  "password": "santri1123"
-}
-
 
 ### LOGIN SANTRI
 POST http://localhost:5000/auth/login
@@ -36,28 +25,13 @@ Content-Type: application/json
   "password": "123456"
 }
 
-### liat data me
-GET http://localhost:8000/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
-
-### reser password
-POST http://localhost:5000/auth/forgot-password
+### LOGIN SANTRI
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "rahmafitriatunnisa@gmail.com"
-}
-
-### veryfi token
-GET http://localhost:5000/auth/reset-password/ISI_TOKEN_DISINI
-
-### set password baru
-POST http://localhost:5000/auth/reset-password/ISI_TOKEN_DISINI
-Content-Type: application/json
-
-{
-  "password": "passwordBaru123",
-  "confirmPassword": "passwordBaru123"
+  "email": "santri1@ysq.com",
+  "password": "123456"
 }
 
 ============= REGISTRASI ======================
@@ -66,8 +40,8 @@ POST http://localhost:5000/pendaftar/daftar
 Content-Type: application/json
 
 {
-  "nama":"fatimah",
-  "email":"fatim@gmail.com",
+  "nama":"yusra",
+  "email":"yusra@gmail.com",
   "no_wa":"081234567890",
   "tempat_lahir":"Bogor",
   "tanggal_lahir":"2000-06-01"
@@ -75,154 +49,36 @@ Content-Type: application/json
 
 ### get pendaftaran
 GET http://localhost:5000/pendaftar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
-
-### get pendaftar santri
-GET http://localhost:5000/pendaftar/28
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 ### Admin Terima Pendaftar
-PUT http://localhost:5000/pendaftar/terima/28
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDY2OTYzNCwiZXhwIjoxNzY0NzU2MDM0fQ.-_kJNwEM5u6P-c_nWCSnnOWNag_X3j3O9AhmFXBBq60
+PUT http://localhost:5000/pendaftar/terima/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 ### DELETE PENDAFTAR
-DELETE http://localhost:5000/pendaftar/13
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+DELETE http://localhost:5000/pendaftar/12
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 ### RESET PENDAFTAR (HAPUS SEMUA KECUALI YANG DITERIMA)
 DELETE http://localhost:5000/pendaftar/reset/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTc1LCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjU5NDIwNTksImV4cCI6MTc2NjAyODQ1OX0.AWI8WyNguGvNHBPs2bLT78EtKTs-e-xgrDacbr5W4H4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
-### =======================================
-### 2. GET ALL SANTRI (Pagination + Filter + Search)
-### =======================================
-GET http://localhost:5000/santri?page=2&limit=10&q=&kategori=&status=
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
-Content-Type: application/json
-
-
-### =======================================
-### 3. GET SANTRI BY ID
-### =======================================
-GET http://localhost:5000/santri/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
-
-
-### =======================================
-### 4. UPDATE SANTRI
-### =======================================
-PUT http://localhost:5000/santri/7
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
-
-{
-  "nis": "YSQ-2025-0007",
-  "username": "YSQ-2025-0007_siti",
-  "user_email": "siti2@gmail.com",
-
-  "nama": "siti",
-  "kategori": "dewasa",
-  "no_wa": "081234567890",
-  "email": "siti2@gmail.com",
-  "tempat_lahir": "cilingsi",
-  "tanggal_lahir": "2000-05-31",
-  "status": "aktif"
-}
-
-
-
-### =======================================
-### 5. DELETE SANTRI
-### =======================================
-DELETE http://localhost:5000/santri/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
-
-
-
-### =======================================
-### 6. EXPORT SANTRI KE EXCEL
-### =======================================
-GET http://localhost:5000/santri/export/excel
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDc3MzIwOSwiZXhwIjoxNzY0ODU5NjA5fQ.h8_vyCSj0G1t6gHzsBTzZdpUH2AcX4CGhrh1nUrILjM
-
-
-### TAMBAH PENGAJAR
-POST http://localhost:5000/pengajar/tambah
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTA4NTA2NywiZXhwIjoxNzY1MTcxNDY3fQ.ttyX9msQz7zr_ojUSxjkwRSO4YdpLGs6ZhEtXENEqiM
-
-{
-  "nama": "nisa",
-  "alamat": "Bogor",
-  "tempat_lahir": "Bogor",
-  "tanggal_lahir": "1990-01-01",
-  "mapel": "Tahfiz",
-  "email": "nisa@gmail.com",
-  "no_kontak": "08123456789",
-  "password": "nis123",
-  "confirmPassword": "nis123"
-}
-
-### LIHAT SEMUA PENGAJAR
-GET http://localhost:5000/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
-Content-Type: application/json
-
-### LIHAT PENGAJAR SESUAI ID
-GET http://localhost:5000/pengajar/10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
-
-### EDIT DATA PENGAJAR
-PUT http://localhost:5000/pengajar/10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTI0ODgzMCwiZXhwIjoxNzY1MzM1MjMwfQ.E7bSRnXsSa_KlMXRMO8b31WjgTi9xJ0QQGX1u83fDb8
-Content-Type: application/json
-
-{
-  "nama": "siti ainun",
-  "alamat": "Bogor",
-  "tempat_lahir": "Bogor",
-  "tanggal_lahir": "1990-01-01",
-  "mapel": "tahfiz",
-  "email": "ainunsiti@ysq.com",
-  "no_kontak": "08123456789",
-  "password": "12345",
-  "confirmPassword": "12345"
-}
-
-### HAPUS PENGAJAR
-DELETE http://localhost:5000/pengajar/3
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
-
-
-### GET ADMIN PROFILE
-GET http://localhost:5000/admin/profile/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
-
-### UPDATE ADMIN PROFILE
-PUT http://localhost:5000/admin/profile/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTQyNzQ1OCwiZXhwIjoxNzY1NTEzODU4fQ.qkeNg5ObcKyl2S90tGGaEWXHsO-uDwJuj14uzGzJ4H0
-Content-Type: application/json
-
-{
-  "username": "Admin",
-  "email": "admin1@gmail.com",
-  "no_wa": "081234567890"
-}
+============== KELAS ===================
 
 ##################################################
 ### 1. TAMBAH KELAS (ADMIN) BENER
 ##################################################
 
 POST http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDIyMDc4MiwiZXhwIjoxNzY0MzA3MTgyfQ.sil6pTL29eoL3iTXqB9yGR26dMca6VpTjuNIPdbdlAY
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 Content-Type: application/json
 
 {
-  "nama_kelas": "Tahsin Dewasa B anak",
+  "nama_kelas": "Tahsin Dewasa F",
   "kapasitas": 20,
   "id_pengajar": 1,
   "id_program": 1,
-  "kategori": "anak"
+  "kategori": "dewasa"
 }
 
 
@@ -231,30 +87,26 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTA4NTA2NywiZXhwIjoxNzY1MTcxNDY3fQ.ttyX9msQz7zr_ojUSxjkwRSO4YdpLGs6ZhEtXENEqiM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 
 ##################################################
 ### 3. DETAIL KELAS (ADMIN) BENER
 ##################################################
 
-GET http://localhost:5000/kelas/detail/8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
-
-### PENGAJAR
-GET http://localhost:5000/kelas/pengajar/detail/8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDA4MzAwLCJleHAiOjE3NjQ0OTQ3MDB9.Nv_jmyX48ELWuKUyJ9kweck_GajnBMomPFjWZFKLVMw
+GET http://localhost:5000/kelas/detail/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 ##################################################
 ### 4. UPDATE KELAS (ADMIN) BENER
 ##################################################
 
-PUT http://localhost:5000/kelas/edit/11
+PUT http://localhost:5000/kelas/edit/10
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MTU4Nzg3LCJleHAiOjE3NjQyNDUxODd9.YVbgrcdRzr6qYEEpWEKmB1JO7NxH67uURosqpa4E7wc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 {
-  "nama_kelas": "Kelas Tahsin B anak",
+  "nama_kelas": "Kelas Tahsin F anak",
   "kapasitas": 15,
   "id_pengajar": 1,
   "id_program": 1,
@@ -266,8 +118,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### 5. DELETE KELAS (ADMIN) BENER
 ##################################################
 
-DELETE http://localhost:5000/kelas/hapus/11
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDQwMzYyNSwiZXhwIjoxNzY0NDkwMDI1fQ.ZzxD9n6JURJ06rOaZ8ZOP_n6Ju-YYqM8aanuQXX1YNA
+DELETE http://localhost:5000/kelas/hapus/9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 
 
 ##################################################
@@ -275,12 +127,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwid
 ### memasukkan santri ke tabel santri_kelas (betul)
 ##################################################
 
-POST http://localhost:5000/kelas/16/santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTc1LCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjU5NDIwNTksImV4cCI6MTc2NjAyODQ1OX0.AWI8WyNguGvNHBPs2bLT78EtKTs-e-xgrDacbr5W4H4
+POST http://localhost:5000/kelas/10/santri
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwicm9sZSI6ImFkbWluIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjQwNTE5OTIsImV4cCI6MTc2NDEzODM5Mn0.OqSwV3gO-J9fwn47NH--Dv02HICEU_IC4qY00J7e3XQ
 Content-Type: application/json
 
 {
-  "id_santri": 36
+  "id_santri": 11
 }
 
 
@@ -289,13 +141,13 @@ Content-Type: application/json
 ### menghapus dari kelas lama → tambah ke kelas baru
 ##################################################
 
-PUT http://localhost:5000/kelas/pindah/36
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTc1LCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjU5NDIwNTksImV4cCI6MTc2NjAyODQ1OX0.AWI8WyNguGvNHBPs2bLT78EtKTs-e-xgrDacbr5W4H4
+PUT http://localhost:5000/kelas/pindah/5
+Authorization: Bearer <token_admin>
 Content-Type: application/json
 
 {
-  "id_kelas_lama": 16,
-  "id_kelas_baru": 15
+  "id_kelas_lama": 10,
+  "id_kelas_baru": 9
 }
 
 
@@ -305,430 +157,12 @@ Content-Type: application/json
 ##################################################
 
 GET http://localhost:5000/kelas/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDA4MzAwLCJleHAiOjE3NjQ0OTQ3MDB9.Nv_jmyX48ELWuKUyJ9kweck_GajnBMomPFjWZFKLVMw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Miwicm9sZSI6InBlbmdhamFyIiwic3RhdHVzIjoiQWt0aWYiLCJpYXQiOjE3NjM5ODY1MDUsImV4cCI6MTc2NDA3MjkwNX0.D_kI2jb6iSWIvM9_VatE6_55minoSUJ-VBy6JRcJ89Q
+
 
 ##################################################
-### 9. SANTRI MELIHAT KELAS MILIKNYA 
+### 9. SANTRI MELIHAT KELAS MILIKNYA (BELUM)
 ##################################################
 
 GET http://localhost:5000/kelas/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTg1LCJyb2xlIjoic2FudHJpIiwiaWF0IjoxNzY1OTQ0MTEyLCJleHAiOjE3NjYwMzA1MTJ9.K9t_FOPh188G-Ec3-We_pEJX6LSdWWlWifnjeCJBAkQ
-
-
-
-##################################################
-### 1. TAMBAH JADWAL (ADMIN ONLY)
-##################################################
-
-POST http://localhost:5000/jadwal
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
-Content-Type: application/json
-
-{
-  "id_kelas": 11,
-  "hari": "kamis",
-  "jam_mulai": "08:00",
-  "jam_selesai": "10:00",
-  "kategori": "dewasa",
-  "id_pengajar": 1
-}
-
-
-
-##################################################
-### 2. LIST SEMUA JADWAL (ADMIN)
-##################################################
-
-GET http://localhost:5000/jadwal
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NTE4MzUzMywiZXhwIjoxNzY1MjY5OTMzfQ.Nqt98bGFbuzhuxQUlkvGjS3u2ZUFWNK64I7fyJlDjaA
-
-
-##################################################
-### 3. UPDATE JADWAL (ADMIN)
-##################################################
-
-PUT http://localhost:5000/jadwal/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbjEiLCJyb2xlIjoiYWRtaW4iLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjEzNzI2LCJleHAiOjE3NjQzMDAxMjZ9.l-Krf2GTI7dE09JnorhqH3NVObK7HV2gmgLgGcgc4FA
-Content-Type: application/json
-
-{
-  "hari": "Senin",
-  "jam_mulai": "09:00",
-  "jam_selesai": "11:00",
-  "lokasi": "Aula Utama",
-  "id_pengajar": 1
-}
-
-
-
-##################################################
-### 4. DELETE JADWAL (ADMIN)
-##################################################
-
-DELETE http://localhost:5000/jadwal/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDkyMDg4LCJleHAiOjE3NjQ1Nzg0ODh9.mYYtuyThVmP7D9gfXagmwz1dXfOWgjdVwiqmg2WqTIQ
-
-
-
-##################################################
-### 5. JADWAL PENGAJAR (KHUSUS PENGAJAR)
-### Hanya menampilkan jadwal kelas yang dia ampu
-##################################################
-
-GET http://localhost:5000/jadwal/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJtYXlhQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY1MTk3ODQxLCJleHAiOjE3NjUyODQyNDF9.JHe-oSZzfu8oAV0Kskh21DjJpD-tDskYXJlJouKodlw
-
-
-##################################################
-### 6. JADWAL SANTRI (KHUSUS SANTRI)
-### Mengambil jadwal dari kelas tempat santri terdaftar
-##################################################
-
-GET http://localhost:5000/jadwal/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NTMsInVzZXJuYW1lIjoibmVuZ0BnbWFpbC5jb20iLCJyb2xlIjoic2FudHJpIiwic3RhdHVzX3VzZXIiOiJha3RpZiIsImlhdCI6MTc2NDQwMDc0OSwiZXhwIjoxNzY0NDg3MTQ5fQ.7ZGaz11RZ3un0GKUaEllCR5TPVqxIzJxDC81ClIqkJg
-
-
-
-###############################################################
-### 1. ADMIN — LIHAT SEMUA ABSENSI SANTRI
-###############################################################
-
-GET http://localhost:5000/absensi/santri/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDUxMzE5MywiZXhwIjoxNzY0NTk5NTkzfQ.HA3_S1w-ghaTcNILNPgj_V5FIlv1x3I7DSjfWBXY2zk
-
-
-###############################################################
-### 2. ADMIN — LIHAT SEMUA ABSENSI PENGAJAR
-###############################################################
-
-GET http://localhost:5000/absensi/pengajar/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NCwidXNlcm5hbWUiOiJhZG1pbkB5c3EuY29tIiwicm9sZSI6ImFkbWluIiwic3RhdHVzX3VzZXIiOiJBa3RpZiIsImlhdCI6MTc2NDkzMzc2MiwiZXhwIjoxNzY1MDIwMTYyfQ.KErcKkHnxcZV9kcGO6C7jZT7E1RXpropi4glpWMb9nA
-
-
-
-###############################################################
-### 3. PENGAJAR — CATAT ABSENSI SANTRI
-###############################################################
-
-POST http://localhost:5000/absensi/santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
-Content-Type: application/json
-
-{
-  "id_santri": 15,
-  "id_jadwal": 1,
-  "tanggal": "2025-11-1",
-  "status_absensi": "Hadir",
-  "catatan": "Tepat waktu"
-}
-
-
-
-###############################################################
-### 4. PENGAJAR — UPDATE ABSENSI SANTRI
-###############################################################
-
-PUT http://localhost:5000/absensi/santri/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0MjQ0NzIxLCJleHAiOjE3NjQzMzExMjF9.OXvtawreNymOAv8N1oblOLWsQdBXhP7XYwvqsYpKJKI
-Content-Type: application/json
-
-{
-  "status_absensi": "Izin"
-}
-
-
-
-###############################################################
-### 5. PENGAJAR — LIHAT ABSENSI SEMUA SANTRI DI KELASNYA
-###############################################################
-
-GET http://localhost:5000/absensi/santri/kelas/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0Njg4MTA3LCJleHAiOjE3NjQ3NzQ1MDd9.39hEQz5CJxi_c43GrZCR4sK-JPwYQfRadrHDXCSfTK8
-
-
-###############################################################
-### 6. SANTRI — LIHAT ABSENSI DIRINYA SENDIRI
-###############################################################
-
-GET http://localhost:5000/absensi/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTg1LCJyb2xlIjoic2FudHJpIiwiaWF0IjoxNzY1OTQ0MTEyLCJleHAiOjE3NjYwMzA1MTJ9.K9t_FOPh188G-Ec3-We_pEJX6LSdWWlWifnjeCJBAkQ
-
-
-
-###############################################################
-### 7. PENGAJAR — CATAT ABSENSI DIRINYA SENDIRI
-###############################################################
-
-POST http://localhost:5000/absensi/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0Njg4MTA3LCJleHAiOjE3NjQ3NzQ1MDd9.39hEQz5CJxi_c43GrZCR4sK-JPwYQfRadrHDXCSfTK8
-Content-Type: application/json
-
-{
-  "id_jadwal": 1,
-  "tanggal": "2025-10-26",
-  "status_absensi": "Hadir",
-  "catatan": "Mengajar sesuai jadwal"
-}
-
-
-
-###############################################################
-### 8. PENGAJAR — LIHAT ABSENSI DIRI SENDIRI
-###############################################################
-
-GET http://localhost:5000/absensi/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MiwidXNlcm5hbWUiOiJNYXlhLnBlbmdhamFyQHlzcS5jb20iLCJyb2xlIjoicGVuZ2FqYXIiLCJzdGF0dXNfdXNlciI6IkFrdGlmIiwiaWF0IjoxNzY0NDAzNTQ0LCJleHAiOjE3NjQ0ODk5NDR9.FOI9xmRj_7DDBbqWk_C8wStF-Dhkg1ylpeFs_8UN_60
-
-
-###############################################################
-### TUGAS DAN NILAI
-###############################################################
-### TAMBAH TUGAS PENGAJAR
-POST http://localhost:8000/api/tugas-media/tugas
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2OTIzNzkyLCJleHAiOjE3NjcwMTAxOTJ9.Dyhg0VXJlLEztxZAch-AslT4zHG9B9xNT0j70xJ3BL8
-Content-Type: application/json
-
-{
-    "id_kelas": 1,
-    "judul": "Tugas Hafalan Surat Al-Mulk",
-    "deskripsi": "Setorkan hafalan ayat 1-10",
-    "due_date": "2025-12-31",
-    "allow_file": "evaluasi portal.word",
-    "allow_text": true
-}
-
-
-### LIST TUGAS KELAS PENGAJAR
-GET http://localhost:8000/api/tugas-media/tugas/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-
-### UPDATE TUGAS PENGAJAR
-PUT http://localhost:8000/api/tugas-media/tugas/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-Content-Type: application/json
-
-{
-  "judul": "Hafalan Surat Al-Mulk (Revisi)",
-  "deskripsi": "Ayat 1–15",
-  "due_date": "2025-12-31 23:59"
-}
-
-
-### DELETE TUGAS PENGAJAR
-DELETE http://localhost:8000/api/tugas-media/tugas/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-
-### MONITORING TUGAS pengajar
-GET http://localhost:8000/api/tugas-media/tugas/1/monitoring
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-
-### TAMBAH MEDIA AJAR (LINK) PENGAJAR
-POST http://localhost:8000/api/tugas-media/media
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-Content-Type: application/json
-
-{
-  "id_kelas": 1,
-  "judul": "Video Tajwid Nun Mati",
-  "tipe": "LINK",
-  "link_url": "https://youtube.com/xxxxx"
-}
-
-## FILE
-POST http://localhost:8000/api/tugas-media/media
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-Content-Type: application/json
-
-{
-  "id_kelas": 1,
-  "judul": "Modul Tajwid PDF",
-  "tipe": "FILE",
-  "file_path": "/uploads/modul_tajwid.pdf"
-}
-
-
-### LIST MEDIA AJAR PENGAJAR
-GET http://localhost:8000/api/tugas-media/media/pengajar
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-
-## HAPUS MEDIA AJAR
-DELETE http://localhost:8000/api/tugas-media/media/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-
-## SANTRI LIHAT TUGAS
-GET http://localhost:8000/api/tugas-media/tugas/saya
-Authorization: Bearer token_santri
-
-## SANTRI NGUMPULIN TUGAS TEXT
-POST http://localhost:8000/api/tugas-media/tugas/kumpul
-Authorization: Bearer token_santri
-Content-Type: application/json
-
-{
-  "id_tugas": 2,
-  "jawaban_text": "Saya sudah menghafal ayat 1–10",
-  "file_path": null
-}
-
-## FILE
-POST http://localhost:8000/api/tugas-media/tugas/kumpul
-Authorization: Bearer token_santri
-Content-Type: application/json
-
-{
-  "id_tugas": 2,
-  "jawaban_text": null,
-  "file_path": "/uploads/setoran_ahmad.mp3"
-}
-
-## SANTRI LIHAT MEDIA AJAR
-GET http://localhost:8000/api/tugas-media/media/saya
-Authorization: Bearer token_santri
-
-###############################################################
-### NILAI DAN PROGRES
-###############################################################
-### INPUT PROGRES (PENGAJAR)
-POST http://localhost:8000/api/nilai-progres/progres
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-Content-Type: application/json
-
-{
-  "id_santri": 1,
-  "id_kelas": 2,
-  "minggu_ke": 1,
-  "catatan": "Makharijul huruf baik",
-  "nilai": 85
-}
-
-### LIHAT PROGRES SANTRI
-GET http://localhost:8000/api/nilai-progres/saya
-Authorization: Bearer token_santri
-
-### REKAP KELAS
-GET http://localhost:8000/api/nilai-progres/rekap/kelas/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY2NjUwMTQ3LCJleHAiOjE3NjY3MzY1NDd9.CWZaTAVMAQsN6lVW28EE74IKD21dNGpTZds6YGmmCIE
-
-### LAPORAN ADMIN
-GET http://localhost:8000/api/nilai-progres/laporan
-Authorization: Bearer token_admin
-
-
-### tambah raport
-### CREATE RAPOR (PENGAJAR)
-POST  http://localhost:8000/api/rapor
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
-Content-Type: application/json
-
-{
-  "id_santri": 11,
-  "periode": "Semester Ganjil 2024",
-  "nilai_tahsin": 85,
-  "nilai_tahfidz": 90,
-  "adab": 95,
-  "kehadiran": 92,
-  "catatan": "Perkembangan sangat baik"
-}
-
-### GET RAPOR BY PENGAJAR
-GET   http://localhost:8000/api/rapor/pengajar/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
-
-
-### GET RAPOR BY SANTRI
-GET  http://localhost:8000/api/rapor/santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjA2NDMsImV4cCI6MTc2OTYwNzA0M30.Y3Um-_PwWpCVoZgoVGSHqezgSWhxn0lXzGbd0fCJGNk
-
-
-### UPDATE RAPOR
-PUT  http://localhost:8000/api/rapor/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
-Content-Type: application/json
-
-{
-  "nilai_tahsin": 88,
-  "nilai_tahfidz": 92,
-  "adab": 97,
-  "kehadiran": 95,
-  "catatan": "Meningkat signifikan"
-}
-
-### DELETE RAPOR
-DELETE  http://localhost:8000/api/rapor/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6NSwicm9sZSI6InBlbmdhamFyIiwiaWF0IjoxNzY5NTIwMjI5LCJleHAiOjE3Njk2MDY2Mjl9.AhqUF1xVRHFj0dDy12uvEKheu7RgnDUZuyh2mWOzXBk
-
-### CREATE BILLING SANTRI
-POST http://localhost:8000/api/billing-santri
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
-Content-Type: application/json
-
-{
-  "id_santri": 11,
-  "jenis": "SPP",
-  "periode": "Januari 2026",
-  "nominal": 250000
-}
-
-### GET ALL BILLING (ADMIN)
-GET http://localhost:8000/api/billing-santri/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
-
-### UPDATE BILLING
-PUT http://localhost:8000/api/billing-santri/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
-Content-Type: application/json
-
-{
-  "jenis": "SPP",
-  "periode": "Januari 2026",
-  "nominal": 250000,
-  "status": "lunas"
-}
-
-### DELETE BILLING
-DELETE http://localhost:8000/api/billing-santri/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
-
-### GET BILLING SANTRI (ME)
-GET http://localhost:8000/api/billing-santri/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjI2NDEsImV4cCI6MTc2OTYwOTA0MX0.WWnbOaEJrD6vC5oFDs0XDIQCYzmoelXmrlMMfrp0zAM
-
-
-### SANTRI - CREATE PEMBAYARAN
-POST http://localhost:8000/api/pembayaran
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjUzNjQsImV4cCI6MTc2OTYxMTc2NH0.q9Kq2N0th2hV2kXiirvo9IniB16ow3nlMyuKDeP79sc
-Content-Type: application/json
-
-{
-  "id_billing": 2,
-  "jumlah_bayar": 300000,
-  "metode": "transfer"
-}
-
-
-### SANTRI - DUPLIKAT PEMBAYARAN
-POST http://localhost:8000/api/pembayaran
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjUzNjQsImV4cCI6MTc2OTYxMTc2NH0.q9Kq2N0th2hV2kXiirvo9IniB16ow3nlMyuKDeP79sc
-Content-Type: application/json
-
-{
-  "id_billing": 2,
-  "jumlah_bayar": 300000,
-  "metode": "transfer"
-}
-
-### SANTRI - GET PEMBAYARAN ME
-GET http://localhost:8000/api/pembayaran/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MTcsInJvbGUiOiJzYW50cmkiLCJpYXQiOjE3Njk1MjUzNjQsImV4cCI6MTc2OTYxMTc2NH0.q9Kq2N0th2hV2kXiirvo9IniB16ow3nlMyuKDeP79sc
-
-### ADMIN - GET ALL PEMBAYARAN
-GET http://localhost:8000/api/pembayaran/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
-
-### ADMIN - VERIFIKASI PEMBAYARAN
-PUT http://localhost:8000/api/pembayaran/1/verifikasi
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
-
-###
-GET http://localhost:8000/api/billing-santri/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6MSwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzY5NTIyNzk2LCJleHAiOjE3Njk2MDkxOTZ9.AH3lvepOS5eRYB1NTqSqqTJ-Hm7nlJ_dFaKs8q_CJDk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZF91c2VycyI6Mywicm9sZSI6InNhbnRyaSIsInN0YXR1cyI6IkFrdGlmIiwiaWF0IjoxNzY0MDc0NDI5LCJleHAiOjE3NjQxNjA4Mjl9.KoKG6QH6QHCNaSEpbFjgfChf49vQH7BE2LAdFO5ScJc

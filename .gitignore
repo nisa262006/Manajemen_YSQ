@@ -24,10 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 *.log
 
-# Database Backup
-backup/
-*.sql
-
 # Testing & Coverage
 Backend/coverage/
 coverage/

@@ -4,15 +4,10 @@ const router = express.Router();
 const {
   tambahJadwal,
   getAllJadwal,
-  getJadwalById,
   updateJadwal,
   deleteJadwal,
   jadwalPengajar,
-  jadwalSantri,
-  getJadwalByPengajar,
-  jadwalPengajarByHari,
-  tambahSantriKeJadwal,
-  getSantriByJadwal
+  jadwalSantri
 } = require("../controllers/jadwalcontrollers");
 
 const {
@@ -22,41 +17,30 @@ const {
   onlySantri
 } = require("../middleware/auth");
 
-
 // ===================== ADMIN =============================
+
+// Tambah jadwal
 router.post("/", verifyToken, onlyAdmin, tambahJadwal);
+
+// List semua jadwal
 router.get("/", verifyToken, onlyAdmin, getAllJadwal);
 
-router.get("/pengajar-sesi/:id_pengajar", verifyToken, onlyAdmin, getJadwalByPengajar);
-router.post(
-  "/:id_jadwal/santri",
-  verifyToken,
-  onlyAdmin,
-  tambahSantriKeJadwal
-);
-
-// ===================== PENGAJAR =============================
-router.get("/pengajar/me", verifyToken, onlyPengajar, jadwalPengajar);
-router.get(
-  "/pengajar/me/hari/:hari",
-  verifyToken,
-  onlyPengajar,
-  jadwalPengajarByHari
-);
-
-// ===================== SANTRI =============================
-router.get("/santri/me", verifyToken, onlySantri, jadwalSantri);
-
-// ===================== DYNAMIC ROUTES (HARUS PALING BAWAH) ============================
-router.get("/:id_jadwal", verifyToken, onlyAdmin, getJadwalById);
+// Update
 router.put("/:id_jadwal", verifyToken, onlyAdmin, updateJadwal);
+
+// Delete
 router.delete("/:id_jadwal", verifyToken, onlyAdmin, deleteJadwal);
 
-router.get(
-  "/:id_jadwal/santri",
-  verifyToken,
-  onlyPengajar,
-  getSantriByJadwal
-);
+
+// ===================== PENGAJAR =============================
+
+// Jadwal kelas yang dia ampu
+router.get("/pengajar/me", verifyToken, onlyPengajar, jadwalPengajar);
+
+
+// ===================== SANTRI =============================
+
+// Jadwal kelas santri sendiri
+router.get("/santri/me", verifyToken, onlySantri, jadwalSantri);
 
 module.exports = router;

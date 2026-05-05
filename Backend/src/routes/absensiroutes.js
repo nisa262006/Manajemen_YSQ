@@ -2,19 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  // ABSENSI SANTRI
   catatAbsensiSantri,
   updateAbsensiSantri,
+  getAbsensiKelasPengajar,
   getAbsensiSantri,
   getAllAbsensiSantri,
-  getAbsensiKelasPengajar,
 
-  // ABSENSI PENGAJAR
   catatAbsensiPengajar,
   getAbsensiPengajar,
-  getAllAbsensiPengajar,
-  getRekapAbsensiPengajar,
-  exportAbsensi
+  getAllAbsensiPengajar
 } = require("../controllers/absensicontrollers");
 
 const {
@@ -24,42 +20,22 @@ const {
   onlySantri
 } = require("../middleware/auth");
 
-// ============================================================
-//                         ADMIN
-// ============================================================
-
+// ===================== ADMIN =============================
 router.get("/santri/all", verifyToken, onlyAdmin, getAllAbsensiSantri);
 router.get("/pengajar/all", verifyToken, onlyAdmin, getAllAbsensiPengajar);
 
+// ===================== PENGAJAR =============================
 
-// ============================================================
-//                         PENGAJAR
-// ============================================================
-
-// --- Absensi Santri ---
+// ABSENSI SANTRI
 router.post("/santri", verifyToken, onlyPengajar, catatAbsensiSantri);
-
-// ❗ sinkron dengan controller:   req.params.id_absensi
-router.put("/santri/:id_absensi", verifyToken, onlyPengajar, updateAbsensiSantri);
-
-// Pengajar melihat absensi santri di kelasnya sendiri
+router.put("/santri/:id_presensi", verifyToken, onlyPengajar, updateAbsensiSantri);
 router.get("/santri/kelas/me", verifyToken, onlyPengajar, getAbsensiKelasPengajar);
 
-
-// --- Absensi Pengajar (diri sendiri) ---
+// ABSENSI PENGAJAR (DIRINYA SENDIRI)
 router.post("/pengajar", verifyToken, onlyPengajar, catatAbsensiPengajar);
 router.get("/pengajar/me", verifyToken, onlyPengajar, getAbsensiPengajar);
 
-router.get("/pengajar/rekap", verifyToken, onlyPengajar, getRekapAbsensiPengajar);
-
-// Route untuk export data 1 tahun ke belakang
-router.get("/export", verifyToken, onlyPengajar, exportAbsensi);
-// ============================================================
-//                         SANTRI
-// ============================================================
-
-// Santri melihat daftar kehadiran dirinya
+// ===================== SANTRI =============================
 router.get("/santri/me", verifyToken, onlySantri, getAbsensiSantri);
-
 
 module.exports = router;

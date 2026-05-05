@@ -1,0 +1,339 @@
+FAIL tests/api/santri-dashboard.api.test.js
+  ● Console
+
+    console.log
+      [2026-05-05T14:08:12.040Z] GET /api/santri-dashboard/me
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.067Z] GET /api/santri-dashboard/me
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.072Z] GET /api/santri-dashboard/me
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.079Z] GET /api/santri-dashboard/me
+
+      at log (src/app.js:19:11)
+
+  ● SANTRI DASHBOARD API TEST › GET /api/santri-dashboard/me › ✅ Sukses - Santri ditemukan + ada kelas
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+    [0m [90m 37 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39m[36mget[39m([32m'/api/santri-dashboard/me'[39m)[33m;[39m
+     [90m 38 |[39m
+    [31m[1m>[22m[39m[90m 39 |[39m       expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 40 |[39m       expect(res[33m.[39mbody[33m.[39msantri[33m.[39mnama)[33m.[39mtoBe([32m'Santri Test'[39m)[33m;[39m
+     [90m 41 |[39m       expect(res[33m.[39mbody[33m.[39mjadwal[33m.[39mlength)[33m.[39mtoBeGreaterThan([35m0[39m)[33m;[39m
+     [90m 42 |[39m     })[33m;[39m[0m
+
+      at Object.toBe (tests/api/santri-dashboard.api.test.js:39:30)
+
+  ● SANTRI DASHBOARD API TEST › GET /api/santri-dashboard/me › ✅ Sukses - Santri ditemukan + tidak ada kelas
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+    [0m [90m 50 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39m[36mget[39m([32m'/api/santri-dashboard/me'[39m)[33m;[39m
+     [90m 51 |[39m
+    [31m[1m>[22m[39m[90m 52 |[39m       expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 53 |[39m       expect(res[33m.[39mbody[33m.[39mjadwal)[33m.[39mtoEqual([])[33m;[39m
+     [90m 54 |[39m     })[33m;[39m
+     [90m 55 |[39m[0m
+
+      at Object.toBe (tests/api/santri-dashboard.api.test.js:52:30)
+
+  ● SANTRI DASHBOARD API TEST › GET /api/santri-dashboard/me › ❌ Gagal - Santri tidak ditemukan (404)
+
+    expect(received).toContain(expected) // indexOf
+
+    Matcher error: received value must not be null nor undefined
+
+    Received has value: undefined
+
+    [0m [90m 60 |[39m
+     [90m 61 |[39m       expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m404[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 62 |[39m       expect(res[33m.[39mbody[33m.[39mmessage)[33m.[39mtoContain([32m'tidak ditemukan'[39m)[33m;[39m
+     [90m    |[39m                                [31m[1m^[22m[39m
+     [90m 63 |[39m     })[33m;[39m
+     [90m 64 |[39m
+     [90m 65 |[39m     test([32m'❌ Gagal - DB Error (500)'[39m[33m,[39m [36masync[39m () [33m=>[39m {[0m
+
+      at Object.toContain (tests/api/santri-dashboard.api.test.js:62:32)
+
+  ● SANTRI DASHBOARD API TEST › GET /api/santri-dashboard/me › ❌ Gagal - DB Error (500)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 500
+    Received: 404
+
+    [0m [90m 68 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app)[33m.[39m[36mget[39m([32m'/api/santri-dashboard/me'[39m)[33m;[39m
+     [90m 69 |[39m
+    [31m[1m>[22m[39m[90m 70 |[39m       expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m500[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 71 |[39m     })[33m;[39m
+     [90m 72 |[39m   })[33m;[39m
+     [90m 73 |[39m[0m
+
+      at Object.toBe (tests/api/santri-dashboard.api.test.js:70:30)
+
+PASS tests/api/auth.api.test.js
+  ● Console
+
+    console.log
+      [2026-05-05T14:08:12.102Z] POST /api/auth/login
+
+      at log (src/app.js:19:11)
+
+    console.log
+      REQUEST MASUK LOGIN: admin
+
+      at log (src/controllers/authcontrollers.js:12:13)
+
+    console.log
+      [2026-05-05T14:08:12.197Z] POST /api/auth/login
+
+      at log (src/app.js:19:11)
+
+    console.log
+      REQUEST MASUK LOGIN: wronguser
+
+      at log (src/controllers/authcontrollers.js:12:13)
+
+    console.log
+      [2026-05-05T14:08:12.203Z] POST /api/auth/login
+
+      at log (src/app.js:19:11)
+
+    console.log
+      REQUEST MASUK LOGIN: user
+
+      at log (src/controllers/authcontrollers.js:12:13)
+
+    console.log
+      [2026-05-05T14:08:12.208Z] POST /api/auth/login
+
+      at log (src/app.js:19:11)
+
+    console.log
+      REQUEST MASUK LOGIN: santri
+
+      at log (src/controllers/authcontrollers.js:12:13)
+
+    console.log
+      [2026-05-05T14:08:12.272Z] POST /api/auth/login
+
+      at log (src/app.js:19:11)
+
+    console.log
+      REQUEST MASUK LOGIN: user
+
+      at log (src/controllers/authcontrollers.js:12:13)
+
+    console.log
+      [2026-05-05T14:08:12.334Z] POST /api/auth/login
+
+      at log (src/app.js:19:11)
+
+    console.log
+      REQUEST MASUK LOGIN: user
+
+      at log (src/controllers/authcontrollers.js:12:13)
+
+    console.error
+      LOGIN ERROR: Error: DB Error
+          at Object.<anonymous> (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\tests\api\auth.api.test.js:123:38)
+          at Promise.finally.completed (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+          at _callCircusTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:947:3)
+          at D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at run (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+          at jestAdapter (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\runner.js:101:19)
+          at runTestInternal (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:275:16)
+          at runTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:343:7)
+          at Object.worker (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:497:12)
+
+    [0m [90m 81 |[39m
+     [90m 82 |[39m   } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 83 |[39m     console[33m.[39merror([32m"LOGIN ERROR:"[39m[33m,[39m err)[33m;[39m
+     [90m    |[39m             [31m[1m^[22m[39m
+     [90m 84 |[39m     [36mreturn[39m res[33m.[39mstatus([35m500[39m)[33m.[39mjson({
+     [90m 85 |[39m       message[33m:[39m [32m"Terjadi kesalahan server internal"[39m
+     [90m 86 |[39m     })[33m;[39m[0m
+
+      at error (src/controllers/authcontrollers.js:83:13)
+
+    console.log
+      [2026-05-05T14:08:12.346Z] POST /api/auth/forgot-password
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.351Z] POST /api/auth/forgot-password
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.357Z] POST /api/auth/forgot-password
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.364Z] POST /api/auth/reset-password
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.429Z] POST /api/auth/reset-password
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.435Z] POST /api/auth/reset-password
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.439Z] POST /api/auth/reset-password
+
+      at log (src/app.js:19:11)
+
+    console.error
+      RESET PASSWORD ERROR: Error: Transaction Error
+          at Object.<anonymous> (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\tests\api\auth.api.test.js:216:48)
+          at Promise.finally.completed (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+          at _callCircusTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:947:3)
+          at D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at run (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+          at jestAdapter (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\runner.js:101:19)
+          at runTestInternal (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:275:16)
+          at runTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:343:7)
+          at Object.worker (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:497:12)
+
+    [0m [90m 274 |[39m   } [36mcatch[39m (err) {
+     [90m 275 |[39m     [36mawait[39m client[33m.[39mquery([32m"ROLLBACK"[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 276 |[39m     console[33m.[39merror([32m"RESET PASSWORD ERROR:"[39m[33m,[39m err)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 277 |[39m     [36mreturn[39m res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ message[33m:[39m [32m"Terjadi kesalahan server"[39m })[33m;[39m
+     [90m 278 |[39m   } [36mfinally[39m {
+     [90m 279 |[39m     client[33m.[39mrelease()[33m;[39m[0m
+
+      at error (src/controllers/authcontrollers.js:276:13)
+
+    console.log
+      [2026-05-05T14:08:12.446Z] GET /api/auth/me
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.454Z] GET /api/auth/me
+
+      at log (src/app.js:19:11)
+
+    console.log
+      [2026-05-05T14:08:12.458Z] GET /api/auth/me
+
+      at log (src/app.js:19:11)
+
+    console.error
+      GETME ERROR: Error: DB Error
+          at Object.<anonymous> (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\tests\api\auth.api.test.js:250:38)
+          at Promise.finally.completed (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1497:10)
+          at _callCircusTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:947:3)
+          at D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:857:11)
+          at run (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\jestAdapterInit.js:1918:21)
+          at jestAdapter (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-circus\build\runner.js:101:19)
+          at runTestInternal (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:275:16)
+          at runTest (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:343:7)
+          at Object.worker (D:\TUGAS KULIAH\aplikasi - YSQ\Sahabat-Quran-Web\Backend\node_modules\jest-runner\build\testWorker.js:497:12)
+
+    [0m [90m 112 |[39m
+     [90m 113 |[39m   } [36mcatch[39m (err) {
+    [31m[1m>[22m[39m[90m 114 |[39m     console[33m.[39merror([32m"GETME ERROR:"[39m[33m,[39m err)[33m;[39m
+     [90m     |[39m             [31m[1m^[22m[39m
+     [90m 115 |[39m     [36mreturn[39m res[33m.[39mstatus([35m500[39m)[33m.[39mjson({ message[33m:[39m [32m"Terjadi kesalahan server"[39m })[33m;[39m
+     [90m 116 |[39m   }
+     [90m 117 |[39m }[33m;[39m[0m
+
+      at error (src/controllers/authcontrollers.js:114:13)
+
+--------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+File                            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                                                            
+--------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+All files                       |   26.81 |     5.53 |    2.92 |   27.32 |                                                                                                                                                              
+ src                            |   63.63 |       25 |     2.7 |    69.3 |                                                                                                                                                              
+  app.js                        |   63.63 |       25 |     2.7 |    69.3 | 51,55,59,63,67,71,75,79,83,87,91,95,99,103,107,111,115,119,123,128,132,137,141,147,151,175-182,187-188                                                       
+ src/controllers                |   14.56 |     5.51 |    3.05 |   14.77 |                                                                                                                                                              
+  absensicontrollers.js         |    8.66 |        0 |       0 |     8.8 | 7-23,29-72,80-144,152-175,185-213,222-258,266-295,303-364,372-393,403-425,432-448                                                                            
+  admincontrollers.js           |   11.47 |        0 |       0 |   11.66 | 7-24,32-49,57-93,102-118,123-129,134-138                                                                                                                     
+  authcontrollers.js            |   78.72 |    83.87 |      80 |   80.21 | 121-165,230-231,258-259                                                                                                                                      
+  jadwalcontrollers.js          |    12.5 |        0 |       0 |    12.5 | 9-30,38-68,74-95,101-125,132-147,153-182,188-209,219-252,259-291,302-345,350-367                                                                             
+  kelascontrollers.js           |   11.34 |        0 |       0 |   11.34 | 7-31,38-68,74-114,121-142,148-163,169-190,196-235,244-255,263-308,315-356                                                                                    
+  keuangancontrollers.js        |   13.66 |     5.55 |       0 |   13.66 | 8-9,22-26,32-62,70-81,88-108,113-128,133-237,245-254,262-270,278-321,329-343,352-358,365-374,382-408,415-432,445-500,509-534,541-621,627-725,732-775,783-825 
+  nilaidanprogrescontrollers.js |      14 |        0 |       0 |      14 | 5-17,24-48,54-67,73-81,87-104,111-125,132-149                                                                                                                
+  pengajarcontrollers.js        |    7.52 |        0 |       0 |    7.52 | 8-112,120-144,152-180,188-330,339-380                                                                                                                        
+  raporcontrollers.js           |    8.48 |        0 |       0 |    8.97 | 5-19,26-81,89-148,156-169,175-205,211-230,235-272,278-372,377-393,399-406,411-423,432-508,516-568,573-603                                                    
+  registercontrollers.js        |    8.91 |        0 |       0 |    9.18 | 4-60,68-77,84-98,104-233,242-254,262-273,281-287,295                                                                                                         
+  santricontrollers.js          |     5.3 |        0 |       0 |    5.42 | 8-129,137-181,190-332,341-418,426-483                                                                                                                        
+  santridashboardcontrollers.js |   14.28 |        0 |       0 |   14.28 | 4-70                                                                                                                                                         
+  tugasmateriajarcontrollers.js |    9.19 |        0 |       0 |    9.52 | 7-14,21-62,70-104,109-127,137-159,164-172,182-210,219-256,264-322,332-359,368-376,383-412,422-473,478-521                                                    
+ src/middleware                 |      35 |        0 |       0 |      35 |                                                                                                                                                              
+  upload.js                     |      35 |        0 |       0 |      35 | 11-32                                                                                                                                                        
+ src/routes                     |   88.83 |        0 |       0 |   88.83 |                                                                                                                                                              
+  absensiroutes.js              |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  adminroutes.js                |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  authroutes.js                 |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  jadwalroutes.js               |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  kelasroutes.js                |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  keuanganroutes.js             |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  meroutes.js                   |   20.68 |        0 |       0 |   20.68 | 7-101                                                                                                                                                        
+  nilaidanprogresroutes.js      |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  pengajarroutes.js             |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  raporroutes.js                |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  registerroutes.js             |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  santridashboardroutes.js      |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  santriroutes.js               |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  tugasmateriajarroutes.js      |     100 |      100 |     100 |     100 |                                                                                                                                                              
+--------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Test Suites: 1 failed, 1 passed, 2 total
+Tests:       4 failed, 16 passed, 20 total
+Snapshots:   0 total
+Time:        2.721 s, estimated 3 s
+Ran all test suites matching tests/api/auth.api.test.js|tests/api/santri-dashboard.api.test.js.

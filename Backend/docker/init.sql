@@ -368,3 +368,17 @@ INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin5@ysq.com', '$2a$12$LlQBotZXQWe0ND5snff30eIrxjo4Q51j3lxX4S86h8m3GiIlv3L0C', 'admin', 'aktif', 'admin5');
 
 --- admin
+INSERT INTO admin (id_users, nama, email)
+VALUES (1, 'Admin1', 'admin1@ysq.com');
+
+INSERT INTO admin (id_users, nama, email)
+VALUES (2, 'Admin2', 'admin2@ysq.com');
+
+INSERT INTO admin (id_users, nama, email)
+VALUES (3, 'Admin3', 'admin3@ysq.com');
+
+INSERT INTO admin (id_users, nama, email)
+VALUES (4, 'Admin4', 'admin4@ysq.com');
+
+INSERT INTO admin (id_users, nama, email)
+VALUES (5, 'Admin5', 'admin5@ysq.com');
