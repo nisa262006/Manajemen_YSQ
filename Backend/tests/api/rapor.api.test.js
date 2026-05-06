@@ -2,12 +2,10 @@ const request = require('supertest');
 const app = require('../../src/app');
 const db = require('../../src/config/db');
 
-// ✅ MOCK DATABASE
 jest.mock('../../src/config/db', () => ({
   query: jest.fn()
 }));
 
-// ✅ MOCK AUTH MIDDLEWARE
 jest.mock('../../src/middleware/auth', () => ({
   verifyToken: (req, res, next) => {
     const role = req.headers['x-role'] || 'pengajar';
@@ -15,71 +13,126 @@ jest.mock('../../src/middleware/auth', () => ({
     req.user = { id_users, role };
     next();
   },
-  onlyAdmin:   (req, res, next) => next(),
-  onlySantri:  (req, res, next) => next(),
-  onlyPengajar:(req, res, next) => next(),
+  onlyAdmin: (req, res, next) => next(),
+  onlySantri: (req, res, next) => next(),
+  onlyPengajar: (req, res, next) => next(),
 }));
 
-describe('RAPOR API TEST (MOCKED)', () => {
+describe('RAPOR API TEST (FIXED)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
+  // ================== TAHSIN ==================
   describe('POST /api/rapor/tahsin', () => {
     test('✅ Sukses catat rapor tahsin', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }); // helper
-      db.query.mockResolvedValueOnce({ rowCount: 0 }); // cek existing
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // insert
+
+      db.query
+        .mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }) // getIdPengajar
+        .mockResolvedValueOnce({ rowCount: 0 }) // cek existing
+        .mockResolvedValueOnce({}); // insert
+
       const res = await request(app).post('/api/rapor/tahsin').send({
-        id_santri: 1, id_jadwal: 1, periode: '2024-05', nilai_akhir: 85
+        id_santri: 1,
+        id_jadwal: 1,
+        periode: '2024-05',
+        nilai_akhir: 85
       });
+
       expect(res.statusCode).toBe(200);
     });
   });
 
+  // ================== TAHFIDZ ==================
   describe('POST /api/rapor/tahfidz', () => {
     test('✅ Sukses buat header tahfidz', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] });
-      db.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ kategori: 'tahfidz' }] });
-      db.query.mockResolvedValueOnce({ rowCount: 0 }); // cek rapor
-      db.query.mockResolvedValueOnce({ rows: [{ id_rapor: 10 }] }); // insert
+
+      db.query
+        .mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }) // getIdPengajar
+        .mockResolvedValueOnce({
+          rowCount: 1,
+          rows: [{ kategori: 'tahfidz' }]
+        }) // cek kategori
+        .mockResolvedValueOnce({ rowCount: 0 }) // cek rapor
+        .mockResolvedValueOnce({ rows: [{ id_rapor: 10 }] }); // insert
+
       const res = await request(app).post('/api/rapor/tahfidz').send({
-        id_santri: 1, id_jadwal: 1, periode: '2024-05'
+        id_santri: 1,
+        id_jadwal: 1,
+        periode: '2024-05'
       });
+
       expect(res.statusCode).toBe(200);
+      expect(res.body.id_rapor).toBe(10);
     });
   });
 
+  // ================== SANTRI ==================
   describe('GET /api/rapor/santri/me', () => {
     test('✅ Sukses ambil rapor saya', async () => {
-      db.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ id_santri: 1 }] });
-      db.query.mockResolvedValueOnce({ rows: [{ periode: '2024-05' }] });
-      db.query.mockResolvedValueOnce({ rows: [] }); // tahsin
-      db.query.mockResolvedValueOnce({ rows: [] }); // tahfidz
-      db.query.mockResolvedValueOnce({ rows: [] }); // simakan
-      const res = await request(app).get('/api/rapor/santri/me').set('x-role', 'santri');
+
+      db.query
+        // identitas santri (WAJIB LENGKAP!)
+        .mockResolvedValueOnce({
+          rowCount: 1,
+          rows: [{
+            id_santri: 1,
+            nama: 'Ahmad',
+            nis: '123',
+            nama_kelas: 'Tahfidz A',
+            nama_pengajar: 'Ustadz'
+          }]
+        })
+        // list periode
+        .mockResolvedValueOnce({
+          rows: [{ periode: '2024-05' }]
+        })
+        // tahsin
+        .mockResolvedValueOnce({ rows: [] })
+        // tahfidz
+        .mockResolvedValueOnce({ rows: [] })
+        // simakan
+        .mockResolvedValueOnce({ rows: [] });
+
+      const res = await request(app)
+        .get('/api/rapor/santri/me')
+        .set('x-role', 'santri');
+
       expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
     });
   });
 
+  // ================== PENGAJAR ==================
   describe('GET /api/rapor/pengajar/me', () => {
     test('✅ Sukses ambil rapor buatan pengajar', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] });
-      db.query.mockResolvedValueOnce({ rows: [] }); // tahsin
-      db.query.mockResolvedValueOnce({ rows: [] }); // tahfidz
+
+      db.query
+        .mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }) // getIdPengajar
+        .mockResolvedValueOnce({ rows: [] }) // tahsin
+        .mockResolvedValueOnce({ rows: [] }); // tahfidz
+
       const res = await request(app).get('/api/rapor/pengajar/me');
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+  });
+
+  // ================== DELETE ==================
+  describe('DELETE /api/rapor/tahfidz/:id', () => {
+    test('✅ Sukses hapus rapor tahfidz', async () => {
+
+      db.query
+        .mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }) // getIdPengajar
+        .mockResolvedValueOnce({}) // delete simakan
+        .mockResolvedValueOnce({}); // delete rapor
+
+      const res = await request(app).delete('/api/rapor/tahfidz/1');
+
       expect(res.statusCode).toBe(200);
     });
   });
 
-  describe('DELETE /api/rapor/tahfidz/:id', () => {
-    test('✅ Sukses hapus rapor tahfidz', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] });
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // delete simakan
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // delete rapor
-      const res = await request(app).delete('/api/rapor/tahfidz/1');
-      expect(res.statusCode).toBe(200);
-    });
-  });
 });

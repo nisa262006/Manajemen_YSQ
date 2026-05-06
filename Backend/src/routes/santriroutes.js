@@ -1,19 +1,35 @@
 const express = require("express");
 const router = express.Router();
 
-const auth = require("../middleware/auth");        // auth adalah FUNCTION
-const allow = require("../middleware/role");       // allow adalah FUNCTION RETURNER
-
 const {
-  registerSantri,
-  verifikasiSantri,
-  getSantriList
+  getAllSantri,
+  getSantriById,
+  updateSantri,
+  deleteSantri,
+  exportSantriExcel
 } = require("../controllers/santricontrollers");
 
-router.post("/register", registerSantri);
+const { verifyToken, onlyAdmin } = require("../middleware/auth");
 
-router.get("/", auth, allow('admin', 'staf'), getSantriList);
 
-router.put("/verifikasi/:id", auth, allow('admin', 'staf'), verifikasiSantri);
+// =========================
+// URUTAN HARUS BENAR
+// =========================
+
+// Export Excel → TARUH DI ATAS
+router.get("/export/excel", verifyToken, onlyAdmin, exportSantriExcel);
+
+// Semua santri
+router.get("/", verifyToken, onlyAdmin, getAllSantri);
+
+// Detail santri
+router.get("/:id_santri", verifyToken, onlyAdmin, getSantriById);
+
+// Update
+router.put("/:id_santri", verifyToken, onlyAdmin, updateSantri);
+
+// Delete
+router.delete("/:id_santri", verifyToken, onlyAdmin, deleteSantri);
+
 
 module.exports = router;

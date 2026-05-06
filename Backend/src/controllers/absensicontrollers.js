@@ -1,185 +1,450 @@
+const db = require("../config/db");
+
+/* =========================================================
+   HELPER
+========================================================= */
+async function getIdPengajar(id_users) {
+  const q = await db.query(
+    `SELECT id_pengajar FROM pengajar WHERE id_users = $1`,
+    [id_users]
+  );
+  return q.rows[0]?.id_pengajar ?? null;
+}
+
+function getHariFromTanggal(tanggal) {
+  if (!tanggal) return null;
+
+  // tanggal harus YYYY-MM-DD
+  const [year, month, day] = tanggal.split("-").map(Number);
+
+  // Pakai Date lokal (tanpa UTC)
+  const localDate = new Date(year, month - 1, day);
+
+  return localDate
+    .toLocaleDateString("id-ID", { weekday: "long" })
+    .toLowerCase();
+}
+
+exports.exportAbsensi = async (req, res) => {
+  try {
+    const id_users = req.user.id_users;
+    const { id_kelas, tanggal_akhir } = req.query; 
+
+    // Ambil ID Pengajar
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar) return res.status(403).json({ message: "Bukan pengajar" });
+
+    // --- LOGIKA 1 TAHUN KE BELAKANG ---
+    // Gunakan tanggal yang dipilih pengajar sebagai batas akhir
+    const endDate = tanggal_akhir || new Date().toISOString().split('T')[0];
+    
+    // Kurangi 1 tahun untuk mendapatkan batas awal
+    const d = new Date(endDate);
+    d.setFullYear(d.getFullYear() - 1);
+    const startDate = d.toISOString().split('T')[0];
+
+    // Query untuk mengambil riwayat absensi santri dalam rentang 1 tahun tersebut
+    const result = await db.query(`
+      SELECT 
+        s.nama AS nama_santri,
+        a.status_absensi,
+        TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+        k.nama_kelas,
+        a.catatan
+      FROM absensi a
+      JOIN santri s ON a.id_santri = s.id_santri
+      JOIN jadwal j ON a.id_jadwal = j.id_jadwal
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE j.id_pengajar = $1
+  AND ($2 = '' OR k.id_kelas::text = $2)
+  AND a.tanggal BETWEEN $3 AND $4
+      ORDER BY a.tanggal DESC, s.nama ASC
+    `, [id_pengajar, id_kelas || '', startDate, endDate]);
+
+    res.json({
+      success: true,
+      message: `Berhasil mengambil data dari ${startDate} sampai ${endDate}`,
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error("Export absensi error:", error);
+    res.status(500).json({ success: false, message: "Gagal export absensi" });
+  }
+};
+
+/* =========================================================
+   CATAT ABSENSI SANTRI (PENGAJAR) - MODIFIED
+========================================================= */
 exports.catatAbsensiSantri = async (req, res) => {
-  const { id_santri, id_jadwal, tanggal, status } = req.body;
-  const pengajar = req.user.id_user;
+  try {
+    const { id_santri, id_jadwal, tanggal, status_absensi, catatan } = req.body;
+    const id_users = req.user.id_users;
 
-  // 1. Validasi: jadwal harus milik pengajar
-  const cekJadwal = await db.query(`
-    SELECT j.id_jadwal 
-    FROM jadwal j
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    WHERE j.id_jadwal = $1 AND k.id_pengajar = $2
-  `, [id_jadwal, pengajar]);
+    const tanggalFinal =
+      tanggal || new Date().toISOString().split("T")[0];
 
-  if (cekJadwal.rowCount === 0)
-    return res.status(403).json({ message: "Tidak boleh mengabsen kelas yang bukan milik Anda" });
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar)
+      return res.status(403).json({ message: "Anda bukan pengajar" });
 
-  // 2. Validasi: santri harus terdaftar pada kelas jadwal tersebut
-  const cekSantri = await db.query(`
-    SELECT s.id_santri
-    FROM santri s
-    JOIN kelas k ON s.id_kelas = k.id_kelas
-    JOIN jadwal j ON k.id_kelas = j.id_kelas
-    WHERE s.id_santri = $1 AND j.id_jadwal = $2
-  `, [id_santri, id_jadwal]);
+    // 🔒 CEK SANTRI AKTIF
+    const cekSantri = await db.query(
+      `SELECT status FROM santri WHERE id_santri = $1`,
+      [id_santri]
+    );
 
-  if (cekSantri.rowCount === 0)
-    return res.status(400).json({
-      message: "Santri tidak terdaftar pada kelas jadwal tersebut"
+    if (cekSantri.rowCount === 0)
+      return res.status(404).json({ message: "Santri tidak ditemukan" });
+
+    if (cekSantri.rows[0].status !== "aktif")
+      return res.status(403).json({
+        message: "Santri nonaktif tidak bisa diabsen"
+      });
+
+    // 🔒 VALIDASI SANTRI TERDAFTAR DI SESI
+    const cekTerdaftar = await db.query(`
+      SELECT 1
+      FROM santri_jadwal sj
+      JOIN jadwal j ON sj.id_jadwal = j.id_jadwal
+      WHERE sj.id_santri = $1
+        AND sj.id_jadwal = $2
+        AND j.id_pengajar = $3
+    `, [id_santri, id_jadwal, id_pengajar]);
+
+    if (cekTerdaftar.rowCount === 0)
+      return res.status(400).json({
+        message: "Santri tidak terdaftar pada sesi ini"
+      });
+
+    // 🔒 CEK DUPLIKAT
+    const duplikat = await db.query(`
+      SELECT 1 FROM absensi
+      WHERE id_santri=$1 AND id_jadwal=$2 AND tanggal=$3
+    `, [id_santri, id_jadwal, tanggalFinal]);
+
+    if (duplikat.rowCount > 0)
+      return res.status(400).json({
+        message: "Absensi sudah tercatat untuk tanggal ini"
+      });
+
+    await db.query(`
+      INSERT INTO absensi
+      (id_santri, id_jadwal, tanggal, status_absensi, catatan)
+      VALUES ($1,$2,$3,$4,$5)
+    `, [id_santri, id_jadwal, tanggalFinal, status_absensi, catatan ?? null]);
+
+    res.json({
+      success: true,
+      message: "Absensi santri berhasil disimpan"
     });
 
-  // 3. Cegah absensi ganda
-  const cekDuplikat = await db.query(`
-    SELECT * FROM presensi_peserta
-    WHERE id_santri = $1 AND id_jadwal = $2 AND tanggal = $3
-  `, [id_santri, id_jadwal, tanggal]);
+  } catch (err) {
+    console.error("ABSENSI SANTRI ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
-  if (cekDuplikat.rowCount > 0)
-    return res.status(400).json({
-      message: "Absensi sudah tercatat hari ini"
-    });
+/* =========================================================
+   ADMIN → LIHAT SEMUA ABSENSI SANTRI
+========================================================= */
+exports.getAllAbsensiSantri = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT
+        a.id_absensi,
+        TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+        a.status_absensi,
+        a.catatan,
+        s.nama AS nama_santri,
+        k.nama_kelas,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai
+      FROM absensi a
+      JOIN santri s ON a.id_santri = s.id_santri
+      JOIN jadwal j ON a.id_jadwal = j.id_jadwal
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE s.status = 'aktif'
+      ORDER BY a.tanggal DESC
+    `);
 
-  // 4. Insert absensi
-  await db.query(`
-    INSERT INTO presensi_peserta(id_santri, id_jadwal, tanggal, status)
-    VALUES($1,$2,$3,$4)
-  `, [id_santri, id_jadwal, tanggal, status]);
-
-  res.json({ message: "Absensi santri dicatat" });
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 };
 
 
-//===========absensi di batasi ============//
+/* ============================================================================
+   UPDATE ABSENSI SANTRI (PENGAJAR)
+============================================================================ */
 
 exports.updateAbsensiSantri = async (req, res) => {
-  const { id_presensi } = req.params;
-  const { status } = req.body;
-  const pengajar = req.user.id_user;
+  try {
+    const { id_absensi } = req.params;
+    const { status_absensi } = req.body;
+    const id_users = req.user.id_users;
 
-  // Validasi: hanya absensi kelasnya
-  const cek = await db.query(`
-    SELECT p.id_presensi
-    FROM presensi_peserta p
-    JOIN jadwal j ON p.id_jadwal = j.id_jadwal
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar)
+      return res.status(403).json({ message: "Anda bukan pengajar" });
+
+    const cek = await db.query(`
+      SELECT a.id_absensi
+      FROM absensi a
+      JOIN jadwal j ON a.id_jadwal = j.id_jadwal
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE a.id_absensi = $1
+  AND j.id_pengajar = $2
+    `, [id_absensi, id_pengajar]);
+
+    if (cek.rowCount === 0)
+      return res.status(403).json({ message: "Tidak boleh mengubah absensi kelas lain" });
+
+    await db.query(`
+      UPDATE absensi SET status_absensi = $1
+      WHERE id_absensi = $2
+    `, [status_absensi, id_absensi]);
+
+    res.json({ message: "Absensi santri diperbarui" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+/* ======================================================================
+   PENGAJAR → MELIHAT ABSENSI SANTRI DI KELASNYA
+====================================================================== */
+exports.getAbsensiKelasPengajar = async (req, res) => {
+  try {
+    const id_users = req.user.id_users;
+
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar) {
+      return res.status(403).json({ message: "Anda bukan pengajar" });
+    }
+
+    const result = await db.query(`
+      SELECT
+      a.id_absensi,
+      TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+      a.status_absensi,
+      a.catatan,
+      s.nama AS nama_santri,
+      k.id_kelas,            -- 🔥 TAMBAHKAN
+      j.id_jadwal,           -- 🔥 TAMBAHKAN
+      k.nama_kelas,
+      j.hari,
+      j.jam_mulai,
+      j.jam_selesai
+    FROM absensi a
+    JOIN santri s ON a.id_santri = s.id_santri
+    JOIN jadwal j ON a.id_jadwal = j.id_jadwal
     JOIN kelas k ON j.id_kelas = k.id_kelas
-    WHERE p.id_presensi = $1 AND k.id_pengajar = $2
-  `, [id_presensi, pengajar]);
+    WHERE j.id_pengajar = $1
+    ORDER BY a.tanggal DESC
+    `, [id_pengajar]);
 
-  if (cek.rowCount === 0)
-    return res.status(403).json({
-      message: "Tidak boleh mengedit absensi kelas lain"
+    res.json({
+      success: true,
+      data: result.rows
     });
 
-  await db.query(`
-    UPDATE presensi_peserta SET status = $1 WHERE id_presensi = $2
-  `, [status, id_presensi]);
-
-  res.json({ message: "Absensi santri diperbarui" });
+  } catch (err) {
+    console.error("ERROR getAbsensiKelasPengajar:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-
-//===========pengajar lihat absen santri (kelasnya sendiri)============//
-
-exports.getAbsensiKelasPengajar = async (req, res) => {
-  const pengajar = req.user.id_user;
-
-  const result = await db.query(`
-    SELECT 
-      p.*, 
-      s.nama AS nama_santri,
-      k.nama_kelas,
-      j.hari, j.jam_mulai, j.jam_selesai
-    FROM presensi_peserta p
-    JOIN santri s ON p.id_santri = s.id_santri
-    JOIN jadwal j ON p.id_jadwal = j.id_jadwal
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    WHERE k.id_pengajar = $1
-    ORDER BY tanggal DESC
-  `, [pengajar]);
-
-  res.json(result.rows);
-};
-
-
-//===========absen santri role============//
-
+/* ======================================================================
+   SANTRI → MELIHAT ABSENSI SENDIRI (HANYA JIKA AKTIF)
+====================================================================== */
 exports.getAbsensiSantri = async (req, res) => {
-  const id_user = req.user.id_user;
+  try {
+    const id_users = req.user.id_users;
 
-  const result = await db.query(`
-    SELECT 
-      p.*, 
-      k.nama_kelas,
-      j.hari, j.jam_mulai, j.jam_selesai
-    FROM presensi_peserta p
-    JOIN santri s ON p.id_santri = s.id_santri
-    JOIN jadwal j ON p.id_jadwal = j.id_jadwal
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    WHERE s.id_user = $1
-    ORDER BY tanggal DESC
-  `, [id_user]);
+    const result = await db.query(`
+      SELECT
+        a.id_absensi,
+        TO_CHAR(a.tanggal, 'YYYY-MM-DD') AS tanggal,
+        a.status_absensi,
+        a.catatan,
+        k.nama_kelas,
+        j.hari,
+        j.jam_mulai,
+        j.jam_selesai
+      FROM absensi a
+      JOIN santri s ON a.id_santri = s.id_santri
+      JOIN jadwal j ON a.id_jadwal = j.id_jadwal
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE s.id_users = $1
+        AND s.status = 'aktif'
+      ORDER BY a.tanggal DESC
+    `, [id_users]);
 
-  res.json(result.rows);
+    res.json({
+      success: true,
+      data: result.rows
+    });
+
+  } catch (err) {
+    console.error("ERROR getAbsensiSantri:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-
-//absensi pengajar
+/* ============================================================================
+   PENGAJAR → MENCATAT ABSENSI PENGAJAR SENDIRI (FIXED)
+============================================================================ */
 exports.catatAbsensiPengajar = async (req, res) => {
-  const { id_jadwal, tanggal, status } = req.body;
-  const id_pengajar = req.user.id_user;
+  try {
+    const id_users = req.user.id_users;
+    let { id_jadwal, tanggal, status_absensi, catatan } = req.body;
 
-  // Cegah absensi ganda
-  const duplikat = await db.query(`
-    SELECT * FROM presensi_pengajar
-    WHERE id_pengajar = $1 AND id_jadwal = $2 AND tanggal = $3
-  `, [id_pengajar, id_jadwal, tanggal]);
+    if (!status_absensi && req.body.status) {
+      status_absensi = req.body.status;
+    }
 
-  if (duplikat.rowCount > 0)
-    return res.status(400).json({ message: "Absensi sudah dicatat hari ini" });
+    if (!status_absensi)
+      return res.status(400).json({ message: "Status absensi harus dipilih" });
 
-  await db.query(`
-    INSERT INTO presensi_pengajar(id_pengajar, id_jadwal, tanggal, status)
-    VALUES ($1,$2,$3,$4)
-  `, [id_pengajar, id_jadwal, tanggal, status]);
+    const tanggalFinal =
+      tanggal || new Date().toISOString().split("T")[0];
 
-  res.json({ message: "Absensi pengajar dicatat" });
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar)
+      return res.status(403).json({ message: "Anda bukan pengajar" });
+
+    // ✅ VALIDASI JADWAL MILIK PENGAJAR
+    const cekJadwal = await db.query(`
+      SELECT 1
+      FROM jadwal
+      WHERE id_jadwal = $1
+        AND id_pengajar = $2
+    `, [id_jadwal, id_pengajar]);
+
+    if (cekJadwal.rowCount === 0)
+      return res.status(403).json({ message: "Jadwal bukan milik Anda" });
+
+    // ✅ CEK DUPLIKAT
+    const cekDuplikat = await db.query(`
+      SELECT 1 FROM absensi_pengajar
+      WHERE id_pengajar=$1 AND id_jadwal=$2 AND tanggal=$3
+    `, [id_pengajar, id_jadwal, tanggalFinal]);
+
+    if (cekDuplikat.rowCount > 0)
+      return res.status(400).json({
+        message: "Absensi pengajar sudah tercatat untuk tanggal ini"
+      });
+
+    const insert = await db.query(`
+      INSERT INTO absensi_pengajar
+      (id_pengajar, id_jadwal, tanggal, status_absensi, catatan)
+      VALUES ($1,$2,$3,$4,$5)
+      RETURNING *
+    `, [
+      id_pengajar,
+      id_jadwal,
+      tanggalFinal,
+      status_absensi,
+      catatan || null
+    ]);
+
+    res.json({
+      success: true,
+      message: "Absensi pengajar berhasil dicatat",
+      data: insert.rows[0]
+    });
+
+  } catch (err) {
+    console.error("ABSENSI PENGAJAR ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-
-//===========pengajar melihat absensi sendiri============//
+/* ============================================================================
+   PENGAJAR → MELIHAT ABSENSI DIRI SENDIRI
+============================================================================ */
 exports.getAbsensiPengajar = async (req, res) => {
-  const id_pengajar = req.user.id_user;
+  try {
+    const id_users = req.user.id_users;
 
-  const result = await db.query(`
-    SELECT 
-      p.*,
-      k.nama_kelas,
-      j.hari, j.jam_mulai
-    FROM presensi_pengajar p
-    JOIN jadwal j ON p.id_jadwal = j.id_jadwal
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    WHERE p.id_pengajar = $1
-    ORDER BY tanggal DESC
-  `, [id_pengajar]);
+    const id_pengajar = await getIdPengajar(id_users);
+    if (!id_pengajar)
+      return res.status(403).json({ message: "Anda bukan pengajar" });
 
-  res.json(result.rows);
+    const result = await db.query(`
+      SELECT
+        p.*,
+        k.nama_kelas,
+        j.hari, j.jam_mulai
+      FROM absensi_pengajar p
+      JOIN jadwal j ON p.id_jadwal = j.id_jadwal
+      JOIN kelas k ON j.id_kelas = k.id_kelas
+      WHERE p.id_pengajar = $1
+      ORDER BY tanggal DESC
+    `, [id_pengajar]);
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 
-//============ADMIN MELIHAT SEMUA ABSEN PENGAJAR===========//
+/* ============================================================================
+   ADMIN → MELIHAT SEMUA ABSENSI PENGAJAR
+============================================================================ */
 
 exports.getAllAbsensiPengajar = async (req, res) => {
-  const result = await db.query(`
-    SELECT 
-      p.*,
-      u.nama_lengkap AS pengajar,
-      k.nama_kelas,
-      j.hari, j.jam_mulai
-    FROM presensi_pengajar p
-    JOIN users u ON p.id_pengajar = u.id_user
-    JOIN jadwal j ON p.id_jadwal = j.id_jadwal
-    JOIN kelas k ON j.id_kelas = k.id_kelas
-    ORDER BY tanggal DESC
-  `);
+  try {
+    const result = await db.query(`
+      SELECT
+        ap.id_absensi_pengajar,
+        ap.id_pengajar,
+        ap.id_jadwal,
+        TO_CHAR(ap.tanggal, 'YYYY-MM-DD') AS tanggal,
+        ap.status_absensi,
+        ap.catatan,
+        p.nama AS nama_pengajar,
+        k.nama_kelas
+      FROM absensi_pengajar ap
+      LEFT JOIN jadwal j ON ap.id_jadwal = j.id_jadwal
+      LEFT JOIN kelas k ON j.id_kelas = k.id_kelas
+      LEFT JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
+      ORDER BY ap.tanggal DESC
+    `);
 
-  res.json(result.rows);
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("Error getAllAbsensiPengajar:", err);
+    res.status(500).json({ message: "Gagal mengambil data absensi pengajar" });
+  }
+};
+
+
+// Backend/src/controllers/absensiControllers.js (Asumsi nama filenya)
+exports.getRekapAbsensiPengajar = async (req, res) => {
+  try {
+      const id_users = req.user.id_users;
+
+      // Logika query database kamu...
+      const result = await db.query(`SELECT
+              COUNT(*) FILTER (WHERE status = 'hadir') as total_hadir,
+              COUNT(*) FILTER (WHERE status = 'izin') as total_izin,
+              COUNT(*) FILTER (WHERE status = 'alfa') as total_alfa
+          FROM absensi_pengajar ap
+          JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
+          WHERE p.id_users = $1
+      `, [id_users]);
+
+      res.json(result.rows[0]);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Gagal mengambil rekap" });
+  }
 };

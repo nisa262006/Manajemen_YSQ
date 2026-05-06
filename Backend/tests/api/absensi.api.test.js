@@ -2,12 +2,12 @@ const request = require('supertest');
 const app = require('../../src/app');
 const db = require('../../src/config/db');
 
-// ✅ MOCK DATABASE
+// MOCK DB
 jest.mock('../../src/config/db', () => ({
   query: jest.fn()
 }));
 
-// ✅ MOCK AUTH MIDDLEWARE
+// MOCK AUTH
 jest.mock('../../src/middleware/auth', () => ({
   verifyToken: (req, res, next) => {
     const role = req.headers['x-role'] || 'pengajar';
@@ -15,21 +15,32 @@ jest.mock('../../src/middleware/auth', () => ({
     req.user = { id_users, role };
     next();
   },
-  onlyAdmin:   (req, res, next) => next(),
-  onlySantri:  (req, res, next) => next(),
-  onlyPengajar:(req, res, next) => next(),
+  onlyAdmin: (req, res, next) => next(),
+  onlySantri: (req, res, next) => next(),
+  onlyPengajar: (req, res, next) => next(),
 }));
 
-describe('ABSENSI API TEST (MOCKED)', () => {
+// HELPER BIAR MOCK RAPI
+const mockQuery = (...responses) => {
+  db.query.mockReset();
+  responses.forEach(r => db.query.mockResolvedValueOnce(r));
+};
+
+describe('ABSENSI API TEST (FIXED)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
+  // ===============================
+  // EXPORT
+  // ===============================
   describe('GET /api/absensi/export', () => {
-    test('✅ Sukses export absensi', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }); // helper
-      db.query.mockResolvedValueOnce({ rows: [{ nama_santri: 'A', status: 'Hadir' }] }); // main query
+    test('✅ Sukses export', async () => {
+      mockQuery(
+        { rows: [{ id_pengajar: 1 }] },
+        { rows: [{ nama_santri: 'A', status: 'Hadir' }] }
+      );
 
       const res = await request(app)
         .get('/api/absensi/export?id_kelas=1')
@@ -39,8 +50,8 @@ describe('ABSENSI API TEST (MOCKED)', () => {
       expect(res.body.success).toBe(true);
     });
 
-    test('❌ Gagal export - bukan pengajar', async () => {
-      db.query.mockResolvedValueOnce({ rows: [] }); // helper return null
+    test('❌ Bukan pengajar', async () => {
+      mockQuery({ rows: [] });
 
       const res = await request(app)
         .get('/api/absensi/export')
@@ -50,13 +61,18 @@ describe('ABSENSI API TEST (MOCKED)', () => {
     });
   });
 
+  // ===============================
+  // CATAT SANTRI
+  // ===============================
   describe('POST /api/absensi/santri', () => {
-    test('✅ Sukses catat absensi santri', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }); // helper
-      db.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ status: 'aktif' }] }); // cekSantri
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // cekTerdaftar
-      db.query.mockResolvedValueOnce({ rowCount: 0 }); // duplikat
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // insert
+    test('✅ Sukses catat', async () => {
+      mockQuery(
+        { rows: [{ id_pengajar: 1 }] }, // helper
+        { rowCount: 1, rows: [{ status: 'aktif' }] }, // cekSantri
+        { rowCount: 1 }, // terdaftar
+        { rowCount: 0 }, // duplikat
+        { rowCount: 1 } // insert
+      );
 
       const res = await request(app)
         .post('/api/absensi/santri')
@@ -67,21 +83,27 @@ describe('ABSENSI API TEST (MOCKED)', () => {
       expect(res.body.success).toBe(true);
     });
 
-    test('❌ Gagal catat - santri nonaktif', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] });
-      db.query.mockResolvedValueOnce({ rowCount: 1, rows: [{ status: 'nonaktif' }] });
+    test('❌ Santri nonaktif', async () => {
+      mockQuery(
+        { rows: [{ id_pengajar: 1 }] },
+        { rowCount: 1, rows: [{ status: 'nonaktif' }] }
+      );
 
       const res = await request(app)
         .post('/api/absensi/santri')
+        .set('x-role', 'pengajar')
         .send({ id_santri: 1, id_jadwal: 1 });
 
       expect(res.statusCode).toBe(403);
     });
   });
 
+  // ===============================
+  // ADMIN LIHAT SEMUA
+  // ===============================
   describe('GET /api/absensi/santri/all', () => {
-    test('✅ Admin lihat semua absensi', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_absensi: 1 }] });
+    test('✅ Success', async () => {
+      mockQuery({ rows: [{ id_absensi: 1 }] });
 
       const res = await request(app)
         .get('/api/absensi/santri/all')
@@ -92,11 +114,16 @@ describe('ABSENSI API TEST (MOCKED)', () => {
     });
   });
 
+  // ===============================
+  // UPDATE
+  // ===============================
   describe('PUT /api/absensi/santri/:id', () => {
-    test('✅ Sukses update absensi santri', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }); // helper
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // cek akses
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // update
+    test('✅ Update berhasil', async () => {
+      mockQuery(
+        { rows: [{ id_pengajar: 1 }] },
+        { rowCount: 1 },
+        { rowCount: 1 }
+      );
 
       const res = await request(app)
         .put('/api/absensi/santri/1')
@@ -107,9 +134,14 @@ describe('ABSENSI API TEST (MOCKED)', () => {
     });
   });
 
+  // ===============================
+  // SANTRI ME
+  // ===============================
   describe('GET /api/absensi/santri/me', () => {
-    test('✅ Santri lihat absensi sendiri', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_absensi: 1, status_absensi: 'Hadir' }] });
+    test('✅ Ada data', async () => {
+      mockQuery({
+        rows: [{ id_absensi: 1, status_absensi: 'Hadir' }]
+      });
 
       const res = await request(app)
         .get('/api/absensi/santri/me')
@@ -118,14 +150,32 @@ describe('ABSENSI API TEST (MOCKED)', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
     });
+
+    test('❌ Tidak ada data', async () => {
+      mockQuery({ rows: [] });
+
+      const res = await request(app)
+        .get('/api/absensi/santri/me')
+        .set('x-role', 'santri');
+
+      // controller kamu tetap return 200
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.length).toBe(0);
+    });
   });
 
+  // ===============================
+  // ABSENSI PENGAJAR
+  // ===============================
   describe('POST /api/absensi/pengajar', () => {
-    test('✅ Sukses catat absensi pengajar', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ id_pengajar: 1 }] }); // helper
-      db.query.mockResolvedValueOnce({ rowCount: 1 }); // cekJadwal
-      db.query.mockResolvedValueOnce({ rowCount: 0 }); // duplikat
-      db.query.mockResolvedValueOnce({ rows: [{ id_absensi_pengajar: 1 }] }); // insert
+    test('✅ Sukses', async () => {
+      mockQuery(
+        { rows: [{ id_pengajar: 1 }] },
+        { rowCount: 1 },
+        { rowCount: 0 },
+        { rows: [{ id_absensi_pengajar: 1 }] }
+      );
 
       const res = await request(app)
         .post('/api/absensi/pengajar')
@@ -137,9 +187,14 @@ describe('ABSENSI API TEST (MOCKED)', () => {
     });
   });
 
+  // ===============================
+  // REKAP
+  // ===============================
   describe('GET /api/absensi/pengajar/rekap', () => {
-    test('✅ Sukses ambil rekap', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ total_hadir: 5, total_izin: 1, total_alfa: 0 }] });
+    test('✅ Sukses', async () => {
+      mockQuery({
+        rows: [{ total_hadir: 5, total_izin: 1, total_alfa: 0 }]
+      });
 
       const res = await request(app)
         .get('/api/absensi/pengajar/rekap')
@@ -149,13 +204,19 @@ describe('ABSENSI API TEST (MOCKED)', () => {
     });
   });
 
-  describe('500 Error Handler', () => {
-    test('Should return 500 on DB error', async () => {
+  // ===============================
+  // ERROR 500
+  // ===============================
+  describe('Error handler', () => {
+    test('❌ DB Error', async () => {
       db.query.mockRejectedValueOnce(new Error('DB Error'));
+
       const res = await request(app)
         .get('/api/absensi/santri/all')
         .set('x-role', 'admin');
+
       expect(res.statusCode).toBe(500);
     });
   });
+
 });
