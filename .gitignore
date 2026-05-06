@@ -51,3 +51,10 @@ Backend/public/uploads/submit/*
 !Backend/public/uploads/materi/*.docx
 !Backend/public/uploads/tugas/*.doc
 !Backend/public/uploads/tugas/*.docx
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
