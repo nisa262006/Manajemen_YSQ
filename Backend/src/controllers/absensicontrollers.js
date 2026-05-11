@@ -434,9 +434,9 @@ exports.getRekapAbsensiPengajar = async (req, res) => {
 
       // Logika query database kamu...
       const result = await db.query(`SELECT
-              COUNT(*) FILTER (WHERE status = 'hadir') as total_hadir,
-              COUNT(*) FILTER (WHERE status = 'izin') as total_izin,
-              COUNT(*) FILTER (WHERE status = 'alfa') as total_alfa
+              COUNT(*) FILTER (WHERE status_absensi = 'Hadir') as total_hadir,
+              COUNT(*) FILTER (WHERE status_absensi = 'Izin') as total_izin,
+              COUNT(*) FILTER (WHERE status_absensi = 'tidak hadir') as total_alfa
           FROM absensi_pengajar ap
           JOIN pengajar p ON ap.id_pengajar = p.id_pengajar
           WHERE p.id_users = $1

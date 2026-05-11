@@ -336,8 +336,9 @@ exports.updatePengajar = async (req, res) => {
    5. Delete Pengajar (PERBAIKAN)
 ========================================= */
 exports.deletePengajar = async (req, res) => {
-  const client = await db.connect();
+  let client;
   try {
+    client = await db.connect();
     const { id_pengajar } = req.params;
     await client.query("BEGIN");
 
@@ -373,10 +374,10 @@ exports.deletePengajar = async (req, res) => {
     await client.query("COMMIT");
     res.json({ message: "Pengajar berhasil dihapus sepenuhnya" });
   } catch (err) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     console.error("DETAIL ERROR DELETE:", err); // Tambahkan log ini agar terlihat di terminal
     res.status(500).json({ message: "Gagal menghapus: Data masih terikat dengan jadwal atau kelas." });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };

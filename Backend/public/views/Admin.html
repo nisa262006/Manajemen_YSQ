@@ -69,7 +69,12 @@
 
         <main class="main-content">
             <header class="dashboard-header">
-                <h1 class="header-title">Dashboard</h1>
+                <div class="header-left">
+                    <button id="sidebar-toggle" class="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="header-title">Dashboard</h1>
+                </div>
                 <div class="admin-profile">
                     <span class="admin-text" id="dashboard-admin-name">Admin</span>
                     <i class="fas fa-user-circle admin-icon" id="dashboard-admin-icon"></i>
@@ -243,5 +248,7 @@
      <script type="module" src="/js/admin.js"></script>
      <script type="module" src="/js/profileSetting.js"></script>
      <script type="module" src="/js/laporan.js"></script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>
+

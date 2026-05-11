@@ -1,0 +1,186 @@
+﻿
+> gsk-app@1.0.0 test
+> cross-env NODE_ENV=test jest --coverage --detectOpenHandles --runInBand tests/api/tugasmateriajarcontrollers.api.test.js -t 201 - berhasil
+
+Seeding test users...
+Γ£à PostgreSQL connected
+Test users seeded successfully!
+  console.log
+    [2026-05-11T01:13:37.745Z] POST /api/tugas-materi/materi
+
+      at log (src/app.js:19:11)
+
+  console.log
+    [2026-05-11T01:13:37.834Z] POST /api/tugas-materi/tugas
+
+      at log (src/app.js:19:11)
+
+  console.log
+    [2026-05-11T01:13:37.867Z] POST /api/tugas-materi/tugas/submit
+
+      at log (src/app.js:19:11)
+
+node.exe : FAIL tests/api/tugasmateriajarcontrollers.api.test.js
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL tests/api/...ers.api.test.js:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  Tugas Materi Ajar Controllers
+    POST /api/tugas-materi/materi
+      ├ù 201 - berhasil (183 ms)
+      Γùï skipped 400 - judul tidak boleh kosong
+      Γùï skipped 500 - db error
+    PUT /api/tugas-materi/materi/:id
+      Γùï skipped 200 - update tanpa file
+      Γùï skipped 200 - update dengan file
+      Γùï skipped 404 - materi tidak ditemukan
+      Γùï skipped 500 - db error
+    GET /api/tugas-materi/materi/jadwal/:id_jadwal/pengajar
+      Γùï skipped 200 - return list
+      Γùï skipped 500 - db error
+    POST /api/tugas-materi/tugas
+      ├ù 201 - berhasil buat tugas tanpa file (32 ms)
+      Γùï skipped 400 - judul atau tenggat waktu kosong
+      Γùï skipped 403 - materi bukan milik pengajar
+      Γùï skipped 500 - db crash
+    PUT /api/tugas-materi/tugas/:id
+      Γùï skipped 200 - update tugas tanpa file
+      Γùï skipped 404 - tidak ditemukan / bukan milik
+      Γùï skipped 500 - db crash
+    GET /api/tugas-materi/tugas/kelas/:id/pengajar
+      Γùï skipped 200 - return list
+      Γùï skipped 500 - db crash
+    GET /api/tugas-materi/tugas/:id/status
+      Γùï skipped 200 - return data
+      Γùï skipped 404 - bukan milik / tidak ketemu
+      Γùï skipped 500 - crash
+    SANTRI ROUTES
+      GET /api/tugas-materi/materi/jadwal/:id
+        Γùï skipped 200 - returns list
+        Γùï skipped 403 - bukan jadwal kelasnya
+        Γùï skipped 500 - db crash
+      POST /api/tugas-materi/tugas/submit
+        ├ù 201 - berhasil (26 ms)
+        Γùï skipped 403 - bukan tugas kelasnya
+        Γùï skipped 500 - db crash
+      GET /api/tugas-materi/tugas/:id/submission/me
+        Γùï skipped 200 - return data
+        Γùï skipped 500 - db error
+      GET /api/tugas-materi/tugas/kelas/:id
+        Γùï skipped 200 - return list
+        Γùï skipped 403 - akses ditolak (beda kelas)
+        Γùï skipped 500 - db error
+      GET /api/tugas-materi/tugas/materi/:id
+        Γùï skipped 200 - return list
+        Γùï skipped 403 - bukan milik
+        Γùï skipped 500 - catch
+
+  ΓùÅ Tugas Materi Ajar Controllers ΓÇ║ POST /api/tugas-materi/materi ΓÇ║ 201 - berhasil
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+    [0m [90m 65 |[39m
+     [90m 66 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m 
+request(app)[33m.[39mpost([32m'/api/tugas-materi/materi'[39m)[33m.[39msend(validData)[33m;[39m
+    [31m[1m>[22m[39m[90m 67 |[39m       expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 68 |[39m       expect(res[33m.[39mbody[33m.[39msuccess)[33m.[39mtoBe([36mtrue[39m)[33m;[39m
+     [90m 69 |[39m     })[33m;[39m
+     [90m 70 |[39m[0m
+
+      at Object.toBe (tests/api/tugasmateriajarcontrollers.api.test.js:67:30)
+
+  ΓùÅ Tugas Materi Ajar Controllers ΓÇ║ POST /api/tugas-materi/tugas ΓÇ║ 201 - berhasil buat tugas tanpa file
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 404
+
+    [0m [90m 149 |[39m
+     [90m 150 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m 
+request(app)[33m.[39mpost([32m'/api/tugas-materi/tugas'[39m)[33m.[39msend(validData)[33m;[39m
+    [31m[1m>[22m[39m[90m 151 |[39m       
+expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                              [31m[1m^[22m[39m
+     [90m 152 |[39m     })[33m;[39m
+     [90m 153 |[39m
+     [90m 154 |[39m     test([32m'400 - judul atau tenggat waktu kosong'[39m[33m,[39m [36masync[39m () 
+[33m=>[39m {[0m
+
+      at Object.toBe (tests/api/tugasmateriajarcontrollers.api.test.js:151:30)
+
+  ΓùÅ Tugas Materi Ajar Controllers ΓÇ║ SANTRI ROUTES ΓÇ║ POST /api/tugas-materi/tugas/submit ΓÇ║ 201 - berhasil
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 201
+    Received: 404
+
+    [0m [90m 287 |[39m
+     [90m 288 |[39m         [36mconst[39m res [33m=[39m [36mawait[39m 
+request(app)[33m.[39mpost([32m'/api/tugas-materi/tugas/submit'[39m)[33m.[39msend({ id_tugas[33m:[39m 
+[35m1[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 289 |[39m         
+expect(res[33m.[39mstatusCode)[33m.[39mtoBe([35m201[39m)[33m;[39m
+     [90m     |[39m                                [31m[1m^[22m[39m
+     [90m 290 |[39m       })[33m;[39m
+     [90m 291 |[39m
+     [90m 292 |[39m       test([32m'403 - bukan tugas kelasnya'[39m[33m,[39m [36masync[39m () [33m=>[39m 
+{[0m
+
+      at Object.toBe (tests/api/tugasmateriajarcontrollers.api.test.js:289:32)
+
+--------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+File                            | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                                                                            
+--------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+All files                       |   18.98 |     0.34 |       0 |   19.29 |                                                                                                                                                              
+ config                         |       0 |        0 |       0 |       0 |                                                                                                                                                              
+  db.js                         |       0 |        0 |       0 |       0 | 1-30                                                                                                                                                         
+ controllers                    |    9.92 |     0.38 |       0 |   10.11 |                                                                                                                                                              
+  absensicontrollers.js         |    8.66 |        0 |       0 |     8.8 | 7-23,29-72,80-144,152-175,185-213,222-258,266-295,303-364,372-393,403-425,432-448                                                                            
+  admincontrollers.js           |   11.47 |        0 |       0 |   11.66 | 7-24,32-49,57-93,102-118,123-129,134-138                                                                                                                     
+  authcontrollers.js            |   10.63 |        0 |       0 |   10.98 | 9-84,92-115,121-165,171-231,237-279                                                                                                                          
+  jadwalcontrollers.js          |    12.5 |        0 |       0 |    12.5 | 9-30,38-68,74-95,101-125,132-147,153-182,188-209,219-252,259-291,302-345,350-367                                                                             
+  kelascontrollers.js           |   11.34 |        0 |       0 |   11.34 | 7-31,38-68,74-114,121-142,148-163,169-190,196-235,244-255,263-308,315-356                                                                                    
+  keuangancontrollers.js        |   13.66 |     5.55 |       0 |   13.66 | 8-9,22-26,32-62,69-80,87-107,112-127,132-238,246-255,263-271,279-322,330-344,353-359,366-375,383-409,416-433,446-501,510-535,542-622,628-726,733-776,784-826 
+  mecontrollers.js              |       0 |        0 |       0 |       0 | 1-79                                                                                                                                                         
+  nilaidanprogrescontrollers.js |   21.87 |        0 |       0 |   21.87 | 5-17,24-44,49-58,63-67,72-85,91-101,107-120                                                                                                                  
+  pengajarcontrollers.js        |    7.52 |        0 |       0 |    7.52 | 8-112,120-144,152-180,188-330,339-380                                                                                                                        
+  raporcontrollers.js           |    8.48 |        0 |       0 |    8.97 | 5-19,26-81,89-148,156-169,175-205,211-230,235-272,278-372,377-393,399-406,411-423,432-508,516-568,573-603                                                    
+  registercontrollers.js        |    8.91 |        0 |       0 |    9.18 | 5-60,68-77,84-98,104-234,243-255,263-274,282-288,296                                                                                                         
+  santricontrollers.js          |     5.3 |        0 |       0 |    5.42 | 8-129,137-181,190-332,341-418,426-483                                                                                                                        
+  santridashboardcontrollers.js |   14.28 |        0 |       0 |   14.28 | 4-70                                                                                                                                                         
+  tugasmateriajarcontrollers.js |    9.19 |        0 |       0 |    9.52 | 7-14,21-62,70-104,109-127,137-159,164-172,182-210,219-256,264-322,332-359,368-376,383-412,422-473,478-521                                                    
+ middleware                     |       0 |        0 |       0 |       0 |                                                                                                                                                              
+  auth.js                       |       0 |        0 |       0 |       0 | 1-80                                                                                                                                                         
+  role.js                       |       0 |        0 |       0 |       0 | 1-35                                                                                                                                                         
+  upload.js                     |       0 |        0 |       0 |       0 | 1-41                                                                                                                                                         
+ routes                         |   88.83 |        0 |       0 |   88.83 |                                                                                                                                                              
+  absensiroutes.js              |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  adminroutes.js                |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  authroutes.js                 |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  jadwalroutes.js               |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  kelasroutes.js                |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  keuanganroutes.js             |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  meroutes.js                   |   20.68 |        0 |       0 |   20.68 | 7-101                                                                                                                                                        
+  nilaidanprogresroutes.js      |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  pengajarroutes.js             |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  raporroutes.js                |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  registerroutes.js             |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  santridashboardroutes.js      |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  santriroutes.js               |     100 |      100 |     100 |     100 |                                                                                                                                                              
+  tugasmateriajarroutes.js      |     100 |      100 |     100 |     100 |                                                                                                                                                              
+ utils                          |       0 |      100 |       0 |       0 |                                                                                                                                                              
+  generateToken.js              |       0 |      100 |       0 |       0 | 1-14                                                                                                                                                         
+--------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 32 skipped, 35 total
+Snapshots:   0 total
+Time:        3.107 s
+Ran all test suites matching tests/api/tugasmateriajarcontrollers.api.test.js with tests matching "201 - berhasil".

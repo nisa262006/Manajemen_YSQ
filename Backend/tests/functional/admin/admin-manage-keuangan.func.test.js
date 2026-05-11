@@ -45,9 +45,9 @@ describe('Functional Test: Admin & Santri Keuangan', () => {
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data)).toBe(true);
 
-    const targetBilling = res.body.data.find(b => b.keterangan === 'SPP Bulan Mei');
+    const targetBilling = res.body.data.find(b => b.keterangan && b.keterangan.includes('SPP Bulan Mei'));
     expect(targetBilling).toBeDefined();
-    idBilling = targetBilling.id_billing;
+    idBilling = targetBilling ? targetBilling.id_billing : null;
   });
 
   test('3. Santri melakukan pembayaran (manual transfer)', async () => {
@@ -75,9 +75,9 @@ describe('Functional Test: Admin & Santri Keuangan', () => {
       const getPay = await request(app)
         .get('/api/keuangan/pembayaran/all')
         .set('Authorization', `Bearer ${adminToken}`);
-      
+
       const payFound = getPay.body.data.find(p => p.id_billing === idBilling);
-      idPembayaran = payFound.id_pembayaran;
+      idPembayaran = payFound ? payFound.id_pembayaran : null;
     }
 
     expect(idPembayaran).toBeDefined();

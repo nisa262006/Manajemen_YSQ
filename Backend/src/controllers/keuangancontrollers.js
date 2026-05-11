@@ -66,15 +66,14 @@ exports.generateSPPMassal = async (req, res) => {
 
 
 exports.tambahBillingManual = async (req, res) => {
-  // Tambahkan tanggal_mulai dan tanggal_selesai di destructuring
-  const { id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai } = req.body;
+  const { id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai, keterangan } = req.body;
 
   try {
     await db.query(`
       INSERT INTO billing_santri
-      (id_santri, jenis, tipe, periode, nominal, sisa, status, tanggal_mulai, tanggal_selesai)
-      VALUES ($1, $2, $3, $4, $5, $5, 'belum bayar', $6, $7)
-    `, [id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai]);
+      (id_santri, jenis, tipe, periode, nominal, sisa, status, tanggal_mulai, tanggal_selesai, keterangan)
+      VALUES ($1, $2, $3, $4, $5, $5, 'belum bayar', $6, $7, $8)
+    `, [id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai, keterangan]);
 
     res.json({ success: true, message: "Billing berhasil ditambahkan" });
   } catch (err) {
@@ -160,10 +159,11 @@ exports.createPembayaran = async (req, res) => {
       });
     }
 
-    await db.query(`
+    const pay = await db.query(`
       INSERT INTO pembayaran
       (id_billing, id_santri, tanggal_bayar, jumlah_bayar, metode, kategori, jenis_pembayaran, status)
       VALUES ($1, $2, CURRENT_DATE, $3, $4, $5, $6, 'menunggu')
+      RETURNING id_pembayaran
     `, [
       id_billing,
       billing.id_santri,
@@ -182,7 +182,8 @@ exports.createPembayaran = async (req, res) => {
     // 🔥 RESPONSE DIKIRIM DULU (BIAR CEPAT)
     res.json({
       success: true,
-      message: "Pembayaran terkirim, menunggu verifikasi admin"
+      message: "Pembayaran terkirim, menunggu verifikasi admin",
+      id_pembayaran: pay.rows[0].id_pembayaran
     });
 
     // ===========================

@@ -292,16 +292,18 @@ body {
 /* ========== CENTER LOGIN & REGISTER DI MOBILE ======== */
 /* ===================================================== */
 @media (max-width: 768px) {
-
   body {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Start from top to allow scrolling */
+    padding: 20px 10px;
+    height: auto;
+    min-height: 100vh;
   }
 
   .login-container,
   .register-container {
-    margin: 0;
+    margin: 10px auto;
     width: 100%;
     max-width: 420px;
   }

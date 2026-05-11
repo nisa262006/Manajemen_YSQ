@@ -52,11 +52,4 @@ router.get(
   ctrl.getMySubmission
 );
 
-router.get(
-  "/materi/jadwal/:id_jadwal",
-  verifyToken,
-  onlySantri,
-  ctrl.getMateriByJadwal
-);
-
 module.exports = router;

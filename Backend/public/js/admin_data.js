@@ -516,26 +516,20 @@ function initDetailPengajar() {
             const payload = {
                 nama: f.nama.value,
                 alamat: f.alamat.value,
-                tempat_lahir: f.tempat.value,
                 tanggal_lahir: f.tanggal.value || null,
-                no_wa: f.wa.value,
+                no_kontak: f.telp.value,
                 email: f.email.value,
                 status: f.status.value
             };
     
-            // hanya kirim kategori jika admin memang pilih
-            if (f.kategori.value) {
-                payload.kategori = f.kategori.value;
-            }
+            await apiPut(`/pengajar/${id}`, payload);
     
-            await apiPut(`/santri/${id}`, payload);
-    
-            alert("Data santri diperbarui");
-            location.href = "/dashboard/daftar-santri";
+            alert("Data pengajar diperbarui");
+            location.href = "/dashboard/daftar-pengajar";
     
         } catch (err) {
-            console.error("Update santri error:", err);
-            alert("Gagal memperbarui data santri");
+            console.error("Update pengajar error:", err);
+            alert("Gagal memperbarui data pengajar");
         }
     };
 

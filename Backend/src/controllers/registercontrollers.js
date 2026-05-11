@@ -1,9 +1,9 @@
 const db = require("../config/db");
 
 exports.daftarPendaftar = async (req, res) => {
-  const client = await db.connect();
-
+  let client;
   try {
+    client = await db.connect();
     const {
       nama,
       email,
@@ -101,10 +101,11 @@ exports.getPendaftarById = async (req, res) => {
 
 
 exports.terimaPendaftar = async (req, res) => {
-  const client = await db.connect();
   const bcrypt = require("bcrypt");
+  let client;
 
   try {
+    client = await db.connect();
     const { id_pendaftar } = req.params;
     const { sumber = "pendaftar", password } = req.body;
 

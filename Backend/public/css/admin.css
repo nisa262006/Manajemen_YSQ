@@ -4887,3 +4887,96 @@ select.ysq-inc-input {
     width: 200px;       /* kamu bisa ubah 180px / 220px sesuai selera */
     max-width: 200px;
 }
+
+/* ===================================================== */
+/* ============= GLOBAL MOBILE RESPONSIVE ============== */
+/* ===================================================== */
+
+.sidebar.collapsed {
+    margin-left: -250px;
+}
+
+.sidebar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--color-dark-green);
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .container {
+        position: relative;
+    }
+
+    .sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transition: margin-left 0.3s ease;
+        z-index: 1000;
+    }
+
+    .sidebar:not(.collapsed) {
+        margin-left: 0;
+    }
+
+    .sidebar.collapsed {
+        margin-left: -250px;
+    }
+
+    .main-content {
+        padding: 20px;
+        width: 100%;
+    }
+
+    .sidebar-toggle {
+        display: block;
+    }
+
+    .stats-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .header-title {
+        font-size: 20px;
+    }
+
+    .admin-profile {
+        font-size: 14px;
+    }
+
+    .admin-icon {
+        font-size: 28px;
+    }
+}
+
+.pendaftar-table {
+    overflow-x: auto;
+}
+
+.dashboard-pendaftar-table {
+    min-width: 600px;
+}

@@ -2,12 +2,13 @@
   "name": "gsk-app",
   "version": "1.0.0",
   "description": "Sistem Akademik YSQ berbasis web",
-  "main": "src/app.js",
+  "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "test": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --runInBand --forceExit",
+    "test:e2e": "npx playwright test"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -22,9 +23,11 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "cross-env": "^10.1.0",
     "jest": "^30.3.0",
     "nodemon": "^3.1.11",
+    "playwright": "^1.59.1",
     "supertest": "^7.2.2"
   },
   "keywords": [],

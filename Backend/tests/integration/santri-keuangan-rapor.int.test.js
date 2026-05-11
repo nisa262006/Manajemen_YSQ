@@ -24,7 +24,7 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
       .post('/api/keuangan/billing/manual')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        id_santri: 1, 
+        id_santri: 1,
         id_jadwal: 1,
         tipe: 'SPP',
         jenis: 'INFAQ_BELAJAR',
@@ -43,7 +43,7 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
     const getBill = await request(app)
       .get('/api/keuangan/billing/me')
       .set('Authorization', `Bearer ${santriToken}`);
-    
+
     const targetBill = getBill.body.data.find(b => b.keterangan === 'SPP Bulan Juni');
     idBilling = targetBill ? targetBill.id_billing : 1; // Fallback ke 1 jika tidak nemu (krn seed data dll)
 
@@ -56,7 +56,11 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
         metode: 'Transfer',
         kategori: 'SPP'
       });
-    
+    // Tambahkan ini untuk melihat alasan error dari server
+    if (payRes.statusCode === 400) {
+      console.log("Pesan Error Server:", payRes.body);
+    }
+
     expect([200, 201]).toContain(payRes.statusCode);
   });
 
@@ -65,13 +69,13 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
     const getPay = await request(app)
       .get('/api/keuangan/pembayaran/all')
       .set('Authorization', `Bearer ${adminToken}`);
-    
+
     // Cari id_pembayaran dari data pembayaran (jika ada)
     let payment = null;
     if (getPay.body.data) {
       payment = getPay.body.data.find(p => p.id_billing === idBilling);
     }
-    
+
     idPembayaran = payment ? payment.id_pembayaran : null;
 
     if (idPembayaran) {
@@ -108,7 +112,7 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
     const res = await request(app)
       .get('/api/rapor/santri/me')
       .set('Authorization', `Bearer ${santriToken}`);
-      
+
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
   });

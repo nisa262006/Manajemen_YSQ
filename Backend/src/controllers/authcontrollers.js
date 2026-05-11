@@ -123,7 +123,7 @@ exports.createUserAfterSantriAccepted = async (req, res) => {
 
     const santriData = await db.query(
       `
-      SELECT nis, nama_santri, email, kategori
+      SELECT nis, nama, email, kategori
       FROM santri
       WHERE id_santri = $1
       `,
@@ -134,9 +134,9 @@ exports.createUserAfterSantriAccepted = async (req, res) => {
       return res.status(404).json({ message: "Santri tidak ditemukan" });
     }
 
-    const { nis, nama_santri, email, kategori } = santriData.rows[0];
+    const { nis, nama, email, kategori } = santriData.rows[0];
 
-    const cleanName = nama_santri.replace(/\s+/g, "").toLowerCase();
+    const cleanName = nama.replace(/\s+/g, "").toLowerCase();
     const username = `${nis}_${cleanName}`;
     const rawPassword = `${cleanName}123`;
 

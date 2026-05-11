@@ -187,9 +187,9 @@ exports.getSantriById = async (req, res) => {
    3. UPDATE SANTRI
 ============================================================ */
 exports.updateSantri = async (req, res) => {
-  const client = await db.connect();
-
+  let client;
   try {
+    client = await db.connect();
     const { id_santri } = req.params;
 
     const {
@@ -325,11 +325,11 @@ exports.updateSantri = async (req, res) => {
     });
 
   } catch (err) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     console.error("UPDATE SANTRI ERROR:", err.message);
     res.status(500).json({ message: err.message });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
 
@@ -338,8 +338,9 @@ exports.updateSantri = async (req, res) => {
     4. DELETE SANTRI (PERBAIKAN FINAL - CLEANING ALL TABLES)
 ============================================================ */
 exports.deleteSantri = async (req, res) => {
-  const client = await db.connect();
+  let client;
   try {
+    client = await db.connect();
     const { id_santri } = req.params;
     const { confirm_tunggakan, confirm_backup } = req.body;
 
@@ -411,11 +412,11 @@ exports.deleteSantri = async (req, res) => {
     res.json({ success: true, message: "Seluruh data santri berhasil dibersihkan dari sistem." });
 
   } catch (err) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     console.error("DELETE ERROR:", err.message);
     res.status(500).json({ success: false, message: "Gagal: " + err.message });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
 

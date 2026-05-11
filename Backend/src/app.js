@@ -182,12 +182,5 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// ================= START SERVER =================
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`✅ Server running at http://localhost:${PORT}`);
-  });
-}
-
 // ================= EXPORT =================
 module.exports = app;
