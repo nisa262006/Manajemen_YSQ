@@ -11,10 +11,14 @@ module.exports = defineConfig({
   use: {
     baseURL: 'http://localhost:8000',
     trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'on-first-retry',
+    screenshot: 'on',
+    video: 'on',
     actionTimeout: 15000,
     navigationTimeout: 30000,
+    headless: false,
+    launchOptions: {
+      slowMo: 300,
+    },
   },
   projects: [
     {

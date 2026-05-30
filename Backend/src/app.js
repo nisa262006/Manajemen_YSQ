@@ -1,5 +1,9 @@
 const path = require("path");
-require("dotenv").config();
+// Hanya load .env jika bukan test environment
+// (test environment akan load .env.test via db.js)
+if (process.env.NODE_ENV !== "test") {
+  require("dotenv").config();
+}
 
 const express = require("express");
 const cors = require("cors");

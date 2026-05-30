@@ -46,13 +46,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     localStorage.setItem("role", data.role);
     localStorage.setItem("id_users", data.userId);
 
+    const userRole = (data.role || "").toLowerCase();
     const roleRedirects = {
       'admin': "/dashboard/Admin",
       'pengajar': "/dashboard/pengajar",
       'santri': "/dashboard/santri"
     };
 
-    window.location.href = roleRedirects[data.role] || "/dashboard/santri";
+    window.location.href = roleRedirects[userRole] || "/dashboard/santri";
 
   } catch (err) {
     console.error(err);

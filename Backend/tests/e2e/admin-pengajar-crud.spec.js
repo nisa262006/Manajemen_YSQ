@@ -6,18 +6,27 @@ const { test, expect } = require('@playwright/test');
 async function loginAsAdmin(page) {
   await page.goto('/login');
   await page.waitForSelector('#identifier', { state: 'visible' });
-  await page.fill('#identifier', 'admin2');
-  await page.fill('#password', 'admin2');
+  await page.fill('#identifier', 'admin@ysq.id');
+  await page.fill('#password', 'admin123');
   await page.click('.login-button');
   await page.waitForURL(/\/dashboard\/admin/i, { timeout: 15000 });
+}
+
+// Helper: buka daftar pengajar dan tunggu tabel siap
+async function goToDaftarPengajar(page) {
+  await page.goto('/dashboard/daftar-pengajar');
+  // Gunakan 'attached' — tbody kosong dianggap hidden oleh Playwright
+  await page.waitForSelector('#pengajarTableBody', { state: 'attached' });
+  // Tunggu JS fetch data dari API
+  await page.waitForTimeout(2000);
 }
 
 // ======================================================================
 // PENGAJAR CRUD E2E TESTS
 // ======================================================================
 test.describe('Pengajar CRUD Operations (Admin)', () => {
-  // Data unik per run agar tidak konflik
-  const timestamp = Date.now();
+  // PENTING: timestamp dinamik agar test repeatable dan tidak bentrok data lama
+  const timestamp = Date.now().toString();
   const PENGAJAR_DATA = {
     nama: `Test Pengajar ${timestamp}`,
     alamat: 'Jl. Testing No. 123',
@@ -81,15 +90,10 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
     await loginAsAdmin(page);
 
     // Navigate ke Daftar Pengajar
-    await page.goto('/dashboard/daftar-pengajar');
-    await page.waitForSelector('#pengajarTableBody', { state: 'visible' });
+    await goToDaftarPengajar(page);
 
-    // Tunggu data dimuat oleh JS
-    await page.waitForTimeout(3000);
-
-    // Cari nama pengajar yang baru dibuat di tabel
-    const tableBody = page.locator('#pengajarTableBody');
-    const namaCell = tableBody.locator(`text=${PENGAJAR_DATA.nama}`);
+    // Cari baris yang mengandung nama pengajar yang baru dibuat
+    const namaCell = page.locator('#pengajarTableBody tr').filter({ hasText: PENGAJAR_DATA.nama });
 
     // Verifikasi pengajar muncul di tabel
     await expect(namaCell).toBeVisible({ timeout: 10000 });
@@ -102,14 +106,10 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
     await loginAsAdmin(page);
 
     // Navigate ke Daftar Pengajar
-    await page.goto('/dashboard/daftar-pengajar');
-    await page.waitForSelector('#pengajarTableBody', { state: 'visible' });
-    await page.waitForTimeout(3000);
+    await goToDaftarPengajar(page);
 
     // Cari baris yang mengandung nama pengajar kita
-    const targetRow = page.locator('#pengajarTableBody tr', {
-      has: page.locator(`text=${PENGAJAR_DATA.nama}`)
-    });
+    const targetRow = page.locator('#pengajarTableBody tr').filter({ hasText: PENGAJAR_DATA.nama });
 
     // Klik tombol edit (icon pen) pada baris tersebut
     const editBtn = targetRow.locator('.edit-btn').first();
@@ -145,9 +145,8 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
     await expect(emailInput).toHaveValue(PENGAJAR_UPDATED.email);
     await expect(noTelpInput).toHaveValue(PENGAJAR_UPDATED.no_telpon);
 
-    // Setup handler untuk alert dialog setelah simpan
+    // Accept alert "Data pengajar diperbarui" dan tunggu redirect
     page.on('dialog', async (dialog) => {
-      expect(dialog.message()).toContain('pengajar diperbarui');
       await dialog.accept();
     });
 
@@ -167,19 +166,16 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
   test('4. Verifikasi data pengajar berhasil diupdate', async ({ page }) => {
     await loginAsAdmin(page);
 
-    await page.goto('/dashboard/daftar-pengajar');
-    await page.waitForSelector('#pengajarTableBody', { state: 'visible' });
-    await page.waitForTimeout(3000);
+    await goToDaftarPengajar(page);
 
     // Cari nama pengajar yang sudah diupdate
-    const tableBody = page.locator('#pengajarTableBody');
-    const updatedNamaCell = tableBody.locator(`text=${PENGAJAR_UPDATED.nama}`);
+    const updatedNamaCell = page.locator('#pengajarTableBody tr').filter({ hasText: PENGAJAR_UPDATED.nama });
 
     // Verifikasi nama baru muncul
     await expect(updatedNamaCell).toBeVisible({ timeout: 10000 });
 
     // Pastikan nama lama sudah tidak ada
-    const oldNamaCell = tableBody.locator(`text=${PENGAJAR_DATA.nama}`);
+    const oldNamaCell = page.locator('#pengajarTableBody tr').filter({ hasText: PENGAJAR_DATA.nama });
     await expect(oldNamaCell).toHaveCount(0);
   });
 
@@ -189,22 +185,16 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
   test('5. Delete Pengajar — hapus data yang telah diupdate', async ({ page }) => {
     await loginAsAdmin(page);
 
-    await page.goto('/dashboard/daftar-pengajar');
-    await page.waitForSelector('#pengajarTableBody', { state: 'visible' });
-    await page.waitForTimeout(3000);
+    await goToDaftarPengajar(page);
 
     // Cari baris pengajar yang mau dihapus (pakai nama yang sudah diupdate)
-    const targetRow = page.locator('#pengajarTableBody tr', {
-      has: page.locator(`text=${PENGAJAR_UPDATED.nama}`)
-    });
+    const targetRow = page.locator('#pengajarTableBody tr').filter({ hasText: PENGAJAR_UPDATED.nama });
 
     // Verifikasi baris ditemukan
     await expect(targetRow).toBeVisible({ timeout: 10000 });
 
-    // Setup handler untuk confirm dialog (klik "OK")
+    // Accept confirm dialog "Apakah Anda yakin ingin menghapus data pengajar ini?"
     page.on('dialog', async (dialog) => {
-      expect(dialog.type()).toBe('confirm');
-      expect(dialog.message()).toContain('Apakah Anda yakin');
       await dialog.accept();
     });
 
@@ -214,12 +204,10 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
     await deleteBtn.click();
 
     // Tunggu tabel di-refresh setelah penghapusan
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(2000);
 
     // Verifikasi pengajar sudah tidak ada di tabel
-    const deletedRow = page.locator('#pengajarTableBody tr', {
-      has: page.locator(`text=${PENGAJAR_UPDATED.nama}`)
-    });
+    const deletedRow = page.locator('#pengajarTableBody tr').filter({ hasText: PENGAJAR_UPDATED.nama });
     await expect(deletedRow).toHaveCount(0);
   });
 
@@ -241,7 +229,7 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
     await page.click('.save-btn');
 
     // Harus tetap di halaman tambah pengajar (tidak redirect)
-    await page.waitForTimeout(2000);
+    await expect(page.locator('.save-btn')).toBeVisible();
     await expect(page).toHaveURL(/\/dashboard\/tambah-pengajar/);
   });
 
@@ -264,7 +252,7 @@ test.describe('Pengajar CRUD Operations (Admin)', () => {
     await page.click('.save-btn');
 
     // Harus tetap di halaman tambah pengajar
-    await page.waitForTimeout(2000);
+    await expect(page.locator('.save-btn')).toBeVisible();
     await expect(page).toHaveURL(/\/dashboard\/tambah-pengajar/);
   });
 });

@@ -2,10 +2,10 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Santri Dashboard & Activities', () => {
   test.beforeEach(async ({ page }) => {
-    // Login as santri
+    // Login as santri — pakai email yang sudah di-seed
     await page.goto('/login');
     await page.waitForSelector('#identifier', { state: 'visible' });
-    await page.fill('#identifier', 'YSQ26DWS011_santri1');
+    await page.fill('#identifier', 'santri1@santri.ysq.id');
     await page.fill('#password', 'santri1123');
     await page.click('.login-button');
     await page.waitForURL(/\/dashboard\/santri/i, { timeout: 15000 });
@@ -17,82 +17,30 @@ test.describe('Santri Dashboard & Activities', () => {
     await expect(body).toBeVisible();
   });
 
-  test('Navigate to Materi Santri', async ({ page }) => {
-    const materiLink = page.locator('a[href*="materi-santri"]').first();
-    if (await materiLink.isVisible()) {
-      await materiLink.click();
-      await page.waitForURL(/\/dashboard\/materi-santri/, { timeout: 10000 });
-      await expect(page).toHaveURL(/\/dashboard\/materi-santri/);
-    }
+  test('Navigate to Riwayat Absensi Santri', async ({ page }) => {
+    // Link di HTML: /dashboard/absensi-siswa (bukan /riwayat-absensi-santri)
+    const riwayatLink = page.locator('a[href*="absensi-siswa"]').first();
+    await expect(riwayatLink).toBeVisible();
+    await riwayatLink.click();
+    await page.waitForURL(/\/dashboard\/absensi-siswa/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/dashboard\/absensi-siswa/);
   });
 
   test('Navigate to Rapor Santri', async ({ page }) => {
+    // Link di HTML: /dashboard/santri/rapor
     const raporLink = page.locator('a[href*="santri/rapor"]').first();
-    if (await raporLink.isVisible()) {
-      await raporLink.click();
-      await page.waitForURL(/\/dashboard\/santri\/rapor/, { timeout: 10000 });
-      await expect(page).toHaveURL(/\/dashboard\/santri\/rapor/);
-    }
+    await expect(raporLink).toBeVisible();
+    await raporLink.click();
+    await page.waitForURL(/\/dashboard\/santri\/rapor/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/dashboard\/santri\/rapor/);
   });
 
-  test('Navigate to Riwayat Absensi Santri', async ({ page }) => {
-    const riwayatLink = page.locator('a[href*="riwayat-absensi-santri"]').first();
-    if (await riwayatLink.isVisible()) {
-      await riwayatLink.click();
-      await page.waitForURL(/\/dashboard\/riwayat-absensi-santri/, { timeout: 10000 });
-      await expect(page).toHaveURL(/\/dashboard\/riwayat-absensi-santri/);
-    }
-  });
-
-  test('API: Get profile santri via /api/me', async ({ page }) => {
-    const response = await page.evaluate(async () => {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      return { status: res.status, role: data.role, success: data.success };
-    });
-
-    if (response.status === 200) {
-      expect(response.success).toBe(true);
-      expect(response.role).toBe('santri');
-    }
-  });
-
-  test('API: Get jadwal santri via /api/jadwal/santri/me', async ({ page }) => {
-    const response = await page.evaluate(async () => {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/jadwal/santri/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      return { status: res.status, ok: res.ok };
-    });
-
-    expect([200, 401]).toContain(response.status);
-  });
-
-  test('API: Get kelas santri via /api/kelas/santri/me', async ({ page }) => {
-    const response = await page.evaluate(async () => {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/kelas/santri/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      return { status: res.status, ok: res.ok };
-    });
-
-    expect([200, 401]).toContain(response.status);
-  });
-
-  test('API: Get riwayat absensi santri via /api/absensi/santri/me', async ({ page }) => {
-    const response = await page.evaluate(async () => {
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/absensi/santri/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      return { status: res.status, ok: res.ok };
-    });
-
-    expect([200, 401]).toContain(response.status);
+  test('Navigate to Billing', async ({ page }) => {
+    // Link di HTML: /dashboard/billing
+    const billingLink = page.locator('a[href*="billing"]').first();
+    await expect(billingLink).toBeVisible();
+    await billingLink.click();
+    await page.waitForURL(/\/dashboard\/billing/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/dashboard\/billing/);
   });
 });

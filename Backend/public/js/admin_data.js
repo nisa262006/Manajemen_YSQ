@@ -77,9 +77,15 @@ santriTableBody.addEventListener("click", async (e) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data santri ini secara permanen?")) return;
 
     try {
-        // PERCOBAAN PERTAMA: Cek Tunggakan & Backup ke Backend
-        // Kita kirim request kosong dulu untuk memancing validasi backend
+        // PERCOBAAN PERTAMA: Cek Tunggakan ke Backend
         let response = await apiDelete(`/santri/${id}`, {});
+
+        // Jika langsung sukses (tidak ada tunggakan, tidak perlu backup confirm)
+        if (response && (response.success || response.message)) {
+            alert(response.message || "Data santri berhasil dihapus");
+            loadAll(); // Refresh tabel
+            return;
+        }
 
     } catch (err) {
         // TAHAP 2: MENANGANI VALIDASI DARI BACKEND (ERROR 400)
@@ -93,7 +99,7 @@ santriTableBody.addEventListener("click", async (e) => {
             return;
         }
 
-        // 2. Jika perlu konfirmasi backup
+        // 2. Jika perlu konfirmasi backup (fallback)
         if (err.type === "VALIDATION_BACKUP") {
             if (confirm("Peringatan: Data akan dihapus selamanya. Apakah Anda sudah memastikan data sudah di-eksport (Backup) ke Excel?")) {
                 // Lanjut ke tahap final dengan semua flag

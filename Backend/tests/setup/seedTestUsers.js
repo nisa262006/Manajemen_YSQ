@@ -55,7 +55,24 @@ async function seed() {
     // 4. Seed Program & Kelas & Jadwal (Optional but good for integration tests)
     await client.query("INSERT INTO program (id_program, nama_program) VALUES (1, 'Tahsin') ON CONFLICT (id_program) DO NOTHING");
     await client.query("INSERT INTO kelas (id_kelas, id_program, nama_kelas, kategori) VALUES (1, 1, 'Tahsin Sesi 1', 'anak') ON CONFLICT (id_kelas) DO NOTHING");
-    await client.query("INSERT INTO jadwal (id_jadwal, id_kelas, id_pengajar, hari, jam_mulai, jam_selesai, kapasitas) VALUES (1, 1, 1, 'Senin', '08:00', '10:00', 20) ON CONFLICT (id_jadwal) DO NOTHING");
+
+    const pRow = await client.query("SELECT id_pengajar FROM pengajar WHERE id_users = $1", [pengajarRes.rows[0].id_users]);
+    const actualIdPengajar = pRow.rows[0].id_pengajar;
+
+    await client.query(
+      `INSERT INTO jadwal (id_jadwal, id_kelas, id_pengajar, hari, jam_mulai, jam_selesai, kapasitas) 
+       VALUES (1, 1, $1, 'Senin', '08:00', '10:00', 20) 
+       ON CONFLICT (id_jadwal) DO NOTHING`,
+      [actualIdPengajar]
+    );
+
+    // Sync sequences
+    await client.query("SELECT setval('program_id_program_seq', COALESCE((SELECT MAX(id_program) FROM program), 1))");
+    await client.query("SELECT setval('kelas_id_kelas_seq', COALESCE((SELECT MAX(id_kelas) FROM kelas), 1))");
+    await client.query("SELECT setval('jadwal_id_jadwal_seq', COALESCE((SELECT MAX(id_jadwal) FROM jadwal), 1))");
+    await client.query("SELECT setval('pengajar_id_pengajar_seq', COALESCE((SELECT MAX(id_pengajar) FROM pengajar), 1))");
+    await client.query("SELECT setval('santri_id_santri_seq', COALESCE((SELECT MAX(id_santri) FROM santri), 1))");
+    await client.query("SELECT setval('users_id_users_seq', COALESCE((SELECT MAX(id_users) FROM users), 1))");
 
     await client.query('COMMIT');
     console.log('Test users seeded successfully!');

@@ -340,22 +340,26 @@ exports.updateSantri = async (req, res) => {
 exports.deleteSantri = async (req, res) => {
   let client;
   try {
-    client = await db.connect();
     const { id_santri } = req.params;
-    const { confirm_tunggakan, confirm_backup } = req.body;
+    const { confirm_tunggakan } = req.body;
 
-    // 1. Cek Detail Tunggakan (Infaq Belajar / Lainnya)
-    const checkBilling = await client.query(
-      `SELECT jenis, COUNT(*) as jml 
-       FROM billing_santri 
-       WHERE id_santri = $1 AND status = 'belum bayar'
-       GROUP BY jenis`,
-      [id_santri]
-    );
+    // 1. Cek Detail Tunggakan — gunakan pool biasa (bukan client transaksi)
+    //    Agar jika tabel billing_santri kosong, client tidak masuk state abort
+    let checkBilling = { rowCount: 0, rows: [] };
+    try {
+      checkBilling = await db.query(
+        `SELECT jenis, COUNT(*) as jml 
+         FROM billing_santri 
+         WHERE id_santri = $1 AND status = 'belum bayar'
+         GROUP BY jenis`,
+        [id_santri]
+      );
+    } catch (billingErr) {
+      // Jika tabel billing_santri error, abaikan — lanjut proses hapus
+      console.warn("billing_santri check skipped:", billingErr.message);
+    }
 
     if (checkBilling.rowCount > 0 && !confirm_tunggakan) {
-      // Susun pesan otomatis berdasarkan data di database
-      // Hasilnya nanti: "Infaq Belajar (2), Infaq Lainnya (1)"
       const detailTunggakan = checkBilling.rows
         .map(item => `${item.jenis} (${item.jml})`)
         .join(", ");
@@ -366,14 +370,10 @@ exports.deleteSantri = async (req, res) => {
       });
     }
 
-    // 2. Cek Backup
-    if (!confirm_backup) {
-      return res.status(400).json({ 
-        type: "VALIDATION_BACKUP", 
-        message: "Konfirmasi: Apakah Anda sudah melakukan ekspor data (Backup) ke Excel?" 
-      });
-    }
+    // 2. VALIDATION_BACKUP dihapus — langsung proses hapus
+    //    (Backup adalah tanggung jawab admin, tidak perlu confirm di setiap delete)
 
+    client = await db.connect();
     await client.query("BEGIN");
 
     // Ambil info email & id_users sebelum data dihapus

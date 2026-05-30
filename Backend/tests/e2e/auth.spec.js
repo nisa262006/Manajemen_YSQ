@@ -6,8 +6,8 @@ test.describe('Authentication Flow', () => {
     await page.waitForSelector('#identifier', { state: 'visible' });
 
     // Fill the login form with correct seeded credentials
-    await page.fill('#identifier', 'admin2');
-    await page.fill('#password', 'admin2');
+    await page.fill('#identifier', 'admin@ysq.id');
+    await page.fill('#password', 'admin123');
 
     // Click login
     await page.click('.login-button');
@@ -21,7 +21,8 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login');
     await page.waitForSelector('#identifier', { state: 'visible' });
 
-    await page.fill('#identifier', 'YSQ25PGJ001_riska');
+    // Pakai email pengajar yang sudah di-seed
+    await page.fill('#identifier', 'riska@pengajar.ysq.id');
     await page.fill('#password', 'riska');
     await page.click('.login-button');
 
@@ -33,7 +34,8 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login');
     await page.waitForSelector('#identifier', { state: 'visible' });
 
-    await page.fill('#identifier', 'YSQ26DWS011_santri1');
+    // Pakai email santri yang sudah di-seed
+    await page.fill('#identifier', 'santri1@santri.ysq.id');
     await page.fill('#password', 'santri1123');
     await page.click('.login-button');
 
@@ -45,12 +47,13 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login');
     await page.waitForSelector('#identifier', { state: 'visible' });
 
-    await page.fill('#identifier', 'admin2');
+    await page.fill('#identifier', 'admin@ysq.id');
     await page.fill('#password', 'passwordsalah');
     await page.click('.login-button');
 
     // Harus tetap di halaman login (tidak redirect)
-    await page.waitForTimeout(2000);
+    await expect(page.locator('#error')).toBeVisible();
+    await expect(page.locator('#error')).not.toBeEmpty();
     await expect(page).toHaveURL(/\/login/);
   });
 
@@ -62,7 +65,7 @@ test.describe('Authentication Flow', () => {
     await page.click('.login-button');
 
     // Tetap di halaman login
-    await page.waitForTimeout(2000);
+    await expect(page.locator('.login-button')).toBeVisible();
     await expect(page).toHaveURL(/\/login/);
   });
 });
