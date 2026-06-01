@@ -6,9 +6,11 @@
 Backend/node_modules/
 node_modules/
 
-# Environment Variables
+# Environment Variables — jangan commit .env asli!
 Backend/.env
 .env
+# Tapi .env.example BOLEH di-commit (template untuk orang yang clone)
+!Backend/.env.example
 
 # Database Data
 pgdata/
@@ -26,7 +28,8 @@ yarn-error.log*
 
 # Database Backup
 backup/
-*.sql
+# *.sql JANGAN di-ignore — init.sql harus ikut ke repo!
+# Kalau mau ignore backup SQL, gunakan: backup/*.sql
 
 # Testing & Coverage
 Backend/coverage/
