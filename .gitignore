@@ -10,6 +10,8 @@ node_modules/
 Backend/.env
 .env
 
+package-lock.json
+
 # Database Data
 pgdata/
 
@@ -53,7 +55,6 @@ Backend/public/uploads/submit/*
 !Backend/public/uploads/materi/*.doc
 !Backend/public/uploads/materi/*.docx
 !Backend/public/uploads/tugas/*.doc
-!Backend/public/uploads/tugas/*.docx
+!Backend/public/uploads/tugas/*.docxgit rm --cached .env
 
-backup.sql
 Backend/src/config/db.js
