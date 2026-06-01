@@ -4,6 +4,7 @@
 # Environment variables file peniting, jangan dicommit
 .env
 package-lock.json
+backup.sql
 
 # Docker file penting, jangan dicommit
 manajemen_db
@@ -18,3 +19,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+Backend/src/config/db.js
+Backend/src/config/db.js
