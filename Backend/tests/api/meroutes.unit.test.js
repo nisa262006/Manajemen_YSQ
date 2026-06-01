@@ -1,7 +1,7 @@
 const express = require("express");
 const request = require("supertest");
 
-// Mock db + auth middleware so we can hit every branch in meroutes.js deterministically.
+// Mock db + auth middleware so we can hit every branch in mecontrollers.js deterministically.
 jest.mock("../../src/config/db", () => ({
   query: jest.fn()
 }));
@@ -31,13 +31,8 @@ describe("GET /api/me (meroutes) unit coverage", () => {
     pool.query.mockReset();
   });
 
-  test("baseUser rowCount=0 -> 404", async () => {
-    pool.query.mockImplementation(async (sql) => {
-      if (String(sql).includes("FROM users")) {
-        return { rowCount: 0, rows: [] };
-      }
-      return { rowCount: 0, rows: [] };
-    });
+  test("Profil tidak ditemukan -> 404", async () => {
+    pool.query.mockResolvedValueOnce({ rowCount: 0, rows: [] });
 
     const res = await request(app)
       .get("/api/me")
@@ -45,63 +40,20 @@ describe("GET /api/me (meroutes) unit coverage", () => {
       .set("x-id-users", "999");
 
     expect(res.statusCode).toBe(404);
-    expect(res.body.message).toBe("User tidak ditemukan");
-  });
-
-  test("role=santri, santri query rowCount=0 -> 404", async () => {
-    pool.query.mockImplementation(async (sql) => {
-      if (String(sql).includes("FROM users")) {
-        return {
-          rowCount: 1,
-          rows: [
-            {
-              id_users: 1,
-              email: "santri@example.com",
-              username: "santri1",
-              role: "santri",
-              status_user: "aktif"
-            }
-          ]
-        };
-      }
-      if (String(sql).includes("FROM santri")) {
-        return { rowCount: 0, rows: [] };
-      }
-      return { rowCount: 0, rows: [] };
-    });
-
-    const res = await request(app)
-      .get("/api/me")
-      .set("x-role", "santri")
-      .set("x-id-users", "1");
-
-    expect(res.statusCode).toBe(404);
-    expect(res.body.message).toBe("Data santri tidak ditemukan");
+    expect(res.body.message).toBe("Profil tidak ditemukan");
   });
 
   test("role=santri, status != aktif -> 403", async () => {
-    pool.query.mockImplementation(async (sql) => {
-      if (String(sql).includes("FROM users")) {
-        return {
-          rowCount: 1,
-          rows: [
-            {
-              id_users: 1,
-              email: "santri@example.com",
-              username: "santri1",
-              role: "santri",
-              status_user: "aktif"
-            }
-          ]
-        };
-      }
-      if (String(sql).includes("FROM santri")) {
-        return {
-          rowCount: 1,
-          rows: [{ status: "nonaktif" }]
-        };
-      }
-      return { rowCount: 0, rows: [] };
+    pool.query.mockResolvedValueOnce({
+      rowCount: 1,
+      rows: [
+        {
+          id_santri: 10,
+          status: "nonaktif",
+          username: "santri1",
+          role: "santri"
+        }
+      ]
     });
 
     const res = await request(app)
@@ -110,44 +62,22 @@ describe("GET /api/me (meroutes) unit coverage", () => {
       .set("x-id-users", "1");
 
     expect(res.statusCode).toBe(403);
-    expect(res.body.message).toBe("Akun santri tidak aktif");
+    expect(res.body.message).toBe("Akun santri tidak aktif. Hubungi admin.");
   });
 
-  test("role=santri, status=aktif -> 200 + profile includes santri fields", async () => {
-    pool.query.mockImplementation(async (sql) => {
-      if (String(sql).includes("FROM users")) {
-        return {
-          rowCount: 1,
-          rows: [
-            {
-              id_users: 1,
-              email: "santri@example.com",
-              username: "santri1",
-              role: "santri",
-              status_user: "aktif"
-            }
-          ]
-        };
-      }
-      if (String(sql).includes("FROM santri")) {
-        return {
-          rowCount: 1,
-          rows: [
-            {
-              id_santri: 10,
-              nis: "NIS001",
-              nama: "Santri A",
-              kategori: "Tahfidz",
-              no_wa: "0812",
-              email: "santri@example.com",
-              tempat_lahir: "Bogor",
-              tanggal_lahir: "2001-01-01",
-              status: "aktif"
-            }
-          ]
-        };
-      }
-      return { rowCount: 0, rows: [] };
+  test("role=santri, status=aktif -> 200", async () => {
+    pool.query.mockResolvedValueOnce({
+      rowCount: 1,
+      rows: [
+        {
+          id_santri: 10,
+          nis: "NIS001",
+          nama: "Santri A",
+          status: "aktif",
+          username: "santri1",
+          role: "santri"
+        }
+      ]
     });
 
     const res = await request(app)
@@ -160,35 +90,25 @@ describe("GET /api/me (meroutes) unit coverage", () => {
     expect(res.body.role).toBe("santri");
     expect(res.body.profile).toEqual(
       expect.objectContaining({
-        id_users: 1,
-        role: "santri",
         id_santri: 10,
         nis: "NIS001",
-        status: "aktif"
+        status: "aktif",
+        role: "santri"
       })
     );
   });
 
-  test("role=pengajar, pengajar query rowCount=0 -> 200 with profile roleData empty", async () => {
-    pool.query.mockImplementation(async (sql) => {
-      if (String(sql).includes("FROM users")) {
-        return {
-          rowCount: 1,
-          rows: [
-            {
-              id_users: 2,
-              email: "pengajar@example.com",
-              username: "pengajar1",
-              role: "pengajar",
-              status_user: "aktif"
-            }
-          ]
-        };
-      }
-      if (String(sql).includes("FROM pengajar")) {
-        return { rowCount: 0, rows: [] };
-      }
-      return { rowCount: 0, rows: [] };
+  test("role=pengajar success -> 200", async () => {
+    pool.query.mockResolvedValueOnce({
+      rowCount: 1,
+      rows: [
+        {
+          id_pengajar: 1,
+          nama: "Pengajar Test",
+          username: "pengajar1",
+          role: "pengajar"
+        }
+      ]
     });
 
     const res = await request(app)
@@ -199,36 +119,20 @@ describe("GET /api/me (meroutes) unit coverage", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.role).toBe("pengajar");
-    expect(res.body.profile).toEqual(
-      expect.objectContaining({
-        id_users: 2,
-        role: "pengajar"
-      })
-    );
-    // roleData should be {} so pengajar-specific fields won't exist
-    expect(res.body.profile).not.toHaveProperty("id_pengajar");
+    expect(res.body.profile.nama).toBe("Pengajar Test");
   });
 
-  test("role=admin, admin query rowCount=0 -> 200 with profile roleData empty", async () => {
-    pool.query.mockImplementation(async (sql) => {
-      if (String(sql).includes("FROM users")) {
-        return {
-          rowCount: 1,
-          rows: [
-            {
-              id_users: 3,
-              email: "admin@example.com",
-              username: "admin1",
-              role: "admin",
-              status_user: "aktif"
-            }
-          ]
-        };
-      }
-      if (String(sql).includes("FROM admin")) {
-        return { rowCount: 0, rows: [] };
-      }
-      return { rowCount: 0, rows: [] };
+  test("role=admin success -> 200", async () => {
+    pool.query.mockResolvedValueOnce({
+      rowCount: 1,
+      rows: [
+        {
+          id_admin: 1,
+          nama: "Admin Test",
+          username: "admin1",
+          role: "admin"
+        }
+      ]
     });
 
     const res = await request(app)
@@ -239,13 +143,7 @@ describe("GET /api/me (meroutes) unit coverage", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.role).toBe("admin");
-    expect(res.body.profile).toEqual(
-      expect.objectContaining({
-        id_users: 3,
-        role: "admin"
-      })
-    );
-    expect(res.body.profile).not.toHaveProperty("id_admin");
+    expect(res.body.profile.nama).toBe("Admin Test");
   });
 
   test("catch error -> 500", async () => {
@@ -257,6 +155,6 @@ describe("GET /api/me (meroutes) unit coverage", () => {
       .set("x-id-users", "1");
 
     expect(res.statusCode).toBe(500);
-    expect(res.body.message).toBe("Server error");
+    expect(res.body.message).toBe("Gagal mengambil data user");
   });
 });

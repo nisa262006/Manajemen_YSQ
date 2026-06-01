@@ -8,12 +8,16 @@ describe('Functional Test: Admin & Santri Keuangan', () => {
   let santriToken;
   let idBilling;
   let idPembayaran;
+  let idSantri;
 
   beforeAll(async () => {
     adminToken = await loginAdmin();
     santriToken = await loginSantri();
     await db.query('TRUNCATE TABLE pembayaran CASCADE');
     await db.query('TRUNCATE TABLE billing_santri CASCADE');
+
+    const meRes = await request(app).get('/api/me').set('Authorization', `Bearer ${santriToken}`);
+    idSantri = meRes.body.profile.id_santri;
   });
 
   test('1. Admin membuat tagihan/billing manual untuk santri', async () => {
@@ -21,7 +25,7 @@ describe('Functional Test: Admin & Santri Keuangan', () => {
       .post('/api/keuangan/billing/manual')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        id_santri: 1, // Santri dari seed
+        id_santri: idSantri,
         id_jadwal: 1,
         tipe: 'SPP',
         jenis: 'INFAQ_BELAJAR',

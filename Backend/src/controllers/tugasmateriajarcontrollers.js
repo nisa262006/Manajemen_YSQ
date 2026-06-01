@@ -194,7 +194,7 @@ exports.updateMateri = async (req, res) => {
     if (req.file) {
       // 2. Jika ada file baru, hapus file fisik yang lama
       if (oldFileName) deletePhysicalFile(oldFileName, "materi");
-      
+
       query += `, file_path=$5 WHERE id_materi=$6 AND id_pengajar=$7`;
       params.push(req.file.filename, id, id_pengajar);
     } else {
@@ -298,21 +298,21 @@ exports.submitTugasSantri = async (req, res) => {
       });
     }
 
-// 4️⃣ SIMPAN PENGUMPULAN
-const sekarang = new Date().toLocaleString("en-US", {timeZone: "Asia/Jakarta"});
+    // 4️⃣ SIMPAN PENGUMPULAN
+    const sekarang = new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
 
-await db.query(
-  `INSERT INTO pengumpulan_tugas (id_tugas, id_santri, file_path, link_url, jawaban_teks, submitted_at)
-   VALUES ($1, $2, $3, $4, $5, $6)`, 
-  [
-    id_tugas,
-    id_santri,
-    req.file?.filename || null,
-    req.body.link_url || null,
-    req.body.jawaban_teks || null,
-    sekarang // Memaksa jam Jakarta masuk ke kolom submitted_at
-  ]
-);
+    await db.query(
+      `INSERT INTO pengumpulan_tugas (id_tugas, id_santri, file_path, link_url, jawaban_teks, submitted_at)
+   VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        id_tugas,
+        id_santri,
+        req.file?.filename || null,
+        req.body.link_url || null,
+        req.body.jawaban_teks || null,
+        sekarang // Memaksa jam Jakarta masuk ke kolom submitted_at
+      ]
+    );
 
 
     res.json({ success: true, message: "Tugas berhasil dikirim" });

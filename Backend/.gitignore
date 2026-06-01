@@ -10,3 +10,11 @@ manajemen_db
 
 # Konfig personal, jangan dicommit
 .vscode
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

@@ -365,6 +365,12 @@ VALUES ('admin4@ysq.com', '$2a$12$F1ZwSY3l0AP2LCAuQEhIu.TzwGgYqhxgC49YmPPG19.qpU
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin5@ysq.com', '$2a$12$LlQBotZXQWe0ND5snff30eIrxjo4Q51j3lxX4S86h8m3GiIlv3L0C', 'admin', 'aktif', 'admin5');
 
+INSERT INTO users (email, password_hash, role, status_user, username)
+VALUES ('santri2@ysq.com',	'$2b$10$AGP.2LVxx8ykLYjiH0X8U.b6DHQyLv3O519up818wMVBW8w05J99a',	'santri',	'aktif'.	'YSQ26DWS012_santri2');
+
+INSERT INTO users (email, password_hash, role, status_user, username)
+VALUES ('pengajar1@ysq.com',	'$2b$10$Dn47wRy1INoGPF1zu1VtmuU0Ic8dBhPRJQ9QSb2k6uGcd14pNxzWe',	'pengajar',	'aktif',	'YSQ25PGJ001_riska');
+
 --- admin
 INSERT INTO admin (id_users, nama, email)
 VALUES (1, 'Admin1', 'admin1@ysq.com');
@@ -380,3 +386,35 @@ VALUES (4, 'Admin4', 'admin4@ysq.com');
 
 INSERT INTO admin (id_users, nama, email)
 VALUES (5, 'Admin5', 'admin5@ysq.com');
+
+santri
+6	YSQ26DWS012	santri2	Dewasa	0812345678	santri2@ysq.com	bogor	2008-10-08	aktif	bogor	2026-01-08 15:19:35.254417+00
+
+id_santri	12
+id_users	18
+nis	YSQ26DWS012
+nama	santri2
+kategori	Dewasa
+no_wa	0812345678
+email	santri2@ysq.com
+tempat_lahir	bogor
+tanggal_lahir	2008-10-08
+status	aktif
+alamat	bogor
+tanggal_terdaftar	2026-01-08 15:19:35.254417+00
+
+pengajar
+7	riska1	089876543210	Alamat Pengajar Baru 1778556757857	aktif		2006-10-06		pengajar1@ysq.com	YSQ25PGJ001	2025-12-23 09:23:54.387074+00
+
+id_pengajar	1
+id_users	5
+nama	riska1
+no_kontak	089876543210
+alamat	Alamat Pengajar Baru 1778556757857
+status	aktif
+tempat_lahir	
+tanggal_lahir	2006-10-06
+mapel	
+email	pengajar1@ysq.com
+nip	YSQ25PGJ001
+tanggal_terdaftar	2025-12-23 09:23:54.387074+00

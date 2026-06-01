@@ -2,7 +2,8 @@ const db = require("../config/db");
 
 exports.getDashboardSantri = async (req, res) => {
   try {
-    const id_users = req.users.id_users;
+    const idSantri = req.user?.id_santri;
+    if (!idSantri) return res.status(401).json({ message: 'Unauthorized' });
 
     // 1. Ambil data santri
     const santriResult = await db.query(`
@@ -17,8 +18,8 @@ exports.getDashboardSantri = async (req, res) => {
         k.level
       FROM santri s
       LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
-      WHERE s.id_users = $1
-    `, [id_users]);
+      WHERE s.id_santri = $1
+    `, [idSantri]);
 
     if (santriResult.rowCount === 0) {
       return res.status(404).json({ message: "Data santri tidak ditemukan" });

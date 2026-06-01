@@ -17,7 +17,7 @@ exports.getMyProfile = async (req, res) => {
           s.nis,
           s.nama,
           s.status,
-          u.nama AS nama_user,
+          u.username,
           u.role
         FROM santri s
         JOIN users u ON u.id_users = s.id_users
@@ -30,7 +30,7 @@ exports.getMyProfile = async (req, res) => {
     // ==========================
     else if (role === "pengajar") {
       query = `
-        SELECT p.*, u.nama, u.role
+        SELECT p.*, u.username, u.role
         FROM pengajar p
         JOIN users u ON u.id_users = p.id_users
         WHERE p.id_users = $1
@@ -42,7 +42,7 @@ exports.getMyProfile = async (req, res) => {
     // ==========================
     else if (role === "admin") {
       query = `
-        SELECT a.*, u.nama, u.role
+        SELECT a.*, u.username, u.role
         FROM admin a
         JOIN users u ON u.id_users = a.id_users
         WHERE a.id_users = $1

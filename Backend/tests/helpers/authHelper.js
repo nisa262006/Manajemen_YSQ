@@ -14,6 +14,7 @@ const loginAdmin = async () => {
     });
   
   if (res.statusCode !== 200 || !res.body.token) {
+    console.error("LOGIN ADMIN FAILED:", res.statusCode, res.body);
     throw new Error('Gagal login sebagai admin di authHelper');
   }
 
@@ -33,6 +34,7 @@ const loginPengajar = async () => {
     });
   
   if (res.statusCode !== 200 || !res.body.token) {
+    console.error("LOGIN PENGAJAR FAILED:", res.statusCode, res.body);
     throw new Error('Gagal login sebagai pengajar di authHelper');
   }
 
@@ -52,14 +54,38 @@ const loginSantri = async () => {
     });
   
   if (res.statusCode !== 200 || !res.body.token) {
+    console.error("LOGIN SANTRI FAILED:", res.statusCode, res.body);
     throw new Error('Gagal login sebagai santri di authHelper');
   }
 
   return res.body.token;
 };
 
+/**
+ * Helper untuk membuat token secara manual (untuk API unit test)
+ */
+const makeSantriToken = (id_users) => {
+  const jwt = require('jsonwebtoken');
+  return jwt.sign({ id_users, role: 'santri' }, process.env.JWT_SECRET || 'secret_test');
+};
+
+const makePengajarToken = (id_users) => {
+  const jwt = require('jsonwebtoken');
+  return jwt.sign({ id_users, role: 'pengajar' }, process.env.JWT_SECRET || 'secret_test');
+};
+
+const makeAdminToken = (id_users) => {
+  const jwt = require('jsonwebtoken');
+  return jwt.sign({ id_users, role: 'admin' }, process.env.JWT_SECRET || 'secret_test');
+};
+
 module.exports = {
   loginAdmin,
   loginPengajar,
-  loginSantri
+  loginSantri,
+  makeSantriToken,
+  makePengajarToken,
+  makeAdminToken
 };
+
+

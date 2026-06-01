@@ -66,17 +66,17 @@ exports.generateSPPMassal = async (req, res) => {
 
 
 exports.tambahBillingManual = async (req, res) => {
-  // Tambahkan tanggal_mulai dan tanggal_selesai di destructuring
-  const { id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai } = req.body;
+  const { id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai, keterangan } = req.body;
 
   try {
-    await db.query(`
+    const result = await db.query(`
       INSERT INTO billing_santri
-      (id_santri, jenis, tipe, periode, nominal, sisa, status, tanggal_mulai, tanggal_selesai)
-      VALUES ($1, $2, $3, $4, $5, $5, 'belum bayar', $6, $7)
-    `, [id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai]);
+      (id_santri, jenis, tipe, periode, nominal, sisa, status, tanggal_mulai, tanggal_selesai, keterangan)
+      VALUES ($1, $2, $3, $4, $5, $5, 'belum bayar', $6, $7, $8)
+      RETURNING *
+    `, [id_santri, jenis, tipe, periode, nominal, tanggal_mulai, tanggal_selesai, keterangan]);
 
-    res.json({ success: true, message: "Billing berhasil ditambahkan" });
+    res.status(201).json({ success: true, data: result.rows[0] });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

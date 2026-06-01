@@ -67,92 +67,92 @@ function initDaftarSantri() {
     }
 
     // Tambahkan listener pada container tabel (Event Delegation)
-santriTableBody.addEventListener("click", async (e) => {
-    const deleteBtn = e.target.closest(".delete-btn");
-    if (!deleteBtn) return;
+    santriTableBody.addEventListener("click", async (e) => {
+        const deleteBtn = e.target.closest(".delete-btn");
+        if (!deleteBtn) return;
 
-    const id = deleteBtn.dataset.id;
-    
-    // TAHAP 1: Konfirmasi Awal
-    if (!confirm("Apakah Anda yakin ingin menghapus data santri ini secara permanen?")) return;
+        const id = deleteBtn.dataset.id;
 
-    try {
-        // PERCOBAAN PERTAMA: Cek Tunggakan & Backup ke Backend
-        // Kita kirim request kosong dulu untuk memancing validasi backend
-        let response = await apiDelete(`/santri/${id}`, {});
+        // TAHAP 1: Konfirmasi Awal
+        if (!confirm("Apakah Anda yakin ingin menghapus data santri ini secara permanen?")) return;
 
-    } catch (err) {
-        // TAHAP 2: MENANGANI VALIDASI DARI BACKEND (ERROR 400)
-        
-        // 1. Jika ada tunggakan
-        if (err.type === "VALIDATION_TUNGGAKAN") {
-            if (confirm(err.message)) { // Pesan: "Santri punya utang Rp..., tetap hapus?"
-                // Lanjut ke tahap berikutnya dengan membawa flag tunggakan
-                return prosesHapusFinal(id, { confirm_tunggakan: true });
-            }
-            return;
-        }
-
-        // 2. Jika perlu konfirmasi backup
-        if (err.type === "VALIDATION_BACKUP") {
-            if (confirm("Peringatan: Data akan dihapus selamanya. Apakah Anda sudah memastikan data sudah di-eksport (Backup) ke Excel?")) {
-                // Lanjut ke tahap final dengan semua flag
-                return prosesHapusFinal(id, { confirm_tunggakan: true, confirm_backup: true });
-            }
-            return;
-        }
-
-        console.error("Gagal menghapus:", err);
-        alert(err.message || "Gagal menghapus data");
-    }
-
-    // Fungsi Pembantu untuk mengirim request dengan body
-    async function prosesHapusFinal(targetId, flags) {
         try {
-            // Karena apiDelete biasanya tidak menerima body di banyak library, 
-            // pastikan apiService.js kamu mendukung parameter kedua sebagai body.
-            // Jika tidak, kamu bisa modifikasi apiDelete atau gunakan fetch langsung:
-            
-            const finalRes = await fetch(`/api/santri/${targetId}`, {
-                method: 'DELETE',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem("token")}` 
-                },
-                body: JSON.stringify(flags)
-            });
+            // PERCOBAAN PERTAMA: Cek Tunggakan & Backup ke Backend
+            // Kita kirim request kosong dulu untuk memancing validasi backend
+            let response = await apiDelete(`/santri/${id}`, {});
 
-            const result = await finalRes.json();
+        } catch (err) {
+            // TAHAP 2: MENANGANI VALIDASI DARI BACKEND (ERROR 400)
 
-            if (finalRes.ok) {
-                alert(result.message);
-                loadAll(); // Refresh tabel
-            } else {
-                // Jika masih butuh validasi selanjutnya (misal dari tunggakan lanjut ke backup)
-                if (result.type === "VALIDATION_BACKUP") {
-                    if (confirm(result.message)) {
-                        return prosesHapusFinal(targetId, { ...flags, confirm_backup: true });
-                    }
-                } else {
-                    alert(result.message);
+            // 1. Jika ada tunggakan
+            if (err.type === "VALIDATION_TUNGGAKAN") {
+                if (confirm(err.message)) { // Pesan: "Santri punya utang Rp..., tetap hapus?"
+                    // Lanjut ke tahap berikutnya dengan membawa flag tunggakan
+                    return prosesHapusFinal(id, { confirm_tunggakan: true });
                 }
+                return;
             }
-        } catch (error) {
-            alert("Terjadi kesalahan sistem");
-        }
-    }
-});
 
-function renderKelas() {
-    if (!kelasSelect) return;
-    kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
-    
-    KELAS.forEach(k => {
-        // Gabungkan nama kelas dan nama pengajar agar admin tidak bingung
-        const pengajar = k.nama_pengajar ? ` - ${k.nama_pengajar}` : "";
-        kelasSelect.innerHTML += `<option value="${k.id_kelas}">${esc(k.nama_kelas)}${esc(pengajar)}</option>`;
+            // 2. Jika perlu konfirmasi backup
+            if (err.type === "VALIDATION_BACKUP") {
+                if (confirm("Peringatan: Data akan dihapus selamanya. Apakah Anda sudah memastikan data sudah di-eksport (Backup) ke Excel?")) {
+                    // Lanjut ke tahap final dengan semua flag
+                    return prosesHapusFinal(id, { confirm_tunggakan: true, confirm_backup: true });
+                }
+                return;
+            }
+
+            console.error("Gagal menghapus:", err);
+            alert(err.message || "Gagal menghapus data");
+        }
+
+        // Fungsi Pembantu untuk mengirim request dengan body
+        async function prosesHapusFinal(targetId, flags) {
+            try {
+                // Karena apiDelete biasanya tidak menerima body di banyak library, 
+                // pastikan apiService.js kamu mendukung parameter kedua sebagai body.
+                // Jika tidak, kamu bisa modifikasi apiDelete atau gunakan fetch langsung:
+
+                const finalRes = await fetch(`/api/santri/${targetId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: JSON.stringify(flags)
+                });
+
+                const result = await finalRes.json();
+
+                if (finalRes.ok) {
+                    alert(result.message);
+                    loadAll(); // Refresh tabel
+                } else {
+                    // Jika masih butuh validasi selanjutnya (misal dari tunggakan lanjut ke backup)
+                    if (result.type === "VALIDATION_BACKUP") {
+                        if (confirm(result.message)) {
+                            return prosesHapusFinal(targetId, { ...flags, confirm_backup: true });
+                        }
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            } catch (error) {
+                alert("Terjadi kesalahan sistem");
+            }
+        }
     });
-}
+
+    function renderKelas() {
+        if (!kelasSelect) return;
+        kelasSelect.innerHTML = `<option value="">Semua Kelas</option>`;
+
+        KELAS.forEach(k => {
+            // Gabungkan nama kelas dan nama pengajar agar admin tidak bingung
+            const pengajar = k.nama_pengajar ? ` - ${k.nama_pengajar}` : "";
+            kelasSelect.innerHTML += `<option value="${k.id_kelas}">${esc(k.nama_kelas)}${esc(pengajar)}</option>`;
+        });
+    }
 
     function renderTable(list) {
         santriTableBody.innerHTML = "";
@@ -161,9 +161,9 @@ function renderKelas() {
             return;
         }
         // Di dalam list.forEach pada fungsi renderTable(list)
-// Ubah bagian baris tabel menjadi seperti ini:
-list.forEach((s, i) => {
-    santriTableBody.innerHTML += `
+        // Ubah bagian baris tabel menjadi seperti ini:
+        list.forEach((s, i) => {
+            santriTableBody.innerHTML += `
         <tr>
             <td>${i + 1}</td>
             <td>${esc(s.nis)}</td>
@@ -180,7 +180,7 @@ list.forEach((s, i) => {
                 <button class="icon-btn delete-btn" data-id="${s.id_santri}"><i class="fas fa-trash-alt"></i></button>
             </td>
         </tr>`;
-});
+        });
     }
 
     function applyFilter() {
@@ -198,13 +198,13 @@ list.forEach((s, i) => {
         exportBtn.onclick = () => {
             const kat = kategoriSelect?.value || "Semua";
             const fileName = `Daftar-Santri-${kat}.xls`;
-    
+
             // 1. Kelompokkan data berdasarkan Kelas dan simpan info Pengajarnya
             const kelompokKelas = {};
             SANTRI.forEach(s => {
                 const namaKelas = s.nama_kelas || "Tanpa Kelas";
                 const namaPengajar = s.nama_pengajar || "Tanpa Pengajar";
-                
+
                 if (!kelompokKelas[namaKelas]) {
                     kelompokKelas[namaKelas] = {
                         pengajar: namaPengajar,
@@ -213,7 +213,7 @@ list.forEach((s, i) => {
                 }
                 kelompokKelas[namaKelas].data.push(s);
             });
-    
+
             // 2. Bangun Struktur HTML untuk Excel
             let htmlKonten = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
@@ -221,10 +221,10 @@ list.forEach((s, i) => {
                 <body>
                     <h2 style="text-align:center;">LAPORAN DAFTAR SANTRI - ${kat.toUpperCase()}</h2>
             `;
-    
+
             for (const kelas in kelompokKelas) {
                 const info = kelompokKelas[kelas];
-                
+
                 htmlKonten += `
                     <table border="0">
                         <tr>
@@ -250,7 +250,7 @@ list.forEach((s, i) => {
                         </thead>
                         <tbody>
                 `;
-    
+
                 info.data.forEach((s, i) => {
                     htmlKonten += `
                         <tr>
@@ -266,12 +266,12 @@ list.forEach((s, i) => {
                         </tr>
                     `;
                 });
-    
+
                 htmlKonten += `</tbody></table><br><br>`; // Jarak antar tabel kelas
             }
-    
+
             htmlKonten += `</body></html>`;
-    
+
             // 3. Proses Download
             const blob = new Blob([htmlKonten], { type: 'application/vnd.ms-excel' });
             const url = URL.createObjectURL(blob);
@@ -310,28 +310,28 @@ function initDaftarPengajar() {
     }
 
     // Tambahkan listener pada body tabel pengajar
-pengajarTableBody.addEventListener("click", async (e) => {
-    // Mencari elemen tombol delete terdekat yang diklik
-    const deleteBtn = e.target.closest(".delete-btn");
+    pengajarTableBody.addEventListener("click", async (e) => {
+        // Mencari elemen tombol delete terdekat yang diklik
+        const deleteBtn = e.target.closest(".delete-btn");
 
-    if (deleteBtn) {
-        const id = deleteBtn.dataset.id;
+        if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
 
-        // Konfirmasi sebelum menghapus
-        if (confirm("Apakah Anda yakin ingin menghapus data pengajar ini?")) {
-            try {
-                // Memanggil fungsi apiDelete dari apiService.js
-                await apiDelete(`/pengajar/${id}`);
+            // Konfirmasi sebelum menghapus
+            if (confirm("Apakah Anda yakin ingin menghapus data pengajar ini?")) {
+                try {
+                    // Memanggil fungsi apiDelete dari apiService.js
+                    await apiDelete(`/pengajar/${id}`);
 
-                // Panggil kembali fungsi load untuk memperbarui tampilan tabel
-                load();
-            } catch (err) {
-                console.error("Gagal menghapus pengajar:", err);
-                alert("Gagal menghapus data: " + (err.message || "Terjadi kesalahan server"));
+                    // Panggil kembali fungsi load untuk memperbarui tampilan tabel
+                    load();
+                } catch (err) {
+                    console.error("Gagal menghapus pengajar:", err);
+                    alert("Gagal menghapus data: " + (err.message || "Terjadi kesalahan server"));
+                }
             }
         }
-    }
-});
+    });
 
     function render() {
         const key = searchInput?.value.toLowerCase() || "";
@@ -407,7 +407,7 @@ function initDetailSantri() {
             f.tempat.value = s.tempat_lahir ?? "";
             f.tanggal.value = s.tanggal_lahir?.split("T")[0] ?? "";
             f.wa.value = s.no_wa ?? "";
-            
+
             // FIX: Paksa ke huruf kecil agar cocok dengan value="anak"/"dewasa" di HTML
             if (s.kategori) {
                 f.kategori.value = s.kategori.trim();
@@ -446,7 +446,7 @@ function initDetailSantri() {
                 tempat_lahir: f.tempat.value,
                 tanggal_lahir: f.tanggal.value || null,
                 no_wa: f.wa.value,
-                kategori: f.kategori.value, // Mengirim "anak" atau "dewasa"
+                kategori: f.kategori.value.toLowerCase(), 
                 email: f.email.value,
                 status: f.status.value
             });
@@ -454,7 +454,8 @@ function initDetailSantri() {
             location.href = "/dashboard/daftar-santri";
         } catch (err) {
             console.error("Update santri error:", err);
-            alert("Gagal memperbarui data santri");
+            const msg = err.message || (typeof err === "string" ? err : "Gagal memperbarui data santri");
+            alert(msg);
         }
     };
 
@@ -512,30 +513,23 @@ function initDetailPengajar() {
 
     btnSave.onclick = async () => {
         try {
-    
-            const payload = {
+
+            await apiPut(`/pengajar/${id}`, {
                 nama: f.nama.value,
                 alamat: f.alamat.value,
-                tempat_lahir: f.tempat.value,
                 tanggal_lahir: f.tanggal.value || null,
-                no_wa: f.wa.value,
+                no_kontak: f.telp.value,
                 email: f.email.value,
                 status: f.status.value
-            };
-    
-            // hanya kirim kategori jika admin memang pilih
-            if (f.kategori.value) {
-                payload.kategori = f.kategori.value;
-            }
-    
-            await apiPut(`/santri/${id}`, payload);
-    
-            alert("Data santri diperbarui");
-            location.href = "/dashboard/daftar-santri";
-    
+            });
+
+            alert("Data pengajar diperbarui");
+            location.href = "/dashboard/daftar-pengajar";
+
         } catch (err) {
-            console.error("Update santri error:", err);
-            alert("Gagal memperbarui data santri");
+            console.error("Update pengajar error:", err);
+            const msg = err.message || (typeof err === "string" ? err : "Gagal memperbarui data pengajar");
+            alert(msg);
         }
     };
 

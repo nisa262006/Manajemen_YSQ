@@ -14,13 +14,20 @@ const pool = new Pool({
   port: process.env.DB_PORT || 5432,
   password: process.env.DB_PASSWORD || "12345",
   database: process.env.DB_NAME || "manajemen_db",
-  max: 20, // Maksimal 20 koneksi simultan
-  idleTimeoutMillis: 30000, // Tutup koneksi nganggur setelah 30 detik
-  connectionTimeoutMillis: 10000, // Naikkan timeout untuk test environment
+  max: process.env.NODE_ENV === "test" ? 5 : 20,
+  idleTimeoutMillis: process.env.NODE_ENV === "test" ? 500 : 30000,
+  connectionTimeoutMillis: 10000,
 });
 
-pool.connect()
-  .then(() => console.log("✅ PostgreSQL connected"))
-  .catch(err => console.error("❌ PostgreSQL error:", err.message));
+// Hanya tes koneksi saat bukan di-mock (test unit memakai jest.mock)
+if (process.env.NODE_ENV !== "test") {
+  pool.connect()
+    .then(client => { console.log("✅ PostgreSQL connected"); client.release(); })
+    .catch(err => console.error("❌ PostgreSQL error:", err.message));
+} else {
+  pool.query('SELECT 1')
+    .then(() => console.log("✅ PostgreSQL connected"))
+    .catch(err => console.error("❌ PostgreSQL error:", err.message));
+}
 
 module.exports = pool;

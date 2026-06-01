@@ -1,6 +1,4 @@
 const request = require('supertest');
-const app = require('../../src/app');
-const db = require('../../src/config/db');
 
 jest.mock('../../src/config/db', () => ({
   query: jest.fn()
@@ -8,13 +6,28 @@ jest.mock('../../src/config/db', () => ({
 
 jest.mock('../../src/middleware/auth', () => ({
   verifyToken: (req, res, next) => {
-    req.user = { id_users: 1, role: 'santri' };
-    next();
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ message: 'Unauthorized' });
+    const token = authHeader.split(" ")[1];
+    try {
+      const jwt = require('jsonwebtoken');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_test');
+      req.user = decoded;
+      // Controller santridashboard reads req.user.id_santri directly
+      if (decoded.role === 'santri') req.user.id_santri = decoded.id_users;
+      next();
+    } catch (e) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
   },
   onlySantri: (req, res, next) => next(),
   onlyAdmin: (req, res, next) => next(),
   onlyPengajar: (req, res, next) => next(),
 }));
+
+const app = require('../../src/app');
+const db = require('../../src/config/db');
+
 
 describe('SANTRI DASHBOARD API TEST', () => {
 
@@ -34,7 +47,11 @@ describe('SANTRI DASHBOARD API TEST', () => {
         rows: [{ id_jadwal: 1, hari: 'Senin', jam_mulai: '08:00', pengajar: 'Ustadz A' }]
       }); // jadwal query
 
-      const res = await request(app).get('/api/santridashboard/me');
+      const { makeSantriToken } = require('../helpers/authHelper');
+      const token = makeSantriToken(1);
+      const res = await request(app)
+        .get('/api/santridashboard/me')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.santri.nama).toBe('Santri Test');
@@ -47,7 +64,11 @@ describe('SANTRI DASHBOARD API TEST', () => {
         rows: [{ id_santri: 1, nama: 'Santri Test', id_kelas: null }]
       });
 
-      const res = await request(app).get('/api/santridashboard/me');
+      const { makeSantriToken } = require('../helpers/authHelper');
+      const token = makeSantriToken(1);
+      const res = await request(app)
+        .get('/api/santridashboard/me')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.jadwal).toEqual([]);
@@ -56,7 +77,11 @@ describe('SANTRI DASHBOARD API TEST', () => {
     test('❌ Gagal - Santri tidak ditemukan (404)', async () => {
       db.query.mockResolvedValueOnce({ rowCount: 0 });
 
-      const res = await request(app).get('/api/santridashboard/me');
+      const { makeSantriToken } = require('../helpers/authHelper');
+      const token = makeSantriToken(1);
+      const res = await request(app)
+        .get('/api/santridashboard/me')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toBe(404);
       expect(res.body.message).toContain('tidak ditemukan');
@@ -65,7 +90,11 @@ describe('SANTRI DASHBOARD API TEST', () => {
     test('❌ Gagal - DB Error (500)', async () => {
       db.query.mockRejectedValueOnce(new Error('DB Error'));
 
-      const res = await request(app).get('/api/santridashboard/me');
+      const { makeSantriToken } = require('../helpers/authHelper');
+      const token = makeSantriToken(1);
+      const res = await request(app)
+        .get('/api/santridashboard/me')
+        .set('Authorization', `Bearer ${token}`);
 
       expect(res.statusCode).toBe(500);
     });

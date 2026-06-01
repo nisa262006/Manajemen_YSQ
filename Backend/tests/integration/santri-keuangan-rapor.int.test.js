@@ -8,15 +8,31 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
   let adminToken, santriToken, pengajarToken;
   let idBilling;
   let idPembayaran;
+  let idSantri;
+  let idJadwal = 1;
 
   beforeAll(async () => {
     await db.query('TRUNCATE TABLE pembayaran CASCADE');
     await db.query('TRUNCATE TABLE billing_santri CASCADE');
     await db.query(`DELETE FROM rapor_tahsin WHERE periode IN ('Int_Genap 2026', 'Genap 2026')`);
-    await db.query('INSERT INTO santri_jadwal (id_santri, id_jadwal) VALUES (1, 1) ON CONFLICT DO NOTHING');
+    
     adminToken = await loginAdmin();
     santriToken = await loginSantri();
     pengajarToken = await loginPengajar();
+
+    const meSantri = await request(app).get('/api/me').set('Authorization', `Bearer ${santriToken}`);
+    idSantri = meSantri.body.profile.id_santri;
+
+    const mePengajar = await request(app).get('/api/me').set('Authorization', `Bearer ${pengajarToken}`);
+    const idPengajar = mePengajar.body.profile.id_pengajar;
+
+    // Cari jadwal pengajar ini
+    const resJadwal = await db.query('SELECT id_jadwal FROM jadwal WHERE id_pengajar = $1 LIMIT 1', [idPengajar]);
+    if (resJadwal.rowCount > 0) {
+      idJadwal = resJadwal.rows[0].id_jadwal;
+    }
+
+    await db.query('INSERT INTO santri_jadwal (id_santri, id_jadwal) VALUES ($1, $2) ON CONFLICT DO NOTHING', [idSantri, idJadwal]);
   });
 
   test('1. [Admin] Membuat Billing Baru', async () => {
@@ -24,8 +40,8 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
       .post('/api/keuangan/billing/manual')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        id_santri: 1, 
-        id_jadwal: 1,
+        id_santri: idSantri, 
+        id_jadwal: idJadwal,
         tipe: 'SPP',
         jenis: 'INFAQ_BELAJAR',
         periode: `Int_Ganjil ${Date.now()}`,
@@ -89,8 +105,8 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
       .post('/api/rapor/tahsin')
       .set('Authorization', `Bearer ${pengajarToken}`)
       .send({
-        id_santri: 1,
-        id_jadwal: 1,
+        id_santri: idSantri,
+        id_jadwal: idJadwal,
         periode: 'Int_Genap 2026',
         nilai_pekanan: 85,
         ujian_tilawah: 88,
