@@ -21,4 +21,3 @@ node_modules/
 /playwright/.auth/
 
 Backend/src/config/db.js
-Backend/src/config/db.js

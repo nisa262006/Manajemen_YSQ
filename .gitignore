@@ -54,3 +54,6 @@ Backend/public/uploads/submit/*
 !Backend/public/uploads/materi/*.docx
 !Backend/public/uploads/tugas/*.doc
 !Backend/public/uploads/tugas/*.docx
+
+backup.sql
+Backend/src/config/db.js
