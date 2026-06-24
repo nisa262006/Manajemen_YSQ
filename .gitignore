@@ -58,3 +58,4 @@ Backend/public/uploads/submit/*
 !Backend/public/uploads/tugas/*.docxgit rm --cached .env
 
 Backend/src/config/db.js
+
