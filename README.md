@@ -1,5 +1,7 @@
 # 📘 Aplikasi Manajemen Yayasan Sahabat Qur'an (YSQ)
 
+[![codecov](https://codecov.io/gh/nisa262006/Manajemen_YSQ/graph/badge.svg?token=YOUR_CODECOV_TOKEN)](https://codecov.io/gh/nisa262006/Manajemen_YSQ)
+
 Sistem manajemen berbasis web yang dirancang untuk meningkatkan efisiensi operasional Yayasan Sahabat Qur'an (YSQ). Proyek ini dibangun sebagai implementasi dari dokumen Proposal Manajemen Proyek – Perancangan dan Implementasi Aplikasi Manajemen Berbasis Web.
 
 ## Tujuan 

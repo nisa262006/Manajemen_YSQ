@@ -15,7 +15,9 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/tests/ui/"
-    ]
+    ],
+    "coverageReporters": ["lcov", "text", "text-summary"],
+    "coverageDirectory": "coverage"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
