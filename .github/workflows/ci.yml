@@ -21,10 +21,22 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d ysq_test"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
+
+    # ─── Environment variables yang digunakan oleh app & tests ───
+    env:
+      NODE_ENV: test
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: ysq_test
+      # JWT_SECRET HARUS sama dengan yang dipakai di .env.test agar
+      # token yang dibuat globalSetup cocok dengan verifikasi middleware
+      JWT_SECRET: ysq-secret-test
 
     steps:
       - name: Checkout repository
@@ -43,28 +55,39 @@ jobs:
 
       - name: Wait for Postgres to be ready
         run: |
-          for i in {1..30}; do
-            pg_isready -h localhost -p 5432 -U postgres && break
-            echo "Waiting for postgres... attempt $i"
-            sleep 1
+          echo "Menunggu PostgreSQL siap..."
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U postgres && echo "✅ Postgres ready!" && break
+            echo "  attempt $i/30 - waiting..."
+            sleep 2
           done
+          # Final check - jika masih gagal, tampilkan error jelas
+          pg_isready -h localhost -p 5432 -U postgres || (echo "❌ Postgres tidak siap setelah 60 detik" && exit 1)
 
       - name: Initialize database schema & seed data
         env:
           PGPASSWORD: postgres
         run: |
+          echo "Menjalankan init.sql (schema + seed)..."
           psql -h localhost -p 5432 -U postgres -d ysq_test -f Backend/docker/init.sql
+          echo "✅ Database schema & seed berhasil dijalankan"
+
+      - name: Verify seed data (debug)
+        env:
+          PGPASSWORD: postgres
+        run: |
+          echo "=== Verifikasi users yang di-seed ==="
+          psql -h localhost -p 5432 -U postgres -d ysq_test \
+            -c "SELECT id_users, username, role, status_user FROM users ORDER BY id_users;"
+          echo "=== Verifikasi tabel santri ==="
+          psql -h localhost -p 5432 -U postgres -d ysq_test \
+            -c "SELECT id_santri, id_users, nis, nama FROM santri ORDER BY id_santri;"
+          echo "=== Verifikasi tabel pengajar ==="
+          psql -h localhost -p 5432 -U postgres -d ysq_test \
+            -c "SELECT id_pengajar, id_users, nama, nip FROM pengajar ORDER BY id_pengajar;"
 
       - name: Run Jest tests with coverage
         working-directory: Backend
-        env:
-          NODE_ENV: test
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: ysq_test
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm test
 
       - name: Upload coverage to Codecov
@@ -75,4 +98,3 @@ jobs:
           flags: jest-unit
           fail_ci_if_error: false
           verbose: true
-

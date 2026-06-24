@@ -349,29 +349,48 @@ CREATE TABLE IF NOT EXISTS warehouse.rekap_keuangan_bulanan (
 );
 
 
--- insert
+-- ============================================================
+-- SEED DATA (users yang dibutuhkan oleh tests/helpers/authHelper.js)
+-- ============================================================
+
+-- *** ADMIN users (id_users: 1-5) ***
+-- admin1 / admin1
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin1@ysq.com', '$2a$12$a8YvFLJ3dhQJaPCdHgeY7Og62137S9KOqbImtWBMipqCzaIf3VRM.', 'admin', 'aktif', 'admin1');
 
+-- admin2 / admin2  <-- dipakai loginAdmin() di authHelper.js
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin2@ysq.com', '$2a$12$cNMExvVowAI/Xbg5OkPyoO.9wrsDV0.MrsJxPbN2WJP0k0JuMD6/q', 'admin', 'aktif', 'admin2');
 
+-- admin3 / admin3
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin3@ysq.com', '$2a$12$Q0x7lTH1.uaK77mKvKZnp.53xyggUf8woBy2RVaVdb8Qt1fe9OLTS', 'admin', 'aktif', 'admin3');
 
+-- admin4 / admin4
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin4@ysq.com', '$2a$12$F1ZwSY3l0AP2LCAuQEhIu.TzwGgYqhxgC49YmPPG19.qpUbC4zA.e', 'admin', 'aktif', 'admin4');
 
+-- admin5 / admin5
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('admin5@ysq.com', '$2a$12$LlQBotZXQWe0ND5snff30eIrxjo4Q51j3lxX4S86h8m3GiIlv3L0C', 'admin', 'aktif', 'admin5');
 
+-- *** SANTRI users (id_users: 6-7) ***
+-- YSQ26DWS011_santri1 / santri1123  <-- dipakai loginSantri() di authHelper.js
+INSERT INTO users (email, password_hash, role, status_user, username)
+VALUES ('santri1@ysq.com', '$2b$10$SeBM7khTb/Zm8Mmkb9EoDOFe8bzfCmpAmyiL52ZIk6O0xdQXEkmzq', 'santri', 'aktif', 'YSQ26DWS011_santri1');
+
+-- YSQ26DWS012_santri2 / santri2
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('santri2@ysq.com', '$2b$10$AGP.2LVxx8ykLYjiH0X8U.b6DHQyLv3O519up818wMVBW8w05J99a', 'santri', 'aktif', 'YSQ26DWS012_santri2');
 
+-- *** PENGAJAR users (id_users: 8) ***
+-- YSQ25PGJ001_riska / riska  <-- dipakai loginPengajar() di authHelper.js
 INSERT INTO users (email, password_hash, role, status_user, username)
 VALUES ('pengajar1@ysq.com', '$2b$10$Dn47wRy1INoGPF1zu1VtmuU0Ic8dBhPRJQ9QSb2k6uGcd14pNxzWe', 'pengajar', 'aktif', 'YSQ25PGJ001_riska');
 
---- admin
+-- ============================================================
+-- ADMIN table entries
+-- ============================================================
 INSERT INTO admin (id_users, nama, email)
 VALUES (1, 'Admin1', 'admin1@ysq.com');
 
@@ -387,10 +406,20 @@ VALUES (4, 'Admin4', 'admin4@ysq.com');
 INSERT INTO admin (id_users, nama, email)
 VALUES (5, 'Admin5', 'admin5@ysq.com');
 
---- santri
+-- ============================================================
+-- SANTRI table entries
+-- ============================================================
+-- santri1 (id_users=6) - dipakai oleh loginSantri()
 INSERT INTO santri (id_users, nis, nama, kategori, no_wa, email, tempat_lahir, tanggal_lahir, status, alamat)
-VALUES (6, 'YSQ26DWS012', 'santri2', 'Dewasa', '0812345678', 'santri2@ysq.com', 'bogor', '2008-10-08', 'aktif', 'bogor');
+VALUES (6, 'YSQ26DWS011', 'santri1', 'Dewasa', '0812345679', 'santri1@ysq.com', 'jakarta', '2007-05-10', 'aktif', 'jakarta');
 
---- pengajar
+-- santri2 (id_users=7)
+INSERT INTO santri (id_users, nis, nama, kategori, no_wa, email, tempat_lahir, tanggal_lahir, status, alamat)
+VALUES (7, 'YSQ26DWS012', 'santri2', 'Dewasa', '0812345678', 'santri2@ysq.com', 'bogor', '2008-10-08', 'aktif', 'bogor');
+
+-- ============================================================
+-- PENGAJAR table entries
+-- ============================================================
+-- riska (id_users=8) - dipakai oleh loginPengajar()
 INSERT INTO pengajar (id_users, nama, no_kontak, alamat, status, tanggal_lahir, email, nip)
-VALUES (7, 'riska1', '089876543210', 'Alamat Pengajar Baru', 'aktif', '2006-10-06', 'pengajar1@ysq.com', 'YSQ25PGJ001');
+VALUES (8, 'riska1', '089876543210', 'Alamat Pengajar Baru', 'aktif', '2006-10-06', 'pengajar1@ysq.com', 'YSQ25PGJ001');
