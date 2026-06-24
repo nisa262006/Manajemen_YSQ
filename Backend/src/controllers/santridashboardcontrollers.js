@@ -13,11 +13,12 @@ exports.getDashboardSantri = async (req, res) => {
         s.nama,
         s.kategori,
         s.status,
-        s.id_kelas,
+        sk.id_kelas,
         k.nama_kelas,
         k.level
       FROM santri s
-      LEFT JOIN kelas k ON s.id_kelas = k.id_kelas
+      LEFT JOIN santri_kelas sk ON s.id_santri = sk.id_santri
+      LEFT JOIN kelas k ON sk.id_kelas = k.id_kelas
       WHERE s.id_santri = $1
     `, [idSantri]);
 

@@ -133,6 +133,7 @@ CREATE TABLE password_reset_tokens (
 --12
 CREATE TABLE pendaftar (
   id_pendaftar SERIAL PRIMARY KEY,
+  id_users INT REFERENCES users(id_users) ON DELETE SET NULL,
   nama VARCHAR(255) NOT NULL,
   tempat_lahir VARCHAR(100),
   tanggal_lahir DATE,

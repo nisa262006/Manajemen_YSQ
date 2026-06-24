@@ -14,17 +14,24 @@ describe('Admin Manage Jadwal Functional Test', () => {
     // 1. Login admin
     adminToken = await loginAdmin();
 
-    // Mengambil data dari test sebelumnya (kelas, pengajar, santri)
-    const [resKelas, resPengajar, resSantri] = await Promise.all([
-      request(app).get('/api/kelas').set('Authorization', `Bearer ${adminToken}`),
+    // Buat kelas khusus untuk testing jadwal agar terisolasi dengan baik
+    const resKelasBaru = await request(app)
+      .post('/api/kelas')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        nama_kelas: 'Kelas Testing Jadwal',
+        kategori: 'Reguler'
+      });
+
+    if (resKelasBaru.statusCode === 201 && resKelasBaru.body.kelas) {
+      idKelas = resKelasBaru.body.kelas.id_kelas;
+    }
+
+    // Mengambil data pengajar dan santri
+    const [resPengajar, resSantri] = await Promise.all([
       request(app).get('/api/pengajar').set('Authorization', `Bearer ${adminToken}`),
       request(app).get('/api/santri').set('Authorization', `Bearer ${adminToken}`)
     ]);
-
-    // Mengambil ID pertama yang ditemukan dari masing-masing response
-    if (resKelas.body.length > 0) {
-      idKelas = resKelas.body[0].id_kelas;
-    }
     
     if (resPengajar.body.data && resPengajar.body.data.length > 0) {
       idPengajar = resPengajar.body.data[0].id_pengajar;
@@ -32,6 +39,14 @@ describe('Admin Manage Jadwal Functional Test', () => {
     
     if (resSantri.body.data && resSantri.body.data.length > 0) {
       idSantri = resSantri.body.data[0].id_santri;
+    }
+  });
+
+  afterAll(async () => {
+    if (idKelas && adminToken) {
+      await request(app)
+        .delete(`/api/kelas/hapus/${idKelas}`)
+        .set('Authorization', `Bearer ${adminToken}`);
     }
   });
 

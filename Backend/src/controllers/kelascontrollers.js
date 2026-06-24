@@ -72,6 +72,9 @@ exports.getAllKelas = async (req, res) => {
 // Detail kelas
 exports.getDetailKelas = async (req, res) => {
   const { id_kelas } = req.params;
+  if (!id_kelas || !/^\d+$/.test(id_kelas)) {
+    return res.status(400).json({ message: "ID Kelas tidak valid" });
+  }
 
   try {
 
@@ -119,6 +122,9 @@ exports.getDetailKelas = async (req, res) => {
 // Update kelas
 exports.updateKelas = async (req, res) => {
   const { id_kelas } = req.params;
+  if (!id_kelas || !/^\d+$/.test(id_kelas)) {
+    return res.status(400).json({ message: "ID Kelas tidak valid" });
+  }
   const { nama_kelas, id_program, kategori } = req.body;
 
   try {
@@ -146,6 +152,9 @@ exports.updateKelas = async (req, res) => {
 // Delete kelas
 exports.deleteKelas = async (req, res) => {
   const { id_kelas } = req.params;
+  if (!id_kelas || !/^\d+$/.test(id_kelas)) {
+    return res.status(400).json({ message: "ID Kelas tidak valid" });
+  }
 
   try {
     const result = await db.query(
@@ -168,6 +177,13 @@ exports.deleteKelas = async (req, res) => {
 exports.tambahSantriKeKelas = async (req, res) => {
   const { id_kelas } = req.params;
   const { id_santri } = req.body;
+
+  if (!id_kelas || !/^\d+$/.test(id_kelas)) {
+    return res.status(400).json({ message: "ID Kelas tidak valid" });
+  }
+  if (!id_santri || !/^\d+$/.test(id_santri)) {
+    return res.status(400).json({ message: "ID Santri tidak valid" });
+  }
 
   try {
     // Hapus dulu dari kelas lama
@@ -196,8 +212,11 @@ exports.pindahSantriKelas = async (req, res) => {
   const { id_santri } = req.params;
   const { id_kelas_baru } = req.body;
 
-  if (!id_kelas_baru) {
-    return res.status(400).json({ message: "id_kelas_baru wajib dikirim" });
+  if (!id_santri || !/^\d+$/.test(id_santri)) {
+    return res.status(400).json({ message: "ID Santri tidak valid" });
+  }
+  if (!id_kelas_baru || !/^\d+$/.test(id_kelas_baru)) {
+    return res.status(400).json({ message: "ID Kelas Baru tidak valid" });
   }
 
   try {
@@ -261,6 +280,9 @@ exports.kelasPengajar = async (req, res) => {
 
 exports.getDetailKelasPengajar = async (req, res) => {
   const { id_kelas } = req.params;
+  if (!id_kelas || !/^\d+$/.test(id_kelas)) {
+    return res.status(400).json({ message: "ID Kelas tidak valid" });
+  }
   const id_users = req.user.id_users;
 
   try {

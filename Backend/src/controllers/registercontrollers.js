@@ -83,6 +83,9 @@ exports.getAllPendaftar = async (req, res) => {
 exports.getPendaftarById = async (req, res) => {
   try {
     const { id_pendaftar } = req.params;
+    if (!id_pendaftar || !/^\d+$/.test(id_pendaftar)) {
+      return res.status(400).json({ message: "ID Pendaftar tidak valid" });
+    }
     const q = await db.query(
       `SELECT * FROM pendaftar WHERE id_pendaftar = $1`,
       [id_pendaftar]
@@ -101,11 +104,15 @@ exports.getPendaftarById = async (req, res) => {
 
 
 exports.terimaPendaftar = async (req, res) => {
+  const { id_pendaftar } = req.params;
+  if (!id_pendaftar || !/^\d+$/.test(id_pendaftar)) {
+    return res.status(400).json({ message: "ID Pendaftar tidak valid" });
+  }
+
   const client = await db.connect();
   const bcrypt = require("bcrypt");
 
   try {
-    const { id_pendaftar } = req.params;
     const { sumber = "pendaftar", password } = req.body;
 
     await client.query("BEGIN");
@@ -241,6 +248,9 @@ exports.terimaPendaftar = async (req, res) => {
 exports.tolakPendaftar = async (req, res) => {
   try {
     const { id_pendaftar } = req.params;
+    if (!id_pendaftar || !/^\d+$/.test(id_pendaftar)) {
+      return res.status(400).json({ message: "ID Pendaftar tidak valid" });
+    }
 
     await db.query(
       `UPDATE pendaftar SET status = 'ditolak' WHERE id_pendaftar = $1`,
@@ -261,6 +271,9 @@ exports.tolakPendaftar = async (req, res) => {
 exports.deletePendaftar = async (req, res) => {
   try {
     const { id_pendaftar } = req.params;
+    if (!id_pendaftar || !/^\d+$/.test(id_pendaftar)) {
+      return res.status(400).json({ message: "ID Pendaftar tidak valid" });
+    }
 
     await db.query(`DELETE FROM pendaftar WHERE id_pendaftar = $1`, [
       id_pendaftar,

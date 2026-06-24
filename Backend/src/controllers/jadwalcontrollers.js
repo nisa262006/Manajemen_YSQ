@@ -73,6 +73,9 @@ exports.getAllJadwal = async (req, res) => {
 exports.getJadwalById = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
+    if (!id_jadwal || !/^\d+$/.test(id_jadwal)) {
+      return res.status(400).json({ message: "ID Jadwal tidak valid" });
+    }
 
     const result = await db.query(`
       SELECT 
@@ -100,6 +103,10 @@ exports.getJadwalById = async (req, res) => {
 exports.updateJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
+    if (!id_jadwal || !/^\d+$/.test(id_jadwal)) {
+      return res.status(400).json({ message: "ID Jadwal tidak valid" });
+    }
+
     const { hari, jam_mulai, jam_selesai, id_pengajar, id_kelas, kapasitas } = req.body;
 
     const result = await db.query(
@@ -131,6 +138,9 @@ exports.updateJadwal = async (req, res) => {
 exports.deleteJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
+    if (!id_jadwal || !/^\d+$/.test(id_jadwal)) {
+      return res.status(400).json({ message: "ID Jadwal tidak valid" });
+    }
 
     const result = await db.query(
       "DELETE FROM jadwal WHERE id_jadwal = $1 RETURNING id_jadwal",
@@ -152,6 +162,9 @@ exports.deleteJadwal = async (req, res) => {
 exports.getJadwalByPengajar = async (req, res) => {
   try {
     const { id_pengajar } = req.params;
+    if (!id_pengajar || !/^\d+$/.test(id_pengajar)) {
+      return res.status(400).json({ message: "ID Pengajar tidak valid" });
+    }
 
     const result = await db.query(`
       SELECT 
@@ -187,6 +200,13 @@ exports.getJadwalByPengajar = async (req, res) => {
 exports.tambahSantriKeJadwal = async (req, res) => {
   const { id_jadwal } = req.params;
   const { id_santri } = req.body;
+
+  if (!id_jadwal || !/^\d+$/.test(id_jadwal)) {
+    return res.status(400).json({ message: "ID Jadwal tidak valid" });
+  }
+  if (!id_santri || !/^\d+$/.test(id_santri)) {
+    return res.status(400).json({ message: "ID Santri tidak valid" });
+  }
 
   try {
     // Hapus dari sesi lama (kalau ada)
@@ -349,6 +369,9 @@ exports.jadwalSantri = async (req, res) => {
 exports.getSantriByJadwal = async (req, res) => {
   try {
     const { id_jadwal } = req.params;
+    if (!id_jadwal || !/^\d+$/.test(id_jadwal)) {
+      return res.status(400).json({ message: "ID Jadwal tidak valid" });
+    }
 
     const result = await db.query(`
       SELECT 
