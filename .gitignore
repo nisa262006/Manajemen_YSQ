@@ -6,9 +6,11 @@
 Backend/node_modules/
 node_modules/
 
-# Environment Variables
+# Environment Variables (jangan commit .env production, tapi .env.test boleh)
 Backend/.env
 .env
+# .env.test boleh di-commit (tidak ada kredensial production)
+!Backend/.env.test
 
 package-lock.json
 
@@ -55,7 +57,7 @@ Backend/public/uploads/submit/*
 !Backend/public/uploads/materi/*.doc
 !Backend/public/uploads/materi/*.docx
 !Backend/public/uploads/tugas/*.doc
-!Backend/public/uploads/tugas/*.docxgit rm --cached .env
+!Backend/public/uploads/tugas/*.docx
 
 Backend/src/config/db.js
 
