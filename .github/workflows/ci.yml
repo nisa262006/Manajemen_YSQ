@@ -41,6 +41,20 @@ jobs:
         working-directory: Backend
         run: npm ci
 
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..30}; do
+            pg_isready -h localhost -p 5432 -U postgres && break
+            echo "Waiting for postgres... attempt $i"
+            sleep 1
+          done
+
+      - name: Initialize database schema & seed data
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -p 5432 -U postgres -d ysq_test -f Backend/docker/init.sql
+
       - name: Run Jest tests with coverage
         working-directory: Backend
         env:
@@ -61,3 +75,4 @@ jobs:
           flags: jest-unit
           fail_ci_if_error: false
           verbose: true
+

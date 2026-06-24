@@ -16,6 +16,7 @@
       "/node_modules/",
       "/tests/ui/"
     ],
+    "globalSetup": "./tests/setup/globalSetup.js",
     "coverageReporters": ["lcov", "text", "text-summary"],
     "coverageDirectory": "coverage"
   },
