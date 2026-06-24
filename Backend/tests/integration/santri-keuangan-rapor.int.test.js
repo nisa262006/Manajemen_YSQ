@@ -30,6 +30,18 @@ describe('Integration Test: Keuangan & Rapor Flow', () => {
     const resJadwal = await db.query('SELECT id_jadwal FROM jadwal WHERE id_pengajar = $1 LIMIT 1', [idPengajar]);
     if (resJadwal.rowCount > 0) {
       idJadwal = resJadwal.rows[0].id_jadwal;
+    } else {
+      // Buat kelas baru
+      const resKelas = await db.query(
+        "INSERT INTO kelas (nama_kelas, kategori) VALUES ('Kelas Test Integration Rapor', 'Reguler') RETURNING id_kelas"
+      );
+      const idKelas = resKelas.rows[0].id_kelas;
+      // Buat jadwal baru
+      const createJadwal = await db.query(
+        'INSERT INTO jadwal (id_kelas, id_pengajar, hari, jam_mulai, jam_selesai, kapasitas) VALUES ($1, $2, $3, $4, $5, 20) RETURNING id_jadwal',
+        [idKelas, idPengajar, 'Senin', '08:00:00', '09:00:00']
+      );
+      idJadwal = createJadwal.rows[0].id_jadwal;
     }
 
     await db.query('INSERT INTO santri_jadwal (id_santri, id_jadwal) VALUES ($1, $2) ON CONFLICT DO NOTHING', [idSantri, idJadwal]);
