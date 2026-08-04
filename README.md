@@ -165,7 +165,7 @@ SAHABAT-QURAN-WEB/
 - Project Manager & Qualiity Assurance (Rizka)
 - Back-end (Fikri)
 - Back-end & Database Developer (Nisa)
-- Front-end & UI/UX Developer (Jingga
+- Front-end & UI/UX Developer (Jingga)
 
 ## 🙏 Penutup
 Repository ini dikelola sebagai bagian dari implementasi sistem manajemen modern untuk Yayasan Sahabat Qur’an Bogor. Proyek ini dibangun dengan tujuan meningkatkan efisiensi, akurasi, dan profesionalitas dalam pengelolaan operasional yayasan.
